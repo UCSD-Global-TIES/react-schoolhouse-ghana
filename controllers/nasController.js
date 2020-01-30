@@ -13,7 +13,7 @@ const NEW_FILE_PATH = NEW_FOLDER_PATH;
 // ---------------------------------------------------------------
 const readDir = (dirPath) => {
     fs.readdir(dirPath, (err, itemPaths) => {
-        for(const itemPath of itemPaths) {
+        for (const itemPath of itemPaths) {
             console.log(`${DRIVE_NAME}/${itemPath}`)
         }
     })
@@ -26,8 +26,10 @@ const readDir = (dirPath) => {
 // Won't create a new directory if one with the 
 // same name already exists (EXPECTED)
 const createDir = (dirPath) => {
-    fs.mkdirSync(dirPath, { recursive: true }, (err) => {
-        if(err) throw err; 
+    fs.mkdirSync(dirPath, {
+        recursive: true
+    }, (err) => {
+        if (err) throw err;
 
         console.log(`Your directory, "${dirPath}" , was made!`);
     })
@@ -44,7 +46,7 @@ const moveFile = (filename, oldFilePath, newFolderPath) => {
     fs.rename(oldFilePath, newFilePath, function (err) {
         if (err) throw err;
         console.log('File Moved!');
-      });
+    });
 }
 
 // moveFile(FILE_NAME, FILE_PATH, NEW_FILE_PATH);
@@ -67,12 +69,12 @@ const renameFile = (old_filename, oldFilePath, new_filename) => {
 // WRITE: Deleting a file
 // ---------------------------------------------------------------
 
-const deleteFile = (filePath) =>{ 
+const deleteFile = (filePath) => {
     fs.unlink(filePath, function (err) {
         if (err) throw err;
         // if no error, file has been deleted successfully
         console.log('File deleted!');
-    }); 
+    });
 }
 
 // deleteFile(`${DRIVE_NAME}/${FOLDER_PATH}/${FILE_PATH}`);
@@ -91,18 +93,20 @@ const app = express();
 app.use(bodyParser.json());
 
 let storage = multer.diskStorage({
-  destination: function (req, file, callback) {
-    callback(null, 'Z:');
-  },
-  filename: function (req, file, callback) {
-    callback(null, file.originalname);
-  }
+    destination: function (req, file, callback) {
+        callback(null, 'Z:');
+    },
+    filename: function (req, file, callback) {
+        callback(null, file.originalname);
+    }
 });
 
-let upload = multer({ storage : storage });
+let upload = multer({
+    storage: storage
+});
 
-app.get('/',function(req,res){
-      res.sendFile(__dirname + "/index.html");
+app.get('/', function (req, res) {
+    res.sendFile(__dirname + "/index.html");
 });
 
 // app.post('/upload', upload.array('files'), function(req,res, next){
@@ -112,30 +116,45 @@ app.get('/',function(req,res){
 //         error.httpStatusCode = 400
 //         return next(error)
 //     }
- 
+
 //     res.send(files)
 // });
 
-app.post('/upload', function(req,res){
+app.post('/upload', function (req, res) {
     console.log(req);
     const FOLDER_PATH = NEW_FOLDER_PATH;
     storage = multer.diskStorage({
         destination: function (req, file, callback) {
-          callback(null, FOLDER_PATH);
+            callback(null, FOLDER_PATH);
         },
         filename: function (req, file, callback) {
-          callback(null, file.originalname);
+            callback(null, file.originalname);
         }
-      });
-    upload = multer({ storage : storage }).array("files");
-    upload(req,res,function(err) {
-        if(err) {
+    });
+    upload = multer({
+        storage: storage
+    }).array("files");
+    upload(req, res, function (err) {
+        if (err) {
             return res.end("Error uploading file.");
         }
         res.end("File is uploaded");
     });
 });
 
-app.listen(3000,function(){
-    console.log("Working on port 3000");
-});
+// app.listen(3000,function(){
+//     console.log("Working on port 3000");
+// });
+
+
+// Get disk space 
+const checkDiskSpace = require('check-disk-space');
+const getDiskSpace = (path, cb) => {
+    return checkDiskSpace(path).then((diskSpace) => {
+        cb(diskSpace);
+    });
+}
+
+// getDiskSpace("C:/", (diskSpace) => {
+//     console.log(((diskSpace.free / diskSpace.size) * 100).toFixed(2) + "%");
+// })
