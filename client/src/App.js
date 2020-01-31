@@ -48,6 +48,10 @@ function App() {
           <Route exact path="/" component={Landing} />
           <PrivateRoute exact path="/private-page" component={PrivatePage} user={userInfo}/>
           <Route component={NoMatch} />
+          {/* <PrivateRoute exact path="/socials/:id" component={Social} user={userInfo}/> */}
+          {/* HOW TO ACCESS ROUTE ID */}
+          {/* this.socialId = this.props.match.params.id; */}
+
         </Switch>
       </div>
   );
