@@ -5,7 +5,7 @@ import { Redirect } from "react-router-dom";
 
 
 function LoginPortal(props) {
-    if(props.user) { <Redirect to="/" /> }
+    if(!props.user) { return <Redirect to="/" /> }
 
     return (
         <div >

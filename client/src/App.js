@@ -16,7 +16,7 @@ import "./App.css";
 // Component that ensures people are logged in and have proper permissions
 // Using Redirect https://reacttraining.com/react-router/web/api/Redirect
 import ProtectedRoute from "./components/ProtectedRoute";
-import Loading from "./components/Loading";
+// import Loading from "./components/Loading";
 
 // PAGES
 import NoMatch from "./pages/NoMatch/index";
@@ -26,22 +26,22 @@ import ClassPage from "./pages/ClassPage/index";
 
 function App() {
 
-  const [userInfo, setUserInfo] = useState({});
-  const [loading, setLoading] = useState(true);
+  const [userInfo, setUserInfo] = useState({type: "student", classes: ["123"]});
+  // const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    if(!loading) { setUserInfo(user) }
-  }, [loading]);
+  // useEffect(() => {
+  //   if(!loading) { setUserInfo(user) }
+  // }, [loading]);
 
-  if (loading) {
-    return (
-      <div className="App text-center">
-        <div>
-          <Loading />
-        </div>
-      </div>
-    )
-  }
+  // if (loading) {
+  //   return (
+  //     <div className="App text-center">
+  //       <div>
+  //         <Loading />
+  //       </div>
+  //     </div>
+  //   )
+  // }
 
   return (
     <div className="App">
@@ -49,11 +49,11 @@ function App() {
         {/* Place navigation bar here */}
       </header>
       <Switch>
-        <Route exact path="/login" component={LoginPortal} user={userInfo} />
         {/* Portal component should check account type and render the correct component */}
-        <ProtectedRoute path="/" component={AccountPortal} user={userInfo} />
+        <ProtectedRoute exact path="/" component={AccountPortal} user={userInfo} />
         {/* Class component should check account type and render the correct component */}
         <ProtectedRoute exact path="/class/:id" component={ClassPage} user={userInfo} />
+        <Route exact path="/login" component={LoginPortal} user={userInfo} />
         <Route component={NoMatch} />        
       </Switch>
     </div>
