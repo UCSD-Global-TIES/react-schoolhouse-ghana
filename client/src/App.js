@@ -20,9 +20,9 @@ import Loading from "./components/Loading";
 
 // PAGES
 import NoMatch from "./pages/NoMatch/index";
-import Login from "./pages/Login/index";
-import Portal from "./pages/Portal/index";
-import Class from "./pages/Class/index";
+import LoginPortal from "./pages/LoginPortal/index";
+import AccountPortal from "./pages/AccountPortal/index";
+import ClassPage from "./pages/ClassPage/index";
 
 function App() {
 
@@ -49,11 +49,11 @@ function App() {
         {/* Place navigation bar here */}
       </header>
       <Switch>
-        <Route exact path="/login" component={Login} user={userInfo} />
+        <Route exact path="/login" component={LoginPortal} user={userInfo} />
         {/* Portal component should check account type and render the correct component */}
-        <ProtectedRoute path="/" component={Portal} user={userInfo} />
+        <ProtectedRoute path="/" component={AccountPortal} user={userInfo} />
         {/* Class component should check account type and render the correct component */}
-        <ProtectedRoute exact path="/class/:id" component={Class} user={userInfo} />
+        <ProtectedRoute exact path="/class/:id" component={ClassPage} user={userInfo} />
         <Route component={NoMatch} />        
       </Switch>
     </div>
