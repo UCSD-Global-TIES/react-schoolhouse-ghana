@@ -2,90 +2,61 @@ import React, {
   useEffect,
   useState
 } from "react";
+
 import {
   Route,
   Switch
 } from "react-router-dom";
-import {
-  useAuth0
-} from "./react-auth0-spa";
-import PrivateRoute from "./components/PrivateRoute";
-import API from './utils/API';
+
 import "./App.css";
 
+
+// COMPONENTS
+// -----------------------------------------------------------
+// Component that ensures people are logged in and have proper permissions
+// Using Redirect https://reacttraining.com/react-router/web/api/Redirect
+import ProtectedRoute from "./components/ProtectedRoute";
 import Loading from "./components/Loading";
-import Landing from "./pages/Landing/index";
-import NoMatch from "./components/NoMatch";
+
+// PAGES
+import NoMatch from "./pages/NoMatch/index";
+import Login from "./pages/Login/index";
+import Portal from "./pages/Portal/index";
+import Class from "./pages/Class/index";
 
 function App() {
-  // const user = {
-  //   name: "Matt Chen",
-  //   email: "matt@email.com",
-  //   picture: "https://link.com"
-  // }
-  const {
-    loading,
-    user,
-    isAuthenticated
-  } = useAuth0();
-  const [userInfo, setUserInfo] = useState();
+
+  const [userInfo, setUserInfo] = useState({});
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    updateUser();
+    if(!loading) { setUserInfo(user) }
   }, [loading]);
 
-  // Retrieve/create userInfo document after Auth0 login
-  const updateUser = () => {
-    if (isAuthenticated && user && !loading) {
-      setUserInfo(user);
-    }
-  };
-
   if (loading) {
-    return ( <
-      div className = "App text-center" >
-      <
-      div className = "mt-5" >
-      <
-      Loading / >
-      <
-      /div> <
-      /div>
-    );
+    return (
+      <div className="App text-center">
+        <div>
+          <Loading />
+        </div>
+      </div>
+    )
   }
 
-  return ( <
-    div className = "App" >
-    <
-    header > {
-      /* Place navigation bar here */ } <
-    /header> <
-    Switch >
-    <
-    Route exact path = "/"
-    component = {
-      Landing
-    }
-    /> <
-    PrivateRoute exact path = "/private-page"
-    component = {
-      PrivatePage
-    }
-    user = {
-      userInfo
-    }
-    /> <
-    Route component = {
-      NoMatch
-    }
-    /> {
-      /* <PrivateRoute exact path="/socials/:id" component={Social} user={userInfo}/> */ } {
-      /* HOW TO ACCESS ROUTE ID */ } {
-      /* this.socialId = this.props.match.params.id; */ }
-
-    <
-    /Switch> <
-    /div>
+  return (
+    <div className="App">
+      <header>
+        {/* Place navigation bar here */}
+      </header>
+      <Switch>
+        <Route exact path="/login" component={Login} user={userInfo} />
+        {/* Portal component should check account type and render the correct component */}
+        <ProtectedRoute path="/" component={Portal} user={userInfo} />
+        {/* Class component should check account type and render the correct component */}
+        <ProtectedRoute exact path="/class/:id" component={Class} user={userInfo} />
+        <Route component={NoMatch} />        
+      </Switch>
+    </div>
   );
 }
 
