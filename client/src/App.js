@@ -26,7 +26,7 @@ import ClassPage from "./pages/ClassPage/index";
 
 function App() {
 
-  const [userInfo, setUserInfo] = useState({type: "student", classes: ["123"]});
+  const [userInfo, setUserInfo] = useState({type: "studenty", classes: ["123"]});
   // const [loading, setLoading] = useState(true);
 
   // useEffect(() => {
