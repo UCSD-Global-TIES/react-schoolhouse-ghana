@@ -29,5 +29,7 @@ const accountSchema = new Schema({
 const Account = mongoose.model("Account", accountSchema);
 
 // Auto assign password  
+// https: //www.mongodb.com/blog/post/password-authentication-with-mongoose-part-1
+https: //stackoverflow.com/questions/44072750/how-to-send-basic-auth-with-axios
 
-module.exports = Account;
+  module.exports = Account;

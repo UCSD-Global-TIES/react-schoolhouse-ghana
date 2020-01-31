@@ -1,46 +1,47 @@
 const fs = require('fs');
-const DRIVE_NAME = "Z:";
-const CLASS_PATH = `${DRIVE_NAME}/grade_1`
-const FOLDER_PATH = `${CLASS_PATH}/addition`;
-const NEW_FOLDER_PATH = `${CLASS_PATH}/division`;
+const checkDiskSpace = require('check-disk-space');
 
-const FILE_NAME = "sample.txt"
-const NEW_FILE_NAME = "new_sample.txt";
-const FILE_PATH = `${FOLDER_PATH}/${FILE_NAME}`;
-const NEW_FILE_PATH = NEW_FOLDER_PATH;
-
-// READ: Listing directory contents
-// ---------------------------------------------------------------
-const readDir = (dirPath) => {
-    fs.readdir(dirPath, (err, itemPaths) => {
-        for (const itemPath of itemPaths) {
-            console.log(`${DRIVE_NAME}/${itemPath}`)
-        }
-    })
-}
-
-// readDir(`${DRIVE_NAME}\\${FOLDER_PATH}`);
 
 // WRITE: Creating a directory
 // ---------------------------------------------------------------
 // Won't create a new directory if one with the 
-// same name already exists (EXPECTED)
-const createDir = (dirPath) => {
-    fs.mkdirSync(dirPath, {
-        recursive: true
-    }, (err) => {
-        if (err) throw err;
+// same name already exists 
+export const createDir = (dir_path, dir_name, cb) => {
+    // Checking if directory exists
+    // ---------------------------------------------------------------
+    const dirExists = (path, dir_name, cb) => {
+        fs.readdir(path, (err, itemNames) => {
+            if (itemNames.includes(dir_name)) {
+                cb(true);
+                return;
+            }
 
-        console.log(`Your directory, "${dirPath}" , was made!`);
+            cb(false);
+        })
+    }
+
+    // dirExists(`${"C:/Users"}`, "Matt", (res) => console.log(res));
+    dirExists(dir_path, dir_name, (dir_exists) => {
+        if (!dir_exists) {
+            fs.mkdirSync(`${dir_path}/${dir_name}`, {
+                recursive: true
+            }, (err) => {
+                if (err) throw err;
+            })
+            cb(true);
+        } else {
+            cb(false);
+        }
+
     })
 }
 
-// createDir(NEW_DIR_NAME);
+// createDir(".", "test", (res) => console.log(res));
 
 // WRITE: Moving a file
 // ---------------------------------------------------------------
 
-const moveFile = (filename, oldFilePath, newFolderPath) => {
+export const moveFile = (filename, oldFilePath, newFolderPath) => {
     let newFilePath = `${newFolderPath}/${filename}`;
 
     fs.rename(oldFilePath, newFilePath, function (err) {
@@ -54,7 +55,7 @@ const moveFile = (filename, oldFilePath, newFolderPath) => {
 // WRITE: Renaming a file
 // ---------------------------------------------------------------
 
-const renameFile = (old_filename, oldFilePath, new_filename) => {
+export const renameFile = (old_filename, oldFilePath, new_filename) => {
 
     const newFilePath = oldFilePath.replace(old_filename, new_filename);
     console.log(newFilePath)
@@ -69,13 +70,24 @@ const renameFile = (old_filename, oldFilePath, new_filename) => {
 // WRITE: Deleting a file
 // ---------------------------------------------------------------
 
-const deleteFile = (filePath) => {
+export const deleteFile = (filePath) => {
     fs.unlink(filePath, function (err) {
         if (err) throw err;
         // if no error, file has been deleted successfully
         console.log('File deleted!');
     });
 }
+
+// Get disk space 
+export const getDiskSpace = (path, cb) => {
+    return checkDiskSpace(path).then((diskSpace) => {
+        cb(diskSpace);
+    });
+}
+
+// getDiskSpace("C:/", (diskSpace) => {
+//     console.log(((diskSpace.free / diskSpace.size) * 100).toFixed(2) + "%");
+// })
 
 // deleteFile(`${DRIVE_NAME}/${FOLDER_PATH}/${FILE_PATH}`);
 
@@ -121,8 +133,8 @@ app.get('/', function (req, res) {
 // });
 
 app.post('/upload', function (req, res) {
-    console.log(req);
-    const FOLDER_PATH = NEW_FOLDER_PATH;
+
+    const FOLDER_PATH = req.body.path;
     storage = multer.diskStorage({
         destination: function (req, file, callback) {
             callback(null, FOLDER_PATH);
@@ -146,15 +158,5 @@ app.post('/upload', function (req, res) {
 //     console.log("Working on port 3000");
 // });
 
-
-// Get disk space 
-const checkDiskSpace = require('check-disk-space');
-const getDiskSpace = (path, cb) => {
-    return checkDiskSpace(path).then((diskSpace) => {
-        cb(diskSpace);
-    });
-}
-
-// getDiskSpace("C:/", (diskSpace) => {
-//     console.log(((diskSpace.free / diskSpace.size) * 100).toFixed(2) + "%");
-// })
+// module.exports = {
+// }
