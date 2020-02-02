@@ -27,8 +27,9 @@ const classSchema = new Schema({
     ref: 'File'
   }],
   grade: {
-    type: Number,
-    required: true
+    type: Schema.Types.ObjectId,
+    required: true,
+    ref: 'Grade'
   }
 });
 

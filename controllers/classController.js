@@ -1,3 +1,4 @@
+const gradeDb = require("../models/Grade");
 const classDb = require("../models/Class");
 const announcementDb = require("../models/Announcement");
 const fileDb = require("../models/File");
@@ -220,6 +221,7 @@ module.exports = {
                         .populate('students')
                         .populate('announcements')
                         .populate('files')
+                        .populate('grade')
                         .then(classDoc => res.json(classDoc))
                         .catch(err => res.status(422).json(err));
 
@@ -272,24 +274,33 @@ module.exports = {
             })
     },
     deleteClass: function (req, res) {
-        // TODO: DELETE IN GRADE DOCUMENT
         verifyKey(req.header('Authorization'))
             .then((isVerified) => {
                 if (isVerified) {
                     const cid = req.params.cid;
-
+                    // Delete class document
                     classDb
-                        .findOneAndDelete({
-                            _id: cid
+                    .findOneAndDelete({
+                        _id: cid
+                    })
+                    .then((deleted_class) => {
+                        gradeDb
+                        .update({_id: deleted_class.grade}, { $pull: { classes: deleted_class._id } })
+                        .then(() => {
+                            // Delete file documents referenced by this class
+                            fileDb
+                            .deleteMany({ _id: { $in: deleted_class.files}})
+                            .then(() => {
+                                // Remove directory in which the files are held
+                                removeDir(deleted_class.path)
+                                    .then((result) => {
+                                        if (!result) res.status(500);
+    
+                                        res.json({});
+                                    })
+                            })
                         })
-                        .then((deleted_class) => {
-                            removeDir(deleted_class.path)
-                                .then((result) => {
-                                    if (!result) res.status(500);
-
-                                    res.json({});
-                                })
-                        })
+                    })
 
                 } else {
                     res.status(403);
