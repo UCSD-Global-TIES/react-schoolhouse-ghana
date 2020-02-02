@@ -1,21 +1,14 @@
-const objDb = require("../models/Obj");
+const accountDb = require("../models/Account");
 
 module.exports = {
     verifyAccount: function (req, res) {
-
+        // TODO
     },
     verifySession: function (req, res) {
-
+        // TODO
     },
     verifyKey: function (key) {
         // TODO
         return true;
-    },
-    delete: function (req, res) {
-        objDb
-            .findOne({})
-            .then(dbModel => dbModel.remove())
-            .then(dbModel => res.json(dbModel))
-            .catch(err => res.status(422).json(err));
     }
 }

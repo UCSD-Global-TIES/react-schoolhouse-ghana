@@ -1,317 +1,388 @@
 const classDb = require("../models/Class");
 const announcementDb = require("../models/Announcement");
 const fileDb = require("../models/File");
-const { createDir, removeDir, deleteFile, uploadFile } = require("./NAS");
+const {
+    createDir,
+    removeDir,
+    deleteFile,
+    uploadFile
+} = require("./NAS");
 
 // TODO
-const { verifyKey } = require("./verifyController");
+const {
+    verifyKey
+} = require("./verifyController");
 
 module.exports = {
     addAnnouncement: function (req, res) {
         verifyKey(req.header('Authorization')).then((isVerified) => {
-            if(isVerified) {
+            if (isVerified) {
                 const cid = req.params.cid;
                 announcementDb
-                .create(req.body)
-                .then(newA => {
-                    // Add to class' announcements
-                    const aid = newA._id;
+                    .create(req.body)
+                    .then(newA => {
+                        // Add to class' announcements
+                        const aid = newA._id;
 
-                    classDb
-                    .update({_id: cid}, { $push: { announcements: aid } })
-                    .then(() => {
-                        res.json(newA);
-                    })    
-                })
-                .catch(err => res.status(422).json(err));
+                        classDb
+                            .update({
+                                _id: cid
+                            }, {
+                                $push: {
+                                    announcements: aid
+                                }
+                            })
+                            .then(() => {
+                                res.json(newA);
+                            })
+                    })
+                    .catch(err => res.status(422).json(err));
             } else {
                 res.status(403);
             }
         })
-        
+
     },
     deleteAnnouncement: function (req, res) {
         verifyKey(req.header('Authorization')).then((isVerified) => {
-            if(isVerified) {
+            if (isVerified) {
                 const aid = req.params.aid;
                 const cid = req.params.cid
                 classDb
-                    .update({_id: cid}, { $pull: { announcements: aid } })
+                    .update({
+                        _id: cid
+                    }, {
+                        $pull: {
+                            announcements: aid
+                        }
+                    })
                     .then(() => {
                         announcementDb
-                        .findOne({ _id: aid })
-                        .then(doc => {
-        
-                            doc.remove();
-                            res.json({});  
-                        })
-                        .catch(err => res.status(422).json(err));
+                            .findOne({
+                                _id: aid
+                            })
+                            .then(doc => {
 
-                    }) 
+                                doc.remove();
+                                res.json({});
+                            })
+                            .catch(err => res.status(422).json(err));
+
+                    })
                     .catch(err => res.status(422).json(err));
- 
+
             } else {
                 res.status(403);
             }
         })
-        
+
     },
     updateAnnouncement: function (req, res) {
         verifyKey(req.header('Authorization')).then((isVerified) => {
-            if(isVerified) {
+            if (isVerified) {
                 const aid = req.params.aid;
                 announcementDb
-                .findOneAndUpdate({ _id: aid}, req.body)
-                .then(newA => res.json(newA))
-                .catch(err => res.status(422).json(err));
- 
+                    .findOneAndUpdate({
+                        _id: aid
+                    }, req.body)
+                    .then(newA => res.json(newA))
+                    .catch(err => res.status(422).json(err));
+
             } else {
                 res.status(403);
             }
         })
-       
+
     },
     addFile: function (req, res) {
         verifyKey(req.header('Authorization'))
-        .then((isVerified) => {
-            if(isVerified) {
-                
-                // Create file document
-                const path = req.body.get('path');
-                const cid = req.params.cid;
-                let fid;
-                
-                // Upload to NAS
-                uploadFile(req, res, path)
-                .then((fileInfo) => {
-                    if(fileInfo) res.json(null);
-
-                    const fileDoc = {
-                        nickname: req.body.get('name'),
-                        filename: fileInfo.name,
-                        path,
-                        date_created: fileInfo.created
-                    };
+            .then((isVerified) => {
+                if (isVerified) {
 
                     // Create file document
-                    fileDb
-                    .create(fileDoc)
-                    .then(newF => {
-                        fid = newF._id;
-                        // Update class files
-                        classDb
-                        .update({_id: cid}, { $push: { files: fid } })
-                        .then((newC) => res.json(newC))
-                        .catch(err => res.status(422).json(err));
+                    const path = req.body.get('path');
+                    const cid = req.params.cid;
+                    let fid;
 
-                    })
-                    .catch(err => res.status(422).json(err));
+                    // Upload to NAS
+                    uploadFile(req, res, path)
+                        .then((fileInfo) => {
+                            if (fileInfo) res.json(null);
+
+                            const fileDoc = {
+                                nickname: req.body.get('name'),
+                                filename: fileInfo.name,
+                                path,
+                                date_created: fileInfo.created
+                            };
+
+                            // Create file document
+                            fileDb
+                                .create(fileDoc)
+                                .then(newF => {
+                                    fid = newF._id;
+                                    // Update class files
+                                    classDb
+                                        .update({
+                                            _id: cid
+                                        }, {
+                                            $push: {
+                                                files: fid
+                                            }
+                                        })
+                                        .then((newC) => res.json(newC))
+                                        .catch(err => res.status(422).json(err));
+
+                                })
+                                .catch(err => res.status(422).json(err));
 
 
-                })
-                .catch(err => res.status(500).json(err));
-
-            } else {
-                res.status(403);
-            }
-        })
-    },
-    deleteFile: function (req, res) {
-        verifyKey(req.header('Authorization'))
-        .then((isVerified) => {
-            if(isVerified) {
-                const fid = req.params.fid;
-                const cid = req.params.cid;
-
-                // Find class document and update file array
-                classDb
-                .update({_id: cid}, { $pull: { files: fid } })
-                .then(() => {
-                    // Delete file document
-                    fileDb
-                    .findOneAndDelete({_id: fid})
-                    .then((deleted_f) => {
-                        // Delete file from NAS
-                        deleteFile(deleted_f.path)
-                        .then((result) => {
-                            if(!result) res.json(null);
-
-                            res.json({});
                         })
                         .catch(err => res.status(500).json(err));
 
-                    })
-                    .catch(err => res.status(422).json(err));
+                } else {
+                    res.status(403);
+                }
+            })
+    },
+    deleteFile: function (req, res) {
+        verifyKey(req.header('Authorization'))
+            .then((isVerified) => {
+                if (isVerified) {
+                    const fid = req.params.fid;
+                    const cid = req.params.cid;
 
-                })
-                .catch(err => res.status(422).json(err));
-    
-            } else {
-                res.status(403);
-            }
-        })
+                    // Find class document and update file array
+                    classDb
+                        .update({
+                            _id: cid
+                        }, {
+                            $pull: {
+                                files: fid
+                            }
+                        })
+                        .then(() => {
+                            // Delete file document
+                            fileDb
+                                .findOneAndDelete({
+                                    _id: fid
+                                })
+                                .then((deleted_f) => {
+                                    // Delete file from NAS
+                                    deleteFile(deleted_f.path)
+                                        .then((result) => {
+                                            if (!result) res.json(null);
+
+                                            res.json({});
+                                        })
+                                        .catch(err => res.status(500).json(err));
+
+                                })
+                                .catch(err => res.status(422).json(err));
+
+                        })
+                        .catch(err => res.status(422).json(err));
+
+                } else {
+                    res.status(403);
+                }
+            })
     },
     updateFile: function (req, res) {
         verifyKey(req.header('Authorization'))
-        .then((isVerified) => {
-            if(isVerified) {
-                // update file document
-                const fid = req.params.fid;
-                const fileDoc = req.body;
-                fileDoc.last_updated = Date.now();
-                fileDb
-                .findOneAndUpdate({ _id: fid}, fileDoc)
-                .then(newF => res.json(newF))
-                .catch(err => res.status(422).json(err));
+            .then((isVerified) => {
+                if (isVerified) {
+                    // update file document
+                    const fid = req.params.fid;
+                    const fileDoc = req.body;
+                    fileDoc.last_updated = Date.now();
+                    fileDb
+                        .findOneAndUpdate({
+                            _id: fid
+                        }, fileDoc)
+                        .then(newF => res.json(newF))
+                        .catch(err => res.status(422).json(err));
 
-            } else {
-                res.status(403);
-            }
-        })
+                } else {
+                    res.status(403);
+                }
+            })
     },
     getClass: function (req, res) {
         verifyKey(req.header('Authorization'))
-        .then((isVerified) => {
-            if(isVerified) {
-               classDb
-               .findOne({_id: req.params.cid})
-               .populate('teachers')
-               .populate('students')
-               .populate('announcements')
-               .populate('files')
-               .then(classDoc => res.json(classDoc))
-               .catch(err => res.status(422).json(err));
+            .then((isVerified) => {
+                if (isVerified) {
+                    classDb
+                        .findOne({
+                            _id: req.params.cid
+                        })
+                        .populate('teachers')
+                        .populate('students')
+                        .populate('announcements')
+                        .populate('files')
+                        .then(classDoc => res.json(classDoc))
+                        .catch(err => res.status(422).json(err));
 
-            } else {
-                res.status(403);
-            }
-        })
+                } else {
+                    res.status(403);
+                }
+            })
     },
     addClass: function (req, res) {
+        // TODO: ADD TO GRADE DOCUMENT
         verifyKey(req.header('Authorization'))
-        .then((isVerified) => {
-            if(isVerified) {
-                // Create folder
-                let classDoc = req.body.document;
-                createDir(req.body.path, classDoc.name)
-                .then((path) => {
-                    if(!path) res.status(500);
+            .then((isVerified) => {
+                if (isVerified) {
+                    // Create folder
+                    let classDoc = req.body.document;
+                    createDir(req.body.path, classDoc.name)
+                        .then((path) => {
+                            if (!path) res.status(500);
 
-                    classDoc.path = path;
-                    
-                    // Create class document 
-                    classDb
-                    .create(classDoc)
-                    .then((newC) => res.json(newC))
-                    .catch(err => res.status(422).json(err));
+                            classDoc.path = path;
 
-                })
+                            // Create class document 
+                            classDb
+                                .create(classDoc)
+                                .then((newC) => res.json(newC))
+                                .catch(err => res.status(422).json(err));
 
-            } else {
-                res.status(403);
-            }
-        })
+                        })
+
+                } else {
+                    res.status(403);
+                }
+            })
     },
     updateClass: function (req, res) {
         verifyKey(req.header('Authorization'))
-        .then((isVerified) => {
-            if(isVerified) {
-                const cid = req.params.cid;
-                classDb
-                .findOneAndUpdate({ _id: cid}, req.body)
-                .then(newC => res.json(newC))
-                .catch(err => res.status(422).json(err));
+            .then((isVerified) => {
+                if (isVerified) {
+                    const cid = req.params.cid;
+                    classDb
+                        .findOneAndUpdate({
+                            _id: cid
+                        }, req.body)
+                        .then(newC => res.json(newC))
+                        .catch(err => res.status(422).json(err));
 
-            } else {
-                res.status(403);
-            }
-        })
+                } else {
+                    res.status(403);
+                }
+            })
     },
     deleteClass: function (req, res) {
+        // TODO: DELETE IN GRADE DOCUMENT
         verifyKey(req.header('Authorization'))
-        .then((isVerified) => {
-            if(isVerified) {
-                const cid = req.params.cid;
+            .then((isVerified) => {
+                if (isVerified) {
+                    const cid = req.params.cid;
 
-                classDb
-                .findOneAndDelete({ _id: cid})
-                .then((deleted_class) => {
-                    removeDir(deleted_class.path)
-                    .then((result) => {
-                        if(!result) res.status(500);
+                    classDb
+                        .findOneAndDelete({
+                            _id: cid
+                        })
+                        .then((deleted_class) => {
+                            removeDir(deleted_class.path)
+                                .then((result) => {
+                                    if (!result) res.status(500);
 
-                        res.json({});
-                    })
-                })
+                                    res.json({});
+                                })
+                        })
 
-            } else {
-                res.status(403);
-            }
-        })
+                } else {
+                    res.status(403);
+                }
+            })
     },
     addStudent: function (req, res) {
         verifyKey(req.header('Authorization'))
-        .then((isVerified) => {
-            if(isVerified) {
-                const sid = req.body.sid;
-                const cid = req.params.cid;
+            .then((isVerified) => {
+                if (isVerified) {
+                    const sid = req.body.sid;
+                    const cid = req.params.cid;
 
-                classDb
-                .findOneAndUpdate({ _id: cid}, { $push: { students: sid }})
-                .then(newC => res.json(newC))
-                .catch(err => res.status(422).json(err));
-            } else {
-                res.status(403);
-            }
-        })
+                    classDb
+                        .findOneAndUpdate({
+                            _id: cid
+                        }, {
+                            $push: {
+                                students: sid
+                            }
+                        })
+                        .then(newC => res.json(newC))
+                        .catch(err => res.status(422).json(err));
+                } else {
+                    res.status(403);
+                }
+            })
     },
     deleteStudent: function (req, res) {
         verifyKey(req.header('Authorization'))
-        .then((isVerified) => {
-            if(isVerified) {
-                const sid = req.body.sid;
-                const cid = req.params.cid;
+            .then((isVerified) => {
+                if (isVerified) {
+                    const sid = req.body.sid;
+                    const cid = req.params.cid;
 
-                classDb
-                .findOneAndUpdate({ _id: cid}, { $pull: { students: sid }})
-                .then(newC => res.json(newC))
-                .catch(err => res.status(422).json(err));
-            } else {
-                res.status(403);
-            }
-        })
+                    classDb
+                        .findOneAndUpdate({
+                            _id: cid
+                        }, {
+                            $pull: {
+                                students: sid
+                            }
+                        })
+                        .then(newC => res.json(newC))
+                        .catch(err => res.status(422).json(err));
+                } else {
+                    res.status(403);
+                }
+            })
     },
     addTeacher: function (req, res) {
         verifyKey(req.header('Authorization'))
-        .then((isVerified) => {
-            if(isVerified) {
-                const tid = req.body.tid;
-                const cid = req.params.cid;
+            .then((isVerified) => {
+                if (isVerified) {
+                    const tid = req.body.tid;
+                    const cid = req.params.cid;
 
-                classDb
-                .findOneAndUpdate({ _id: cid}, { $push: { teachers: tid }})
-                .then(newC => res.json(newC))
-                .catch(err => res.status(422).json(err));
-            } else {
-                res.status(403);
-            }
-        })
+                    classDb
+                        .findOneAndUpdate({
+                            _id: cid
+                        }, {
+                            $push: {
+                                teachers: tid
+                            }
+                        })
+                        .then(newC => res.json(newC))
+                        .catch(err => res.status(422).json(err));
+                } else {
+                    res.status(403);
+                }
+            })
     },
     deleteTeacher: function (req, res) {
         verifyKey(req.header('Authorization'))
-        .then((isVerified) => {
-            if(isVerified) {
-                const tid = req.body.tid;
-                const cid = req.params.cid;
+            .then((isVerified) => {
+                if (isVerified) {
+                    const tid = req.body.tid;
+                    const cid = req.params.cid;
 
-                classDb
-                .findOneAndUpdate({ _id: cid}, { $pull: { teachers: tid }})
-                .then(newC => res.json(newC))
-                .catch(err => res.status(422).json(err));
-            } else {
-                res.status(403);
-            }
-        })
+                    classDb
+                        .findOneAndUpdate({
+                            _id: cid
+                        }, {
+                            $pull: {
+                                teachers: tid
+                            }
+                        })
+                        .then(newC => res.json(newC))
+                        .catch(err => res.status(422).json(err));
+                } else {
+                    res.status(403);
+                }
+            })
     }
 
 }

@@ -83,6 +83,7 @@ module.exports = {
             })
     },
     deleteGrade: function (req, res) {
+        // TODO - NEED TO RECURSIVELY DELETE ALL ASSOCIATED CLASSES, FILES, AND ACCOUNT REFERENCES TO THOSE CLASSES
         verifyKey(req.header('Authorization'))
             .then((isVerified) => {
                 if (isVerified) {

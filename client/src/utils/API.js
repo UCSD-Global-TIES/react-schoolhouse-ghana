@@ -229,7 +229,7 @@ export default {
     return axios.get(`api/verify/session`);
   },
   // Add option for creating multiple accounts
-  createAccount: function (newA, key) {
+  addAccount: function (newA, key) {
     const config = {
       'Authorization': key
     };

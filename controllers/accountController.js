@@ -1,30 +1,35 @@
-const objDb = require("../models/Obj");
+const accountDb = require("../models/Account");
 
 module.exports = {
-    create: function (req, res) {
-        objDb
-            .create(req.body)
-            .then(dbModel => res.json(dbModel))
-            .catch(err => res.status(422).json(err));
-    },
-    find: function (req, res) {
-        objDb
-            .findOne({})
-            .then(dbModel => res.json(dbModel))
-            .catch(err => res.status(422).json(err));
-    },
-    update: function (req, res) {
+    addAccount: function (req, res) {
+        verifyKey(req.header('Authorization'))
+            .then((isVerified) => {
+                if (isVerified) {
+                    // Create document in Student/Teacher/Admin collection
 
-        objDb
-            .findOneAndUpdate({}, req.body)
-            .then(dbModel => res.json(dbModel))
-            .catch(err => res.status(422).json(err));
+                    // Create document in Account collection
+
+                }
+            })
     },
-    delete: function (req, res) {
-        objDb
-            .findOne({})
-            .then(dbModel => dbModel.remove())
-            .then(dbModel => res.json(dbModel))
-            .catch(err => res.status(422).json(err));
+    updateAccount: function (req, res) {
+        verifyKey(req.header('Authorization'))
+            .then((isVerified) => {
+                if (isVerified) {}
+            })
+    },
+    deleteAccount: function (req, res) {
+        verifyKey(req.header('Authorization'))
+            .then((isVerified) => {
+                if (isVerified) {
+
+                    // Delete document in Student/Teacher/Admin collection
+
+                    // Delete References in Announcement/Class collections
+
+                    // Delete document in Account collection
+
+                }
+            })
     }
 }
