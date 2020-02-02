@@ -9,10 +9,6 @@ const accountSchema = new Schema({
   password: {
     type: String
   },
-  type: {
-    type: String,
-    required: true
-  },
   profile: {
     type: Schema.Types.ObjectId,
     required: true,
@@ -33,4 +29,4 @@ const Account = mongoose.model("Account", accountSchema);
 // https: //stackoverflow.com/questions/44072750/how-to-send-basic-auth-with-axios
 // https://stackoverflow.com/questions/14559200/how-to-exclude-one-particular-field-from-a-collection-in-mongoose
 
-  module.exports = Account;
+module.exports = Account;

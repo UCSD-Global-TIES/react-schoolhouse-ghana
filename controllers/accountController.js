@@ -1,4 +1,8 @@
 const accountDb = require("../models/Account");
+// TODO
+const {
+    verifyKey
+} = require("./verifyController");
 
 module.exports = {
     addAccount: function (req, res) {

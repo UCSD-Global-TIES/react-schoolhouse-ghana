@@ -19,7 +19,7 @@ module.exports = {
                         })
                         .catch(err => res.status(422).json(err));
                 } else {
-                    res.status(403);
+                    res.status(403).json(null);
                 }
             })
     },
@@ -34,7 +34,7 @@ module.exports = {
                         })
                         .catch(err => res.status(422).json(err));
                 } else {
-                    res.status(403);
+                    res.status(403).json(null);
                 }
             })
 
@@ -55,7 +55,7 @@ module.exports = {
                     .catch(err => res.status(422).json(err));
 
             } else {
-                res.status(403);
+                res.status(403).json(null);
             }
         })
 
@@ -71,7 +71,7 @@ module.exports = {
                     .then(newA => res.json(newA))
                     .catch(err => res.status(422).json(err));
             } else {
-                res.status(403);
+                res.status(403).json(null);
             }
         })
 

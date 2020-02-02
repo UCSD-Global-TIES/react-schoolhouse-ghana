@@ -1,4 +1,7 @@
 const gradeDb = require("../models/Grade");
+const studentDb = require("../models/Student");
+const teacherDb = require("../models/Teacher");
+
 const {
     createDir,
     removeDir,
@@ -20,7 +23,7 @@ module.exports = {
                         .catch(err => res.status(422).json(err));
 
                 } else {
-                    res.status(403);
+                    res.status(403).json(null);
                 }
             })
     },
@@ -36,7 +39,7 @@ module.exports = {
                         .catch(err => res.status(422).json(err));
 
                 } else {
-                    res.status(403);
+                    res.status(403).json(null);
                 }
             })
     },
@@ -61,7 +64,7 @@ module.exports = {
                         })
 
                 } else {
-                    res.status(403);
+                    res.status(403).json(null);
                 }
             })
     },
@@ -78,12 +81,11 @@ module.exports = {
                         .catch(err => res.status(422).json(err));
 
                 } else {
-                    res.status(403);
+                    res.status(403).json(null);
                 }
             })
     },
     deleteGrade: function (req, res) {
-        // TODO - NEED TO RECURSIVELY DELETE ALL ASSOCIATED CLASSES, FILES, AND ACCOUNT REFERENCES TO THOSE CLASSES
         verifyKey(req.header('Authorization'))
             .then((isVerified) => {
                 if (isVerified) {
@@ -93,19 +95,62 @@ module.exports = {
                         .findOneAndDelete({
                             _id: gid
                         })
-                        .then((deleted_graph) => {
-                            removeDir(deleted_graph.path)
-                                .then((result) => {
-                                    if (!result) res.status(500);
+                        .then((deleted_grade) => {
+                            let promises = [];
+                            // CONCURRENT FN LAYER A
+                            promises.push(removeDir(deleted_grade.path));
 
-                                    res.json({});
+                            // CONCURRENT FN LAYER A: Delete Student references to these classes
+                            promises.push(studentDb.update({}, {
+                                $pull: {
+                                    classes: {
+                                        $in: deleted_grade.classes
+                                    }
+                                }
+                            }))
+
+                            // CONCURRENT FN LAYER A: Delete Student references to these classes
+                            promises.push(teacherDb.update({}, {
+                                $pull: {
+                                    classes: {
+                                        $in: deleted_grade.classes
+                                    }
+                                }
+                            }))
+
+                            // CONCURRENT FN LAYER A: Find Class documents
+                            promises.push(classDb.find({
+                                _id: {
+                                    $in: deleted_grade.classes
+                                }
+                            }));
+
+                            Promise.all(promises)
+                                .then((results) => {
+                                    let fileIDs = [];
+                                    for (let classDoc of results[3]) {
+                                        fileIDs.push(classDoc.files);
+                                    }
+                                    // CONCURRENT FN LAYER B: Delete files
+
+                                    fileDb.deleteMany({
+                                            _id: {
+                                                $in: fileIDs
+                                            }
+                                        })
+                                        .then(() => {
+                                            res.json({});
+                                        })
+
                                 })
+
+
                         })
                         .catch(err => res.status(422).json(err));
 
 
                 } else {
-                    res.status(403);
+                    res.status(403).json(null);
                 }
             })
     }
