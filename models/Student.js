@@ -10,14 +10,15 @@ const studentSchema = new Schema({
     type: String,
     required: true
   },
-  grade: {
-    type: Number,
-    required: true
-  },
   classes: [{
     type: Schema.Types.ObjectId,
     ref: 'Class'
-  }]
+  }],
+  grade: {
+    type: Schema.Types.ObjectId,
+    required: true,
+    ref: 'Grade'
+  }
 });
 
 const Student = mongoose.model("Student", studentSchema);
