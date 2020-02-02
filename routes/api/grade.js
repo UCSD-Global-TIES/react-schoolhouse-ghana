@@ -3,12 +3,13 @@ const gradeController = require("../../controllers/gradeController");
 
 // Matches with "/api/grade"
 router.route("/")
-  // .post(objController.create)
+  .get(gradeController.getGrades)
+  .post(gradeController.addGrade)
 
 // Matches with "/api/grade/:gid"
 router.route("/:gid")
-// .get(objController.find)
-// .delete(objController.delete)
-// .put(objController.update)
+  .get(gradeController.getGrade)
+  .delete(gradeController.deleteGrade)
+  .put(gradeController.updateGrade)
 
 module.exports = router;

@@ -1,13 +1,12 @@
 const router = require("express").Router();
 const generalController = require("../../controllers/generalController");
 
-// Matches with "/api/general/ann"
 router.route("/ann")
-  // .post(objController.create)
+  .post(generalController.addAnnouncement)
 
-// Matches with "/api/general/ann/:aid"
+// Matches with "/api/class/:cid/ann/:aid"
 router.route("/ann/:aid")
-// .delete(objController.delete)
-// .put(objController.update)
+  .delete(generalController.deleteAnnouncement)
+  .put(generalController.updateAnnouncement)
 
 module.exports = router;

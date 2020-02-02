@@ -1,24 +1,15 @@
 const objDb = require("../models/Obj");
 
 module.exports = {
-    create: function (req, res) {
-        objDb
-            .create(req.body)
-            .then(dbModel => res.json(dbModel))
-            .catch(err => res.status(422).json(err));
-    },
-    find: function (req, res) {
-        objDb
-            .findOne({})
-            .then(dbModel => res.json(dbModel))
-            .catch(err => res.status(422).json(err));
-    },
-    update: function (req, res) {
+    verifyAccount: function (req, res) {
 
-        objDb
-            .findOneAndUpdate({}, req.body)
-            .then(dbModel => res.json(dbModel))
-            .catch(err => res.status(422).json(err));
+    },
+    verifySession: function (req, res) {
+
+    },
+    verifyKey: function (key) {
+        // TODO
+        return true;
     },
     delete: function (req, res) {
         objDb

@@ -223,7 +223,10 @@ export default {
   // Populate profile
   verifyAccount: function (username, password) {
     const hash = encrypt(password);
-    return axios.get(`api/verify/?username=${username}?password=${hash}`);
+    return axios.get(`api/verify/account?username=${username}?password=${hash}`);
+  },
+  verifySession: function (username, password) {
+    return axios.get(`api/verify/session`);
   },
   // Add option for creating multiple accounts
   createAccount: function (newA, key) {
