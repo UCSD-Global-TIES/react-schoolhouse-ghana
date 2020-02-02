@@ -4,15 +4,14 @@ const Schema = mongoose.Schema;
 const fileSchema = new Schema({
   nickname: {
     type: String,
-    default: ""
+    required: true
   },
   filename: {
     type: String,
     required: true
   },
   path: {
-    type: String,
-    required: true
+    type: String
   },
   last_updated: {
     type: Date

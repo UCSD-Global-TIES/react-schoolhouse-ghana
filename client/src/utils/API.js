@@ -22,11 +22,14 @@ export default {
   // ---------------------------------------------------------------
   // *GET in getClass()*
   // https://programmingwithmosh.com/javascript/react-file-upload-proper-server-side-nodejs-easy/
-  addClassFile: function (class_id, fileObj, fileInfo, key) {
+  addClassFile: function (class_id, file, filename, path, key) {
     const config = {'Authorization': key};
     const fileData = new FormData();
-    fileData.append('file', fileObj);
-    return axios.post(`/api/class/${class_id}/file`, {file: fileData, info: fileInfo}, {headers: config}); // SECURE
+    fileData.append('file', file);
+    fileInfo.append('name', filename);
+    fileInfo.append('path', path);
+
+    return axios.post(`/api/class/${class_id}/file`, fileData, {headers: config}); // SECURE
   },
   deleteClassFile: function (class_id, file_id, key) {
     const config = {'Authorization': key};
@@ -38,14 +41,14 @@ export default {
   },
   // CLASSES
   // ---------------------------------------------------------------
-  // Populate files & announcements
+  // May be slow with four populate calls
   getClass: function (class_id, key) {
     const config = {'Authorization': key};
     return axios.get(`api/class/${class_id}`, {headers: config}); // SECURE
   },
-  addClass: function (newC, key) {
+  addClass: function (newC, path, key) {
     const config = {'Authorization': key};
-    return axios.post(`/api/class`, newC, {headers: config}); // SECURE
+    return axios.post(`/api/class`, {document: newC, path}, {headers: config}); // SECURE
   },
   updateClass: function (class_id, newC, key) {
     const config = {'Authorization': key};
@@ -55,6 +58,17 @@ export default {
     const config = {'Authorization': key};
     return axios.delete(`/api/class/${class_id}`, {headers: config}); // SECURE
   },
+  // CLASSES MEMBERS
+  // ---------------------------------------------------------------
+  addStudent: function (sid, path, key) {
+    const config = {'Authorization': key};
+    return axios.post(`/api/class/${class_id}/student`, {sid}, {headers: config}); // SECURE
+  },
+  deleteStudent: function (key) {
+    const config = {'Authorization': key};
+    return axios.delete(`/api/class/${class_id}/student`, {headers: config}); // SECURE
+  },
+
   // ANNOUNCEMENTS
   // ---------------------------------------------------------------
   // *GET in getClass()*
@@ -113,3 +127,6 @@ export default {
     return axios.delete(`/api/account/${acc_id}`, {headers: config}); // SECURE
   }
 };
+
+// ADD TEACHERS
+// ADD STUDENTS

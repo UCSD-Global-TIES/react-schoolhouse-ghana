@@ -17,33 +17,47 @@ let upload = multer({
 module.exports = {
     // WRITE: Creating a directory
     // ---------------------------------------------------------------
-    createDir: function (dir_path, dir_name, cb) {
-        // Checking if directory exists
-        // ---------------------------------------------------------------
-        const dirExists = (path, dir_name, cb) => {
-            fs.readdir(path, (err, itemNames) => {
-                if (itemNames.includes(dir_name)) {
-                    cb(true);
-                    return;
-                }
+    createDir: function (dir_path, dir_name) {
+        return new Promise( (resolve, reject) => {        // Checking if directory exists
+            // ---------------------------------------------------------------
+            const dirExists = (path, dir_name, cb) => {
+                fs.readdir(path, (err, itemNames) => {
+                    if (itemNames.includes(dir_name)) {
+                        cb(true);
+                        return;
+                    }
 
-                cb(false);
-            })
-        }
-
-        // dirExists(`${"C:/Users"}`, "Matt", (res) => console.log(res));
-        dirExists(dir_path, dir_name, (dir_exists) => {
-            if (!dir_exists) {
-                fs.mkdirSync(`${dir_path}/${dir_name}`, {
-                    recursive: true
-                }, (err) => {
-                    if (err) throw err;
+                    cb(false);
                 })
-                cb(true);
-            } else {
-                cb(false);
             }
 
+            // dirExists(`${"C:/Users"}`, "Matt", (res) => console.log(res));
+            dirExists(dir_path, dir_name, (dir_exists) => {
+                if (!dir_exists) {
+                    const path = `${dir_path}/${Date.now()}-${dir_name}`
+                    fs.mkdirSync(path, {
+                        recursive: true
+                    }, (err) => {
+                        if (err) throw err;
+                    })
+                    resolve(path);
+                } else {
+                    resolve(false);
+                }
+
+        })} )
+    },
+    // WRITE: Removing a directory recursively
+    // ---------------------------------------------------------------
+    removeDir: function (dir_path) {
+        return new Promise( (resolve, reject) => {        
+            fs.rmdirSync(dir_path, {
+                recursive: true
+            }, (err) => {
+                if (err) resolve(false);
+            })
+            resolve(true);
+                
         })
     },
     // WRITE: Moving a file
@@ -70,37 +84,45 @@ module.exports = {
     // WRITE: Deleting a file
     // ---------------------------------------------------------------
     deleteFile: function (filePath) {
-        fs.unlink(filePath, function (err) {
-            if (err) throw err;
-            // if no error, file has been deleted successfully
-            console.log('File deleted!');
-        });
+        return new Promise((resolve, reject) => {
+            fs.unlink(filePath, function (err) {
+                if (err) resolve(null);
+                // if no error, file has been deleted successfully
+                resolve({});
+            });
+        })
     },
     // WRITE: Uploading a file to directory
     // ---------------------------------------------------------------
     // https://codeforgeek.com/multiple-file-upload-node-js/
     // https://stackoverflow.com/questions/38458570/multer-uploading-array-of-files-fail/38476327
     // https://code.tutsplus.com/tutorials/file-upload-with-multer-in-node--cms-32088
-    uploadFile: function (req, res) {
+    uploadFile: function (req, res, path) {
+        new Promise((resolve, reject) => {
+            const FOLDER_PATH = path;
+            storage = multer.diskStorage({
+                destination: function (req, file, callback) {
+                    callback(null, FOLDER_PATH);
+                },
+                filename: function (req, file, callback) {
+                    callback(null, `${Date.now()}-${file.originalname}`);
+                }
+            });
+            // upload = multer({
+            //     storage: storage
+            // }).array("files");
 
-        const FOLDER_PATH = req.body.path;
-        storage = multer.diskStorage({
-            destination: function (req, file, callback) {
-                callback(null, FOLDER_PATH);
-            },
-            filename: function (req, file, callback) {
-                callback(null, file.originalname);
-            }
-        });
-        upload = multer({
-            storage: storage
-        }).array("files");
-        upload(req, res, function (err) {
-            if (err) {
-                return res.end("Error uploading file.");
-            }
-            res.end("File is uploaded");
-        });
+            upload = multer({
+                storage: storage
+            }).single("file");
+            
+            upload(req, res, function (err) {
+                if (err) {
+                    return resolve(null);
+                }
+                resolve({name: `${Date.now()}-${file.originalname}`, path: `${FOLDER_PATH}/${req.file.originalname}`, created: Date.now()});
+            });
+        })
     },
     // READ: Get disk space 
     getDiskSpace: function (path, cb) {
