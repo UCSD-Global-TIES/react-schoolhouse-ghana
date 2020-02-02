@@ -1,30 +1,79 @@
-const objDb = require("../models/Obj");
+const announcementDb = require("../models/Announcement");
+
+// TODO
+const {
+    verifyKey
+} = require("./verifyController");
 
 module.exports = {
-    create: function (req, res) {
-        objDb
-            .create(req.body)
-            .then(dbModel => res.json(dbModel))
-            .catch(err => res.status(422).json(err));
+    getAnnouncements: function (req, res) {
+        verifyKey(req.header('Authorization'))
+            .then((isVerified) => {
+                if (isVerified) {
+                    announcementDb
+                        .find({
+                            private: false
+                        })
+                        .then((announcements) => {
+                            res.json(announcements);
+                        })
+                        .catch(err => res.status(422).json(err));
+                } else {
+                    res.status(403);
+                }
+            })
     },
-    find: function (req, res) {
-        objDb
-            .findOne({})
-            .then(dbModel => res.json(dbModel))
-            .catch(err => res.status(422).json(err));
-    },
-    update: function (req, res) {
+    addAnnouncement: function (req, res) {
+        verifyKey(req.header('Authorization'))
+            .then((isVerified) => {
+                if (isVerified) {
+                    announcementDb
+                        .create(req.body)
+                        .then(newA => {
+                            res.json(newA);
+                        })
+                        .catch(err => res.status(422).json(err));
+                } else {
+                    res.status(403);
+                }
+            })
 
-        objDb
-            .findOneAndUpdate({}, req.body)
-            .then(dbModel => res.json(dbModel))
-            .catch(err => res.status(422).json(err));
     },
-    delete: function (req, res) {
-        objDb
-            .findOne({})
-            .then(dbModel => dbModel.remove())
-            .then(dbModel => res.json(dbModel))
-            .catch(err => res.status(422).json(err));
+    deleteAnnouncement: function (req, res) {
+        verifyKey(req.header('Authorization')).then((isVerified) => {
+            if (isVerified) {
+                const aid = req.params.aid;
+
+                announcementDb
+                    .findOne({
+                        _id: aid
+                    })
+                    .then(doc => {
+                        doc.remove();
+                        res.json({});
+                    })
+                    .catch(err => res.status(422).json(err));
+
+            } else {
+                res.status(403);
+            }
+        })
+
+    },
+    updateAnnouncement: function (req, res) {
+        verifyKey(req.header('Authorization')).then((isVerified) => {
+            if (isVerified) {
+                const aid = req.params.aid;
+                announcementDb
+                    .findOneAndUpdate({
+                        _id: aid
+                    }, req.body)
+                    .then(newA => res.json(newA))
+                    .catch(err => res.status(422).json(err));
+            } else {
+                res.status(403);
+            }
+        })
+
     }
 }
