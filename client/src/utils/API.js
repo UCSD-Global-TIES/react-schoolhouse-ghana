@@ -2,6 +2,7 @@ import axios from "axios";
 import encrypt from "./encrypt";
 
 // ROUTES UNSECURED
+// CONVERT ALL API FUNCTIONS SO YOU PASS IN VARIABLES NOT A OBJECT
 export default {
   // CLASS ANNOUNCEMENTS
   // ---------------------------------------------------------------
@@ -237,11 +238,22 @@ export default {
       headers: config
     }); // SECURE 
   },
-  updateAccount: function (acc_id, newA, key) {
+  updateAccountName: function (acc_id, first_name, last_name, key) {
     const config = {
       'Authorization': key
     };
-    return axios.put(`/api/account/${acc_id}`, newA, {
+    return axios.put(`/api/account/${acc_id}?field=name`, {first_name, last_name}, {
+      headers: config
+    }); // SECURE
+  },
+  updateAccountPassword: function (acc_id, oldPassword, newPassword, key) {
+    const config = {
+      'Authorization': key
+    };
+    const oldP = oldPassword;
+    const newP = newPassword;
+
+    return axios.put(`/api/account/${acc_id}?field=password`, {oldP, newP}, {
       headers: config
     }); // SECURE
   },
