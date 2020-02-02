@@ -141,10 +141,6 @@ export default {
   },
   // ANNOUNCEMENTS
   // ---------------------------------------------------------------
-  // *GET in getClass()*
-  // CLASS ANNOUNCEMENTS
-  // ---------------------------------------------------------------
-  // *GET in getClass()*
   getSchoolAnnouncements: function (key) {
     const config = {
       'Authorization': key
@@ -182,6 +178,14 @@ export default {
   // GRADES
   // ---------------------------------------------------------------
   // Populate classes
+  getGrades: function (key) {
+    const config = {
+      'Authorization': key
+    };
+    return axios.get(`api/grade`, {
+      headers: config
+    }); // SECURE
+  },
   getGrade: function (grade_id, key) {
     const config = {
       'Authorization': key

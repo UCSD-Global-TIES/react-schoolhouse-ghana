@@ -15,10 +15,11 @@ let upload = multer({
 });
 
 module.exports = {
+    NAS_PATH: "Z:/",
     // WRITE: Creating a directory
     // ---------------------------------------------------------------
     createDir: function (dir_path, dir_name) {
-        return new Promise( (resolve, reject) => {        // Checking if directory exists
+        return new Promise((resolve, reject) => { // Checking if directory exists
             // ---------------------------------------------------------------
             const dirExists = (path, dir_name, cb) => {
                 fs.readdir(path, (err, itemNames) => {
@@ -45,19 +46,20 @@ module.exports = {
                     resolve(false);
                 }
 
-        })} )
+            })
+        })
     },
     // WRITE: Removing a directory recursively
     // ---------------------------------------------------------------
     removeDir: function (dir_path) {
-        return new Promise( (resolve, reject) => {        
+        return new Promise((resolve, reject) => {
             fs.rmdirSync(dir_path, {
                 recursive: true
             }, (err) => {
                 if (err) resolve(false);
             })
             resolve(true);
-                
+
         })
     },
     // WRITE: Moving a file
@@ -115,12 +117,16 @@ module.exports = {
             upload = multer({
                 storage: storage
             }).single("file");
-            
+
             upload(req, res, function (err) {
                 if (err) {
                     return resolve(null);
                 }
-                resolve({name: `${Date.now()}-${file.originalname}`, path: `${FOLDER_PATH}/${req.file.originalname}`, created: Date.now()});
+                resolve({
+                    name: `${Date.now()}-${file.originalname}`,
+                    path: `${FOLDER_PATH}/${req.file.originalname}`,
+                    created: Date.now()
+                });
             });
         })
     },
