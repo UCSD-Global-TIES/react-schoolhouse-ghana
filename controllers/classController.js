@@ -16,7 +16,7 @@ const {
 
 module.exports = {
     addAnnouncement: function (req, res) {
-        verifyKey(req.header('Authorization')).then((isVerified) => {
+        verifyKey(req.header('Authorization'), 'teacher,admin').then((isVerified) => {
             if (isVerified) {
                 const cid = req.params.cid;
                 announcementDb
@@ -45,7 +45,7 @@ module.exports = {
 
     },
     deleteAnnouncement: function (req, res) {
-        verifyKey(req.header('Authorization')).then((isVerified) => {
+        verifyKey(req.header('Authorization'), 'teacher,admin').then((isVerified) => {
             if (isVerified) {
                 const aid = req.params.aid;
                 const cid = req.params.cid
@@ -79,7 +79,7 @@ module.exports = {
 
     },
     updateAnnouncement: function (req, res) {
-        verifyKey(req.header('Authorization')).then((isVerified) => {
+        verifyKey(req.header('Authorization'), 'teacher,admin').then((isVerified) => {
             if (isVerified) {
                 const aid = req.params.aid;
                 announcementDb
@@ -96,7 +96,7 @@ module.exports = {
 
     },
     addFile: function (req, res) {
-        verifyKey(req.header('Authorization'))
+        verifyKey(req.header('Authorization'), 'teacher,admin')
             .then((isVerified) => {
                 if (isVerified) {
 
@@ -147,7 +147,7 @@ module.exports = {
             })
     },
     deleteFile: function (req, res) {
-        verifyKey(req.header('Authorization'))
+        verifyKey(req.header('Authorization'), 'teacher,admin')
             .then((isVerified) => {
                 if (isVerified) {
                     const fid = req.params.fid;
@@ -190,7 +190,7 @@ module.exports = {
             })
     },
     updateFile: function (req, res) {
-        verifyKey(req.header('Authorization'))
+        verifyKey(req.header('Authorization'), 'teacher,admin')
             .then((isVerified) => {
                 if (isVerified) {
                     // update file document
@@ -210,7 +210,7 @@ module.exports = {
             })
     },
     getClass: function (req, res) {
-        verifyKey(req.header('Authorization'))
+        verifyKey(req.header('Authorization'), 'student,teacher,admin')
             .then((isVerified) => {
                 if (isVerified) {
                     classDb
@@ -231,13 +231,12 @@ module.exports = {
             })
     },
     addClass: function (req, res) {
-        // TODO: ADD TO GRADE DOCUMENT
-        verifyKey(req.header('Authorization'))
+        verifyKey(req.header('Authorization'), 'admin')
             .then((isVerified) => {
                 if (isVerified) {
                     // Create folder
                     let classDoc = req.body.document;
-                    createDir(req.body.path, classDoc.name)
+                    createDir(req.body.path, `${Date.now()}-${classDoc.name}`)
                         .then((path) => {
                             if (!path) res.status(500);
 
@@ -246,7 +245,20 @@ module.exports = {
                             // Create class document 
                             classDb
                                 .create(classDoc)
-                                .then((newC) => res.json(newC))
+                                .then((newC) => {
+                                    gradeDb
+                                        .updateOne({
+                                            _id: newC.grade
+                                        }, {
+                                            $push: {
+                                                classes: newC._id
+                                            }
+                                        })
+                                        .then(() => {
+                                            res.json(newC)
+
+                                        })
+                                })
                                 .catch(err => res.status(422).json(err));
 
                         })
@@ -257,7 +269,7 @@ module.exports = {
             })
     },
     updateClass: function (req, res) {
-        verifyKey(req.header('Authorization'))
+        verifyKey(req.header('Authorization'), 'admin')
             .then((isVerified) => {
                 if (isVerified) {
                     const cid = req.params.cid;
@@ -274,33 +286,43 @@ module.exports = {
             })
     },
     deleteClass: function (req, res) {
-        verifyKey(req.header('Authorization'))
+        verifyKey(req.header('Authorization'), 'admin')
             .then((isVerified) => {
                 if (isVerified) {
                     const cid = req.params.cid;
                     // Delete class document
                     classDb
-                    .findOneAndDelete({
-                        _id: cid
-                    })
-                    .then((deleted_class) => {
-                        gradeDb
-                        .update({_id: deleted_class.grade}, { $pull: { classes: deleted_class._id } })
-                        .then(() => {
-                            // Delete file documents referenced by this class
-                            fileDb
-                            .deleteMany({ _id: { $in: deleted_class.files}})
-                            .then(() => {
-                                // Remove directory in which the files are held
-                                removeDir(deleted_class.path)
-                                    .then((result) => {
-                                        if (!result) res.status(500);
-    
-                                        res.json({});
-                                    })
-                            })
+                        .findOneAndDelete({
+                            _id: cid
                         })
-                    })
+                        .then((deleted_class) => {
+                            gradeDb
+                                .update({
+                                    _id: deleted_class.grade
+                                }, {
+                                    $pull: {
+                                        classes: deleted_class._id
+                                    }
+                                })
+                                .then(() => {
+                                    // Delete file documents referenced by this class
+                                    fileDb
+                                        .deleteMany({
+                                            _id: {
+                                                $in: deleted_class.files
+                                            }
+                                        })
+                                        .then(() => {
+                                            // Remove directory in which the files are held
+                                            removeDir(deleted_class.path)
+                                                .then((result) => {
+                                                    if (!result) res.status(500);
+
+                                                    res.json({});
+                                                })
+                                        })
+                                })
+                        })
 
                 } else {
                     res.status(403).json(null);
@@ -308,7 +330,7 @@ module.exports = {
             })
     },
     addStudent: function (req, res) {
-        verifyKey(req.header('Authorization'))
+        verifyKey(req.header('Authorization'), 'admin')
             .then((isVerified) => {
                 if (isVerified) {
                     const sid = req.body.sid;
@@ -330,7 +352,7 @@ module.exports = {
             })
     },
     deleteStudent: function (req, res) {
-        verifyKey(req.header('Authorization'))
+        verifyKey(req.header('Authorization'), 'admin')
             .then((isVerified) => {
                 if (isVerified) {
                     const sid = req.body.sid;
@@ -352,7 +374,7 @@ module.exports = {
             })
     },
     addTeacher: function (req, res) {
-        verifyKey(req.header('Authorization'))
+        verifyKey(req.header('Authorization'), 'admin')
             .then((isVerified) => {
                 if (isVerified) {
                     const tid = req.body.tid;
@@ -374,7 +396,7 @@ module.exports = {
             })
     },
     deleteTeacher: function (req, res) {
-        verifyKey(req.header('Authorization'))
+        verifyKey(req.header('Authorization'), 'admin')
             .then((isVerified) => {
                 if (isVerified) {
                     const tid = req.body.tid;

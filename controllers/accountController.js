@@ -10,7 +10,11 @@ const {
     verifyKey
 } = require("./verifyController");
 
-const { generatePassword, encryptPassword, verifyPassword } = require("../scripts/encrypt");
+const {
+    generatePassword,
+    encryptPassword,
+    verifyPassword
+} = require("../scripts/encrypt");
 
 const PASSWORD_LENGTH = 6;
 const PASSWORD_NUMBERS = true;
@@ -45,7 +49,9 @@ const generateUniqueUsername = (first_name, last_name) => {
     const proposedName = generateUsername(first_name, last_name);
 
     return accountDb
-        .findOne({ username: proposedName })
+        .findOne({
+            username: proposedName
+        })
         .then(function (account) {
             if (account) {
                 return generateUniqueUsername(first_name, last_name);
@@ -60,7 +66,7 @@ const generateUniqueUsername = (first_name, last_name) => {
 
 module.exports = {
     addAccount: function (req, res) {
-        verifyKey(req.header('Authorization'))
+        verifyKey(req.header('Authorization'), 'admin')
             .then((isVerified) => {
                 if (isVerified) {
                     // Client provides first_name, last_name, type, Grade _id (if student)
@@ -134,28 +140,38 @@ module.exports = {
                         })
                         .catch((err) => res.status(422).json(err))
 
-                }
-                else {
+                } else {
                     res.status(403).json(null);
                 }
             })
     },
     updateAccount: function (req, res) {
         const updateAccountPassword = (req, res) => {
-            verifyKey(req.header('Authorization').key)
+            verifyKey(req.header('Authorization').key, 'student,teacher,admin')
                 .then((isVerified) => {
                     if (isVerified) {
-                        const { oldPassword, newPassword } = req.header('Authorization'); 
+                        const {
+                            oldPassword,
+                            newPassword
+                        } = req.header('Authorization');
 
                         const aid = req.params.aid;
 
                         accountDb
-                            .findOne({ _id: aid })
+                            .findOne({
+                                _id: aid
+                            })
                             .then((aDoc) => {
                                 // Old password matches
                                 if (verifyPassword(oldPassword, aDoc.password)) {
                                     accountDb
-                                        .findOneAndUpdate({ _id: aid }, { $set: { password: encryptPassword(newPassword) } })
+                                        .findOneAndUpdate({
+                                            _id: aid
+                                        }, {
+                                            $set: {
+                                                password: encryptPassword(newPassword)
+                                            }
+                                        })
                                         .then((newA) => {
                                             res.json(newA);
                                         })
@@ -169,17 +185,19 @@ module.exports = {
 
 
 
-                    }
-                    else {
+                    } else {
                         res.status(403).json(null);
                     }
                 })
         }
         const updateAccountName = (req, res) => {
-            verifyKey(req.header('Authorization'))
+            verifyKey(req.header('Authorization', 'admin'))
                 .then((isVerified) => {
                     if (isVerified) {
-                        const { first_name, last_name } = req.body;
+                        const {
+                            first_name,
+                            last_name
+                        } = req.body;
                         const aid = req.params.aid;
                         let newDoc = {
                             first_name,
@@ -187,7 +205,9 @@ module.exports = {
                         };
 
                         accountDb
-                            .findOne({ _id: aid })
+                            .findOne({
+                                _id: aid
+                            })
                             .then((aDoc) => {
                                 if (aDoc) {
                                     const type = aDoc.type;
@@ -207,22 +227,22 @@ module.exports = {
 
                                     }
 
-                                    db.update({ _id: aDoc.profile }, newDoc)
+                                    db.update({
+                                            _id: aDoc.profile
+                                        }, newDoc)
                                         .then(() => {
                                             res.json({});
                                         })
                                         .catch((err) => res.status(422).json(err));
 
-                                }
-                                else {
+                                } else {
                                     res.status(422).json(null);
                                 }
                             })
                             .catch((err) => res.status(422).json(err));
 
 
-                    }
-                    else {
+                    } else {
                         res.status(403).json(null);
                     }
                 })
@@ -238,13 +258,15 @@ module.exports = {
         }
     },
     deleteAccount: function (req, res) {
-        verifyKey(req.header('Authorization'))
+        verifyKey(req.header('Authorization'), 'admin')
             .then((isVerified) => {
                 if (isVerified) {
                     const aid = req.params.aid;
                     // Delete document in Account collection (A)
                     accountDb
-                        .findOneAndDelete({ _id: aid })
+                        .findOneAndDelete({
+                            _id: aid
+                        })
                         .then((deleted_account) => {
                             let promises = [];
                             const type = deleted_account.type;
@@ -265,10 +287,14 @@ module.exports = {
                             }
 
                             // Delete document in Student/Teacher/Admin collection (B)
-                            promises.push(db.deleteOne({ _id: profile }));
+                            promises.push(db.deleteOne({
+                                _id: profile
+                            }));
 
                             // Find Announcements created by this Account (B)
-                            promises.push(announcementDb.find({ author: profile }))
+                            promises.push(announcementDb.find({
+                                author: profile
+                            }))
 
                             Promise
                                 .all(promises)
@@ -280,17 +306,24 @@ module.exports = {
 
                                     // Delete References in Class collections (C)
                                     classDb
-                                    .update({}, { $pull: { students: profile, teachers: profile, announcements: { $in: announcementIDs } } })
-                                    .then(() => {
-                                        res.json({});
-                                    })
+                                        .update({}, {
+                                            $pull: {
+                                                students: profile,
+                                                teachers: profile,
+                                                announcements: {
+                                                    $in: announcementIDs
+                                                }
+                                            }
+                                        })
+                                        .then(() => {
+                                            res.json({});
+                                        })
 
                                 })
 
                         })
 
-                }
-                else {
+                } else {
                     res.status(403).json(null);
                 }
             })

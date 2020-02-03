@@ -18,6 +18,10 @@ const announcementSchema = new Schema({
     type: Date,
     default: Date.now
   },
+  title: {
+    type: String,
+    required: true
+  },
   content: {
     type: String,
     default: "",

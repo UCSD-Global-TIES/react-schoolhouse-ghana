@@ -7,7 +7,7 @@ const {
 
 module.exports = {
     getAnnouncements: function (req, res) {
-        verifyKey(req.header('Authorization'))
+        verifyKey(req.header('Authorization'), 'admin')
             .then((isVerified) => {
                 if (isVerified) {
                     announcementDb
@@ -24,7 +24,7 @@ module.exports = {
             })
     },
     addAnnouncement: function (req, res) {
-        verifyKey(req.header('Authorization'))
+        verifyKey(req.header('Authorization'), 'admin')
             .then((isVerified) => {
                 if (isVerified) {
                     announcementDb
@@ -40,7 +40,7 @@ module.exports = {
 
     },
     deleteAnnouncement: function (req, res) {
-        verifyKey(req.header('Authorization')).then((isVerified) => {
+        verifyKey(req.header('Authorization'), 'admin').then((isVerified) => {
             if (isVerified) {
                 const aid = req.params.aid;
 
@@ -61,7 +61,7 @@ module.exports = {
 
     },
     updateAnnouncement: function (req, res) {
-        verifyKey(req.header('Authorization')).then((isVerified) => {
+        verifyKey(req.header('Authorization'), 'admin').then((isVerified) => {
             if (isVerified) {
                 const aid = req.params.aid;
                 announcementDb

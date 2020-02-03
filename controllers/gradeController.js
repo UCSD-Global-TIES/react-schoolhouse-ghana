@@ -14,7 +14,7 @@ const {
 } = require("./verifyController");
 module.exports = {
     getGrades: function (req, res) {
-        verifyKey(req.header('Authorization'))
+        verifyKey(req.header('Authorization'), 'admin')
             .then((isVerified) => {
                 if (isVerified) {
                     gradeDb
@@ -28,13 +28,14 @@ module.exports = {
             })
     },
     getGrade: function (req, res) {
-        verifyKey(req.header('Authorization'))
+        verifyKey(req.header('Authorization'), 'admin')
             .then((isVerified) => {
                 if (isVerified) {
                     gradeDb
                         .findOne({
                             _id: req.params.gid
                         })
+                        .populate('classes')
                         .then(gradeDoc => res.json(gradeDoc))
                         .catch(err => res.status(422).json(err));
 
@@ -44,7 +45,7 @@ module.exports = {
             })
     },
     addGrade: function (req, res) {
-        verifyKey(req.header('Authorization'))
+        verifyKey(req.header('Authorization'), 'admin')
             .then((isVerified) => {
                 if (isVerified) {
                     // Create folder
@@ -68,25 +69,25 @@ module.exports = {
                 }
             })
     },
-    updateGrade: function (req, res) {
-        verifyKey(req.header('Authorization'))
-            .then((isVerified) => {
-                if (isVerified) {
-                    const gid = req.params.gid;
-                    gradeDb
-                        .findOneAndUpdate({
-                            _id: gid
-                        }, req.body)
-                        .then(newG => res.json(newG))
-                        .catch(err => res.status(422).json(err));
+    // updateGrade: function (req, res) {
+    //     verifyKey(req.header('Authorization'))
+    //         .then((isVerified) => {
+    //             if (isVerified) {
+    //                 const gid = req.params.gid;
+    //                 gradeDb
+    //                     .findOneAndUpdate({
+    //                         _id: gid
+    //                     }, req.body)
+    //                     .then(newG => res.json(newG))
+    //                     .catch(err => res.status(422).json(err));
 
-                } else {
-                    res.status(403).json(null);
-                }
-            })
-    },
+    //             } else {
+    //                 res.status(403).json(null);
+    //             }
+    //         })
+    // },
     deleteGrade: function (req, res) {
-        verifyKey(req.header('Authorization'))
+        verifyKey(req.header('Authorization'), 'admin')
             .then((isVerified) => {
                 if (isVerified) {
                     const gid = req.params.gid;

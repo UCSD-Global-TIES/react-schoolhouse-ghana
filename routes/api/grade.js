@@ -10,6 +10,6 @@ router.route("/")
 router.route("/:gid")
   .get(gradeController.getGrade)
   .delete(gradeController.deleteGrade)
-  .put(gradeController.updateGrade)
+// .put(gradeController.updateGrade)
 
 module.exports = router;

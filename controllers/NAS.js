@@ -69,7 +69,6 @@ module.exports = {
 
         fs.rename(oldFilePath, newFilePath, function (err) {
             if (err) throw err;
-            console.log('File Moved!');
         });
     },
     // WRITE: Renaming a file
@@ -80,7 +79,6 @@ module.exports = {
         console.log(newFilePath)
         fs.rename(oldFilePath, newFilePath, function (err) {
             if (err) throw err;
-            console.log('File Renamed!');
         });
     },
     // WRITE: Deleting a file
@@ -130,6 +128,7 @@ module.exports = {
             });
         })
     },
+    // TODO - NOT USED (SHOULD BE CALLED EVERYTIME UPLOADING TO NAS)
     // READ: Get disk space 
     getDiskSpace: function (path, cb) {
         return checkDiskSpace(path).then((diskSpace) => {
