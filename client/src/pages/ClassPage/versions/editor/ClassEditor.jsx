@@ -5,7 +5,7 @@ import "./main.css";
 function ClassEditor(props) {
 
     return (
-        <div> CLASS EDITOR </div>
+        <div> CLASS EDITOR: {props.class.name} </div>
     );
 }
 

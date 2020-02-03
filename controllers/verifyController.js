@@ -13,7 +13,7 @@ module.exports = {
                 // If passwords match, return populated document
                 if (verifyPassword(password, account.password)) {
                     // Set session user cookie (in login)
-                    req.session.user = { profile: account.profile, key: account._id };
+                    req.session.user = { type: account.type, profile: account.profile, key: account._id };
 
                     // API KEY SHOULD NOT BE ACCOUNT _id (future feature)
                     res.json({ profile: account.profile, key: account._id });

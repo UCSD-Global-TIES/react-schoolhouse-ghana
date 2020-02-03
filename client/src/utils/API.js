@@ -41,8 +41,8 @@ export default {
     };
     const fileData = new FormData();
     fileData.append('file', file);
-    fileInfo.append('name', filename);
-    fileInfo.append('path', path);
+    fileData.append('name', filename);
+    fileData.append('path', path);
 
     return axios.post(`/api/class/${class_id}/file`, fileData, {
       headers: config
@@ -71,7 +71,7 @@ export default {
     const config = {
       'Authorization': key
     };
-    return axios.get(`api/class/${class_id}`, {
+    return axios.get(`/api/class/${class_id}`, {
       headers: config
     }); // SECURE
   },
@@ -104,7 +104,7 @@ export default {
   },
   // CLASS MEMBERS
   // ---------------------------------------------------------------
-  addStudent: function (sid, path, key) {
+  addStudent: function (class_id, sid, key) {
     const config = {
       'Authorization': key
     };
@@ -114,15 +114,16 @@ export default {
       headers: config
     }); // SECURE
   },
-  deleteStudent: function (key) {
+  deleteStudent: function (class_id, sid, key) {
     const config = {
       'Authorization': key
     };
     return axios.delete(`/api/class/${class_id}/student`, {
-      headers: config
+      headers: config,
+      data: {sid}
     }); // SECURE
   },
-  addTeacher: function (tid, path, key) {
+  addTeacher: function (class_id, tid, key) {
     const config = {
       'Authorization': key
     };
@@ -132,12 +133,13 @@ export default {
       headers: config
     }); // SECURE
   },
-  deleteTeacher: function (key) {
+  deleteTeacher: function (class_id, tid, key) {
     const config = {
       'Authorization': key
     };
     return axios.delete(`/api/class/${class_id}/teacher`, {
-      headers: config
+      headers: config,
+      date: {tid}
     }); // SECURE
   },
   // ANNOUNCEMENTS
@@ -183,7 +185,7 @@ export default {
     const config = {
       'Authorization': key
     };
-    return axios.get(`api/grade`, {
+    return axios.get(`/api/grade`, {
       headers: config
     }); // SECURE
   },
@@ -191,7 +193,7 @@ export default {
     const config = {
       'Authorization': key
     };
-    return axios.get(`api/grade/${grade_id}`, {
+    return axios.get(`/api/grade/${grade_id}`, {
       headers: config
     }); // SECURE
   },
@@ -225,10 +227,10 @@ export default {
     const config = {
       'Authorization': {username, password}
     };    
-    return axios.get(`api/verify/account`, { headers: config });
+    return axios.get(`/api/verify/account`, { headers: config });
   },
   verifySession: function () {
-    return axios.get(`api/verify/session`);
+    return axios.get(`/api/verify/session`);
   },
   // Add option for creating multiple accounts
   addAccount: function (newA, key) {
@@ -247,7 +249,7 @@ export default {
       headers: config
     }); // SECURE
   },
-  updateAccountPassword: function (acc_id, key) {
+  updateAccountPassword: function (acc_id, oldPassword, newPassword, key) {
     const config = {
       'Authorization': {key, oldPassword, newPassword}
     };

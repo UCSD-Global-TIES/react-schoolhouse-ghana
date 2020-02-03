@@ -9,6 +9,7 @@ import {
 } from "react-router-dom";
 
 import "./App.css";
+import API from "./utils/API";
 
 
 // COMPONENTS
@@ -25,23 +26,27 @@ import AccountPortal from "./pages/AccountPortal/index";
 import ClassPage from "./pages/ClassPage/index";
 
 function App() {
+  // const testUser = null;
+  const testUser = { type: "teacher", classes: ["123"] };
+  const [userInfo, setUserInfo] = useState(testUser);
+  const [loading, setLoading] = useState(true);
 
-  const [userInfo, setUserInfo] = useState({type: "student", classes: ["123"]});
-  // const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    API.verifySession()
+      .then((user) => {
+        if (user.data) setUserInfo(user);
+        setLoading(false);
+      })
 
-  // useEffect(() => {
-  //   if(!loading) { setUserInfo(user) }
-  // }, [loading]);
+  }, []);
 
-  // if (loading) {
-  //   return (
-  //     <div className="App text-center">
-  //       <div>
-  //         <Loading />
-  //       </div>
-  //     </div>
-  //   )
-  // }
+  if (loading) {
+    return (
+      <div className="App text-center">
+        Loading
+      </div>
+    )
+  }
 
   return (
     <div className="App">
@@ -53,8 +58,8 @@ function App() {
         <ProtectedRoute exact path="/" component={AccountPortal} user={userInfo} />
         {/* Class component should check account type and render the correct component */}
         <ProtectedRoute exact path="/class/:id" component={ClassPage} user={userInfo} />
-        <Route exact path="/login" component={LoginPortal} user={userInfo} />
-        <Route component={NoMatch} />        
+        <Route exact path="/login" component={props => <LoginPortal {...props} user={userInfo} />}/>
+        <Route component={NoMatch} />
       </Switch>
     </div>
   );

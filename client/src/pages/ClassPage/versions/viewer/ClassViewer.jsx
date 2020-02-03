@@ -5,7 +5,7 @@ import "./main.css";
 function ClassViewer(props) {
 
     return (
-        <div> CLASS VIEWER </div>
+        <div> CLASS VIEWER: {props.class.name} </div>
     );
 }
 
