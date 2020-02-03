@@ -265,6 +265,3 @@ export default {
     }); // SECURE
   }
 };
-
-// ADD TEACHERS
-// ADD STUDENTS

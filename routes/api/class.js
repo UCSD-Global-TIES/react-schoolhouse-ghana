@@ -11,6 +11,16 @@ router.route("/:cid")
   .delete(classController.deleteClass)
   .put(classController.updateClass)
 
+  // Matches with "/api/class/:cid/student"
+router.route("/:cid/student")
+.post(classController.addStudent)
+.delete(classController.deleteStudent)
+
+// Matches with "/api/class/:cid/teacher"
+router.route("/:cid/teacher")
+.post(classController.addTeacher)
+.delete(classController.deleteTeacher)
+
 router.route("/:cid/ann")
   .post(classController.addAnnouncement)
 
