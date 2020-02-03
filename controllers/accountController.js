@@ -1,7 +1,9 @@
 const accountDb = require("../models/Account");
+const announcementDb = require("../models/Account");
 const studentDb = require("../models/Student");
 const teacherDb = require("../models/Teacher");
 const adminDb = require("../models/Admin");
+const classDb = require("../models/Admin");
 
 // TODO
 const {
@@ -140,11 +142,11 @@ module.exports = {
     },
     updateAccount: function (req, res) {
         const updateAccountPassword = (req, res) => {
-            verifyKey(req.header('Authorization'))
+            verifyKey(req.header('Authorization').key)
                 .then((isVerified) => {
                     if (isVerified) {
-                        const oldPassword = req.body.oldP;
-                        const newPassword = req.body.newP;
+                        const { oldPassword, newPassword } = req.header('Authorization'); 
+
                         const aid = req.params.aid;
 
                         accountDb
@@ -177,7 +179,7 @@ module.exports = {
             verifyKey(req.header('Authorization'))
                 .then((isVerified) => {
                     if (isVerified) {
-                        const {first_name, last_name} = req.body;
+                        const { first_name, last_name } = req.body;
                         const aid = req.params.aid;
                         let newDoc = {
                             first_name,
@@ -235,19 +237,57 @@ module.exports = {
                 break;
         }
     },
-
     deleteAccount: function (req, res) {
         verifyKey(req.header('Authorization'))
             .then((isVerified) => {
                 if (isVerified) {
+                    const aid = req.params.aid;
+                    // Delete document in Account collection (A)
+                    accountDb
+                        .findOneAndDelete({ _id: aid })
+                        .then((deleted_account) => {
+                            let promises = [];
+                            const type = deleted_account.type;
+                            const profile = deleted_account._id;
+                            let db;
+                            switch (type) {
+                                case "student":
+                                    db = studentDb;
+                                    break;
+                                case "teacher":
+                                    db = teacherDb;
+                                    break;
+                                case "admin":
+                                    db = adminDb;
+                                    break;
+                                default:
+                                    res.status(422).json(null);
+                            }
 
-                    // Delete document in Student/Teacher/Admin collection
+                            // Delete document in Student/Teacher/Admin collection (B)
+                            promises.push(db.deleteOne({ _id: profile }));
 
-                    // Delete References in Class collections
+                            // Find Announcements created by this Account (B)
+                            promises.push(announcementDb.find({ author: profile }))
 
-                    // Delete Announcements created by this Account
+                            Promise
+                                .all(promises)
+                                .then((results) => {
+                                    let announcementIDs = [];
+                                    for (const announcement of results[1]) {
+                                        announcementIDs.push(announcement._id);
+                                    }
 
-                    // Delete document in Account collection
+                                    // Delete References in Class collections (C)
+                                    classDb
+                                    .update({}, { $pull: { students: profile, teachers: profile, announcements: { $in: announcementIDs } } })
+                                    .then(() => {
+                                        res.json({});
+                                    })
+
+                                })
+
+                        })
 
                 }
                 else {

@@ -1,8 +1,13 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-const objSchema = new Schema({
+const announcementSchema = new Schema({
   author: {
+    type: Schema.Types.ObjectId,
+    required: true,
+    refPath: 'authorType'
+  },
+  authorType: {
     type: String,
     required: true
   },
@@ -24,6 +29,6 @@ const objSchema = new Schema({
   }
 });
 
-const Obj = mongoose.model("Obj", objSchema);
+const Announcement = mongoose.model("Announcement", announcementSchema);
 
-module.exports = Obj;
+module.exports = Announcement;

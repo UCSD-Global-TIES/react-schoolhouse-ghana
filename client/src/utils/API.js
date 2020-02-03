@@ -221,12 +221,13 @@ export default {
   },
   // ACCOUNTS
   // ---------------------------------------------------------------
-  // Populate profile
   verifyAccount: function (username, password) {
-    const hash = encrypt(password);
-    return axios.get(`api/verify/account?username=${username}?password=${hash}`);
+    const config = {
+      'Authorization': {username, password}
+    };    
+    return axios.get(`api/verify/account`, { headers: config });
   },
-  verifySession: function (username, password) {
+  verifySession: function () {
     return axios.get(`api/verify/session`);
   },
   // Add option for creating multiple accounts
@@ -246,14 +247,12 @@ export default {
       headers: config
     }); // SECURE
   },
-  updateAccountPassword: function (acc_id, oldPassword, newPassword, key) {
+  updateAccountPassword: function (acc_id, key) {
     const config = {
-      'Authorization': key
+      'Authorization': {key, oldPassword, newPassword}
     };
-    const oldP = oldPassword;
-    const newP = newPassword;
 
-    return axios.put(`/api/account/${acc_id}?field=password`, {oldP, newP}, {
+    return axios.put(`/api/account/${acc_id}?field=password`, {}, {
       headers: config
     }); // SECURE
   },
