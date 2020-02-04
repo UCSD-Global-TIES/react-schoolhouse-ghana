@@ -34,7 +34,7 @@ function App() {
   useEffect(() => {
     API.verifySession()
       .then((user) => {
-        if (user.data) setUserInfo(user);
+        if (user.data) setUserInfo(user.data);
         setLoading(false);
       })
 

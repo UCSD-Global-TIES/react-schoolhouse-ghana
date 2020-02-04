@@ -281,6 +281,9 @@ export default {
   verifySession: function () {
     return axios.get(`/api/verify/session`);
   },
+  destroySession: function () {
+    return axios.delete(`/api/verify/session`);
+  },
   // Add option for creating multiple accounts
   addAccount: function (first_name, last_name, type, gradeID, key) {
     const config = {

@@ -41,6 +41,12 @@ module.exports = {
         if (req.session.user && req.cookies.user_sid) res.json(req.session.user);
         else res.json(null);
     },
+    destroySession: function (req, res) {
+        if (req.session.user && req.cookies.user_sid) {
+            res.clearCookie('user_sid');
+        }
+        res.json(null);
+    },
     verifyKey: function (key, access_type) {
         const types = access_type.split(",");
 

@@ -8,5 +8,6 @@ router.route("/account")
 // Matches with "/api/verify/session"
 router.route("/session")
   .get(verifyController.verifySession)
+  .delete(verifyController.destroySession)
 
 module.exports = router;
