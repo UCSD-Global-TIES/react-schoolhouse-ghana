@@ -24,12 +24,39 @@ import NoMatch from "./pages/NoMatch/index";
 import LoginPortal from "./pages/LoginPortal/index";
 import AccountPortal from "./pages/AccountPortal/index";
 import ClassPage from "./pages/ClassPage/index";
+import NavBar from "./components/NavBar";
 
 function App() {
   // const testUser = null;
-  const testUser = { type: "teacher", classes: ["123"] };
-  const [userInfo, setUserInfo] = useState(testUser);
+  const [userInfo, setUserInfo] = useState(null);
+  const [IsErrorVisible, showLoginError] = useState(false);
+
   const [loading, setLoading] = useState(true);
+
+  const handleLogout = () => {
+    API.destroySession()
+      .then((nullUser) => {
+        setUserInfo(nullUser.data)
+      })
+  }
+
+  const handleLogin = (username, password) => {
+    if(username.length && password.length) {
+      API.verifyAccount(username, password)
+        .then((user) => {
+          
+          if(user.data) {
+            setUserInfo(user.data);
+            showLoginError(false);
+          } 
+  
+          // Login failed, show error message
+          else {
+            showLoginError(true);
+          }
+        })
+    }
+  }
 
   useEffect(() => {
     API.verifySession()
@@ -52,13 +79,14 @@ function App() {
     <div className="App">
       <header>
         {/* Place navigation bar here */}
+        <NavBar user={userInfo} logout={handleLogout} />
       </header>
       <Switch>
         {/* Portal component should check account type and render the correct component */}
         <ProtectedRoute exact path="/" component={AccountPortal} user={userInfo} />
         {/* Class component should check account type and render the correct component */}
         <ProtectedRoute exact path="/class/:id" component={ClassPage} user={userInfo} />
-        <Route exact path="/login" component={props => <LoginPortal {...props} user={userInfo} />}/>
+        <Route exact path="/login" component={props => <LoginPortal {...props} user={userInfo} hasError={IsErrorVisible} login={handleLogin} />} />
         <Route component={NoMatch} />
       </Switch>
     </div>

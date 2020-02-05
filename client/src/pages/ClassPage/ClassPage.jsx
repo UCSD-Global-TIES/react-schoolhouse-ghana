@@ -12,9 +12,9 @@ import ClassEditor from "./versions/editor/ClassEditor.jsx";
 import AccessDenied from "../../components/AccessDenied";
 
 const accountComponents = {
-  student: ClassViewer,
-  teacher: ClassEditor,
-  admin: ClassEditor
+  Student: ClassViewer,
+  Teacher: ClassEditor,
+  Admin: ClassEditor
 }
 
 function ClassPage(props) {
@@ -40,8 +40,8 @@ function ClassPage(props) {
   //   )
   // }
 
-  if (props.user.type === "student" || props.user.type === "teacher") {
-    if(!props.user.classes.includes(class_id)) { return <AccessDenied /> }
+  if (props.user.type === "Student" || props.user.type === "Teacher") {
+    if(!props.user.profile.classes.includes(class_id)) { return <AccessDenied /> }
   }
 
   const Component = accountComponents[props.user.type];

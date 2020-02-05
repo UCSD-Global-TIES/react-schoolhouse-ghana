@@ -5,7 +5,9 @@ import "./main.css";
 function AdminPortal(props) {
 
     return (
-        <div> ADMIN PORTAL </div>
+        <div style={{display: "flex", width: "100%", height: "100vh"}}>  
+            <div style={{margin: "auto"}}> ADMIN PORTAL </div>
+        </div>    
     );
 }
 

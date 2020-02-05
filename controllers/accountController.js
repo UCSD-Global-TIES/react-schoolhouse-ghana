@@ -147,13 +147,13 @@ module.exports = {
     },
     updateAccount: function (req, res) {
         const updateAccountPassword = (req, res) => {
-            verifyKey(req.header('Authorization').key, 'student,teacher,admin')
+            verifyKey(JSON.parse(req.header('Authorization')).key, 'student,teacher,admin')
                 .then((isVerified) => {
                     if (isVerified) {
                         const {
                             oldPassword,
                             newPassword
-                        } = req.header('Authorization');
+                        } = JSON.parse(req.header('Authorization'));;
 
                         const aid = req.params.aid;
 

@@ -7,9 +7,9 @@ import TeacherPortal from "./versions/teacher/TeacherPortal.jsx";
 import AdminPortal from "./versions/admin/AdminPortal.jsx";
 
 const accountComponents = {
-    student: StudentPortal,
-    teacher: TeacherPortal,
-    admin: AdminPortal
+    Student: StudentPortal,
+    Teacher: TeacherPortal,
+    Admin: AdminPortal
 }
 
 function AccountPortal(props) {

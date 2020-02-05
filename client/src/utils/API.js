@@ -269,10 +269,10 @@ export default {
   // ---------------------------------------------------------------
   verifyAccount: function (username, password) {
     const config = {
-      'Authorization': {
+      'Authorization': JSON.stringify({
         username,
         password
-      }
+      })
     };
     return axios.get(`/api/verify/account`, {
       headers: config
@@ -312,13 +312,13 @@ export default {
     }); // SECURE
   },
   updateAccountPassword: function (acc_id, oldPassword, newPassword, key) {
-    const config = {
+    const config = JSON.stringify({
       'Authorization': {
         key,
         oldPassword,
         newPassword
       }
-    };
+    });
 
     return axios.put(`/api/account/${acc_id}?field=password`, {}, {
       headers: config

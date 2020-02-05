@@ -5,8 +5,10 @@ import "./main.css";
 function TeacherPortal(props) {
 
     return (
-        <div> TEACHER PORTAL </div>
-    );
+        <div style={{display: "flex", width: "100%", height: "100vh"}}>  
+            <div style={{margin: "auto"}}> TEACHER PORTAL </div>
+        </div>    
+        );
 }
 
 export default TeacherPortal;

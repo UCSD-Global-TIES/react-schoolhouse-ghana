@@ -5,8 +5,9 @@ import "./main.css";
 function ClassViewer(props) {
 
     return (
-        <div> CLASS VIEWER: {props.class.name} </div>
-    );
+        <div style={{display: "flex", width: "100%", height: "100vh"}}>  
+        <div style={{margin: "auto"}}> CLASS VIEWER: {props.class.name} </div>
+    </div>        );
 }
 
 export default ClassViewer;

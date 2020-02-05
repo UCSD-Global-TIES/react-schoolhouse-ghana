@@ -1,3 +1,11 @@
 .App{
-    
+}
+
+body {
+    margin: 0;
+}
+
+/* Fixes weird alignment for inline FA icons */
+.svg-inline--fa {
+    vertical-align: 0em;
 }
