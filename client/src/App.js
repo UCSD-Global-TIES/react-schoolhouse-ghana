@@ -47,6 +47,7 @@ function App() {
           
           if(user.data) {
             setUserInfo(user.data);
+            console.log(user.data)
             showLoginError(false);
           } 
   
