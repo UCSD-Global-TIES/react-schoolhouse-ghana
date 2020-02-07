@@ -1,5 +1,5 @@
 import React from "react";
-import { Route, Link, Switch, Redirect } from "react-router-dom";
+import { Route, NavLink, Switch, Redirect } from "react-router-dom";
 import AnnouncementsForm from "../../../../components/AnnouncementsForm";
 import GradesForm from "../../../../components/GradesForm";
 import ClassesForm from "../../../../components/ClassesForm";
@@ -7,6 +7,7 @@ import AccountsForm from "../../../../components/AccountsForm";
 import NoMatch from "../../../NoMatch/index";
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 import { Drawer, Hidden, Divider, List, ListItem, ListItemIcon, ListItemText, CssBaseline} from "@material-ui/core"
+import { TransitionGroup, CSSTransition } from 'react-transition-group'
 
 import "../../../../utils/flowHeaders.min.css";
 import "./main.css";
@@ -45,9 +46,15 @@ function AdminPortal(props) {
     const classes = useStyles();
     const theme = useTheme();
     const [mobileOpen, setMobileOpen] = React.useState(false);
+    const [selectedIdx, setSelectedIdx] = React.useState(0);
+
 
     const handleDrawerToggle = () => {
         setMobileOpen(!mobileOpen);
+    };
+
+    const handleListItemClick = (index) => {
+        setSelectedIdx(index);
     };
 
     const menuItems = [
@@ -76,22 +83,22 @@ function AdminPortal(props) {
             {/* <Divider /> */}
             <List>
                 {menuItems.map((item, index) => (
-                    <Link to={item.path} key={index} className={classes.buttonLink}>
-                        <ListItem button>
+                    <NavLink to={item.path} key={index} className={classes.buttonLink}>
+                        <ListItem selected={selectedIdx === index} onClick={() => handleListItemClick(index)} button>
                             <ListItemIcon>{<FontAwesomeIcon icon={item.icon}/>}</ListItemIcon>
                             <ListItemText primary={item.label} />
                         </ListItem>
-                    </Link>
+                    </NavLink>
                 ))}
             </List>
             <Divider />
             <List>
-                <Link to={`${props.match.url}/accounts`} className={classes.buttonLink}>
-                <ListItem button >
+                <NavLink to={`${props.match.url}/accounts`} className={classes.buttonLink}>
+                    <ListItem button selected={selectedIdx === menuItems.length} onClick={() => handleListItemClick(menuItems.length)}>
                     <ListItemIcon>{<FontAwesomeIcon icon={faUsers} />}</ListItemIcon>
                         <ListItemText primary={"Accounts"} />
                     </ListItem>
-                    </Link>
+                    </NavLink>
             </List>
         </div>
     );
@@ -154,14 +161,21 @@ function AdminPortal(props) {
             {/* Render all accounts (w/ CRUD dialog) */}
 
             {/*  */}
-
-            <Switch>
+                <TransitionGroup>
+                    <CSSTransition
+                        key={props.location.key}
+                        timeout={300}
+                        classNames='fade'
+                    >
+                        <Switch location={props.location}>
                 <Route exact path={`${props.match.path}/announcements`} component={AnnouncementsForm} user={props.user} />
                 <Route exact path={`${props.match.path}/grades`} component={GradesForm} user={props.user} />
                 <Route exact path={`${props.match.path}/classes`} component={ClassesForm} user={props.user} />
                 <Route exact path={`${props.match.path}/accounts`} component={AccountsForm} user={props.user} />
                 <Route component={() => <Redirect to={`${props.match.path}/announcements`} />} />
-            </Switch>
+                        </Switch>
+                    </CSSTransition>
+                </TransitionGroup>
             </main>
         </div>
 
