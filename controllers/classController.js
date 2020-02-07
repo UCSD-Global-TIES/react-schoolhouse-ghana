@@ -16,7 +16,7 @@ const {
 
 module.exports = {
     addAnnouncement: function (req, res) {
-        verifyKey(req.header('Authorization'), 'teacher,admin').then((isVerified) => {
+        verifyKey(req.header('Authorization'), 'Teacher,Admin').then((isVerified) => {
             if (isVerified) {
                 const cid = req.params.cid;
                 announcementDb
@@ -45,7 +45,7 @@ module.exports = {
 
     },
     deleteAnnouncement: function (req, res) {
-        verifyKey(req.header('Authorization'), 'teacher,admin').then((isVerified) => {
+        verifyKey(req.header('Authorization'), 'Teacher,Admin').then((isVerified) => {
             if (isVerified) {
                 const aid = req.params.aid;
                 const cid = req.params.cid
@@ -79,7 +79,7 @@ module.exports = {
 
     },
     updateAnnouncement: function (req, res) {
-        verifyKey(req.header('Authorization'), 'teacher,admin').then((isVerified) => {
+        verifyKey(req.header('Authorization'), 'Teacher,Admin').then((isVerified) => {
             if (isVerified) {
                 const aid = req.params.aid;
                 announcementDb
@@ -96,7 +96,7 @@ module.exports = {
 
     },
     addFile: function (req, res) {
-        verifyKey(req.header('Authorization'), 'teacher,admin')
+        verifyKey(req.header('Authorization'), 'Teacher,Admin')
             .then((isVerified) => {
                 if (isVerified) {
 
@@ -147,7 +147,7 @@ module.exports = {
             })
     },
     deleteFile: function (req, res) {
-        verifyKey(req.header('Authorization'), 'teacher,admin')
+        verifyKey(req.header('Authorization'), 'Teacher,Admin')
             .then((isVerified) => {
                 if (isVerified) {
                     const fid = req.params.fid;
@@ -190,7 +190,7 @@ module.exports = {
             })
     },
     updateFile: function (req, res) {
-        verifyKey(req.header('Authorization'), 'teacher,admin')
+        verifyKey(req.header('Authorization'), 'Teacher,Admin')
             .then((isVerified) => {
                 if (isVerified) {
                     // update file document
@@ -210,15 +210,15 @@ module.exports = {
             })
     },
     getClass: function (req, res) {
-        verifyKey(req.header('Authorization'), 'student,teacher,admin')
+        verifyKey(req.header('Authorization'), 'Student,Teacher,Admin')
             .then((isVerified) => {
                 if (isVerified) {
                     classDb
                         .findOne({
                             _id: req.params.cid
                         })
-                        .populate('teachers')
-                        .populate('students')
+                        .populate('Teachers')
+                        .populate('Students')
                         .populate('announcements')
                         .populate('files')
                         .populate('grade')
@@ -231,7 +231,7 @@ module.exports = {
             })
     },
     addClass: function (req, res) {
-        verifyKey(req.header('Authorization'), 'admin')
+        verifyKey(req.header('Authorization'), 'Admin')
             .then((isVerified) => {
                 if (isVerified) {
                     // Create folder
@@ -269,7 +269,7 @@ module.exports = {
             })
     },
     updateClass: function (req, res) {
-        verifyKey(req.header('Authorization'), 'admin')
+        verifyKey(req.header('Authorization'), 'Admin')
             .then((isVerified) => {
                 if (isVerified) {
                     const cid = req.params.cid;
@@ -286,7 +286,7 @@ module.exports = {
             })
     },
     deleteClass: function (req, res) {
-        verifyKey(req.header('Authorization'), 'admin')
+        verifyKey(req.header('Authorization'), 'Admin')
             .then((isVerified) => {
                 if (isVerified) {
                     const cid = req.params.cid;
@@ -330,7 +330,7 @@ module.exports = {
             })
     },
     addStudent: function (req, res) {
-        verifyKey(req.header('Authorization'), 'admin')
+        verifyKey(req.header('Authorization'), 'Admin')
             .then((isVerified) => {
                 if (isVerified) {
                     const sid = req.body.sid;
@@ -341,7 +341,7 @@ module.exports = {
                             _id: cid
                         }, {
                             $push: {
-                                students: sid
+                                Students: sid
                             }
                         })
                         .then(newC => res.json(newC))
@@ -352,7 +352,7 @@ module.exports = {
             })
     },
     deleteStudent: function (req, res) {
-        verifyKey(req.header('Authorization'), 'admin')
+        verifyKey(req.header('Authorization'), 'Admin')
             .then((isVerified) => {
                 if (isVerified) {
                     const sid = req.body.sid;
@@ -363,7 +363,7 @@ module.exports = {
                             _id: cid
                         }, {
                             $pull: {
-                                students: sid
+                                Students: sid
                             }
                         })
                         .then(newC => res.json(newC))
@@ -374,7 +374,7 @@ module.exports = {
             })
     },
     addTeacher: function (req, res) {
-        verifyKey(req.header('Authorization'), 'admin')
+        verifyKey(req.header('Authorization'), 'Admin')
             .then((isVerified) => {
                 if (isVerified) {
                     const tid = req.body.tid;
@@ -385,7 +385,7 @@ module.exports = {
                             _id: cid
                         }, {
                             $push: {
-                                teachers: tid
+                                Teachers: tid
                             }
                         })
                         .then(newC => res.json(newC))
@@ -396,7 +396,7 @@ module.exports = {
             })
     },
     deleteTeacher: function (req, res) {
-        verifyKey(req.header('Authorization'), 'admin')
+        verifyKey(req.header('Authorization'), 'Admin')
             .then((isVerified) => {
                 if (isVerified) {
                     const tid = req.body.tid;
@@ -407,7 +407,7 @@ module.exports = {
                             _id: cid
                         }, {
                             $pull: {
-                                teachers: tid
+                                Teachers: tid
                             }
                         })
                         .then(newC => res.json(newC))

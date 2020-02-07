@@ -1,9 +1,10 @@
-import React from "react";
-import { Route, NavLink, Switch, Redirect } from "react-router-dom";
+import React, {useEffect, useState} from "react";
+import { NavLink, Switch, Redirect } from "react-router-dom";
 import AnnouncementsForm from "../../../../components/AnnouncementsForm";
 import GradesForm from "../../../../components/GradesForm";
 import ClassesForm from "../../../../components/ClassesForm";
 import AccountsForm from "../../../../components/AccountsForm";
+import ProtectedRoute from "../../../../components/ProtectedRoute"
 import NoMatch from "../../../NoMatch/index";
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 import { Drawer, Hidden, Divider, List, ListItem, ListItemIcon, ListItemText, CssBaseline} from "@material-ui/core"
@@ -103,6 +104,8 @@ function AdminPortal(props) {
         </div>
     );
 
+    useEffect(() => {
+    }, [])
 
     return (
         <div className={classes.root}>
@@ -141,26 +144,6 @@ function AdminPortal(props) {
             <main className={classes.content}>
                 <div className={classes.toolbar} />
     
-        {/* <div style={{ display: "flex", width: "100%", height: "100vh" }}>   */}
-            
-            
-            {/* <div style={{ margin: "auto" }}> ADMIN PORTAL </div> */}
-            {/* Add, Delete, Update Classes */}
-            {/* Add, Delete Student/Teacher accounts to classes */}
-            {/* Get, Add, Delete, Update School Announcements */}
-            {/* Get all grades */}
-            {/* Get, Add, Delete grade */}
-            {/* Add, delete accounts */}
-
-            {/* General Layout (menu in side panel, MUI Responsive Drawer) */}
-            {/* https://www.w3schools.com/howto/howto_css_custom_scrollbar.asp */}
-            {/* https://material-ui.com/components/drawers/#responsive-drawer */}
-            
-            {/* Render all school / with CRUD buttons */}
-            {/* Render all grades (w/CRUD dialog) with associated classes (w/CRUD dialog) */}
-            {/* Render all accounts (w/ CRUD dialog) */}
-
-            {/*  */}
                 <TransitionGroup>
                     <CSSTransition
                         key={props.location.key}
@@ -168,11 +151,11 @@ function AdminPortal(props) {
                         classNames='fade'
                     >
                         <Switch location={props.location}>
-                <Route exact path={`${props.match.path}/announcements`} component={AnnouncementsForm} user={props.user} />
-                <Route exact path={`${props.match.path}/grades`} component={GradesForm} user={props.user} />
-                <Route exact path={`${props.match.path}/classes`} component={ClassesForm} user={props.user} />
-                <Route exact path={`${props.match.path}/accounts`} component={AccountsForm} user={props.user} />
-                <Route component={() => <Redirect to={`${props.match.path}/announcements`} />} />
+                            <ProtectedRoute exact path={`${props.match.path}/announcements`} component={AnnouncementsForm} user={props.user}/>
+                            <ProtectedRoute exact path={`${props.match.path}/grades`} component={GradesForm} user={props.user} />
+                            <ProtectedRoute exact path={`${props.match.path}/classes`} component={ClassesForm} user={props.user} />
+                            <ProtectedRoute exact path={`${props.match.path}/accounts`} component={AccountsForm} user={props.user} />
+                            <ProtectedRoute path={`${props.match.path}/announcements`} component={AnnouncementsForm} user={props.user} />
                         </Switch>
                     </CSSTransition>
                 </TransitionGroup>

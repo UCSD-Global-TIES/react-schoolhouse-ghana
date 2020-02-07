@@ -2,6 +2,7 @@ const router = require("express").Router();
 const generalController = require("../../controllers/generalController");
 
 router.route("/ann")
+  .get(generalController.getAnnouncements)
   .post(generalController.addAnnouncement)
 
 // Matches with "/api/class/:cid/ann/:aid"

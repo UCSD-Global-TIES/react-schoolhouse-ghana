@@ -6,7 +6,7 @@ const ProtectedRoute = ({ component: Component, path, user, ...rest }) => {
     
     const render = props => <Component {...props} user={user} {...rest}/>;
 
-    return <Route path={path} render={render} {...rest} />
+    return <Route path={path} render={render} />
 };
 
 export default ProtectedRoute;

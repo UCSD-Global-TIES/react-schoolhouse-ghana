@@ -18,7 +18,7 @@ module.exports = {
             .populate('profile')
             .then((account) => {
                 // If an account with the provided username is found
-                if(account) {
+                if (account) {
                     // If passwords match, return populated document
                     if (verifyPassword(password, account.password)) {
                         // Set session user cookie (in login)
@@ -27,7 +27,7 @@ module.exports = {
                             profile: account.profile,
                             key: account._id
                         };
-    
+
                         // API KEY SHOULD NOT BE ACCOUNT _id (future feature)
                         res.json({
                             type: account.type,
@@ -37,7 +37,7 @@ module.exports = {
                     } else {
                         res.json(null);
                     }
-                } 
+                }
                 // If an account with the provided username is NOT found
                 else {
                     res.json(null)
@@ -47,7 +47,8 @@ module.exports = {
     }, // ~ 100 ms
 
     verifySession: function (req, res) {
-        if (req.session.user && req.cookies.user_sid) res.json(req.session.user);
+        if (!req.session || !req.cookies) res.json(null);
+        else if (req.session.user && req.cookies.user_sid) res.json(req.session.user);
         else res.json(null);
     }, // ~ 0.5 - 1.5 ms
     destroySession: function (req, res) {
