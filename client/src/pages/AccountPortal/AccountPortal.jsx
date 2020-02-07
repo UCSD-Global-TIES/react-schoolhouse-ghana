@@ -4,12 +4,15 @@ import "./main.css";
 
 import StudentPortal from "./versions/student/StudentPortal.jsx";
 import TeacherPortal from "./versions/teacher/TeacherPortal.jsx";
-import AdminPortal from "./versions/admin/AdminPortal.jsx";
+import { Redirect } from "react-router-dom";
+// import AdminPortal from "./versions/admin/AdminPortal.jsx";
+
+const AdminRedirect = () => <Redirect to="/edit" />;
 
 const accountComponents = {
     Student: StudentPortal,
     Teacher: TeacherPortal,
-    Admin: AdminPortal
+    Admin: AdminRedirect
 }
 
 function AccountPortal(props) {

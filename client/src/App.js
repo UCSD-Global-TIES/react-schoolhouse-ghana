@@ -26,6 +26,8 @@ import AccountPortal from "./pages/AccountPortal/index";
 import ClassPage from "./pages/ClassPage/index";
 import NavBar from "./components/NavBar";
 
+import AdminPortal from "./pages/AccountPortal/versions/admin/AdminPortal";
+
 function App() {
   // const testUser = null;
   const [userInfo, setUserInfo] = useState(null);
@@ -47,7 +49,6 @@ function App() {
           
           if(user.data) {
             setUserInfo(user.data);
-            console.log(user.data)
             showLoginError(false);
           } 
   
@@ -87,6 +88,7 @@ function App() {
         <ProtectedRoute exact path="/" component={AccountPortal} user={userInfo} />
         {/* Class component should check account type and render the correct component */}
         <ProtectedRoute exact path="/class/:id" component={ClassPage} user={userInfo} />
+        <ProtectedRoute path="/edit" component={props => <AdminPortal {...props} logout={handleLogout}/>} user={userInfo} />
         <Route exact path="/login" component={props => <LoginPortal {...props} user={userInfo} hasError={IsErrorVisible} login={handleLogin} />} />
         <Route component={NoMatch} />
       </Switch>
