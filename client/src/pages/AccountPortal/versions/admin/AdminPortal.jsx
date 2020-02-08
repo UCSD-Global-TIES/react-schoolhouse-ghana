@@ -155,7 +155,7 @@ function AdminPortal(props) {
                             <ProtectedRoute exact path={`${props.match.path}/grades`} component={GradesForm} user={props.user} />
                             <ProtectedRoute exact path={`${props.match.path}/classes`} component={ClassesForm} user={props.user} />
                             <ProtectedRoute exact path={`${props.match.path}/accounts`} component={AccountsForm} user={props.user} />
-                            <ProtectedRoute path={`${props.match.path}/announcements`} component={AnnouncementsForm} user={props.user} />
+                            <ProtectedRoute path={`${props.match.path}`} component={AnnouncementsForm} user={props.user} />
                         </Switch>
                     </CSSTransition>
                 </TransitionGroup>

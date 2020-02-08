@@ -1,3 +1,5 @@
+const moment = require('moment');
+
 module.exports = {
     getQueries: (param_str) => {
         let tmp = param_str.split("?")[1];
@@ -11,5 +13,8 @@ module.exports = {
         }
 
         return res;
+    },
+    parseTime: (date) => {
+        return moment(date).format("dddd, MMMM Do YYYY, h:mm:ss a");
     }
 }
