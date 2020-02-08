@@ -19,6 +19,28 @@ const accountComponents = {
 
 function ClassPage(props) {
   const class_id = props.match.params.id;
+  const announcements = [
+    {
+      author: "Author 1",
+      content: "Content",
+      date: "Jan 1, 2019"
+    },
+    {
+      author: "Author 2",
+      content: "Content",
+      date: "Jan 1, 2019"
+    },
+    {
+      author: "Author 3",
+      content: "Content",
+      date: "Jan 1, 2019"
+    },
+    {
+      author: "Author 4",
+      content: "Content",
+      date: "Jan 1, 2019"
+    }
+  ];
   
   const [classInfo, setClassInfo] = useState({name: "Linear Algebra"});
   const [loading, setLoading] = useState(true);
