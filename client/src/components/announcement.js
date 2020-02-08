@@ -30,9 +30,9 @@ const useStyles = makeStyles({
 
 // /*SimpleCard https://material-ui.com/components/cards/ */
 
-export default function SimpleAnnouncement() {
+export default function SimpleAnnouncement(props) {
   const classes = useStyles();
-  const announcement = this.props.announcement;
+  const announcement = props.announcement;
   // const bull = <span className={classes.bullet}>•</span>;
 
   return (
