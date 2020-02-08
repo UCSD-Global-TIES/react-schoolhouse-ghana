@@ -14,6 +14,7 @@ const accountComponents = {
 
 function AccountPortal(props) {
     const Component = accountComponents[props.user.type];
+    console.log(props.user);
 
     return (
         <Component {...props} />
