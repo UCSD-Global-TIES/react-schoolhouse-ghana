@@ -54,7 +54,6 @@ export default function SimpleAnnouncement(props) {
         <Typography variant="body1" component="p">
           {announcement.content}
         </Typography>
-        {/*<EditDialog content={announcement.content} />*/}
       </CardContent>
     </Card>
   );
