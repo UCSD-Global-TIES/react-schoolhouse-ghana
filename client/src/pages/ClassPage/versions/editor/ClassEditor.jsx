@@ -54,9 +54,7 @@ const useStyles = makeStyles(theme => ({
 
 function ClassEditor(props) {
   const classes = useStyles();
-  const [checked, setChecked] = useState([0]);
-  const [isDelete, setDelete] = useState([false]);
-  const [isUpdate, setUpdate] = useState([false]);
+  const [checked, setChecked] = useState([]);
 
   const handleToggle = value => () => {
     const currentIndex = checked.indexOf(value);
@@ -70,18 +68,7 @@ function ClassEditor(props) {
     }
 
     setChecked(newChecked);
-    if (newChecked.length == 1) {
-      setDelete(false);
-      setUpdate(false);
-    }
-    else if (newChecked.length === 2) {
-      setDelete(true);
-      setUpdate(true);
-    }
-    else if (newChecked.length > 2) {
-      setDelete(true);
-      setUpdate(false);
-    }
+
   };
 
 
@@ -89,12 +76,12 @@ function ClassEditor(props) {
     <div style={{ display: "flex", width: "100%", height: "100vh" }}>
       <div>announcements</div>
       <section className={classes.pageSection}>
-        {isDelete == true &&
+        {checked.length &&
           <Fab
             variant="extended"
             onClick={console.log("delete")}>Delete</Fab>
         }
-        {isUpdate == true &&
+        {checked.length === 1 &&
           <Fab
             variant="extended"
             onClick={console.log("Update")}>Update</Fab>
@@ -104,7 +91,9 @@ function ClassEditor(props) {
           onClick={console.log("Add")}>Add</Fab>
         <div style={{ margin: "auto" }}>
           <List className={classes.root}>
+            {/* Render every announcement */}
             {announcements.map(announcement => {
+              // To uniquely identify each list element
               const labelId = `checkbox-list-label-${announcement._id}`;
 
               return (
