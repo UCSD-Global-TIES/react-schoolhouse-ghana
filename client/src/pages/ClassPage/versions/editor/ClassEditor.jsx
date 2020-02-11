@@ -91,18 +91,15 @@ function ClassEditor(props) {
       <section className={classes.pageSection}>
         {isDelete == true &&
           <Fab
-            color="secondary"
             variant="extended"
             onClick={console.log("delete")}>Delete</Fab>
         }
         {isUpdate == true &&
           <Fab
-            color="secondary"
             variant="extended"
             onClick={console.log("Update")}>Update</Fab>
         }
         <Fab
-          color="primary"
           variant="extended"
           onClick={console.log("Add")}>Add</Fab>
         <div style={{ margin: "auto" }}>
