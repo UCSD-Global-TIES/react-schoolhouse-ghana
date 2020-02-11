@@ -12,8 +12,7 @@ import Checkbox from '@material-ui/core/Checkbox';
 import IconButton from '@material-ui/core/IconButton';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBullhorn } from '@fortawesome/free-solid-svg-icons'
-import CommentIcon from '@material-ui/icons/Comment';
-import { Grid } from "@material-ui/core";
+import Fab from "@material-ui/core/Fab";
 
 const announcements = [
   {
@@ -48,6 +47,9 @@ const useStyles = makeStyles(theme => ({
     maxWidth: 360,
     backgroundColor: theme.palette.background.paper,
   },
+  pageSection: {
+    marginTop: '4em'
+  }
 }));
 
 function ClassEditor(props) {
@@ -68,11 +70,11 @@ function ClassEditor(props) {
     }
 
     setChecked(newChecked);
-    if (newChecked.length   ==1) {
+    if (newChecked.length == 1) {
       setDelete(false);
       setUpdate(false);
     }
-    else if (newChecked.length  === 2) {
+    else if (newChecked.length === 2) {
       setDelete(true);
       setUpdate(true);
     }
@@ -86,40 +88,51 @@ function ClassEditor(props) {
   return (
     <div style={{ display: "flex", width: "100%", height: "100vh" }}>
       <div>announcements</div>
-      {isDelete == true &&
-        <button id="delButton">Delete</button>
-      }
-      {isUpdate == true &&
-        <button id="updateButton">Update</button>
-      }
-        <button id="updateButton">Add</button>
-      <div style={{ margin: "auto" }}>
-        <List className={classes.root}>
-          {announcements.map(announcement => {
-            const labelId = `checkbox-list-label-${announcement._id}`;
+      <section className={classes.pageSection}>
+        {isDelete == true &&
+          <Fab
+            color="secondary"
+            variant="extended"
+            onClick={console.log("delete")}>Delete</Fab>
+        }
+        {isUpdate == true &&
+          <Fab
+            color="secondary"
+            variant="extended"
+            onClick={console.log("Update")}>Update</Fab>
+        }
+        <Fab
+          color="primary"
+          variant="extended"
+          onClick={console.log("Add")}>Add</Fab>
+        <div style={{ margin: "auto" }}>
+          <List className={classes.root}>
+            {announcements.map(announcement => {
+              const labelId = `checkbox-list-label-${announcement._id}`;
 
-            return (
-              <ListItem key={announcement._id} role={undefined} dense button onClick={handleToggle(announcement._id)}>
-                <ListItemIcon>
-                  <Checkbox
-                    edge="start"
-                    checked={checked.indexOf(announcement._id) !== -1}
-                    tabIndex={-1}
-                    disableRipple
-                    inputProps={{ 'aria-labelledby': labelId }}
-                  />
-                </ListItemIcon>
-                <ListItemText id={labelId} primary={announcement.date} />
-                <ListItemSecondaryAction>
-                  <IconButton edge="end" aria-label="comments">
-                    <FontAwesomeIcon icon={faBullhorn} size="sm" />
-                  </IconButton>
-                </ListItemSecondaryAction>
-              </ListItem>
-            );
-          })}
-        </List>
-      </div>
+              return (
+                <ListItem key={announcement._id} role={undefined} dense button onClick={handleToggle(announcement._id)}>
+                  <ListItemIcon>
+                    <Checkbox
+                      edge="start"
+                      checked={checked.indexOf(announcement._id) !== -1}
+                      tabIndex={-1}
+                      disableRipple
+                      inputProps={{ 'aria-labelledby': labelId }}
+                    />
+                  </ListItemIcon>
+                  <ListItemText id={labelId} primary={announcement.date} />
+                  <ListItemSecondaryAction>
+                    <IconButton edge="end" aria-label="comments">
+                      <FontAwesomeIcon icon={faBullhorn} size="sm" />
+                    </IconButton>
+                  </ListItemSecondaryAction>
+                </ListItem>
+              );
+            })}
+          </List>
+        </div>
+      </section>
     </div>
   );
 }
