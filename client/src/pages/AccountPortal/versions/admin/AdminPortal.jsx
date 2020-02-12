@@ -9,7 +9,7 @@ import NoMatch from "../../../NoMatch/index";
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 import { Drawer, Hidden, Divider, List, ListItem, ListItemIcon, ListItemText, CssBaseline} from "@material-ui/core"
 import { TransitionGroup, CSSTransition } from 'react-transition-group'
-
+import { useMediaQuery } from 'react-responsive';
 import "../../../../utils/flowHeaders.min.css";
 import "./main.css";
 import NavBarAdmin from "../../../../components/NavBarAdmin";
@@ -23,18 +23,18 @@ const useStyles = makeStyles(theme => ({
         display: 'flex',
     },
     toolbar: theme.mixins.toolbar,
-    drawer: {
-        [theme.breakpoints.up('sm')]: {
-            width: drawerWidth,
-            flexShrink: 0,
-        },
-    },
+    // drawer: {
+    //     [theme.breakpoints.up('sm')]: {
+    //         width: drawerWidth,
+    //         flexShrink: 0,
+    //     },
+    // },
     drawerPaper: {
         width: drawerWidth,
     },
     content: {
         flexGrow: 1,
-        padding: theme.spacing(3),
+        // padding: theme.spacing(3),
     },
     buttonLink: {
         color: "inherit",
@@ -48,7 +48,10 @@ function AdminPortal(props) {
     const theme = useTheme();
     const [mobileOpen, setMobileOpen] = React.useState(false);
     const [selectedIdx, setSelectedIdx] = React.useState(0);
-
+    const isSmallDevice = useMediaQuery({
+        query: '(max-width: 600px)'
+      })
+    
 
     const handleDrawerToggle = () => {
         setMobileOpen(!mobileOpen);
@@ -141,7 +144,7 @@ function AdminPortal(props) {
                     </Drawer>
                 </Hidden>
             </nav>
-            <main className={classes.content}>
+            <main className={classes.content} style={{marginLeft: !isSmallDevice ? drawerWidth : 0,}}>
                 <div className={classes.toolbar} />
     
                 <TransitionGroup>

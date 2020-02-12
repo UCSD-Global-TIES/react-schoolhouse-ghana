@@ -2,10 +2,14 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { getQueries, parseTime } from "../../utils/misc";
 import API from "../../utils/API";
-import { Button, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Checkbox } from "@material-ui/core";
+import { Alert } from '@material-ui/lab'
+import { Snackbar, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Checkbox, Typography } from "@material-ui/core";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBullhorn, faPlus, faTrash, faEdit } from "@fortawesome/free-solid-svg-icons";
+import { faBullhorn, faSpinner } from "@fortawesome/free-solid-svg-icons";
 import { makeStyles, useTheme } from '@material-ui/core/styles';
+import EnhancedListToolbar from "../EnhancedListToolbar";
+import "../../utils/flowHeaders.min.css";
+
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -13,7 +17,6 @@ const useStyles = makeStyles(theme => ({
     },
     list: {
         width: '100%',
-        maxWidth: 360,
         backgroundColor: theme.palette.background.paper,
     },
     buttonLink: {
@@ -22,6 +25,10 @@ const useStyles = makeStyles(theme => ({
     },
     actionButton: {
         margin: theme.spacing(1)
+    },
+    content: {
+        width: "90%",
+        maxWidth: "700px"
     }
 }));
 
@@ -44,12 +51,24 @@ function AnnouncementsForm(props) {
     // const theme = useTheme();
     const [selected, setSelected] = useState([]);
     // const [announcements, setAnnouncements] = useState([]);
+    const [currentAlert, setCurrentAlert] = useState({isOpen: false, severity: "", message: ""});
     // const [loading, setLoading] = useState(true);
 
     // TESTING
     const [announcements, setAnnouncements] = useState(testAnnouncements);
     const [loading, setLoading] = useState(false);
 
+    const handleAlertClose = (event, reason) => {
+        if (reason === 'clickaway') {
+            return;
+        }
+
+        let tmp = currentAlert;
+
+        tmp.isOpen = false;
+
+        setCurrentAlert({...tmp});
+    };
 
     const handleSelect = value => () => {
         const currentIndex = selected.indexOf(value);
@@ -87,102 +106,87 @@ function AnnouncementsForm(props) {
     }, []);
 
     return (
-        // Consider using a table instead!!
-        // https://material-ui.com/components/tables/#sorting-amp-selecting
-        <div style={{ display: "flex", width: "100%", height: "100%" }}>
-            <div style={{ margin: "auto" }}>
-                Current Query: {props.location.search ? getQueries(props.location.search).id : "None"}
+        <>
+            <Snackbar
+                anchorOrigin={{ vertical: "top", horizontal: "right" }}
+                open={currentAlert.isOpen}
+                autoHideDuration={6000}
+                onClose={handleAlertClose}
+            >
+                <Alert onClose={handleAlertClose} severity={currentAlert.severity}>
+                    {currentAlert.message}
+                </Alert>
+            </Snackbar>
+            <div style={{ display: "flex", width: "100%", height: "100%" }}>
+                <div style={{ margin: "auto" }} className={classes.content}>
+                    {/* Current Query: {props.location.search ? getQueries(props.location.search).id : "None"}
                 <br />
                 <br />
                 Announcements Editor
                 <br />
                 <br />
-                <Link to={`${props.match.url}?id=123`}>Update Announcement ID #123 </Link>
+                <Link to={`${props.match.url}?id=123`}>Update Announcement ID #123 </Link> */}
 
-                <div>
-                    <Button
-                        variant="contained"
-                        style={{ backgroundColor: "#5cb85c", color: "white" }}
-                        size="small"
-                        className={classes.actionButton}
-                        onClick={handleCreate}
-                        startIcon={<FontAwesomeIcon icon={faPlus} />}
-                    >
-                        Add
-                    </Button>
-                    {
-                        selected.length ?
-                            <Button
-                                variant="contained"
-                                color="secondary"
-                                size="small"
-                                className={classes.actionButton}
-                                startIcon={<FontAwesomeIcon icon={faTrash} />}
-                                onClick={handleDelete}
-                            >
-                                Delete ({selected.length})
-                            </Button>
-                            : ""
-                    }
-                    {
-                        selected.length === 1 ?
+                    <>
+                    {/* https://material-ui.com/components/dialogs/ */}
+                        <EnhancedListToolbar title={"Announcements"} numSelected={selected.length} handleCreate={handleCreate} handleUpdate={handleUpdate} handleDelete={handleDelete} />
 
-                            <Button
-                                variant="contained"
-                                color="default"
-                                size="small"
-                                className={classes.actionButton}
-                                onClick={handleUpdate}
-                                startIcon={<FontAwesomeIcon icon={faEdit} />}
-                            >
-                                Update
-                            </Button>
-                            : ""
-                    }
+                        {
+                            loading ?
+                                <div style={{ display: "flex", marginTop: "2rem" }}>
+                                    <div style={{ margin: "auto", padding: "3rem" }}>
+                                        <Typography className="flow-text" style={{ color: "grey" }} variant="h5">Loading...</Typography>
+                                        <p style={{ textAlign: "center", color: "grey" }}><FontAwesomeIcon icon={faSpinner} spin size="5x" /></p>
+                                    </div>
+                                </div>
+
+                                :
+
+                                announcements.length ?
+                                    <List className={classes.list}>
+
+                                        {
+                                            announcements.map((announcement, idx) => {
+                                                const labelId = `announcement-${idx}`;
+
+                                                return (
+                                                    <ListItem key={labelId} role={undefined} dense button onClick={handleSelect(idx)}>
+                                                        <ListItemIcon>
+                                                            <Checkbox
+                                                                edge="start"
+                                                                checked={selected.indexOf(idx) !== -1}
+                                                                tabIndex={-1}
+                                                                disableRipple
+                                                                inputProps={{ 'aria-labelledby': labelId }}
+                                                            />
+                                                        </ListItemIcon>
+                                                        <ListItemText id={labelId} primary={announcement.title} secondary={announcement.last_updated ? `Updated: ${parseTime(announcement.last_updated, true)}` : `Created: ${parseTime(announcement.date_created, true)}`} />
+                                                        <ListItemSecondaryAction>
+                                                            {/* <IconButton edge="end" aria-label="comments"> */}
+                                                            <FontAwesomeIcon icon={faBullhorn} />
+                                                            {/* </IconButton> */}
+                                                        </ListItemSecondaryAction>
+                                                    </ListItem>
+                                                );
+                                            })
+                                        }
+                                    </List>
+
+                                    :
+                                    <div style={{ display: "flex", marginTop: "2rem" }}>
+                                        <div style={{ margin: "auto", padding: "3rem" }}>
+                                            <Typography className="flow-text" style={{ color: "grey" }} variant="h5">No announcements exist yet.</Typography>
+                                            <p style={{ textAlign: "center", color: "grey" }}><FontAwesomeIcon icon={faBullhorn} size="5x" /></p>
+                                        </div>
+                                    </div>
+                        }
+                    </>
+
+
+
                 </div>
-                {
-                    loading ?
-                        <> Loading... </>
-                        :
-
-                        announcements.length ?
-
-                            <List className={classes.list}>
-                                {
-                                    announcements.map((announcement, idx) => {
-                                        const labelId = `announcement-${idx}`;
-
-                                        return (
-                                            <ListItem key={labelId} role={undefined} dense button onClick={handleSelect(idx)}>
-                                                <ListItemIcon>
-                                                    <Checkbox
-                                                        edge="start"
-                                                        checked={selected.indexOf(idx) !== -1}
-                                                        tabIndex={-1}
-                                                        disableRipple
-                                                        inputProps={{ 'aria-labelledby': labelId }}
-                                                    />
-                                                </ListItemIcon>
-                                                <ListItemText id={labelId} primary={announcement.title} secondary={announcement.last_updated ? `Updated: ${parseTime(announcement.last_updated)}` : `Created: ${parseTime(announcement.date_created)}`} />
-                                                <ListItemSecondaryAction>
-                                                    {/* <IconButton edge="end" aria-label="comments"> */}
-                                                    <FontAwesomeIcon icon={faBullhorn} />
-                                                    {/* </IconButton> */}
-                                                </ListItemSecondaryAction>
-                                            </ListItem>
-                                        );
-                                    })
-                                }
-                            </List>
-
-                            :
-                            <> No announcements exist yet. Create one!</>
-                }
-
-
-
             </div>
-        </div>
+        </>
     )
 };
 

@@ -14,7 +14,8 @@ module.exports = {
 
         return res;
     },
-    parseTime: (date) => {
-        return moment(date).format("dddd, MMMM Do YYYY, h:mm:ss a");
+    parseTime: (date, isShort) => {
+        if(isShort) return moment(date).format("h:mm a on MM/DD/YY");
+        return moment(date).format("dddd, MMMM Do YYYY, h:mm a");
     }
 }
