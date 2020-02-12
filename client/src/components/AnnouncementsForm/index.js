@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 import { getQueries, parseTime } from "../../utils/misc";
 import API from "../../utils/API";
 import { Alert } from '@material-ui/lab'
@@ -8,6 +7,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBullhorn, faSpinner } from "@fortawesome/free-solid-svg-icons";
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 import EnhancedListToolbar from "../EnhancedListToolbar";
+import FullScreenDialog from "../FullScreenDialog";
+import ConfirmDialog from "../ConfirmDialog";
 import "../../utils/flowHeaders.min.css";
 
 
@@ -32,16 +33,20 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
+{/* Current Query: {props.location.search ? getQueries(props.location.search).id : "None"}
+                <Link to={`${props.match.url}?id=123`}>Update Announcement ID #123 </Link> */}
 
 function AnnouncementsForm(props) {
     const testAnnouncements = [
         {
+            _id: "1",
             title: "Title 0",
             content: "Content 0",
             date_created: "123",
             last_updated: "1234"
         },
         {
+            _id: "2",
             title: "Title 1",
             content: "Content 1",
             date_created: "123"
@@ -50,14 +55,20 @@ function AnnouncementsForm(props) {
     const classes = useStyles();
     // const theme = useTheme();
     const [selected, setSelected] = useState([]);
+    const [currentAlert, setCurrentAlert] = useState({ isOpen: false, severity: "", message: "" });
+    const [dialogOpen, setDialogOpen] = useState(false);
+    const [confirmOpen, setConfirmOpen] = useState(false);
+    const [documentAction, setDocumentAction] = useState({ text: "", function: () => { } });
+    const [currentDocument, setCurrentDocument] = useState({});
+
     // const [announcements, setAnnouncements] = useState([]);
-    const [currentAlert, setCurrentAlert] = useState({isOpen: false, severity: "", message: ""});
     // const [loading, setLoading] = useState(true);
 
     // TESTING
     const [announcements, setAnnouncements] = useState(testAnnouncements);
     const [loading, setLoading] = useState(false);
 
+    // Closing snackbar alerts
     const handleAlertClose = (event, reason) => {
         if (reason === 'clickaway') {
             return;
@@ -67,10 +78,11 @@ function AnnouncementsForm(props) {
 
         tmp.isOpen = false;
 
-        setCurrentAlert({...tmp});
+        setCurrentAlert({ ...tmp });
     };
 
-    const handleSelect = value => () => {
+    // Handle checkbox selection
+    const handleSelect = value => {
         const currentIndex = selected.indexOf(value);
         const newSelected = [...selected];
 
@@ -83,18 +95,46 @@ function AnnouncementsForm(props) {
         setSelected(newSelected);
     };
 
+    // Handle deletion of document
+    const handleDelete = (id) => {
+        console.log("Deleting announcements: ", selected.join(" "));
+        handleConfirm(false);
+        setCurrentAlert({ isOpen: true, severity: "success", message: "The document(s) have been successfully deleted!" });
+    }
+
+    // Handle opening/closing of confirmation
+    const handleConfirm = (isOpen) => {
+        setConfirmOpen(isOpen);
+    }
+
+    // Handle creation of document
     const handleCreate = () => {
         console.log("Creating announcements")
-
+        setDialogOpen(false);
+        setCurrentAlert({ isOpen: true, severity: "success", message: "The document has been successfully created!" });
     }
 
-    const handleDelete = () => {
-        console.log("Deleting announcements: ", selected.join(" "))
-    }
-
-    const handleUpdate = () => {
+    // Handle saving of document
+    const handleSave = () => {
         console.log("Updating announcement: ", selected[0]);
+        setDialogOpen(false);
+        setCurrentAlert({ isOpen: true, severity: "success", message: "The document has been successfully updated!" });
 
+    }
+
+    // Handle opening/closing of document 
+    const handleDocument = (isOpen, document) => {
+        setDialogOpen(isOpen);
+
+        if (document) {
+            setCurrentDocument(document);
+            if (!Object.keys(document).length) {
+                setDocumentAction({ text: "Create", function: handleCreate });
+            } else {
+                setDocumentAction({ text: "Update", function: handleSave });
+
+            }
+        }
     }
 
     useEffect(() => {
@@ -107,6 +147,7 @@ function AnnouncementsForm(props) {
 
     return (
         <>
+            {/* ALERTS FOR API ACTIONS */}
             <Snackbar
                 anchorOrigin={{ vertical: "top", horizontal: "right" }}
                 open={currentAlert.isOpen}
@@ -117,19 +158,36 @@ function AnnouncementsForm(props) {
                     {currentAlert.message}
                 </Alert>
             </Snackbar>
+
+            {/* UPDATE DOCUMENT DIALOG */}
+            <FullScreenDialog
+                open={dialogOpen}
+                handleClose={() => handleDocument(false)}
+                type="Announcement"
+                action={documentAction}
+            >
+                {JSON.stringify(currentDocument)}
+            </FullScreenDialog>
+
+            {/* DELETE DOCUMENT(S) DIALOG */}
+            <ConfirmDialog
+                open={confirmOpen}
+                handleClose={() => handleConfirm(false)}
+                handleAction={handleDelete}>
+                Are you sure you would like to delete all {selected.length} document(s)?
+            </ConfirmDialog>
+
+            {/* DOCUMENTS */}
             <div style={{ display: "flex", width: "100%", height: "100%" }}>
                 <div style={{ margin: "auto" }} className={classes.content}>
-                    {/* Current Query: {props.location.search ? getQueries(props.location.search).id : "None"}
-                <br />
-                <br />
-                Announcements Editor
-                <br />
-                <br />
-                <Link to={`${props.match.url}?id=123`}>Update Announcement ID #123 </Link> */}
-
                     <>
-                    {/* https://material-ui.com/components/dialogs/ */}
-                        <EnhancedListToolbar title={"Announcements"} numSelected={selected.length} handleCreate={handleCreate} handleUpdate={handleUpdate} handleDelete={handleDelete} />
+                        <EnhancedListToolbar
+                            title={"Announcements"}
+                            numSelected={selected.length}
+                            handleCreate={() => handleDocument(true, {})}
+                            handleUpdate={() => handleDocument(true, announcements[selected[0]])}
+                            handleDelete={() => handleConfirm(true)}
+                        />
 
                         {
                             loading ?
@@ -150,7 +208,7 @@ function AnnouncementsForm(props) {
                                                 const labelId = `announcement-${idx}`;
 
                                                 return (
-                                                    <ListItem key={labelId} role={undefined} dense button onClick={handleSelect(idx)}>
+                                                    <ListItem key={labelId} role={undefined} dense button onClick={() => handleSelect(idx)}>
                                                         <ListItemIcon>
                                                             <Checkbox
                                                                 edge="start"

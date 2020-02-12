@@ -25,6 +25,9 @@ import LoginPortal from "./pages/LoginPortal/index";
 import AccountPortal from "./pages/AccountPortal/index";
 import ClassPage from "./pages/ClassPage/index";
 import NavBar from "./components/NavBar";
+import { faSpinner } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+
 
 import AdminPortal from "./pages/AccountPortal/versions/admin/AdminPortal";
 
@@ -43,15 +46,15 @@ function App() {
   }
 
   const handleLogin = (username, password) => {
-    if(username.length && password.length) {
+    if (username.length && password.length) {
       API.verifyAccount(username, password)
         .then((user) => {
-          
-          if(user.data) {
+
+          if (user.data) {
             setUserInfo(user.data);
             showLoginError(false);
-          } 
-  
+          }
+
           // Login failed, show error message
           else {
             showLoginError(true);
@@ -69,29 +72,32 @@ function App() {
 
   }, []);
 
-  if (loading) {
-    return (
-      <div className="App text-center">
-        Loading
-      </div>
-    )
-  }
-
   return (
     <div className="App">
       <header>
         {/* Place navigation bar here */}
         <NavBar user={userInfo} logout={handleLogout} />
       </header>
-      <Switch>
-        {/* Portal component should check account type and render the correct component */}
-        <ProtectedRoute exact path="/" component={AccountPortal} user={userInfo} />
-        {/* Class component should check account type and render the correct component */}
-        <ProtectedRoute exact path="/class/:id" component={ClassPage} user={userInfo} />
-        <ProtectedRoute path="/edit" component={AdminPortal} logout={handleLogout} user={userInfo} />
-        <Route exact path="/login" component={props => <LoginPortal {...props} user={userInfo} hasError={IsErrorVisible} login={handleLogin} />} />
-        <Route component={NoMatch} />
-      </Switch>
+
+      {
+        loading ?
+          <div style={{ display: "flex", width: "100vw", height: "100vh"  }}>
+            <div style={{ margin: "auto" }}>
+              <FontAwesomeIcon icon={faSpinner} size="2x" spin />
+            </div>
+
+          </div>
+          :
+          <Switch>
+            {/* Portal component should check account type and render the correct component */}
+            <ProtectedRoute exact path="/" component={AccountPortal} user={userInfo} />
+            {/* Class component should check account type and render the correct component */}
+            <ProtectedRoute exact path="/class/:id" component={ClassPage} user={userInfo} />
+            <ProtectedRoute path="/edit" component={AdminPortal} logout={handleLogout} user={userInfo} />
+            <Route exact path="/login" component={props => <LoginPortal {...props} user={userInfo} hasError={IsErrorVisible} login={handleLogin} />} />
+            <Route component={NoMatch} />
+          </Switch>
+      }
     </div>
   );
 }
