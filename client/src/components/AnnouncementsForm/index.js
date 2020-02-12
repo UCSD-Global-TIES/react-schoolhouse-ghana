@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { getQueries, parseTime } from "../../utils/misc";
 import {useHistory } from "react-router-dom";
 // import API from "../../utils/API";
-import { Alert } from '@material-ui/lab'
+import { Alert, Skeleton } from '@material-ui/lab'
 import { TextField, Snackbar, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Checkbox, Typography } from "@material-ui/core";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBullhorn, faSpinner } from "@fortawesome/free-solid-svg-icons";
@@ -34,6 +34,11 @@ const useStyles = makeStyles(theme => ({
     },
     dialogContent: {
         padding: "2rem"
+    },
+    skeleton: {
+        width: "100%",
+        margin: "1em",
+        height: "40px"
     }
 }));
 
@@ -261,14 +266,18 @@ function AnnouncementsForm(props) {
                             handleDelete={() => handleConfirm(true)}
                         />
 
+                        {/* Consider using https://material-ui.com/components/skeleton/ for documents */}
                         {
                             loading ?
-                                <div style={{ display: "flex", marginTop: "2rem" }}>
-                                    <div style={{ margin: "auto", padding: "3rem" }}>
-                                        <Typography className="flow-text" style={{ color: "grey" }} variant="h5">Loading...</Typography>
-                                        <p style={{ textAlign: "center", color: "grey" }}><FontAwesomeIcon icon={faSpinner} spin size="5x" /></p>
-                                    </div>
-                                </div>
+                                // <div style={{ display: "flex", marginTop: "2rem" }}>
+                                //     <div style={{ margin: "auto", padding: "3rem" }}>
+                                //         <Typography className="flow-text" style={{ color: "grey" }} variant="h5">Loading...</Typography>
+                                //         <p style={{ textAlign: "center", color: "grey" }}><FontAwesomeIcon icon={faSpinner} spin size="5x" /></p>
+                                //     </div>
+                                // </div>
+                                [0, 1, 2].map((item, idx) => (
+                                    <Skeleton key={`skeleton-document-${idx}`} animation="wave" variant="rect" className={classes.skeleton} />
+                                ))
 
                                 :
                                 // MAPPING ALL DOCUMENTS
