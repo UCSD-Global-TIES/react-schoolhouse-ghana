@@ -38,7 +38,7 @@ export default function FullScreenDialog(props) {
               <CloseIcon />
             </IconButton>
             <Typography variant="h6" className={classes.title}>
-              {props.type} Editor
+              {props.type}
             </Typography>
             <Button autoFocus color="inherit" onClick={props.action.function}>
               {props.action.text}

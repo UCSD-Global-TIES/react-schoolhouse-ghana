@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import "../../utils/flowHeaders.min.css";
 import "./main.css";
 import { makeStyles } from '@material-ui/core/styles';
@@ -8,23 +8,33 @@ import AccountCircle from "@material-ui/icons/AccountCircle";
 import Key from "@material-ui/icons/VpnKey";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSignInAlt, faChalkboardTeacher } from '@fortawesome/free-solid-svg-icons'
+import FullScreenDialog from "../../components/FullScreenDialog";
 
 const useStyles = makeStyles(theme => ({
     formInput: {
-        margin: "1em"
+        margin: "1em 0em",
+        width: "100%"
+    },
+    formContainer: {
+        width: "100%"
     },
     title: {
         width: "100%",
         display: "block",
         margin: "20px 0"
+    },
+    portal: {
+        width: "75vw",
+        maxWidth: "300px"
     }
 
 }));
 
 function LoginPortal(props) {
     const classes = useStyles();
-    const [username, setUsername] = React.useState("");
-    const [password, setPassword] = React.useState("");
+    const [username, setUsername] = useState("");
+    const [password, setPassword] = useState("");
+    const [seedDialogOpen, setSeedDialogOpen] = useState(false);
 
     const set = {
         username: setUsername,
@@ -35,13 +45,43 @@ function LoginPortal(props) {
         set[e.target.name](e.target.value);
     }
 
+    const handleCloseSeedDialog = () => {
+        setSeedDialogOpen(false);
+    }
+
+    const handleSeedDatabase = () => {
+        setTimeout(() => {
+            // Send alert
+            console.log("Documents seeded!");
+            handleCloseSeedDialog();
+        }, 1500);
+    }
+
+    useEffect(() => {
+        // Check if database is empty
+        setTimeout(() => {
+            // Set information for account created
+
+            // Open dialog
+            setSeedDialogOpen(true);
+        }, 1500);
+    }, [])
 
     if (props.user) { return <Redirect to="/" /> }
 
     return (
+        <>
+        <FullScreenDialog
+            open={seedDialogOpen}
+            handleClose={handleCloseSeedDialog}
+            type={"Welcome to Schoolhouse Ghana!"}
+            action={{ text: "Seed", function: handleSeedDatabase}}
+        >
+
+        </FullScreenDialog>
         <div style={{ display: "flex", width: "100%", height: "100vh" }}>
             <div style={{ margin: "auto" }}>
-                <div>
+                <div className={classes.portal}>
 
                 <Typography align='center' variant="h6" className={classes.title}>
                     login <FontAwesomeIcon icon={faChalkboardTeacher} size="lg" />
@@ -54,8 +94,8 @@ function LoginPortal(props) {
                 </div>
                     : ""
                 }
-                <div className={classes.formInput}>
-                    <FormControl>
+                <div className={classes.formContainer}>
+                    <FormControl className={classes.formInput}>
                         <InputLabel htmlFor="input-with-icon-adornment">Username</InputLabel>
                         <Input
                             startAdornment={
@@ -70,8 +110,8 @@ function LoginPortal(props) {
                         />
                     </FormControl>
                 </div>
-                <div className={classes.formInput}>
-                    <FormControl>
+                <div className={classes.formContainer}>
+                    <FormControl className={classes.formInput}>
                         <InputLabel htmlFor="input-with-icon-adornment">Password</InputLabel>
                         <Input
                             type='password'
@@ -80,6 +120,7 @@ function LoginPortal(props) {
                                     <Key />
                                 </InputAdornment>
                             }
+                            
                             name='password'
                             value={password}
                             onChange={handleChange}
@@ -101,6 +142,7 @@ function LoginPortal(props) {
 
             </div>
         </div>
+        </>
 
     );
 }

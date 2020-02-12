@@ -42,7 +42,7 @@ const useStyles = makeStyles(theme => ({
 // title - used for dialog editor, alerts
 // API - specifies create, get, update, delete actions
 // icon - used for no documents message and for list
-// form - component used for document dialog
+// Form - component used for document dialog
 function AnnouncementsForm(props) {
     const testAnnouncements = [
         {
@@ -218,7 +218,7 @@ function AnnouncementsForm(props) {
             <FullScreenDialog
                 open={dialogOpen}
                 handleClose={() => handleDocument(false)}
-                type="Announcement"
+                type={`Announcement Editor`}
                 action={documentAction}
             >
                 <div className={classes.dialogContent}>
