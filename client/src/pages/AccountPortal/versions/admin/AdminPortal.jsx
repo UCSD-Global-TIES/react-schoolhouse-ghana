@@ -1,11 +1,10 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect} from "react";
 import { NavLink, Switch, Redirect } from "react-router-dom";
 import AnnouncementsForm from "../../../../components/AnnouncementsForm";
 import GradesForm from "../../../../components/GradesForm";
 import ClassesForm from "../../../../components/ClassesForm";
 import AccountsForm from "../../../../components/AccountsForm";
 import ProtectedRoute from "../../../../components/ProtectedRoute"
-import NoMatch from "../../../NoMatch/index";
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 import { Drawer, Hidden, Divider, List, ListItem, ListItemIcon, ListItemText, CssBaseline} from "@material-ui/core"
 import { TransitionGroup, CSSTransition } from 'react-transition-group'
@@ -34,7 +33,7 @@ const useStyles = makeStyles(theme => ({
     },
     content: {
         flexGrow: 1,
-        // padding: theme.spacing(3),
+        padding: theme.spacing(1),
     },
     buttonLink: {
         color: "inherit",
@@ -47,7 +46,6 @@ function AdminPortal(props) {
     const classes = useStyles();
     const theme = useTheme();
     const [mobileOpen, setMobileOpen] = React.useState(false);
-    const [selectedIdx, setSelectedIdx] = React.useState(0);
     const isSmallDevice = useMediaQuery({
         query: '(max-width: 600px)'
       })
@@ -57,11 +55,7 @@ function AdminPortal(props) {
         setMobileOpen(!mobileOpen);
     };
 
-    const handleListItemClick = (index) => {
-        setSelectedIdx(index);
-    };
-
-    const menuItems = [
+    const documentMenuItems = [
         {
             label: "Announcements",
             icon: faBullhorn,
@@ -80,15 +74,23 @@ function AdminPortal(props) {
 
     ]
 
+    const otherMenuItems = [
+        {
+            label: "Accounts",
+            icon: faUsers,
+            path: `${props.match.url}/accounts`
+        },
+    ]
+
 
     const drawer = (
         <div>
             <div className={classes.toolbar} />
             {/* <Divider /> */}
             <List>
-                {menuItems.map((item, index) => (
+                {documentMenuItems.map((item, index) => (
                     <NavLink to={item.path} key={index} className={classes.buttonLink}>
-                        <ListItem selected={selectedIdx === index} onClick={() => handleListItemClick(index)} button>
+                        <ListItem selected={props.location.pathname.includes(item.path)}  button>
                             <ListItemIcon>{<FontAwesomeIcon icon={item.icon}/>}</ListItemIcon>
                             <ListItemText primary={item.label} />
                         </ListItem>
@@ -97,19 +99,22 @@ function AdminPortal(props) {
             </List>
             <Divider />
             <List>
-                <NavLink to={`${props.match.url}/accounts`} className={classes.buttonLink}>
-                    <ListItem button selected={selectedIdx === menuItems.length} onClick={() => handleListItemClick(menuItems.length)}>
-                    <ListItemIcon>{<FontAwesomeIcon icon={faUsers} />}</ListItemIcon>
-                        <ListItemText primary={"Accounts"} />
+            {otherMenuItems.map((item, index) => (
+
+                <NavLink to={item.path} key={index} className={classes.buttonLink}>
+                    <ListItem button selected={props.location.pathname.includes(item.path) } >
+                    <ListItemIcon>{<FontAwesomeIcon icon={item.icon} />}</ListItemIcon>
+                        <ListItemText primary={item.label} />
                     </ListItem>
                     </NavLink>
+            ))}
             </List>
         </div>
     );
 
     useEffect(() => {
     }, [])
-
+    
     return (
         <div className={classes.root}>
             <CssBaseline />
@@ -158,7 +163,7 @@ function AdminPortal(props) {
                             <ProtectedRoute exact path={`${props.match.path}/grades`} component={GradesForm} user={props.user} />
                             <ProtectedRoute exact path={`${props.match.path}/classes`} component={ClassesForm} user={props.user} />
                             <ProtectedRoute exact path={`${props.match.path}/accounts`} component={AccountsForm} user={props.user} />
-                            <ProtectedRoute path={`${props.match.path}`} component={AnnouncementsForm} user={props.user} />
+                            <Redirect to={`${props.match.path}/announcements`}/>
                         </Switch>
                     </CSSTransition>
                 </TransitionGroup>

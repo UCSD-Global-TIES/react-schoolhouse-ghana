@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { getQueries, parseTime } from "../../utils/misc";
-import API from "../../utils/API";
+import {useHistory } from "react-router-dom";
+// import API from "../../utils/API";
 import { Alert } from '@material-ui/lab'
-import { Snackbar, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Checkbox, Typography } from "@material-ui/core";
+import { TextField, Snackbar, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Checkbox, Typography } from "@material-ui/core";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBullhorn, faSpinner } from "@fortawesome/free-solid-svg-icons";
-import { makeStyles, useTheme } from '@material-ui/core/styles';
+import { makeStyles } from '@material-ui/core/styles';
 import EnhancedListToolbar from "../EnhancedListToolbar";
 import FullScreenDialog from "../FullScreenDialog";
 import ConfirmDialog from "../ConfirmDialog";
@@ -30,26 +31,32 @@ const useStyles = makeStyles(theme => ({
     content: {
         width: "90%",
         maxWidth: "700px"
+    },
+    dialogContent: {
+        padding: "2rem"
     }
 }));
 
-{/* Current Query: {props.location.search ? getQueries(props.location.search).id : "None"}
-                <Link to={`${props.match.url}?id=123`}>Update Announcement ID #123 </Link> */}
-
+// Can be non-specific for all document editors
+// PROPS:
+// title - used for dialog editor, alerts
+// API - specifies create, get, update, delete actions
+// icon - used for no documents message and for list
+// form - component used for document dialog
 function AnnouncementsForm(props) {
     const testAnnouncements = [
         {
             _id: "1",
             title: "Title 0",
             content: "Content 0",
-            date_created: "123",
-            last_updated: "1234"
+            date_created: new Date(1581452252),
+            last_updated: new Date(1581527252)
         },
         {
             _id: "2",
             title: "Title 1",
             content: "Content 1",
-            date_created: "123"
+            date_created: new Date(1481452252)
         },
     ];
     const classes = useStyles();
@@ -60,13 +67,8 @@ function AnnouncementsForm(props) {
     const [confirmOpen, setConfirmOpen] = useState(false);
     const [documentAction, setDocumentAction] = useState({ text: "", function: () => { } });
     const [currentDocument, setCurrentDocument] = useState({});
-
-    // const [announcements, setAnnouncements] = useState([]);
-    // const [loading, setLoading] = useState(true);
-
-    // TESTING
-    const [announcements, setAnnouncements] = useState(testAnnouncements);
-    const [loading, setLoading] = useState(false);
+    const [announcements, setAnnouncements] = useState([]);
+    const [loading, setLoading] = useState(true);
 
     // Closing snackbar alerts
     const handleAlertClose = (event, reason) => {
@@ -116,7 +118,7 @@ function AnnouncementsForm(props) {
 
     // Handle saving of document
     const handleSave = () => {
-        console.log("Updating announcement: ", selected[0]);
+        console.log("Updating announcement: ", currentDocument._id);
         setDialogOpen(false);
         setCurrentAlert({ isOpen: true, severity: "success", message: "The document has been successfully updated!" });
 
@@ -124,17 +126,49 @@ function AnnouncementsForm(props) {
 
     // Handle opening/closing of document 
     const handleDocument = (isOpen, document) => {
+        // Redirect to previous page in history if redirect param is true
+        if(props.location.search) {
+            if(getQueries(props.location.search).redirect && !isOpen) props.history.goBack()  
+        }
+
         setDialogOpen(isOpen);
 
         if (document) {
             setCurrentDocument(document);
+            // If the document is empty (passed when creating a document)
             if (!Object.keys(document).length) {
                 setDocumentAction({ text: "Create", function: handleCreate });
             } else {
                 setDocumentAction({ text: "Update", function: handleSave });
-
             }
         }
+    }
+
+    const handleChange = (event) => {
+        const { name, value } = event.target;
+        let tmp = { ...currentDocument };
+        tmp[name] = value;
+
+        setCurrentDocument({ ...tmp });
+    }
+
+    const handleRouteChange = (destination, _id) => {
+        // Replace the current history item as the current path with the open document
+        // you are navigating away from
+        let route;
+        // If the current path does not have an document query, append one
+        if(!props.match.url.includes("_id")) {
+            if(props.match.url.includes("?")) {
+                route = `${props.match.url}&_id=${currentDocument._id}`;
+            }
+            else {
+                route = `${props.match.url}?_id=${currentDocument._id}`;
+            }
+            props.history.replace(route);
+        }
+  
+        // Travel to the new specified route with the redirect param as true
+        props.history.push(`${destination}?_id=${_id}&redirect=true`);
     }
 
     useEffect(() => {
@@ -143,6 +177,27 @@ function AnnouncementsForm(props) {
         //         setAnnouncements(result.data);
         //         setLoading(false);
         //     })
+        setTimeout(() => {
+            setLoading(false);
+            setAnnouncements(testAnnouncements);
+
+            // If the user has requested a document in the route, set the document
+            // with that _id in the editor
+            if(props.location.search) {
+                const _id = getQueries(props.location.search)._id;
+    
+                let isDocument = false;
+                for(const announcement of testAnnouncements) {
+                    if(announcement._id == _id) {
+                        handleDocument(true, announcement);
+                        isDocument = true;
+                    }
+                }
+    
+                if(!isDocument) setCurrentAlert({ isOpen: true, severity: "error", message: `A document with ID ${_id} could not be found.` });
+            }
+        }, 1500);
+
     }, []);
 
     return (
@@ -166,7 +221,24 @@ function AnnouncementsForm(props) {
                 type="Announcement"
                 action={documentAction}
             >
-                {JSON.stringify(currentDocument)}
+                <div className={classes.dialogContent}>
+
+                    <TextField
+                        label="Title"
+                        style={{ margin: 8 }}
+                        name="title"
+                        value={currentDocument["title"] || ""}
+                        helperText="An informative title for your announcement"
+                        onChange={handleChange}
+                        fullWidth
+                        margin="normal"
+                        InputLabelProps={{
+                            shrink: true,
+                        }}
+                        variant="outlined"
+                    />
+
+                </div>
             </FullScreenDialog>
 
             {/* DELETE DOCUMENT(S) DIALOG */}
@@ -199,7 +271,7 @@ function AnnouncementsForm(props) {
                                 </div>
 
                                 :
-
+                                // MAPPING ALL DOCUMENTS
                                 announcements.length ?
                                     <List className={classes.list}>
 

@@ -1,5 +1,5 @@
 import axios from "axios";
-import encrypt from "./encrypt";
+// import encrypt from "./encrypt";
 
 // ROUTES UNSECURED
 // CONVERT ALL API FUNCTIONS SO YOU PASS IN VARIABLES NOT A OBJECT
