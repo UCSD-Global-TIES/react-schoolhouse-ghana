@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { getQueries, parseTime } from "../../utils/misc";
-import {useHistory } from "react-router-dom";
+import clsx from "clsx";
+import { useHistory } from "react-router-dom";
 // import API from "../../utils/API";
 import { Alert, Skeleton } from '@material-ui/lab'
 import { TextField, Snackbar, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Checkbox, Typography } from "@material-ui/core";
@@ -37,7 +38,7 @@ const useStyles = makeStyles(theme => ({
     },
     skeleton: {
         width: "100%",
-        margin: "1em",
+        margin: "1rem 0rem",
         height: "40px"
     }
 }));
@@ -132,8 +133,8 @@ function AnnouncementsForm(props) {
     // Handle opening/closing of document 
     const handleDocument = (isOpen, document) => {
         // Redirect to previous page in history if redirect param is true
-        if(props.location.search) {
-            if(getQueries(props.location.search).redirect && !isOpen) props.history.goBack()  
+        if (props.location.search) {
+            if (getQueries(props.location.search).redirect && !isOpen) props.history.goBack()
         }
 
         setDialogOpen(isOpen);
@@ -162,8 +163,8 @@ function AnnouncementsForm(props) {
         // you are navigating away from
         let route;
         // If the current path does not have an document query, append one
-        if(!props.match.url.includes("_id")) {
-            if(props.match.url.includes("?")) {
+        if (!props.match.url.includes("_id")) {
+            if (props.match.url.includes("?")) {
                 route = `${props.match.url}&_id=${currentDocument._id}`;
             }
             else {
@@ -171,7 +172,7 @@ function AnnouncementsForm(props) {
             }
             props.history.replace(route);
         }
-  
+
         // Travel to the new specified route with the redirect param as true
         props.history.push(`${destination}?_id=${_id}&redirect=true`);
     }
@@ -188,18 +189,18 @@ function AnnouncementsForm(props) {
 
             // If the user has requested a document in the route, set the document
             // with that _id in the editor
-            if(props.location.search) {
+            if (props.location.search) {
                 const _id = getQueries(props.location.search)._id;
-    
+
                 let isDocument = false;
-                for(const announcement of testAnnouncements) {
-                    if(announcement._id == _id) {
+                for (const announcement of testAnnouncements) {
+                    if (announcement._id == _id) {
                         handleDocument(true, announcement);
                         isDocument = true;
                     }
                 }
-    
-                if(!isDocument) setCurrentAlert({ isOpen: true, severity: "error", message: `A document with ID ${_id} could not be found.` });
+
+                if (!isDocument) setCurrentAlert({ isOpen: true, severity: "error", message: `A document with ID ${_id} could not be found.` });
             }
         }, 1500);
 
@@ -227,21 +228,23 @@ function AnnouncementsForm(props) {
                 action={documentAction}
             >
                 <div className={classes.dialogContent}>
-
-                    <TextField
-                        label="Title"
-                        style={{ margin: 8 }}
-                        name="title"
-                        value={currentDocument["title"] || ""}
-                        helperText="An informative title for your announcement"
-                        onChange={handleChange}
-                        fullWidth
-                        margin="normal"
-                        InputLabelProps={{
-                            shrink: true,
-                        }}
-                        variant="outlined"
-                    />
+                    {[1, 2, 3].map(() => (
+                        <TextField
+                            label="Title"
+                            style={{ margin: 8 }}
+                            name="title"
+                            value={currentDocument["title"] || ""}
+                            helperText="An informative title for your announcement"
+                            onChange={handleChange}
+                            fullWidth
+                            autoComplete={'off'}
+                            margin="normal"
+                            InputLabelProps={{
+                                shrink: true,
+                            }}
+                            variant="outlined"
+                        />))
+                    }
 
                 </div>
             </FullScreenDialog>
