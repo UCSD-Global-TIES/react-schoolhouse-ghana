@@ -19,7 +19,7 @@ const studentSchema = new Schema({
     required: true,
     ref: 'Grade'
   }
-});
+}, { timestamps: true });
 
 const Student = mongoose.model("Student", studentSchema);
 

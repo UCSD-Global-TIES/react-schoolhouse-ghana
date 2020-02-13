@@ -32,6 +32,8 @@ const useStyles = makeStyles(theme => ({
 
 }));
 
+const socket = window.socket;
+
 function LoginPortal(props) {
     const classes = useStyles();
     const [username, setUsername] = useState("");
@@ -69,6 +71,7 @@ function LoginPortal(props) {
                     if (user.data) {
                         props.setUser(user.data);
                         setLoginError(false);
+                        socket.emit('authentication', `${user.data.first_name} has connected!`)
                     }
 
                     // Login failed, show error message

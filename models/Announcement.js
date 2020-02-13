@@ -11,13 +11,6 @@ const announcementSchema = new Schema({
     type: String,
     required: true
   },
-  last_updated: {
-    type: Date
-  },
-  date_created: {
-    type: Date,
-    default: Date.now
-  },
   title: {
     type: String,
     required: true
@@ -31,7 +24,7 @@ const announcementSchema = new Schema({
     type: Boolean,
     default: true
   }
-});
+}, { timestamps: true });
 
 const Announcement = mongoose.model("Announcement", announcementSchema);
 

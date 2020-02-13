@@ -14,7 +14,7 @@ const gradeSchema = new Schema({
     type: String,
     required: true
   }
-});
+}, { timestamps: true });
 
 const Grade = mongoose.model("Grade", gradeSchema);
 

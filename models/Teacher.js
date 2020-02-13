@@ -14,7 +14,7 @@ const teacherSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: 'Class'
   }]
-});
+}, { timestamps: true });
 
 const Teacher = mongoose.model("Teacher", teacherSchema);
 

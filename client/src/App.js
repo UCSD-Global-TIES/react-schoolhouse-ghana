@@ -12,7 +12,6 @@ import "./App.css";
 import API from "./utils/API";
 import 'typeface-roboto';
 
-
 // COMPONENTS
 // -----------------------------------------------------------
 // Component that ensures people are logged in and have proper permissions
@@ -31,6 +30,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 
 import AdminPortal from "./pages/AccountPortal/versions/admin/AdminPortal";
+
+const socket = window.socket;
 
 function App() {
   // const testUser = null;
