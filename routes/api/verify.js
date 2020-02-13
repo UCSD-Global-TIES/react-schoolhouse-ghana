@@ -10,4 +10,8 @@ router.route("/session")
   .get(verifyController.verifySession)
   .delete(verifyController.destroySession)
 
+// Matches with "/api/verify/database"
+router.route("/database")
+  .get(verifyController.verifyInitialization)
+
 module.exports = router;

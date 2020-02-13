@@ -281,6 +281,9 @@ export default {
   verifySession: function () {
     return axios.get(`/api/verify/session`);
   },
+  verifyInitialization: function () {
+    return axios.get(`/api/verify/database`);
+  },
   destroySession: function () {
     return axios.delete(`/api/verify/session`);
   },

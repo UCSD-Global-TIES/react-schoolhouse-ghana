@@ -10,6 +10,7 @@ import {
 
 import "./App.css";
 import API from "./utils/API";
+import 'typeface-roboto';
 
 
 // COMPONENTS
@@ -34,7 +35,6 @@ import AdminPortal from "./pages/AccountPortal/versions/admin/AdminPortal";
 function App() {
   // const testUser = null;
   const [userInfo, setUserInfo] = useState(null);
-  const [IsErrorVisible, showLoginError] = useState(false);
 
   const [loading, setLoading] = useState(true);
 
@@ -45,22 +45,8 @@ function App() {
       })
   }
 
-  const handleLogin = (username, password) => {
-    if (username.length && password.length) {
-      API.verifyAccount(username, password)
-        .then((user) => {
-
-          if (user.data) {
-            setUserInfo(user.data);
-            showLoginError(false);
-          }
-
-          // Login failed, show error message
-          else {
-            showLoginError(true);
-          }
-        })
-    }
+  const setUser = (user) => {
+    setUserInfo(user);
   }
 
   useEffect(() => {
@@ -81,7 +67,7 @@ function App() {
 
       {
         loading ?
-          <div style={{ display: "flex", width: "100vw", height: "100vh"  }}>
+          <div style={{ display: "flex", width: "100vw", height: "100vh" }}>
             <div style={{ margin: "auto" }}>
               <FontAwesomeIcon icon={faSpinner} size="2x" spin />
             </div>
@@ -94,7 +80,7 @@ function App() {
             {/* Class component should check account type and render the correct component */}
             <ProtectedRoute exact path="/class/:id" component={ClassPage} user={userInfo} />
             <ProtectedRoute path="/edit" component={AdminPortal} logout={handleLogout} user={userInfo} />
-            <Route exact path="/login" component={props => <LoginPortal {...props} user={userInfo} hasError={IsErrorVisible} login={handleLogin} />} />
+            <Route exact path="/login" component={props => <LoginPortal {...props} user={userInfo} setUser={setUser} />} />
             <Route component={NoMatch} />
           </Switch>
       }

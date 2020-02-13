@@ -8,6 +8,8 @@ import IconButton from '@material-ui/core/IconButton';
 import Typography from '@material-ui/core/Typography';
 import CloseIcon from '@material-ui/icons/Close';
 import Slide from '@material-ui/core/Slide';
+import "../../utils/flowHeaders.min.css"
+import clsx from 'clsx';
 
 const useStyles = makeStyles(theme => ({
   appBar: {
@@ -37,7 +39,7 @@ export default function FullScreenDialog(props) {
             <IconButton edge="start" color="inherit" onClick={props.handleClose} aria-label="close">
               <CloseIcon />
             </IconButton>
-            <Typography variant="h6" className={classes.title}>
+            <Typography variant="h6" className={clsx(classes.title, "flow-text")}>
               {props.type}
             </Typography>
             <Button autoFocus color="inherit" onClick={props.action.function}>

@@ -5,9 +5,6 @@ const session = require('express-session');
 const morgan = require('morgan');
 const mongoose = require("mongoose");
 const routes = require("./routes");
-const accountDb = require("./models/Account");
-const adminDb = require("./models/Admin");
-const { encryptPassword } = require("./scripts/encrypt");
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -87,44 +84,4 @@ const startServer = () => {
   });
 }
 
-const rootAccount = {
-  first_name: "SAS",
-  last_name: "Admin",
-  username: "root",
-  password: "admin"
-}
-
-// Before starting the server, check to see an admin user exists; if not, create one
-accountDb
-.find({type: "Admin"})
-.then((accounts) => {
-
-  if(!accounts.length) {
-    adminDb
-    .create({
-      first_name: rootAccount.first_name,
-      last_name: rootAccount.last_name
-    })
-    .then((newAdmin) => {
-      accountDb
-      .create({
-        username: rootAccount.username,
-        password: encryptPassword(rootAccount.password),
-        profile: newAdmin._id,
-        type: 'Admin'
-      })
-      .then(() => {
-        console.log("An admin account has been created.");
-        console.log(`Username: ${rootAccount.username}`);
-        console.log(`Password: ${rootAccount.password}`);
-
-        startServer();
-      })
-
-    })
-  }
-
-  else {
-    startServer();
-  }
-})
+startServer();

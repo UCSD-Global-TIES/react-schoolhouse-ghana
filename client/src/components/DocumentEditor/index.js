@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { getQueries, parseTime } from "../../utils/misc";
 import clsx from "clsx";
-import { Alert, Skeleton } from '@material-ui/lab'
-import { TextField, Snackbar, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Checkbox, Typography } from "@material-ui/core";
+import { Alert, Skeleton, Pagination } from '@material-ui/lab'
+import { FormControl, Input, InputLabel, InputAdornment, Snackbar, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Checkbox, Typography } from "@material-ui/core";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import SearchIcon from '@material-ui/icons/Search';
 import { makeStyles } from '@material-ui/core/styles';
 import EnhancedListToolbar from "../EnhancedListToolbar";
 import FullScreenDialog from "../FullScreenDialog";
@@ -31,12 +32,20 @@ const useStyles = makeStyles(theme => ({
         maxWidth: "700px"
     },
     dialogContent: {
-        padding: "2rem"
+        padding: "0.5rem"
     },
     skeleton: {
         width: "100%",
         margin: "1rem 0rem",
         height: "40px"
+    },
+    paginationContainer: {
+        margin: "auto",
+        padding: "1rem"
+    },
+    searchbar: {
+        margin: "0.5rem 0rem",
+        width: "100%"
     }
 }));
 
@@ -47,17 +56,63 @@ const useStyles = makeStyles(theme => ({
 // icon - used for no documents message and for list
 // Form - component used for document dialog
 function DocumentEditor(props) {
+    const MAX_ITEMS = 5;
 
-    const { API, FormComponent, icon, collection } = props;
+    const { API, FormComponent, icon, collection, primary } = props;
     const classes = useStyles();
+    // DOCUMENTS EDITOR
     const [selected, setSelected] = useState([]);
+    const [documents, setDocuments] = useState([]);
+    const [filteredDocuments, setFilteredDocuments] = useState([]);
+    const [viewableDocuments, setViewableDocuments] = useState([]);
+    const [page, setPage] = React.useState(1);
+    const [searchQuery, setSearchQuery] = useState("");
+
+    // ALERTS
     const [currentAlert, setCurrentAlert] = useState({ isOpen: false, severity: "", message: "" });
-    const [dialogOpen, setDialogOpen] = useState(false);
     const [confirmOpen, setConfirmOpen] = useState(false);
+
+    // DOCUMENT DIALOG
+    const [dialogOpen, setDialogOpen] = useState(false);
     const [documentAction, setDocumentAction] = useState({ text: "", function: () => { } });
     const [currentDocument, setCurrentDocument] = useState({});
-    const [documents, setDocuments] = useState([]);
+
+    // COMPONENT STATUS
     const [loading, setLoading] = useState(true);
+
+    // HANDLE PAGE CHANGE
+    const handlePageChange = (event, value) => {
+        setPage(value);
+
+        if (MAX_ITEMS * value >= filteredDocuments.length)
+            setViewableDocuments(filteredDocuments.slice((value - 1) * MAX_ITEMS));
+        else
+            setViewableDocuments(
+                filteredDocuments.slice((value - 1) * MAX_ITEMS, value * MAX_ITEMS)
+            );
+    };
+
+    // HANDLE QUERY CHANGE
+    const handleQueryChange = (event) => {
+        const { value } = event.target;
+        // Set search query
+        setSearchQuery(value);
+
+        // Reset page 
+        setPage(0)
+
+        // Filter documents
+        if (value.length) {
+            const filteredDocuments = documents.filter(document => document[primary].toLowerCase().includes(value.toLowerCase()));
+            setFilteredDocuments(filteredDocuments);
+            setViewableDocuments(filteredDocuments.slice(0, MAX_ITEMS));
+
+        } else {
+            // Reset the filtered documents to ALL documents
+            setFilteredDocuments(documents);
+            setViewableDocuments(documents.slice(0, MAX_ITEMS));
+        }
+    }
 
     // Closing snackbar alerts
     const handleAlertClose = (event, reason) => {
@@ -133,7 +188,7 @@ function DocumentEditor(props) {
         }
     }
 
-    const handleChange = (event) => {
+    const handleFormChange = (event) => {
         const { name, value } = event.target;
         let tmp = { ...currentDocument };
         tmp[name] = value;
@@ -167,8 +222,64 @@ function DocumentEditor(props) {
         //         setLoading(false);
         //     })
         setTimeout(() => {
+            const testDocuments = [
+                {
+                    _id: "1",
+                    title: "Title 0",
+                    content: "Content 0",
+                    date_created: new Date(1581452252),
+                    last_updated: new Date(1581527252)
+                },
+                {
+                    _id: "2",
+                    title: "Title 1",
+                    content: "Content 1",
+                    date_created: new Date(1481452252)
+                },
+                {
+                    _id: "2",
+                    title: "Title 1",
+                    content: "Content 1",
+                    date_created: new Date(1481452252)
+                },
+                {
+                    _id: "2",
+                    title: "Title 1",
+                    content: "Content 1",
+                    date_created: new Date(1481452252)
+                },
+                {
+                    _id: "2",
+                    title: "Title 1",
+                    content: "Content 1",
+                    date_created: new Date(1481452252)
+                },
+
+                {
+                    _id: "2",
+                    title: "Title 1",
+                    content: "Content 1",
+                    date_created: new Date(1481452252)
+                },
+                {
+                    _id: "2",
+                    title: "Title 1",
+                    content: "Content 1",
+                    date_created: new Date(1481452252)
+                },
+                {
+                    _id: "2",
+                    title: "Title 1",
+                    content: "Content 1",
+                    date_created: new Date(1481452252)
+                },
+            ];
             setLoading(false);
-            setDocuments(testAnnouncements);
+
+            // Initialize documents
+            setDocuments(testDocuments);
+            setFilteredDocuments(testDocuments);
+            setViewableDocuments(testDocuments.slice(0, MAX_ITEMS));
 
             // If the user has requested a document in the route, set the document
             // with that _id in the editor
@@ -176,7 +287,7 @@ function DocumentEditor(props) {
                 const _id = getQueries(props.location.search)._id;
 
                 let isDocument = false;
-                for (const document of testAnnouncements) {
+                for (const document of testDocuments) {
                     if (document._id == _id) {
                         handleDocument(true, document);
                         isDocument = true;
@@ -185,7 +296,7 @@ function DocumentEditor(props) {
 
                 if (!isDocument) setCurrentAlert({ isOpen: true, severity: "error", message: `A ${collection.toLowerCase()} with ID ${_id} could not be found.` });
             }
-        }, 1500);
+        }, 1000);
 
     }, []);
 
@@ -211,25 +322,7 @@ function DocumentEditor(props) {
                 action={documentAction}
             >
                 <div className={classes.dialogContent}>
-                    {/* <FormComponent /> */}
-                    {[1, 2, 3].map(() => (
-                        <TextField
-                            label="Title"
-                            style={{ margin: 8 }}
-                            name="title"
-                            value={currentDocument["title"] || ""}
-                            helperText="An informative title for your announcement"
-                            onChange={handleChange}
-                            fullWidth
-                            autoComplete={'off'}
-                            margin="normal"
-                            InputLabelProps={{
-                                shrink: true,
-                            }}
-                            variant="outlined"
-                        />))
-                    }
-
+                    <FormComponent document={currentDocument} handleRouteChange={handleRouteChange} handleChange={handleFormChange} />
                 </div>
             </FullScreenDialog>
 
@@ -246,53 +339,77 @@ function DocumentEditor(props) {
                 <div style={{ margin: "auto" }} className={classes.content}>
                     <>
                         <EnhancedListToolbar
-                            title={collection.toLowerCase()}
+                            title={collection}
                             numSelected={selected.length}
                             handleCreate={() => handleDocument(true, {})}
                             handleUpdate={() => handleDocument(true, documents[selected[0]])}
                             handleDelete={() => handleConfirm(true)}
                         />
 
+                        <FormControl fullWidth className={classes.searchbar}>
+                            <InputLabel htmlFor="standard-adornment-amount">Search {collection.toLowerCase()}</InputLabel>
+                            <Input
+                                value={searchQuery}
+                                onChange={handleQueryChange}
+                                startAdornment={<InputAdornment position="start"><SearchIcon /></InputAdornment>}
+                            />
+                        </FormControl>
+                        {/* </div> */}
+
                         {
                             loading ?
-                                [0, 1, 2].map((item, idx) => (
+                                [0, 1, 2, 3, 4, 5].map((item, idx) => (
                                     <Skeleton key={`skeleton-document-${idx}`} animation="wave" variant="rect" className={classes.skeleton} />
                                 ))
-
                                 :
                                 // MAPPING ALL DOCUMENTS
-                                documents.length ?
-                                    <List className={classes.list}>
+                                filteredDocuments.length ?
+                                    <>
+                                        <div style={{ display: "flex" }}>
+                                            <div className={classes.paginationContainer}>
+                                                <Pagination
+                                                    size="small"
+                                                    color={"primary"}
+                                                    count={Math.ceil(filteredDocuments.length / MAX_ITEMS)}
+                                                    page={page}
+                                                    onChange={handlePageChange}
+                                                />
 
-                                        {
-                                            documents.map((document, idx) => {
-                                                const labelId = `${collection.toLowerCase()}-${idx}`;
+                                            </div>
+                                        </div>
+                                        <List className={classes.list}>
 
-                                                return (
-                                                    <ListItem key={labelId} role={undefined} dense button onClick={() => handleSelect(idx)}>
-                                                        <ListItemIcon>
-                                                            <Checkbox
-                                                                edge="start"
-                                                                checked={selected.indexOf(idx) !== -1}
-                                                                tabIndex={-1}
-                                                                disableRipple
-                                                                inputProps={{ 'aria-labelledby': labelId }}
-                                                            />
-                                                        </ListItemIcon>
-                                                        <ListItemText id={labelId} primary={document[props.primary]} secondary={document.last_updated ? `Updated: ${parseTime(document.last_updated, true)}` : `Created: ${parseTime(document.date_created, true)}`} />
-                                                        <ListItemSecondaryAction>
-                                                            <FontAwesomeIcon icon={icon} />
-                                                        </ListItemSecondaryAction>
-                                                    </ListItem>
-                                                );
-                                            })
-                                        }
-                                    </List>
+                                            {
+                                                viewableDocuments.map((document, idx) => {
+                                                    const labelId = `${collection.toLowerCase()}-${idx}`;
+
+                                                    return (
+                                                        <ListItem key={labelId} role={undefined} dense button onClick={() => handleSelect(document._id)}>
+                                                            <ListItemIcon>
+                                                                <Checkbox
+                                                                    edge="start"
+                                                                    checked={selected.indexOf(document._id) !== -1}
+                                                                    tabIndex={-1}
+                                                                    disableRipple
+                                                                    inputProps={{ 'aria-labelledby': labelId }}
+                                                                />
+                                                            </ListItemIcon>
+                                                            <ListItemText id={labelId} primary={document[primary]} secondary={document.last_updated ? `Updated: ${parseTime(document.last_updated, true)}` : `Created: ${parseTime(document.date_created, true)}`} />
+                                                            <ListItemSecondaryAction>
+                                                                <FontAwesomeIcon icon={icon} />
+                                                            </ListItemSecondaryAction>
+                                                        </ListItem>
+                                                    );
+                                                })
+                                            }
+                                        </List>
+
+                                    </>
 
                                     :
                                     <div style={{ display: "flex", marginTop: "2rem" }}>
                                         <div style={{ margin: "auto", padding: "3rem" }}>
-                                            <Typography className="flow-text" style={{ color: "grey" }} variant="h5">No {collection.toLowerCase()} exist yet.</Typography>
+                                            <Typography className="flow-text" style={{ color: "grey" }} variant="h5">No {collection.toLowerCase()} were found.</Typography>
                                             <p style={{ textAlign: "center", color: "grey" }}><FontAwesomeIcon icon={icon} size="5x" /></p>
                                         </div>
                                     </div>
