@@ -1,20 +1,45 @@
-import React from "react";
-import { Link } from "react-router-dom";
-import { getQueries } from "../../utils/misc"
+import React, { useEffect, useState } from "react";
+import { TextField } from "@material-ui/core";
+import { makeStyles } from '@material-ui/core/styles';
 
-const GradesForm = (props) => (
-    <div style={{ display: "flex", width: "100%", height: "100%" }}>
-        <div style={{ margin: "auto" }}>
-            Current Query: {props.location.search ? getQueries(props.location.search).id : "None"}
-            <br />
-            <br />
-            Grades Editor
-            <br />
-            <br />
-            <Link to={`${props.match.url}?id=123`}>Update Grade ID #123 </Link>
+import "../../utils/flowHeaders.min.css";
 
-        </div>
-    </div>   
-);
+const useStyles = makeStyles(theme => ({
+    root: {
+        display: 'flex',
+    }
+}));
+
+
+function GradesForm(props) {
+
+    useEffect(() => {
+
+    }, []);
+
+    return (
+        <>
+            {
+                [1, 2, 3].map((item) => (
+                    <TextField
+                        key={item}
+                        label="Title"
+                        style={{ margin: 8 }}
+                        name="title"
+                        value={props.document["title"] || ""}
+                        helperText="An informative title for your announcement"
+                        onChange={props.handleChange}
+                        fullWidth
+                        autoComplete={'off'}
+                        margin="normal"
+                        InputLabelProps={{
+                            shrink: true,
+                        }}
+                        variant="outlined"
+                    />))
+            }
+        </>
+    )
+};
 
 export default GradesForm;

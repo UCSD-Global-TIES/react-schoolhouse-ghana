@@ -14,4 +14,8 @@ router.route("/session")
 router.route("/database")
   .get(verifyController.verifyInitialization)
 
+// Matches with "/api/verify/database"
+router.route("/load")
+  .get(verifyController.verifyLatency)
+
 module.exports = router;

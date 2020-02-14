@@ -1,5 +1,6 @@
 const accountDb = require("../models/Account");
 const adminDb = require("../models/Admin");
+const loadtest = require('loadtest');
 
 const {
     encryptPassword,
@@ -115,6 +116,20 @@ module.exports = {
                 }
             }
             )
+    },
+    verifyLatency: function (req, res) {
+        const options = {
+            url: 'http://localhost:3000',
+            maxRequests: 1000,
+        };
+        loadtest.loadTest(options, function (error, result) {
+            if (error) {
+                res.json(null);
+                return;
+            }
+            const { meanLatencyMs: mean, maxLatencyMs: max, minLatencyMs: min } = result;
+            res.json({ mean, min, max });
+        });
     }
 
 }

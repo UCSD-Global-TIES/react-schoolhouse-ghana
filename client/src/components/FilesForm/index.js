@@ -11,7 +11,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 
-function ClassesForm(props) {
+function FilesForm(props) {
 
     useEffect(() => {
 
@@ -24,7 +24,7 @@ function ClassesForm(props) {
                     <TextField
                         key={item}
                         label="Title"
-                        style={{ margin: 8 }}
+                        style={{ margin: "8px 0px" }}
                         name="title"
                         value={props.document["title"] || ""}
                         helperText="An informative title for your announcement"
@@ -42,4 +42,4 @@ function ClassesForm(props) {
     )
 };
 
-export default ClassesForm;
+export default FilesForm;

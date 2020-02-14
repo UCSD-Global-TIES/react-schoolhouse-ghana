@@ -4,6 +4,7 @@ import AnnouncementsForm from "../../../../components/AnnouncementsForm";
 import GradesForm from "../../../../components/GradesForm";
 import ClassesForm from "../../../../components/ClassesForm";
 import AccountsForm from "../../../../components/AccountsForm";
+import ServerDash from "../../../../components/ServerDash"
 import ProtectedRoute from "../../../../components/ProtectedRoute"
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 import { Drawer, Hidden, Divider, List, ListItem, ListItemIcon, ListItemText, CssBaseline, TextField } from "@material-ui/core"
@@ -13,7 +14,7 @@ import "../../../../utils/flowHeaders.min.css";
 import "./main.css";
 import NavBarAdmin from "../../../../components/NavBarAdmin";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faUsers, faBullhorn, faChalkboardTeacher, faShapes } from "@fortawesome/free-solid-svg-icons";
+import { faUsers, faBullhorn, faChalkboardTeacher, faShapes, faServer } from "@fortawesome/free-solid-svg-icons";
 import DocumentEditor from '../../../../components/DocumentEditor'
 
 const drawerWidth = 220;
@@ -82,6 +83,11 @@ function AdminPortal(props) {
             icon: faUsers,
             path: `${props.match.url}/accounts`
         },
+        {
+            label: "Server",
+            icon: faServer,
+            path: `${props.match.url}/server`
+        },
     ]
 
     const drawer = (
@@ -113,32 +119,6 @@ function AdminPortal(props) {
         </div>
     );
 
-    const AnnouncementsForm = (props) => {
-        return (
-            <>
-                {
-                    [1, 2, 3].map((item) => (
-                        <TextField
-                            key={item}
-                            label="Title"
-                            style={{ margin: 8 }}
-                            name="title"
-                            value={props.document["title"] || ""}
-                            helperText="An informative title for your announcement"
-                            onChange={props.handleChange}
-                            fullWidth
-                            autoComplete={'off'}
-                            margin="normal"
-                            InputLabelProps={{
-                                shrink: true,
-                            }}
-                            variant="outlined"
-                        />))
-                }
-            </>
-        )
-    }
-
     const pagesInfo = [
         {
             collection: "Announcements",
@@ -150,24 +130,24 @@ function AdminPortal(props) {
         {
             collection: "Grades",
             icon: faShapes,
-            FormComponent: AnnouncementsForm,
+            FormComponent: GradesForm,
             primary: "title",
             path: `${props.match.path}/grades`
         },
         {
             collection: "Classes",
             icon: faChalkboardTeacher,
-            FormComponent: AnnouncementsForm,
+            FormComponent: ClassesForm,
             primary: "title",
             path: `${props.match.path}/classes`
         },
         {
             collection: "Accounts",
             icon: faUsers,
-            FormComponent: AnnouncementsForm,
+            FormComponent: AccountsForm,
             primary: "title",
             path: `${props.match.path}/accounts`
-        },
+        }
     ]
 
     let pages = [];
@@ -184,6 +164,9 @@ function AdminPortal(props) {
                     {...props} />
         })
     })
+
+    // ADD SERVER MANAGEMENT PAGE
+    pages.push({ path: `${props.match.path}/server`, component: ServerDash })
 
     const defaultRoute = `${props.match.path}/announcements`;
 

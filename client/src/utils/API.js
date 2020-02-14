@@ -284,6 +284,9 @@ export default {
   verifyInitialization: function () {
     return axios.get(`/api/verify/database`);
   },
+  checkLoadSpeed: function () {
+    return axios.get(`/api/verify/load`)
+  },
   destroySession: function () {
     return axios.delete(`/api/verify/session`);
   },
