@@ -13,11 +13,14 @@ import clsx from 'clsx';
 
 const useStyles = makeStyles(theme => ({
   appBar: {
-    position: 'relative',
   },
   title: {
     marginLeft: theme.spacing(2),
     flex: 1,
+  },
+  dialogContent: {
+    marginTop: "4rem",
+    padding: "0.5rem"
   },
 }));
 
@@ -34,7 +37,7 @@ export default function FullScreenDialog(props) {
         Open full-screen dialog
       </Button> */}
       <Dialog fullScreen open={props.open} onClose={props.handleClose} TransitionComponent={Transition}>
-        <AppBar className={classes.appBar}>
+        <AppBar className={classes.appBar} position="fixed">
           <Toolbar>
             <IconButton edge="start" color="inherit" onClick={props.handleClose} aria-label="close">
               <CloseIcon />
@@ -47,7 +50,9 @@ export default function FullScreenDialog(props) {
             </Button>
           </Toolbar>
         </AppBar>
-        {props.children}
+        <div className={classes.dialogContent}>
+          {props.children}
+        </div>
       </Dialog>
     </div>
   );

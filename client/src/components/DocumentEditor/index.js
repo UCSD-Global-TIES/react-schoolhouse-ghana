@@ -31,9 +31,6 @@ const useStyles = makeStyles(theme => ({
         width: "90%",
         maxWidth: "700px"
     },
-    dialogContent: {
-        padding: "0.5rem"
-    },
     skeleton: {
         width: "100%",
         margin: "1rem 0rem",
@@ -321,9 +318,7 @@ function DocumentEditor(props) {
                 type={`${collection} Editor`}
                 action={documentAction}
             >
-                <div className={classes.dialogContent}>
-                    <FormComponent document={currentDocument} handleRouteChange={handleRouteChange} handleChange={handleFormChange} />
-                </div>
+                <FormComponent document={currentDocument} handleRouteChange={handleRouteChange} handleChange={handleFormChange} />
             </FullScreenDialog>
 
             {/* DELETE DOCUMENT(S) DIALOG */}

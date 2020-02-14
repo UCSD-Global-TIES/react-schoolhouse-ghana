@@ -15,7 +15,9 @@ module.exports = {
         return res;
     },
     parseTime: (date, isShort) => {
-        if(isShort) return moment(date).format("h:mm a on MM/DD/YY");
+        if (!date) return;
+
+        if (isShort) return moment(date).format("h:mm a on MM/DD/YY");
         return moment(date).format("dddd, MMMM Do YYYY, h:mm a");
     }
 }
