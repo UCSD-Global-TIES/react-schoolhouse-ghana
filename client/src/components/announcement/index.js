@@ -1,11 +1,10 @@
-
 import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Card from "@material-ui/core/Card";
 import CardContent from "@material-ui/core/CardContent";
 import Typography from "@material-ui/core/Typography";
-/*import EditDialog from "./announcement_form";*/
 import Divider from "@material-ui/core/Divider";
+
 
 const useStyles = makeStyles({
   card: {
@@ -30,10 +29,10 @@ const useStyles = makeStyles({
 
 // /*SimpleCard https://material-ui.com/components/cards/ */
 
-export default function SimpleAnnouncement(props) {
+export default function AnnouncementView(data) {
   const classes = useStyles();
-  const announcement = props.announcement;
   // const bull = <span className={classes.bullet}>•</span>;
+  const announcement = data.announcement;
 
   return (
     <Card className={classes.card}>
