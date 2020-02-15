@@ -91,7 +91,9 @@ function AdminPortal(props) {
     ]
 
     const drawer = (
-        <div>
+        <div
+            onClick={isSmallDevice ? handleDrawerToggle : () => { }}
+        >
             <div className={classes.toolbar} />
             {/* <Divider /> */}
             <List>
@@ -168,6 +170,7 @@ function AdminPortal(props) {
     // ADD SERVER MANAGEMENT PAGE
     pages.push({ path: `${props.match.path}/server`, component: ServerDash })
 
+    // SET DEFAULT MENU
     const defaultRoute = `${props.match.path}/announcements`;
 
     useEffect(() => {

@@ -222,6 +222,7 @@ function DocumentEditor(props) {
             const testDocuments = [
                 {
                     _id: "1",
+                    private: false,
                     title: "Title 0",
                     content: "Content 0",
                     date_created: new Date(1581452252),
@@ -291,6 +292,8 @@ function DocumentEditor(props) {
                     }
                 }
 
+                // ADD CONDITIONS TO HANDLE CREATE FLAGS AND PRESET VALUES FROM DocumentEditorLink
+
                 if (!isDocument) setCurrentAlert({ isOpen: true, severity: "error", message: `A ${collection.toLowerCase()} with ID ${_id} could not be found.` });
             }
         }, 1000);
@@ -318,7 +321,7 @@ function DocumentEditor(props) {
                 type={`${collection} Editor`}
                 action={documentAction}
             >
-                <FormComponent document={currentDocument} handleRouteChange={handleRouteChange} handleChange={handleFormChange} />
+                <FormComponent history={props.history} match={props.match} isCreate={documentAction.text === "Create"} document={currentDocument} handleRouteChange={handleRouteChange} handleChange={handleFormChange} />
             </FullScreenDialog>
 
             {/* DELETE DOCUMENT(S) DIALOG */}

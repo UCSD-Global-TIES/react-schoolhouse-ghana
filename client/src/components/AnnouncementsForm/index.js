@@ -9,7 +9,7 @@ import "../../utils/flowHeaders.min.css";
 
 const useStyles = makeStyles(theme => ({
     root: {
-        padding: "3rem",
+        padding: "3rem 0rem",
         display: "flex"
     },
     field: {
@@ -66,19 +66,6 @@ const textFields = [
 ]
 
 // Private field is special use case
-const classOptions = [
-    {
-        name: "Math",
-        grade: 2,
-        _id: "1"
-
-    },
-    {
-        name: "English",
-        grade: 1,
-        _id: "2"
-    }
-];
 
 function AnnouncementsForm(props) {
     const classes = useStyles();
@@ -111,10 +98,31 @@ function AnnouncementsForm(props) {
 
     useEffect(() => {
         setTimeout(() => {
-            // Retrieve grades and populate classes
-            // For every grade...
-            // For each of their classes...
-            // Push object containing class name, grade level, and class_id (see 'classOptions')
+            // Retrieve classes and populate grades
+            // For every class...
+
+            const result = {
+                data: [
+
+                    {
+                        name: "Math",
+                        grade: { level: 2 },
+                        _id: "1"
+
+                    },
+                    {
+                        name: "English",
+                        grade: { level: 1 },
+                        _id: "2"
+                    }
+                ]
+            };
+
+            let classOptions = [];
+            for (const classDoc of result.data) {
+                // Push object containing class name, grade level, and class_id (see 'classOptions')
+                classOptions.push({ name: classDoc.name, grade: classDoc.grade.level, _id: classDoc._id })
+            }
 
             // Set options and loading flag to false
             setOptions(classOptions);
@@ -133,7 +141,7 @@ function AnnouncementsForm(props) {
                         </Box>
                         <Box >
                             <Switch
-                                // disabled={props.document['private']}
+                                disabled={!props.isCreate}
                                 checked={props.document['private'] || false}
                                 onChange={handleSwitchToggle('private')}
                                 color="primary"
@@ -181,9 +189,9 @@ function AnnouncementsForm(props) {
                             className={classes.field}
                             label={item.label}
                             name={item.name}
-                            placeholder={!props.document[item.name] && (item.updateOnly || item.disabled) ? disabledMsg : ""}
-                            disabled={(item.disabled || item.updateOnly && !props.document[item.name])}
-                            value={(item.isDate ? parseTime(props.document[item.name]) : null) || props.document[item.name] || ""}
+                            placeholder={(item.disabled || (item.updateOnly && props.isCreate)) ? disabledMsg : ""}
+                            disabled={(item.disabled || (item.updateOnly && props.isCreate))}
+                            value={(props.isDate ? parseTime(props.document[item.name]) : null) || props.document[item.name] || ""}
                             helperText={item.helper}
                             onChange={props.handleChange}
                             fullWidth
