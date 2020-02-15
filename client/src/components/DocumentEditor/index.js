@@ -169,6 +169,7 @@ function DocumentEditor(props) {
     const handleDocument = (isOpen, document) => {
         // Redirect to previous page in history if redirect param is true
         if (props.location.search) {
+            // Inform user of redirect to previous document (inform user -> wait 1 sec. -> redirect)
             if (getQueries(props.location.search).redirect && !isOpen) props.history.goBack()
         }
 

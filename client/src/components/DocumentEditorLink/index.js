@@ -180,6 +180,7 @@ function DocumentEditorLink(props) {
         }
 
         // Travel to the new specified route with the redirect param as true
+        // Inform user of redirect
         if (isCreate) {
             // Travel to the specified destination with the create flag, intial values, and redirect flag
             history.push(`${destination}?create=true&initial={"${presetField}": "${docId}"}&redirect=true`);
