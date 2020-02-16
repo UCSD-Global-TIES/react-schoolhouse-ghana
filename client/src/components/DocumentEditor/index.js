@@ -177,7 +177,6 @@ function DocumentEditor(props) {
 
     // Handle opening/closing of document 
     const handleDocument = (isOpen, document) => {
-        console.log(redirectOnExit)
         // Redirect to previous page in history if redirect param is true
         if (redirectOnExit) {
             // Inform user of redirect to previous document (inform user -> wait 1 sec. -> redirect)
