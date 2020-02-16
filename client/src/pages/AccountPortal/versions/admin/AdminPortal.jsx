@@ -14,8 +14,9 @@ import "../../../../utils/flowHeaders.min.css";
 import "./main.css";
 import NavBarAdmin from "../../../../components/NavBarAdmin";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faUsers, faBullhorn, faChalkboardTeacher, faShapes, faServer } from "@fortawesome/free-solid-svg-icons";
+import { faUsers, faBullhorn, faChalkboardTeacher, faShapes, faServer, faFile } from "@fortawesome/free-solid-svg-icons";
 import DocumentEditor from '../../../../components/DocumentEditor'
+import FilesForm from "../../../../components/FilesForm";
 
 const drawerWidth = 220;
 
@@ -84,6 +85,11 @@ function AdminPortal(props) {
             path: `${props.match.url}/accounts`
         },
         {
+            label: "Files",
+            icon: faFile,
+            path: `${props.match.url}/files`
+        },
+        {
             label: "Server",
             icon: faServer,
             path: `${props.match.url}/server`
@@ -149,6 +155,13 @@ function AdminPortal(props) {
             FormComponent: AccountsForm,
             primary: "title",
             path: `${props.match.path}/accounts`
+        },
+        {
+            collection: "Files",
+            icon: faFile,
+            FormComponent: FilesForm,
+            primary: "nickname",
+            path: `${props.match.path}/files`
         }
     ]
 

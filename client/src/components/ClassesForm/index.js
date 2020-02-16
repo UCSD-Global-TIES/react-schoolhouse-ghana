@@ -225,7 +225,7 @@ function ClassesForm(props) {
                         {...props}
                     />
                     {/* Document Editor for Files */}                    
-                    {/* <DocumentEditorLink
+                    <DocumentEditorLink
                         // _id of document that is being updated
                         docId={props.document['_id']}
                         primary={'nickname'}
@@ -234,7 +234,7 @@ function ClassesForm(props) {
                         link={"/edit/files/"}
                         docs={testFiles}
                         {...props}
-                    /> */}
+                    />
                     </>
                 }
 
