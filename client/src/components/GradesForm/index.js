@@ -62,6 +62,12 @@ const textFields = [
 function GradesForm(props) {
     const classes = useStyles();
     const MIN_GRADE = 1;
+    const testClasses = [
+        {
+            _id: "1",
+            name: "English"
+        }
+    ]
 
     const handleNumberChange = (e) => {
         const { value, name } = e.target;
@@ -122,7 +128,7 @@ function GradesForm(props) {
                         collection={'Classes'}
                         icon={faChalkboardTeacher}
                         link={"/edit/classes/"}
-                        docs={[]}
+                        docs={testClasses}
                         {...props}
                     />
                 }

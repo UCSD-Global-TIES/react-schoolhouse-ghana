@@ -183,7 +183,8 @@ function DocumentEditorLink(props) {
         // Inform user of redirect
         if (isCreate) {
             // Travel to the specified destination with the create flag, intial values, and redirect flag
-            history.push(`${destination}?create=true&initial={"${presetField}": "${docId}"}&redirect=true`);
+            const presetDoc = { [presetField]: docId }
+            history.push(`${destination}?preset=${JSON.stringify(presetDoc)}&redirect=true`);
         } else {
             // Travel to the specified destination with the document _id to update and redirect flag
             history.push(`${destination}?_id=${_id}&redirect=true`);

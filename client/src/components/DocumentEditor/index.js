@@ -73,6 +73,7 @@ function DocumentEditor(props) {
     const [dialogOpen, setDialogOpen] = useState(false);
     const [documentAction, setDocumentAction] = useState({ text: "", function: () => { } });
     const [currentDocument, setCurrentDocument] = useState({});
+    const [redirectOnExit, setRedirectOnExit] = useState(false);
 
     // COMPONENT STATUS
     const [loading, setLoading] = useState(true);
@@ -155,6 +156,11 @@ function DocumentEditor(props) {
         console.log(`Creating ${collection}(s) `);
         setDialogOpen(false);
         setCurrentAlert({ isOpen: true, severity: "success", message: `The ${collection.toLowerCase()} has been successfully created!` });
+        
+        if (redirectOnExit) {
+            // Inform user of redirect to previous document (inform user -> wait 1 sec. -> redirect)
+            setTimeout( () => props.history.goBack(), 1000 );
+        }
     }
 
     // Handle saving of document
@@ -163,14 +169,19 @@ function DocumentEditor(props) {
         setDialogOpen(false);
         setCurrentAlert({ isOpen: true, severity: "success", message: `The ${collection.toLowerCase()} has been successfully updated!` });
 
+        if (redirectOnExit) {
+            // Inform user of redirect to previous document (inform user -> wait 1 sec. -> redirect)
+            setTimeout( () => props.history.goBack(), 1000 );
+        }
     }
 
     // Handle opening/closing of document 
     const handleDocument = (isOpen, document) => {
+        console.log(redirectOnExit)
         // Redirect to previous page in history if redirect param is true
-        if (props.location.search) {
+        if (redirectOnExit) {
             // Inform user of redirect to previous document (inform user -> wait 1 sec. -> redirect)
-            if (getQueries(props.location.search).redirect && !isOpen) props.history.goBack()
+            setTimeout( () => props.history.goBack(), 1000 );
         }
 
         setDialogOpen(isOpen);
@@ -281,21 +292,31 @@ function DocumentEditor(props) {
             setViewableDocuments(testDocuments.slice(0, MAX_ITEMS));
 
             // If the user has requested a document in the route, set the document
-            // with that _id in the editor
+            // with that _id in the editor; or if they wish to create a document with 
+            // preset values
             if (props.location.search) {
                 const _id = getQueries(props.location.search)._id;
+                const presetStr = getQueries(props.location.search).preset;
+                const redirect = getQueries(props.location.search).redirect;
 
-                let isDocument = false;
-                for (const document of testDocuments) {
-                    if (document._id == _id) {
-                        handleDocument(true, document);
-                        isDocument = true;
+                // Check if the specified document exists 
+                if(_id) {
+
+                    let isDocument = false;
+                    for (const document of testDocuments) {
+                        if (document._id == _id) {
+                            handleDocument(true, document);
+                            isDocument = true;
+                        }
                     }
+    
+                    if (!isDocument) setCurrentAlert({ isOpen: true, severity: "error", message: `A ${collection.toLowerCase()} with ID ${_id} could not be found.` });
                 }
 
-                // ADD CONDITIONS TO HANDLE CREATE FLAGS AND PRESET VALUES FROM DocumentEditorLink
-
-                if (!isDocument) setCurrentAlert({ isOpen: true, severity: "error", message: `A ${collection.toLowerCase()} with ID ${_id} could not be found.` });
+                // Check if the presetStr exists, and if so parse and open the document with the preset values
+                if(presetStr !== undefined) handleDocument(true, JSON.parse(presetStr));
+                // Check if the redirect flag exists, set the variable
+                if(redirect !== undefined) setRedirectOnExit(redirect);
             }
         }, 1000);
 
@@ -353,7 +374,6 @@ function DocumentEditor(props) {
                                 startAdornment={<InputAdornment position="start"><SearchIcon /></InputAdornment>}
                             />
                         </FormControl>
-                        {/* </div> */}
 
                         {
                             loading ?
