@@ -84,6 +84,7 @@ const resources = [
 function ClassViewer(props) {
 
     const [classInfo, setClassInfo] = useState({});
+
     const MAX_ITEMS = 2;
     const classes = useStyles();
     const [pageAnnouncements, setPageAnnouncements] = React.useState(
@@ -103,10 +104,26 @@ function ClassViewer(props) {
     };
 
     useEffect(() => {
-        API.getClass(props.match.params.cid, props.user.key)
-            .then((result) => {
-                setClassInfo(result.data);
-            })
+        setTimeout(() => {
+            const testClass = {
+                "_id" : "5e46ded505551964a01e9cc0",
+                "class_id" : "1",
+                "name" : "math",
+                "path" : "1",
+                "teachers" : [],
+                "students" : [],
+                "files" : [],
+                "grade" : 1,
+                "announcements" : []
+            }
+            setClassInfo(testClass);
+
+        }, 1000)
+        // API.getClass(props.match.params.id, props.user.key)
+        //     .then((result) => {
+        //         setClassInfo(result.data);
+            
+        //     })
     }, [])
 
     return (

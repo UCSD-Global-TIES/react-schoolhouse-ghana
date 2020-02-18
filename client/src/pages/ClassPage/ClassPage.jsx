@@ -14,7 +14,7 @@ import AccessDenied from "../../components/AccessDenied";
 const accountComponents = {
   Student: ClassViewer,
   Teacher: ClassEditor,
-  Admin: ClassEditor
+  Admin: ClassViewer
 }
 
 function ClassPage(props) {
