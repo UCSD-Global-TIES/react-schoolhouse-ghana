@@ -12,7 +12,7 @@ const AdminRedirect = () => <Redirect to="/edit" />;
 const accountComponents = {
     Student: StudentPortal,
     Teacher: TeacherPortal,
-    Admin: AdminRedirect
+    Admin: StudentPortal
 }
 
 function AccountPortal(props) {
