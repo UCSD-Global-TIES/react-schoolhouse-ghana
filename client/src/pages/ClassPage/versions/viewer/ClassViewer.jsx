@@ -121,7 +121,8 @@ function ClassViewer(props) {
         }, 1000)
         // API.getClass(props.match.params.id, props.user.key)
         //     .then((result) => {
-        //         setClassInfo(result.data);
+        //         setClassInfo(result.data); 
+        
             
         //     })
     }, [])
