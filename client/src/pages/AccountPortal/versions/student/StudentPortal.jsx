@@ -29,6 +29,9 @@ const useStyles = makeStyles(theme => ({
     textGlow: {
         color: "white",
         textShadow: "2px 2px 7px #787676"
+    },
+    boxShadow: {
+        boxShadow: "10px 10px 5px #bebebe"
     }
 }));
 
@@ -198,6 +201,8 @@ function StudentPortal(props) {
                 <Grid item xs={12}><Typography style={{padding: "2rem"}} align='center' className={clsx(classes.textGlow, "flow-text")} variant="h3">welcome back, {props.user.profile.first_name} 😄</Typography> </Grid>
                 {/* Announcements */}
                 <Grid item xs={12} md={5} lg={4} xl={3}>
+                    <div className={classes.boxShadow} >
+
                     <List
                         className={classes.root}
                         subheader={
@@ -214,7 +219,7 @@ function StudentPortal(props) {
                         {
                             schoolAnnouncements.slice(schoolAnnPageIdx * MAX_ANN, (schoolAnnPageIdx + 1) * MAX_ANN).map((schoolAnn, idx) => (
 
-
+                                
                                 <ListItem button onClick={() => handleOpenCurrentAnn(schoolAnn)} key={`school-ann-${idx}`} alignItems="flex-start">
                                     <ListItemIcon>
                                         <SchoolIcon />
@@ -226,12 +231,12 @@ function StudentPortal(props) {
                                         secondary={
                                             moment(schoolAnn.createdAt).format('MMMM Do YYYY, h:mm a')
                                         }
-                                    />
+                                        />
                                 </ListItem>
 
-                            ))
+))
 
-                        }
+}
 
 
                     </List>
@@ -249,8 +254,8 @@ function StudentPortal(props) {
                     >
                         {
                             classAnnouncements.slice(classAnnPageIdx * MAX_ANN, (classAnnPageIdx + 1) * MAX_ANN).map((classAnn, idx) => (
-
-
+                                
+                                
                                 <ListItem button onClick={() => handleOpenCurrentAnn(classAnn)} key={`class-ann-${idx}`} alignItems="flex-start">
                                     <ListItemIcon>
                                         <ClassIcon />
@@ -262,16 +267,17 @@ function StudentPortal(props) {
                                         secondary={
                                             moment(classAnn.createdAt).format('MMMM Do YYYY, h:mm a')
                                         }
-                                    />
+                                        />
                                 </ListItem>
 
-                            ))
+))
 
-                        }
+}
 
 
                     </List>
 
+</div>
                 </Grid>
                 {/* Classes */}
                 <Grid item xs={12} md={7} lg={8} xl={9}>
