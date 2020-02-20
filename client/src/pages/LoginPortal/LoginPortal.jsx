@@ -175,6 +175,7 @@ function LoginPortal(props) {
                             </FormControl>
                         </div>
                 </div>
+                </div>
             </FullScreenDialog>
             <div style={{ display: "flex", width: "100%", height: "100vh" }}>
                 <div style={{ margin: "auto" }}>
@@ -221,7 +222,7 @@ function LoginPortal(props) {
                         <div style={{ display: "flex", width: "100%", margin: "10px 0" }}>
 
                              <div style={{ margin: "auto" }}>
-                        <Fab style={{backgroundColor: "rgb(0, 182, 112)", color: "white"}} aria-label="login" onClick={() => props.login(username, password)}>
+                        <Fab style={{backgroundColor: "rgb(0, 182, 112)", color: "white"}} aria-label="login" onClick={() => handleLogin(username, password)}>
                             <FontAwesomeIcon icon={faSignInAlt} size="lg" />
                         </Fab>
 
