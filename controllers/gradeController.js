@@ -14,7 +14,7 @@ const {
 } = require("./verifyController");
 module.exports = {
     getGrades: function (req, res) {
-        verifyKey(req.header('Authorization'), 'admin')
+        verifyKey(req.header('Authorization'), 'Admin')
             .then((isVerified) => {
                 if (isVerified) {
                     gradeDb
@@ -28,7 +28,7 @@ module.exports = {
             })
     },
     getGrade: function (req, res) {
-        verifyKey(req.header('Authorization'), 'admin')
+        verifyKey(req.header('Authorization'), 'Admin')
             .then((isVerified) => {
                 if (isVerified) {
                     gradeDb
@@ -45,7 +45,7 @@ module.exports = {
             })
     },
     addGrade: function (req, res) {
-        verifyKey(req.header('Authorization'), 'admin')
+        verifyKey(req.header('Authorization'), 'Admin')
             .then((isVerified) => {
                 if (isVerified) {
                     // Create folder
@@ -87,7 +87,7 @@ module.exports = {
     //         })
     // },
     deleteGrade: function (req, res) {
-        verifyKey(req.header('Authorization'), 'admin')
+        verifyKey(req.header('Authorization'), 'Admin')
             .then((isVerified) => {
                 if (isVerified) {
                     const gid = req.params.gid;
@@ -135,10 +135,10 @@ module.exports = {
                                     // CONCURRENT FN LAYER B: Delete files
 
                                     fileDb.deleteMany({
-                                            _id: {
-                                                $in: fileIDs
-                                            }
-                                        })
+                                        _id: {
+                                            $in: fileIDs
+                                        }
+                                    })
                                         .then(() => {
                                             res.json({});
                                         })

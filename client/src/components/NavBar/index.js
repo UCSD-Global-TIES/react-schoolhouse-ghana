@@ -30,7 +30,7 @@ function NavBar(props) {
     const classes = useStyles();
 
     return (
-        <AppBar position="static">
+        <AppBar position="fixed">
             <Toolbar variant="dense">
                 <Typography variant="overline" className={classes.title}>
                     Schoolhouse Ghana&nbsp;&nbsp;<FontAwesomeIcon icon={faSchool} />
@@ -43,9 +43,9 @@ function NavBar(props) {
                             </Link>
                         </Button>
                         <Button onClick={props.logout}>
-                            <Link to="/login" className={classes.buttonLink} >
+                            {/* <Link to="/login" className={classes.buttonLink} > */}
                                 <FontAwesomeIcon className={classes.navIcon} icon={faSignOutAlt} size="lg" />
-                            </Link>
+                            {/* </Link> */}
                         </Button>
                     </ButtonGroup>
                     :

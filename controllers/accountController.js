@@ -1,8 +1,8 @@
 const accountDb = require("../models/Account");
 const announcementDb = require("../models/Account");
-const studentDb = require("../models/Student");
-const teacherDb = require("../models/Teacher");
-const adminDb = require("../models/Admin");
+const StudentDb = require("../models/Student");
+const TeacherDb = require("../models/Teacher");
+const AdminDb = require("../models/Admin");
 const classDb = require("../models/Admin");
 
 // TODO
@@ -66,37 +66,37 @@ const generateUniqueUsername = (first_name, last_name) => {
 
 module.exports = {
     addAccount: function (req, res) {
-        verifyKey(req.header('Authorization'), 'admin')
+        verifyKey(req.header('Authorization'), 'Admin')
             .then((isVerified) => {
                 if (isVerified) {
-                    // Client provides first_name, last_name, type, Grade _id (if student)
+                    // Client provides first_name, last_name, type, Grade _id (if Student)
                     // Server generates username, password
 
                     const type = req.body.type;
                     let doc;
                     let db;
                     switch (type) {
-                        case "student":
+                        case "Student":
                             doc = {
                                 first_name: req.body.first_name,
                                 last_name: req.body.last_name,
                                 grade: req.body.grade
                             }
-                            db = studentDb;
+                            db = StudentDb;
                             break;
-                        case "teacher":
+                        case "Teacher":
                             doc = {
                                 first_name: req.body.first_name,
                                 last_name: req.body.last_name,
                             }
-                            db = teacherDb;
+                            db = TeacherDb;
                             break;
-                        case "admin":
+                        case "Admin":
                             doc = {
                                 first_name: req.body.first_name,
                                 last_name: req.body.last_name,
                             }
-                            db = adminDb;
+                            db = AdminDb;
                             break;
                         default:
                             res.status(422).json(null);
@@ -147,7 +147,7 @@ module.exports = {
     },
     updateAccount: function (req, res) {
         const updateAccountPassword = (req, res) => {
-            verifyKey(JSON.parse(req.header('Authorization')).key, 'student,teacher,admin')
+            verifyKey(JSON.parse(req.header('Authorization')).key, 'Student,Teacher,Admin')
                 .then((isVerified) => {
                     if (isVerified) {
                         const {
@@ -191,7 +191,7 @@ module.exports = {
                 })
         }
         const updateAccountName = (req, res) => {
-            verifyKey(req.header('Authorization', 'admin'))
+            verifyKey(req.header('Authorization', 'Admin'))
                 .then((isVerified) => {
                     if (isVerified) {
                         const {
@@ -213,14 +213,14 @@ module.exports = {
                                     const type = aDoc.type;
                                     let db;
                                     switch (type) {
-                                        case "student":
-                                            db = studentDb;
+                                        case "Student":
+                                            db = StudentDb;
                                             break;
-                                        case "teacher":
-                                            db = teacherDb;
+                                        case "Teacher":
+                                            db = TeacherDb;
                                             break;
-                                        case "admin":
-                                            db = adminDb;
+                                        case "Admin":
+                                            db = AdminDb;
                                             break;
                                         default:
                                             res.status(422).json(null);
@@ -228,8 +228,8 @@ module.exports = {
                                     }
 
                                     db.update({
-                                            _id: aDoc.profile
-                                        }, newDoc)
+                                        _id: aDoc.profile
+                                    }, newDoc)
                                         .then(() => {
                                             res.json({});
                                         })
@@ -258,7 +258,7 @@ module.exports = {
         }
     },
     deleteAccount: function (req, res) {
-        verifyKey(req.header('Authorization'), 'admin')
+        verifyKey(req.header('Authorization'), 'Admin')
             .then((isVerified) => {
                 if (isVerified) {
                     const aid = req.params.aid;
@@ -273,14 +273,14 @@ module.exports = {
                             const profile = deleted_account._id;
                             let db;
                             switch (type) {
-                                case "student":
-                                    db = studentDb;
+                                case "Student":
+                                    db = StudentDb;
                                     break;
-                                case "teacher":
-                                    db = teacherDb;
+                                case "Teacher":
+                                    db = TeacherDb;
                                     break;
-                                case "admin":
-                                    db = adminDb;
+                                case "Admin":
+                                    db = AdminDb;
                                     break;
                                 default:
                                     res.status(422).json(null);
@@ -308,8 +308,8 @@ module.exports = {
                                     classDb
                                         .update({}, {
                                             $pull: {
-                                                students: profile,
-                                                teachers: profile,
+                                                Students: profile,
+                                                Teachers: profile,
                                                 announcements: {
                                                     $in: announcementIDs
                                                 }

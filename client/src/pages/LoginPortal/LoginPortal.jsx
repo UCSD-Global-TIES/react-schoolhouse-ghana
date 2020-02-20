@@ -90,7 +90,7 @@ function LoginPortal(props) {
                 <div style={{ display: "flex", width: "100%", margin: "10px 0" }}>
 
                     <div style={{ margin: "auto" }}>
-                        <Fab color="primary" aria-label="login" onClick={() => props.login(username, password)}>
+                        <Fab style={{backgroundColor: "rgb(0, 182, 112)", color: "white"}} aria-label="login" onClick={() => props.login(username, password)}>
                             <FontAwesomeIcon icon={faSignInAlt} size="lg" />
                         </Fab>
                     </div>
