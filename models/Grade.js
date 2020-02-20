@@ -6,9 +6,17 @@ const gradeSchema = new Schema({
     type: Number,
     required: true
   },
-  classes: [{
+  subjects: [{
     type: Schema.Types.ObjectId,
-    ref: 'Class'
+    ref: 'Subject'
+  }],
+  teachers: [{
+    type: Schema.Types.ObjectId,
+    ref: 'Teacher'
+  }],
+  students: [{
+    type: Schema.Types.ObjectId,
+    ref: 'Student'
   }],
   path: {
     type: String,

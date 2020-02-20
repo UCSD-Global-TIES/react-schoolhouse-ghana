@@ -4,70 +4,62 @@ import axios from "axios";
 // ROUTES UNSECURED
 // CONVERT ALL API FUNCTIONS SO YOU PASS IN VARIABLES NOT A OBJECT
 export default {
-  // CLASS ANNOUNCEMENTS
+  // SUBJECT ANNOUNCEMENTS
   // ---------------------------------------------------------------
-  // *GET in getClass()*
-  addClassAnnouncement: function (class_id, title, content, authorID, authorType, key) {
+  // Create an 'Announcement' -> Add new 'Announcement' to 'Subject' announcements
+  addSubjectAnnouncement: function (subject_id, title, content, files, authorName, key) {
     const config = {
       'Authorization': key
     };
     const newA = {
       title,
-      author: authorID,
-      authorType,
-      content
-    };
-    return axios.post(`/api/class/${class_id}/ann`, newA, {
-      headers: config
-    }); // SECURE
-  },
-  deleteClassAnnouncement: function (class_id, ann_id, key) {
-    const config = {
-      'Authorization': key
-    };
-    return axios.delete(`/api/class/${class_id}/ann/${ann_id}`, {
-      headers: config
-    }); // SECURE
-  },
-  updateClassAnnouncement: function (class_id, ann_id, title, content, key) {
-    const config = {
-      'Authorization': key
-    };
-    const newA = {
-      title,
+      authorName,
       content,
-      last_updated: Date.now()
-    }
-    return axios.put(`/api/class/${class_id}/ann/${ann_id}`, newA, {
+      files
+    };
+    return axios.post(`/api/subject/${subject_id}/ann`, newA, {
+      headers: config
+    }); // SECURE
+  },
+  // Delete an 'Announcement' -> Pull 'Announcement' from 'Subject' announcements
+  deleteSubjectAnnouncement: function (subject_id, ann_id, key) {
+    const config = {
+      'Authorization': key
+    };
+    return axios.delete(`/api/subject/${subject_id}/ann/${ann_id}`, {
       headers: config
     }); // SECURE
   },
   // FILES
   // ---------------------------------------------------------------
-  // *GET in getClass()*
   // https://programmingwithmosh.com/javascript/react-file-upload-proper-server-side-nodejs-easy/
-  addClassFile: function (class_id, file, nickname, path, key) {
+
+  // Create a 'File'
+  addFile: function (file, nickname, type, path, key) {
     const config = {
       'Authorization': key
     };
     const fileData = new FormData();
     fileData.append('file', file);
     fileData.append('name', nickname);
+    fileData.append('type', type);
     fileData.append('path', path);
 
-    return axios.post(`/api/class/${class_id}/file`, fileData, {
+    return axios.post(`/api/file`, fileData, {
       headers: config
     }); // SECURE
   },
-  deleteClassFile: function (class_id, file_id, key) {
+  // Delete a 'File'
+  deleteFile: function (file_id, key) {
     const config = {
       'Authorization': key
     };
-    return axios.delete(`/api/class/${class_id}/file/${file_id}`, {
+    return axios.delete(`/api/file/${file_id}`, {
       headers: config
     }); // SECURE
   },
-  updateClassFile: function (class_id, file_id, nickname, key) {
+  // Update a 'File'
+  updateFile: function (file_id, nickname, key) {
     const config = {
       'Authorization': key
     };
@@ -75,104 +67,65 @@ export default {
       nickname,
       last_updated: Date.now()
     }
-    return axios.put(`/api/class/${class_id}/file/${file_id}`, newF, {
+    return axios.put(`/api/file/${file_id}`, newF, {
       headers: config
     }); // SECURE
   },
-  // CLASSES
+  // SUBJECTS
   // ---------------------------------------------------------------
-  // May be slow with four populate calls
-  getClass: function (class_id, key) {
+  // Get a specified subject
+  getSubject: function (subject_id, key) {
     const config = {
       'Authorization': key
     };
-    console.log(class_id)
-    return axios.get(`/api/class/${class_id}`, {
+    return axios.get(`/api/subject/${subject_id}`, {
       headers: config
     }); // SECURE
   },
-  addClass: function (name, gradeID, gradePath, key) {
+  // Create a 'Subject' -> Add 'Subject' to 'Grade' subjects
+  addSubject: function (name, grade_id, gradePath, key) {
     const config = {
       'Authorization': key
     };
     const newC = {
       name,
-      grade: gradeID
+      grade: grade_id
     };
 
-    return axios.post(`/api/class`, {
+    return axios.post(`/api/subject`, {
       document: newC,
       path: gradePath
     }, {
       headers: config
     }); // SECURE
   },
-  updateClass: function (class_id, name, key) {
+  // Update a 'Subject'
+  updateSubject: function (subject_id, name, grade_id, files, key) {
     const config = {
       'Authorization': key
     };
 
     const newC = {
-      name
+      name,
+      grade: grade_id,
+      files
     };
-    return axios.put(`/api/class/${class_id}`, newC, {
+    return axios.put(`/api/subject/${subject_id}`, newC, {
       headers: config
     }); // SECURE
   },
-  deleteClass: function (class_id, key) {
+  // Delete a 'Subject' -> Pull 'Subject' from 'Grade' subjects
+  deleteSubject: function (subject_id, key) {
     const config = {
       'Authorization': key
     };
-    return axios.delete(`/api/class/${class_id}`, {
+    return axios.delete(`/api/subject/${subject_id}`, {
       headers: config
-    }); // SECURE
-  },
-  // CLASS MEMBERS
-  // ---------------------------------------------------------------
-  addStudent: function (class_id, sid, key) {
-    const config = {
-      'Authorization': key
-    };
-    return axios.post(`/api/class/${class_id}/student`, {
-      sid
-    }, {
-      headers: config
-    }); // SECURE
-  },
-  deleteStudent: function (class_id, sid, key) {
-    const config = {
-      'Authorization': key
-    };
-    return axios.delete(`/api/class/${class_id}/student`, {
-      headers: config,
-      data: {
-        sid
-      }
-    }); // SECURE
-  },
-  addTeacher: function (class_id, tid, key) {
-    const config = {
-      'Authorization': key
-    };
-    return axios.post(`/api/class/${class_id}/teacher`, {
-      tid
-    }, {
-      headers: config
-    }); // SECURE
-  },
-  deleteTeacher: function (class_id, tid, key) {
-    const config = {
-      'Authorization': key
-    };
-    return axios.delete(`/api/class/${class_id}/teacher`, {
-      headers: config,
-      data: {
-        tid
-      }
     }); // SECURE
   },
   // ANNOUNCEMENTS
   // ---------------------------------------------------------------
+  // Get all 'Announcement' documents that are not 'private'
   getSchoolAnnouncements: function (key) {
     const config = {
       'Authorization': key
@@ -181,21 +134,23 @@ export default {
       headers: config
     }); // SECURE
   },
-  addSchoolAnnouncement: function (title, content, authorID, authorType, key) {
+  // Create a public 'Announcement'
+  addSchoolAnnouncement: function (title, content, authorName, key) {
     const config = {
       'Authorization': key
     };
     let doc = {
       title,
       content,
-      author: authorID,
-      authorType,
+      authorName,
+      files,
       private: false
     };
     return axios.post(`/api/general/ann`, doc, {
       headers: config
     }); // SECURE
   },
+  // Delete a public 'Announcement'
   deleteSchoolAnnouncement: function (ann_id, key) {
     const config = {
       'Authorization': key
@@ -204,13 +159,15 @@ export default {
       headers: config
     }); // SECURE
   },
-  updateSchoolAnnouncement: function (ann_id, title, content, key) {
+  // Update ANY 'Announcement'
+  updateAnnouncement: function (ann_id, title, content, files, key) {
     const config = {
       'Authorization': key
     };
     const newA = {
       title,
       content,
+      files,
       last_updated: Date.now()
     }
     return axios.put(`/api/general/ann/${ann_id}`, newA, {
@@ -219,7 +176,7 @@ export default {
   },
   // GRADES
   // ---------------------------------------------------------------
-  // Populate classes
+  // Get all 'Grade' documents
   getGrades: function (key) {
     const config = {
       'Authorization': key
@@ -228,6 +185,7 @@ export default {
       headers: config
     }); // SECURE
   },
+  // Get a 'Grade'
   getGrade: function (grade_id, key) {
     const config = {
       'Authorization': key
@@ -236,6 +194,7 @@ export default {
       headers: config
     }); // SECURE
   },
+  // Create a 'Grade'
   addGrade: function (level, key) {
     const config = {
       'Authorization': key
@@ -247,17 +206,7 @@ export default {
       headers: config
     }); // SECURE 
   },
-  // updateGrade: function (grade_id, level, key) {
-  //   const config = {
-  //     'Authorization': key
-  //   };
-  //   const newG = {
-  //     level
-  //   };
-  //   return axios.put(`/api/grade/${grade_id}`, newG, {
-  //     headers: config
-  //   }); // SECURE
-  // },
+  // Delete a 'Grade'
   deleteGrade: function (grade_id, key) {
     const config = {
       'Authorization': key
@@ -266,8 +215,66 @@ export default {
       headers: config
     }); // SECURE
   },
+  // GRADE MEMBERS
+  // ---------------------------------------------------------------
+  // Add a 'Student' to 'Grade' students 
+  addStudent: function (grade_id, sid, key) {
+    const config = {
+      'Authorization': key
+    };
+    return axios.post(`/api/grade/${grade_id}/student/${sid}`, {
+      headers: config
+    }); // SECURE
+  },
+  // Remove a 'Student' from 'Grade' students
+  deleteStudent: function (grade_id, sid, key) {
+    const config = {
+      'Authorization': key
+    };
+    return axios.delete(`/api/grade/${grade_id}/student/${sid}`, {
+      headers: config
+    }); // SECURE
+  },
+  // Add a 'Teacher' to 'Grade' teachers 
+  addTeacher: function (grade_id, tid, key) {
+    const config = {
+      'Authorization': key
+    };
+    return axios.post(`/api/grade/${grade_id}/teacher/${tid}`, {
+      headers: config
+    }); // SECURE
+  },
+  // Remove a 'Teacher' from 'Grade' teachers
+  deleteTeacher: function (grade_id, tid, key) {
+    const config = {
+      'Authorization': key
+    };
+    return axios.delete(`/api/grade/${grade_id}/teacher/${tid}`, {
+      headers: config
+    }); // SECURE
+  },
+  // Add a 'Subject' to 'Grade' subjects 
+  addSubject: function (grade_id, sid, key) {
+    const config = {
+      'Authorization': key
+    };
+    return axios.post(`/api/grade/${grade_id}/subject/${sid}`, {
+      headers: config
+    }); // SECURE
+  },
+  // Remove a 'Subject' from 'Grade' subjects
+  deleteSubject: function (grade_id, sid, key) {
+    const config = {
+      'Authorization': key
+    };
+    return axios.delete(`/api/grade/${grade_id}/subject/${sid}`, {
+      headers: config
+    }); // SECURE
+  },
+
   // ACCOUNTS
   // ---------------------------------------------------------------
+  // Gets 'Account' profile matching the specified username and password
   verifyAccount: function (username, password) {
     const config = {
       'Authorization': JSON.stringify({
@@ -279,20 +286,29 @@ export default {
       headers: config
     });
   },
+  // Verifies there is a current user session
   verifySession: function () {
     return axios.get(`/api/verify/session`);
   },
+  // Verifies if the database is empty (checks for existence of user accounts)
+  // If so, create a new user account and return credentials
   verifyInitialization: function () {
     return axios.get(`/api/verify/database`);
   },
+  // Seeds the database with default
+  seedDatabase: function () {
+    return axios.post(`/api/verify/database`);
+  },
+  // Checks load speed of the website
   checkLoadSpeed: function () {
     return axios.get(`/api/verify/load`)
   },
+  // Destroys the current user session
   destroySession: function () {
     return axios.delete(`/api/verify/session`);
   },
-  // Add option for creating multiple accounts
-  addAccount: function (first_name, last_name, type, gradeID, key) {
+  // Add an 'Account' of ANY type -> Add 'Account' to 'Grade'
+  addAccount: function (first_name, last_name, type, grade_id, key) {
     const config = {
       'Authorization': key
     };
@@ -301,12 +317,13 @@ export default {
       last_name,
       type
     };
-    if (gradeID) newA.grade = gradeID;
+    if (gradeID) newA.grade = grade_id;
 
     return axios.post(`/api/account`, newA, {
       headers: config
     }); // SECURE 
   },
+  // Updates 'Account' name 
   updateAccountName: function (acc_id, first_name, last_name, key) {
     const config = {
       'Authorization': key
@@ -318,6 +335,7 @@ export default {
       headers: config
     }); // SECURE
   },
+  // Updates 'Account' password
   updateAccountPassword: function (acc_id, oldPassword, newPassword, key) {
     const config = JSON.stringify({
       'Authorization': {
@@ -331,6 +349,7 @@ export default {
       headers: config
     }); // SECURE
   },
+  // Delete 'Account' and associated profile
   deleteAccount: function (acc_id, key) {
     const config = {
       'Authorization': key

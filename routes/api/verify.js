@@ -13,6 +13,7 @@ router.route("/session")
 // Matches with "/api/verify/database"
 router.route("/database")
   .get(verifyController.verifyInitialization)
+  .post(verifyController.seedDefault)
 
 // Matches with "/api/verify/database"
 router.route("/load")

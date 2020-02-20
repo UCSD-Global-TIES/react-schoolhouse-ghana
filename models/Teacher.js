@@ -10,10 +10,11 @@ const teacherSchema = new Schema({
     type: String,
     required: true
   },
-  classes: [{
+  grade: {
     type: Schema.Types.ObjectId,
-    ref: 'Class'
-  }]
+    required: true,
+    ref: 'Grade'
+  }
 }, { timestamps: true });
 
 const Teacher = mongoose.model("Teacher", teacherSchema);

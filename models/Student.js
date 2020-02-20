@@ -10,10 +10,6 @@ const studentSchema = new Schema({
     type: String,
     required: true
   },
-  classes: [{
-    type: Schema.Types.ObjectId,
-    ref: 'Class'
-  }],
   grade: {
     type: Schema.Types.ObjectId,
     required: true,

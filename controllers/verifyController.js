@@ -117,6 +117,9 @@ module.exports = {
             }
             )
     },
+    seedDefault: function(req, res) {
+        // Seed the database with example documents
+    },
     verifyLatency: function (req, res) {
         const options = {
             url: 'http://localhost:3000',

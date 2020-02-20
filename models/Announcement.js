@@ -2,12 +2,7 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 const announcementSchema = new Schema({
-  author: {
-    type: Schema.Types.ObjectId,
-    required: true,
-    refPath: 'authorType'
-  },
-  authorType: {
+  authorName: {
     type: String,
     required: true
   },
@@ -23,7 +18,11 @@ const announcementSchema = new Schema({
   private: {
     type: Boolean,
     default: true
-  }
+  },
+  files: [{
+    type: Schema.Types.ObjectId,
+    ref: 'File'
+  }]
 }, { timestamps: true });
 
 const Announcement = mongoose.model("Announcement", announcementSchema);
