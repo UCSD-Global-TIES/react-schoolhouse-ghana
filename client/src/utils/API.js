@@ -49,6 +49,24 @@ export default {
       headers: config
     }); // SECURE
   },
+  // Get all 'File' documents
+  getFiles: function (key) {
+    const config = {
+      'Authorization': key
+    };
+    return axios.get(`/api/file`, {
+      headers: config
+    }); // SECURE
+  },
+  // Get a 'File'
+  getFile: function (file_id, key) {
+    const config = {
+      'Authorization': key
+    };
+    return axios.get(`/api/file/${file_id}`, {
+      headers: config
+    }); // SECURE
+  },
   // Delete a 'File'
   deleteFile: function (file_id, key) {
     const config = {

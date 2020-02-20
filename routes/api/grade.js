@@ -17,19 +17,22 @@ router.route("/:gid")
   // Updates a specific grade
   .put(gradeController.updateGrade)
 
+// Matches with "/api/grade/:gid/student/:sid"
 router.route("/:gid/student/:sid")
   // Add a student to the grade
   .post(gradeController.addStudent)
   // Remove a student from the grade
   .delete(gradeController.removeStudent)
 
+// Matches with "/api/grade/:gid/teacher/:sid"
 router.route("/:gid/teacher/:tid")
   // Add a teacher to the grade
   .post(gradeController.addTeacher)
   // Remove a teacher from the grade
   .delete(gradeController.removeTeacher)
 
-router.route("/:gid/student/:sid")
+// Matches with "/api/grade/:gid/subject/:sid" 
+router.route("/:gid/subject/:sid")
   // Add a subject to the grade
   .post(gradeController.addSubject)
   // Remove a subject from the grade

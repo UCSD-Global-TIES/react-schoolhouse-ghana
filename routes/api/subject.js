@@ -15,6 +15,7 @@ router.route("/:sid")
   // Update a specific subject
   .put(subjectController.updateSubject)
 
+// Matches with "/api/subject/:sid/ann"
 router.route("/:sid/ann")
   // Get all subject announcements
   .get(subjectController.getAnnouncements)
