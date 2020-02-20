@@ -9,10 +9,7 @@ import "./main.css"
 
 const useStyles = makeStyles(theme => ({
     root: {
-        flexGrow: 1,
-    },
-    menuButton: {
-        marginRight: theme.spacing(2),
+        // flexGrow: 1,
     },
     title: {
         flexGrow: 1,
@@ -30,7 +27,7 @@ const useStyles = makeStyles(theme => ({
         [theme.breakpoints.up('sm')]: {
             // width: `calc(100% - ${drawerWidth}px)`,
             // marginLeft: drawerWidth,
-            zIndex: 2000
+            zIndex: 1300
         },
     },
     buttonLink: {

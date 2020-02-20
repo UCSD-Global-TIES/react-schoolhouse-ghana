@@ -31,7 +31,7 @@ const classSchema = new Schema({
     required: true,
     ref: 'Grade'
   }
-});
+}, { timestamps: true });
 
 const Class = mongoose.model("Class", classSchema);
 

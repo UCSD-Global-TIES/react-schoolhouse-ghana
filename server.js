@@ -5,12 +5,14 @@ const session = require('express-session');
 const morgan = require('morgan');
 const mongoose = require("mongoose");
 const routes = require("./routes");
-const accountDb = require("./models/Account");
-const adminDb = require("./models/Admin");
-const { encryptPassword } = require("./scripts/encrypt");
 
 const app = express();
+var http = require('http').createServer(app);
+var io = require('socket.io')(http);
 const PORT = process.env.PORT || 3001;
+// Track the number of connections to the server
+let connections = 0;
+let users = 0;
 
 // Define middleware here
 app.use(express.urlencoded({
@@ -47,25 +49,6 @@ app.use((req, res, next) => {
   next();
 });
 
-// middleware function to check for logged-in users
-// var sessionChecker = (req, res, next) => {
-//   if (req.session.user && req.cookies.user_sid) {
-//     // If user logged in...
-//     // res.redirect('/dashboard');
-
-//   } else {
-//     next();
-//   }
-// };
-
-// Set session user cookie (in login)
-// req.session.user = user.dataValues;
-
-// Clear session cookie (in logout)
-// res.clearCookie('user_sid');
-
-// https: //www.codementor.io/@mayowa.a/how-to-build-a-simple-session-based-authentication-system-with-nodejs-from-scratch-6vn67mcy3
-
 // Serve up static assets (usually on heroku)
 if (process.env.NODE_ENV === "production") {
   app.use(express.static("client/build"));
@@ -80,51 +63,32 @@ mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost/schoolhouse-db"
   useUnifiedTopology: true
 });
 
+
 const startServer = () => {
   // Start the API server
-  app.listen(PORT, function () {
+  http.listen(PORT, function () {
     console.log(`🌎  ==> API Server now listening on PORT ${PORT}!`);
   });
 }
 
-const rootAccount = {
-  first_name: "SAS",
-  last_name: "Admin",
-  username: "root",
-  password: "admin"
-}
+startServer();
 
-// Before starting the server, check to see an admin user exists; if not, create one
-accountDb
-.find({type: "Admin"})
-.then((accounts) => {
+// BINDING LISTENER FUNCTIONS
+// On connection of a user
+io.on('connection', function (client) {
+  // The socket is attached to the user that 
+  console.log(`A device has connected to the server: ${++connections} connection(s)`);
 
-  if(!accounts.length) {
-    adminDb
-    .create({
-      first_name: rootAccount.first_name,
-      last_name: rootAccount.last_name
-    })
-    .then((newAdmin) => {
-      accountDb
-      .create({
-        username: rootAccount.username,
-        password: encryptPassword(rootAccount.password),
-        profile: newAdmin._id,
-        type: 'Admin'
-      })
-      .then(() => {
-        console.log("An admin account has been created.");
-        console.log(`Username: ${rootAccount.username}`);
-        console.log(`Password: ${rootAccount.password}`);
+  // Emit on the channel 'chat message' the payload msg
+  client.on('authentication', function (msg) {
+    console.log(msg);
+    console.log(`A user has logged in: ${++users} user(s)`);
 
-        startServer();
-      })
+  })
 
-    })
-  }
+  client.on('disconnect', function () {
+    console.log(`A user has disconnected from the server: ${--connections} connection(s)`);
+  });
 
-  else {
-    startServer();
-  }
-})
+
+});

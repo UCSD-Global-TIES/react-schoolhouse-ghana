@@ -20,7 +20,7 @@ const accountSchema = new Schema({
     enum: ['Student', 'Teacher', 'Admin']
   }
 
-});
+}, { timestamps: true });
 
 const Account = mongoose.model("Account", accountSchema);
 

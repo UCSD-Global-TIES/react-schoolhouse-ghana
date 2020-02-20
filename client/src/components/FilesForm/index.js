@@ -24,21 +24,25 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const disabledMsg = `This field will be populated after grade creation.`
+const disabledMsg = `This field will be populated after file creation.`
 
 const textFields = [
     {
-        name: "level",
-        label: "Grade Level",
-        helper: "This is the numerical level of this grade.",
-        createOnly: true,
-        isNumber: true
+        name: "nickname",
+        label: "File Nickname",
+        helper: "This is an informative nickname for this file."
+    },
+    {
+        name: "filename",
+        label: "File Name",
+        disabled: true,
+        helper: "This is the actual name of the file on the NAS."
     },
     {
         name: "path",
-        label: "Folder Path",
+        label: "File Path",
         disabled: true,
-        helper: "This is the folder path of this grade on the NAS."
+        helper: "This is the path of this file on the NAS."
     },
     {
         name: "createdAt",
@@ -59,32 +63,8 @@ const textFields = [
 
 // Private field is special use case
 
-function GradesForm(props) {
+function FilesForm(props) {
     const classes = useStyles();
-    const MIN_GRADE = 1;
-    const testClasses = [
-        {
-            _id: "1",
-            name: "English"
-        }
-    ]
-
-    const handleNumberChange = (e) => {
-        const { value, name } = e.target;
-        let tmp = {
-            target: {
-                name,
-                value
-            }
-        }
-
-        // Prevent manual input of negative numbers
-        if (parseInt(value) < MIN_GRADE) {
-            tmp.target.value = MIN_GRADE;
-        }
-
-        props.handleChange(tmp);
-    }
 
     useEffect(() => {
 
@@ -93,20 +73,27 @@ function GradesForm(props) {
     return (
         <div className={classes.root}>
             <div className={classes.vc}>
+                {/* Add field to upload file */}
+                {/* for websites - upload folder but mark path to the index.html file */}
+                
+                {/* Add file preview */}
+                {/* iFrame - websites */}
+                {/* react-pdf - pdfs */}
+                {/* react-file-viewer - images, csv, docx, mp4 */}
+
                 {
                     textFields.map((item, idx) => (
                         <TextField
-                            // Just for Grade 'level' field
-                            type={item.isNumber ? "number" : "text"}
+
                             key={`${item.name}-form-${idx}`}
                             className={classes.field}
                             label={item.label}
                             name={item.name}
                             placeholder={(item.disabled || (item.updateOnly && props.isCreate)) ? disabledMsg : ""}
                             disabled={(item.disabled || (item.updateOnly && props.isCreate) || (item.createOnly && !props.isCreate))}
-                            value={(props.isDate ? parseTime(props.document[item.name]) : null) || ((item.isNumber && !props.document[item.name]) ? MIN_GRADE : null) || props.document[item.name] || ""}
+                            value={(props.isDate ? parseTime(props.document[item.name]) : null) || ""}
                             helperText={item.helper}
-                            onChange={item.isNumber ? handleNumberChange : props.handleChange}
+                            onChange={props.handleChange}
                             fullWidth
                             autoComplete={'off'}
                             margin="normal"
@@ -118,24 +105,10 @@ function GradesForm(props) {
                             variant="outlined"
                         />
                     ))}
-                {/* Only show if document was already created */}
-                {
-                    props.document['_id'] &&
-                    <DocumentEditorLink
-                        // _id of document that is being updated
-                        docId={props.document['_id']}
-                        primary={'name'}
-                        collection={'Classes'}
-                        icon={faChalkboardTeacher}
-                        link={"/edit/classes/"}
-                        docs={testClasses}
-                        {...props}
-                    />
-                }
 
             </div>
         </div>
     )
 };
 
-export default GradesForm;
+export default FilesForm;

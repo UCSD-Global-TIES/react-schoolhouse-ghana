@@ -12,15 +12,8 @@ const fileSchema = new Schema({
   },
   path: {
     type: String
-  },
-  last_updated: {
-    type: Date
-  },
-  date_created: {
-    type: Date,
-    default: Date.now
   }
-});
+}, { timestamps: true });
 
 const File = mongoose.model("File", fileSchema);
 
