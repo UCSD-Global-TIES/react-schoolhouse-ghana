@@ -12,11 +12,12 @@ const AdminRedirect = () => <Redirect to="/edit" />;
 const accountComponents = {
     Student: StudentPortal,
     Teacher: TeacherPortal,
-    Admin: AdminRedirect
+    Admin: StudentPortal
 }
 
 function AccountPortal(props) {
     const Component = accountComponents[props.user.type];
+    console.log(props.user);
 
     return (
         <Component {...props} />

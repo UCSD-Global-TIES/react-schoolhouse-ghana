@@ -86,6 +86,7 @@ export default {
     const config = {
       'Authorization': key
     };
+    console.log(class_id)
     return axios.get(`/api/class/${class_id}`, {
       headers: config
     }); // SECURE
