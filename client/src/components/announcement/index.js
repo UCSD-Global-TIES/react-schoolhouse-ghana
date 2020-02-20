@@ -27,7 +27,7 @@ const useStyles = makeStyles({
   }
 });
 
-// /*SimpleCard https://material-ui.com/components/cards/ */
+// *SimpleCard https://material-ui.com/components/cards/ */
 
 export default function AnnouncementView(data) {
   const classes = useStyles();
