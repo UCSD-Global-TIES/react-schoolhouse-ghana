@@ -100,6 +100,15 @@ export default {
       headers: config
     }); // SECURE
   },
+  // Get a specified subject
+  // getSubjects: function (key) {
+  //   const config = {
+  //     'Authorization': key
+  //   };
+  //   return axios.get(`/api/subject/`, {
+  //     headers: config
+  //   }); // SECURE
+  // },
   // Create a 'Subject' -> Add 'Subject' to 'Grade' subjects
   addSubject: function (name, grade_id, gradePath, key) {
     const config = {

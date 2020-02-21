@@ -101,7 +101,7 @@ function SubjectPage(props) {
           title={"Announcements"}
           items={subjectInfo.announcements || []}
           pageMax={5}
-          icon={faFile}
+          icon={faBullhorn}
           labelField={"title"}
           viewer={AnnouncementViewer}
           searchbar
@@ -111,7 +111,7 @@ function SubjectPage(props) {
       path: `${props.match.path}/announcements`
     },
     {
-      component:  (props) => (
+      component: (props) => (
         <SimpleListView
           title={"Resources"}
           items={subjectInfo.files || []}
@@ -147,7 +147,7 @@ function SubjectPage(props) {
 
   if (loading) {
     return <PageSpinner />
-}
+  }
 
   return (
     <div className={classes.root}>
@@ -192,16 +192,16 @@ function SubjectPage(props) {
             timeout={300}
             classNames='fade'
           > */}
-            <Switch location={props.location}>
-              {
-                pagesInfo.map((page, idx) => (
-                  <ProtectedRoute key={`page-${idx}`} exact path={page.path} component={page.component} user={props.user} />
+        <Switch location={props.location}>
+          {
+            pagesInfo.map((page, idx) => (
+              <ProtectedRoute key={`page-${idx}`} exact path={page.path} component={page.component} user={props.user} />
 
-                ))
-              }
-              <Redirect to={defaultRoute} />
-            </Switch>
-          {/* </CSSTransition>
+            ))
+          }
+          <Redirect to={defaultRoute} />
+        </Switch>
+        {/* </CSSTransition>
         </TransitionGroup> */}
       </main>
     </div>

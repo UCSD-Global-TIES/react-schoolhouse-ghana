@@ -18,6 +18,7 @@ module.exports = {
                 if (isVerified) {
                     gradeDb
                         .find({})
+                        .populate('subjects')
                         .then(gradeDocs => res.json(gradeDocs))
                         .catch(err => res.status(422).json(err));
 

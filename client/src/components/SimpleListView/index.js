@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { makeStyles } from '@material-ui/core/styles';
 
-import { Dialog, DialogContent, DialogTitle, Slide, DialogActions, List, ListItem, ListItemIcon, ListItemText, ListSubheader, Button, ButtonGroup  } from "@material-ui/core";
+import { Dialog, DialogContent, DialogTitle, Slide, DialogActions, List, ListItem, ListItemIcon, ListItemText, ListSubheader, Button, ButtonGroup, InputAdornment, FormControl, InputLabel, Input, Typography } from "@material-ui/core";
+import SearchIcon from '@material-ui/icons/Search';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import moment from "moment";
 import "../../utils/flowHeaders.min.css";
@@ -12,6 +13,10 @@ const useStyles = makeStyles(theme => ({
     root: {
         width: '100%',
         backgroundColor: theme.palette.background.paper,
+    },
+    searchbar: {
+        margin: "0.5rem 0rem",
+        width: "100%"
     }
 }));
 
@@ -27,6 +32,8 @@ function SimpleListView(props) {
     const [pageIdx, setPageIdx] = useState(0);
     const [dialogOpen, setDialogOpen] = useState(false);
     const [currentDocument, setCurrentDocument] = useState({});
+    const [filteredDocuments, setFilteredDocuments] = useState(props.items);
+    const [searchQuery, setSearchQuery] = useState("");
 
     const handleItemClick = (doc) => {
         if (props.link) {
@@ -37,6 +44,26 @@ function SimpleListView(props) {
             setDialogOpen(true);
         }
 
+    }
+
+    // HANDLE QUERY CHANGE
+    const handleQueryChange = (event) => {
+        const { value } = event.target;
+        // Set search query
+        setSearchQuery(value);
+
+        // Reset page 
+        setPageIdx(0)
+
+        // Filter documents
+        if (value.length) {
+            const filteredDocuments = props.items.filter(document => document[props.labelField].toLowerCase().includes(value.toLowerCase()));
+            setFilteredDocuments(filteredDocuments);
+
+        } else {
+            // Reset the filtered documents to ALL documents
+            setFilteredDocuments(props.items);
+        }
     }
 
     const handleCloseDocument = () => {
@@ -54,7 +81,7 @@ function SimpleListView(props) {
         <div style={{ ...props.style }}>
             {currentDocument[props.labelField] && DocumentViewer &&
                 <Dialog
-                
+
                     open={dialogOpen}
                     TransitionComponent={Transition}
                     keepMounted
@@ -81,6 +108,17 @@ function SimpleListView(props) {
 
             }
 
+            {
+                props.searchbar &&
+                <FormControl className={classes.searchbar}>
+                    <InputLabel htmlFor="standard-adornment-amount">Search {props.title.toLowerCase()}</InputLabel>
+                    <Input
+                        value={searchQuery}
+                        onChange={handleQueryChange}
+                        startAdornment={<InputAdornment position="start"><SearchIcon /></InputAdornment>}
+                    />
+                </FormControl>
+            }
             <List
                 className={classes.root}
                 subheader={
@@ -96,26 +134,37 @@ function SimpleListView(props) {
                     </ListSubheader>}
             >
                 {
-                    props.items.slice(pageIdx * props.pageMax, (pageIdx + 1) * props.pageMax).map((item) => (
+                    filteredDocuments.length ?
 
-                        <a target="_blank" style={{ textDecoration: "none" }} key={item} href={props.link ? item[props.link] : null}>
-                            <ListItem button onClick={() => handleItemClick(item)} alignItems="flex-start">
-                                <ListItemIcon>
-                                    <FontAwesomeIcon icon={props.icon} />
-                                </ListItemIcon>
-                                <ListItemText
-                                    primary={
-                                        item[props.labelField]
-                                    }
-                                    secondary={
-                                        moment(item.createdAt).format('MMMM Do YYYY, h:mm a')
-                                    }
-                                />
-                            </ListItem>
+                        filteredDocuments.slice(pageIdx * props.pageMax, (pageIdx + 1) * props.pageMax).map((item) => (
 
-                        </a>
+                            <a target="_blank" style={{ textDecoration: "none" }} key={item} href={props.link ? item[props.link] : null}>
+                                <ListItem button onClick={() => handleItemClick(item)} alignItems="flex-start">
+                                    <ListItemIcon>
+                                        <FontAwesomeIcon icon={props.icon} />
+                                    </ListItemIcon>
+                                    <ListItemText
+                                        primary={
+                                            item[props.labelField]
+                                        }
+                                        secondary={
+                                            moment(item.createdAt).format('MMMM Do YYYY, h:mm a')
+                                        }
+                                    />
+                                </ListItem>
 
-                    ))
+                            </a>
+
+                        ))
+
+                        :
+
+                        <div style={{ display: "flex", marginTop: "2rem" }}>
+                            <div style={{ margin: "auto", padding: "3rem" }}>
+                                <Typography className="flow-text" style={{ color: "grey" }} variant="h5">No {props.title.toLowerCase()} were found.</Typography>
+                                <p style={{ textAlign: "center", color: "grey" }}><FontAwesomeIcon icon={props.icon} size="5x" /></p>
+                            </div>
+                        </div>
 
                 }
 

@@ -62,9 +62,7 @@ function UserPortal(props) {
         const promises = [];
 
         // Get 'Grade' associated with user account, populating subjects and their announcements
-        // promises.push(API.getStudentGrade(props.user.profile.grade, props.user.key))
-
-        promises.push(API.getUserGrade("5e4f4d3c7811a40f88a8b12f", props.user.key))
+        promises.push(API.getUserGrade(props.user.profile.grade, props.user.key))
 
         // Get school announcements
         promises.push(API.getSchoolAnnouncements(props.user.key))

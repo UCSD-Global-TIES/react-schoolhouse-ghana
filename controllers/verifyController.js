@@ -148,6 +148,7 @@ module.exports = {
                                 subjectDoc.announcements = [newDoc._id];
                             }
                         }
+                        subjectDoc.files = [newF._id];
 
                         // 3
                         subjectDb

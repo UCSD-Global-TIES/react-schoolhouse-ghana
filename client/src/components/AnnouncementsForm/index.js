@@ -6,6 +6,7 @@ import { Autocomplete } from '@material-ui/lab';
 
 
 import "../../utils/flowHeaders.min.css";
+import API from "../../utils/API";
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -97,38 +98,24 @@ function AnnouncementsForm(props) {
     }
 
     useEffect(() => {
-        setTimeout(() => {
-            // Retrieve classes and populate grades
-            // For every class...
-
-            const result = {
-                data: [
-
-                    {
-                        name: "Math",
-                        grade: { level: 2 },
-                        _id: "1"
-
-                    },
-                    {
-                        name: "English",
-                        grade: { level: 1 },
-                        _id: "2"
+        API.getGrades(props.user.key)
+            .then((result) => {
+                // Retrieve grades and populate subjects
+                // For every grade...
+                let subjectOptions = [];
+                for (const gradeDoc of result.data) {
+                    for (const subjectDoc of gradeDoc.subjects) {
+                        // Push object containing class name, grade level, and class_id (see 'subjectOptions')
+                        subjectOptions.push({ name: subjectDoc.name, grade: gradeDoc.level, _id: subjectDoc._id })
                     }
-                ]
-            };
+                }
 
-            let classOptions = [];
-            for (const classDoc of result.data) {
-                // Push object containing class name, grade level, and class_id (see 'classOptions')
-                classOptions.push({ name: classDoc.name, grade: classDoc.grade.level, _id: classDoc._id })
-            }
+                // Set options and loading flag to false
+                setOptions(subjectOptions);
+                setLoading(false);
 
-            // Set options and loading flag to false
-            setOptions(classOptions);
-            setLoading(false);
+            })
 
-        }, 1000)
     }, []);
 
     return (
@@ -137,7 +124,7 @@ function AnnouncementsForm(props) {
                 <div style={{ width: "100%" }}>
                     <Box className={classes.field} display="flex">
                         <Box flexGrow={1}>
-                            Private <Typography display='inline' variant='caption' color='textSecondary'> Specifies if this announcement is viewable to all users.</Typography>
+                            Subject-Specific <Typography display='inline' variant='caption' color='textSecondary'> Specifies if this announcement is viewable to the entire school.</Typography>
                         </Box>
                         <Box >
                             <Switch
@@ -151,7 +138,7 @@ function AnnouncementsForm(props) {
                     </Box>
 
                     <Autocomplete
-                        onChange={(e, value) => handleAutocompleteChange(e, value, 'class')}
+                        onChange={(e, value) => handleAutocompleteChange(e, value, 'subject')}
                         disabled={!props.document['private']}
                         className={classes.field}
                         loading={loading}
@@ -164,8 +151,8 @@ function AnnouncementsForm(props) {
                         renderInput={params => (
                             <TextField
                                 {...params}
-                                label="Class Name"
-                                helperText="This announcement will only be viewable to the selected class."
+                                label="Subject Name"
+                                helperText="This announcement will only be viewable to this subject's grade."
                                 fullWidth
                                 variant="outlined"
                                 InputProps={{

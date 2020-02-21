@@ -3,6 +3,8 @@ const subjectController = require("../../controllers/subjectController");
 
 // Matches with "/api/subject"
 router.route("/")
+  // Gets all subjects
+  // .get(subjectController.getSubjects)
   // Adds a subject  
   .post(subjectController.addSubject)
 

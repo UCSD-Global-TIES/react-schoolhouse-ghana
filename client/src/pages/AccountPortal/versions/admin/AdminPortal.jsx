@@ -131,7 +131,8 @@ function AdminPortal(props) {
         {
             collection: "Announcements",
             icon: faBullhorn,
-            FormComponent: AnnouncementsForm,
+            FormComponent: (p) =>
+                <AnnouncementsForm user={props.user} {...p} />,
             primary: "title",
             path: `${props.match.path}/announcements`
         },
@@ -232,16 +233,16 @@ function AdminPortal(props) {
                         timeout={300}
                         classNames='fade'
                     > */}
-                        <Switch location={props.location}>
-                            {
-                                pages.map((page, idx) => (
-                                    <ProtectedRoute key={`page-${idx}`} exact path={page.path} component={page.component} user={props.user} />
+                <Switch location={props.location}>
+                    {
+                        pages.map((page, idx) => (
+                            <ProtectedRoute key={`page-${idx}`} exact path={page.path} component={page.component} user={props.user} />
 
-                                ))
-                            }
-                            <Redirect to={defaultRoute} />
-                        </Switch>
-                    {/* </CSSTransition>
+                        ))
+                    }
+                    <Redirect to={defaultRoute} />
+                </Switch>
+                {/* </CSSTransition>
                 </TransitionGroup> */}
             </main>
         </div>
