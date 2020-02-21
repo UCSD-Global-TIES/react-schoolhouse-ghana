@@ -75,12 +75,12 @@ const useStyles = makeStyles(theme => ({
 // Link to redirect to for editing and creating documents
 // link = { "/edit/classes/"}
 function DocumentSelector(props) {
-    const { docs, icon, collection, primary } = props;
+    const { icon, collection, primary } = props;
     const classes = useStyles();
     // DOCUMENTS EDITOR
-    const [documents, setDocuments] = useState(docs);
-    const [filteredDocuments, setFilteredDocuments] = useState(docs);
-    const [viewableDocuments, setViewableDocuments] = useState(docs.slice(0, props.pageMax));
+    const [documents, setDocuments] = useState([]);
+    const [filteredDocuments, setFilteredDocuments] = useState([]);
+    const [viewableDocuments, setViewableDocuments] = useState([]);
     const [page, setPage] = React.useState(1);
     const [searchQuery, setSearchQuery] = useState("");
 
@@ -134,8 +134,10 @@ function DocumentSelector(props) {
 
     useEffect(() => {
         // DOCUMENTS NOT PROPERLY BEING SET (TODO)
-        setDocuments(docs);
-    }, []);
+        setDocuments(props.docs);
+        setFilteredDocuments(props.docs);
+        setViewableDocuments(props.docs.slice(0, props.pageMax))
+    }, [props.docs]);
 
     return (
         <>

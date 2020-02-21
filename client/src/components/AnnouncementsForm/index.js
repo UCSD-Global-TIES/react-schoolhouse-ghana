@@ -109,7 +109,6 @@ function AnnouncementsForm(props) {
                 value: selectedDocs
             }
         }
-
         props.handleChange(event)
     }
 
