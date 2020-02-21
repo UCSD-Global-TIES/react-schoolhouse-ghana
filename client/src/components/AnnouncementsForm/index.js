@@ -3,10 +3,11 @@ import { TextField, Box, Switch, Typography, CircularProgress } from "@material-
 import { makeStyles } from '@material-ui/core/styles';
 import { parseTime } from '../../utils/misc';
 import { Autocomplete } from '@material-ui/lab';
-
+import DocumentPicker from "../DocumentPicker"
 
 import "../../utils/flowHeaders.min.css";
 import API from "../../utils/API";
+import { faFile } from "@fortawesome/free-solid-svg-icons";
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -20,7 +21,7 @@ const useStyles = makeStyles(theme => ({
         maxWidth: "500px",
         width: "90%",
         margin: "auto"
-    }
+    },
 }));
 
 const disabledMsg = `This field will be populated after announcement creation.`
@@ -71,6 +72,8 @@ const textFields = [
 function AnnouncementsForm(props) {
     const classes = useStyles();
     const [loading, setLoading] = useState(true);
+    const [fileOptions, setFileOptions] = useState([]);
+    const [selectedFiles, setSelectedFiles] = useState(props.document.files || []);
     const [options, setOptions] = useState([]);
 
     const handleSwitchToggle = name => e => {
@@ -97,13 +100,30 @@ function AnnouncementsForm(props) {
         }
     }
 
+    const handlePickChange = (name, selectedDocs) => {
+        setSelectedFiles(selectedDocs);
+
+        const event = {
+            target: {
+                name,
+                value: selectedDocs
+            }
+        }
+
+        props.handleChange(event)
+    }
+
     useEffect(() => {
-        API.getGrades(props.user.key)
-            .then((result) => {
+        const promises = [];
+        promises.push(API.getGrades(props.user.key));
+        promises.push(API.getFiles(props.user.key))
+
+        Promise.all(promises)
+            .then((results) => {
                 // Retrieve grades and populate subjects
                 // For every grade...
                 let subjectOptions = [];
-                for (const gradeDoc of result.data) {
+                for (const gradeDoc of results[0].data) {
                     for (const subjectDoc of gradeDoc.subjects) {
                         // Push object containing class name, grade level, and class_id (see 'subjectOptions')
                         subjectOptions.push({ name: subjectDoc.name, grade: gradeDoc.level, _id: subjectDoc._id })
@@ -112,6 +132,7 @@ function AnnouncementsForm(props) {
 
                 // Set options and loading flag to false
                 setOptions(subjectOptions);
+                setFileOptions([...results[1].data]);
                 setLoading(false);
 
             })
@@ -192,6 +213,17 @@ function AnnouncementsForm(props) {
                             variant="outlined"
                         />
                     ))}
+
+                <DocumentPicker
+                    title={"Attached Files"}
+                    docs={fileOptions}
+                    pageMax={5}
+                    selected={selectedFiles}
+                    icon={faFile}
+                    collection={"Files"}
+                    primary={"nickname"}
+                    handleChange={(docs) => handlePickChange('files', docs)}
+                />
 
             </div>
         </div>
