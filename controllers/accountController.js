@@ -5,7 +5,6 @@ const TeacherDb = require("../models/Teacher");
 const AdminDb = require("../models/Admin");
 const classDb = require("../models/Admin");
 
-// TODO
 const {
     verifyKey
 } = require("./verifyController");

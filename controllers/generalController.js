@@ -61,7 +61,7 @@ module.exports = {
 
     },
     updateAnnouncement: function (req, res) {
-        verifyKey(req.header('Authorization'), 'Admin').then((isVerified) => {
+        verifyKey(req.header('Authorization'), 'Teacher,Admin').then((isVerified) => {
             if (isVerified) {
                 const aid = req.params.aid;
                 announcementDb

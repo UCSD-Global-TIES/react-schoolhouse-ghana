@@ -12,7 +12,6 @@ const studentSchema = new Schema({
   },
   grade: {
     type: Schema.Types.ObjectId,
-    required: true,
     ref: 'Grade'
   }
 }, { timestamps: true });

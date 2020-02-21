@@ -105,13 +105,13 @@ export default {
     const config = {
       'Authorization': key
     };
-    const newC = {
+    const newS = {
       name,
       grade: grade_id
     };
 
     return axios.post(`/api/subject`, {
-      document: newC,
+      document: newS,
       path: gradePath
     }, {
       headers: config
@@ -123,12 +123,12 @@ export default {
       'Authorization': key
     };
 
-    const newC = {
+    const newS = {
       name,
       grade: grade_id,
       files
     };
-    return axios.put(`/api/subject/${subject_id}`, newC, {
+    return axios.put(`/api/subject/${subject_id}`, newS, {
       headers: config
     }); // SECURE
   },
@@ -153,7 +153,7 @@ export default {
     }); // SECURE
   },
   // Create a public 'Announcement'
-  addSchoolAnnouncement: function (title, content, authorName, key) {
+  addSchoolAnnouncement: function (title, content, files, authorName, key) {
     const config = {
       'Authorization': key
     };
@@ -209,6 +209,15 @@ export default {
       'Authorization': key
     };
     return axios.get(`/api/grade/${grade_id}`, {
+      headers: config
+    }); // SECURE
+  },
+  // Get a student or teacher associated 'Grade'
+  getUserGrade: function (grade_id, key) {
+    const config = {
+      'Authorization': key
+    };
+    return axios.get(`/api/grade/${grade_id}/user`, {
       headers: config
     }); // SECURE
   },
@@ -335,7 +344,7 @@ export default {
       last_name,
       type
     };
-    if (gradeID) newA.grade = grade_id;
+    if (grade_id) newA.grade = grade_id;
 
     return axios.post(`/api/account`, newA, {
       headers: config

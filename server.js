@@ -5,6 +5,7 @@ const session = require('express-session');
 const morgan = require('morgan');
 const mongoose = require("mongoose");
 const routes = require("./routes");
+const verifyController = require("./controllers/verifyController")
 
 const app = express();
 var http = require('http').createServer(app);
@@ -69,6 +70,7 @@ const startServer = () => {
   http.listen(PORT, function () {
     console.log(`🌎  ==> API Server now listening on PORT ${PORT}!`);
   });
+
 }
 
 startServer();

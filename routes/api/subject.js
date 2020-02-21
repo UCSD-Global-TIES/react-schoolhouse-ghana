@@ -17,8 +17,6 @@ router.route("/:sid")
 
 // Matches with "/api/subject/:sid/ann"
 router.route("/:sid/ann")
-  // Get all subject announcements
-  .get(subjectController.getAnnouncements)
   // Create a Subject announcement
   .post(subjectController.addAnnouncement)
 
@@ -28,14 +26,14 @@ router.route("/:sid/ann/:aid")
   .delete(subjectController.deleteAnnouncement)
 
 // Matches with "/api/subject/:sid/file"
-router.route("/:sid/file")
+router.route("/:sid/file/:fid")
   // Add a file reference to the subject's 'files' array
   .post(subjectController.addFile)
 
 // Matches with "/api/subject/:sid/file/:fid"
 router.route("/:sid/file/:fid")
   // Remove a file reference from the subject's 'files' array
-  .delete(subjectController.deleteFile)
+  .delete(subjectController.removeFile)
 
 module.exports = router;
 

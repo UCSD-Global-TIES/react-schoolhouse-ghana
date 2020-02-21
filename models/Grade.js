@@ -17,11 +17,7 @@ const gradeSchema = new Schema({
   students: [{
     type: Schema.Types.ObjectId,
     ref: 'Student'
-  }],
-  path: {
-    type: String,
-    required: true
-  }
+  }]
 }, { timestamps: true });
 
 const Grade = mongoose.model("Grade", gradeSchema);

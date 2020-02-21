@@ -1,0 +1,15 @@
+{
+    "announcements": [{
+            "authorName": "Matt C.",
+            "title": "Hello world!",
+            "content": "This is an example announcement",
+            "private": false
+        },
+        {
+            "authorName": "Matt C.",
+            "title": "Hello Grade 1!",
+            "content": "This is an example announcement",
+            "private": true
+        }
+    ]
+}

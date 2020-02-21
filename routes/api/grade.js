@@ -14,8 +14,12 @@ router.route("/:gid")
   .get(gradeController.getGrade)
   // Deletes a specific grade
   .delete(gradeController.deleteGrade)
-  // Updates a specific grade
-  .put(gradeController.updateGrade)
+// Updates a specific grade
+// .put(gradeController.updateGrade)
+
+router.route("/:gid/user")
+  // Retrieves a specific grade
+  .get(gradeController.getUserGrade)
 
 // Matches with "/api/grade/:gid/student/:sid"
 router.route("/:gid/student/:sid")

@@ -6,10 +6,6 @@ const subjectSchema = new Schema({
     type: String,
     required: true
   },
-  path: {
-    type: String,
-    required: true
-  },
   announcements: [{
     type: Schema.Types.ObjectId,
     ref: 'Announcement'
