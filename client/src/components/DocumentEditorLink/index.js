@@ -233,7 +233,7 @@ function DocumentEditorLink(props) {
                             handleDelete={() => handleConfirm(true)}
                         />
 
-                        <FormControl fullWidth className={classes.searchbar}>
+                        <FormControl className={classes.searchbar}>
                             <InputLabel htmlFor="standard-adornment-amount">Search {collection.toLowerCase()}</InputLabel>
                             <Input
                                 value={searchQuery}

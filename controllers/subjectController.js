@@ -126,7 +126,12 @@ module.exports = {
                         .findOne({
                             _id: req.params.sid
                         })
-                        .populate('announcements')
+                        .populate({
+                            path: 'announcements',
+                            populate: {
+                                path: 'files'
+                            }
+                        })
                         .populate('files')
                         .populate('grade')
                         .then(subjectDoc => res.json(subjectDoc))

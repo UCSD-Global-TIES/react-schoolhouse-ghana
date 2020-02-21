@@ -79,7 +79,7 @@ function App() {
             {/* Portal component should check account type and render the correct component */}
             <ProtectedRoute exact path="/" component={AccountPortal} user={userInfo} />
             {/* Class component should check account type and render the correct component */}
-            <ProtectedRoute exact path="/subject/:id" component={SubjectPage} user={userInfo} />
+            <ProtectedRoute path="/subject/:id" component={SubjectPage} user={userInfo} />
             <ProtectedRoute path="/edit" component={AdminPortal} logout={handleLogout} user={userInfo} />
             <Route exact path="/login" component={props => <LoginPortal {...props} user={userInfo} setUser={setUser} />} />
             <Route component={NoMatch} />

@@ -226,12 +226,12 @@ function AdminPortal(props) {
             <main className={classes.content} style={{ marginLeft: !isSmallDevice ? drawerWidth : 0, }}>
                 <div className={classes.toolbar} />
 
-                <TransitionGroup>
+                {/* <TransitionGroup>
                     <CSSTransition
                         key={props.location.key}
                         timeout={300}
                         classNames='fade'
-                    >
+                    > */}
                         <Switch location={props.location}>
                             {
                                 pages.map((page, idx) => (
@@ -241,8 +241,8 @@ function AdminPortal(props) {
                             }
                             <Redirect to={defaultRoute} />
                         </Switch>
-                    </CSSTransition>
-                </TransitionGroup>
+                    {/* </CSSTransition>
+                </TransitionGroup> */}
             </main>
         </div>
 

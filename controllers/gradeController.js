@@ -26,6 +26,7 @@ module.exports = {
                 }
             })
     },
+    // SLOW, ~4 seconds
     getUserGrade: function (req, res) {
         verifyKey(req.header('Authorization'), 'Student,Teacher,Admin')
             .then((isVerified) => {
@@ -38,7 +39,10 @@ module.exports = {
                         .populate({
                             path: 'subjects',
                             populate: {
-                                path: 'announcements'
+                                path: 'announcements',
+                                populate: {
+                                    path: 'files'
+                                }
                             }
                         })
 

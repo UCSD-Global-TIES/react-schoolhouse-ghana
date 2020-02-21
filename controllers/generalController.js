@@ -6,6 +6,7 @@ const {
 } = require("./verifyController");
 
 module.exports = {
+    // SLOW ~ 2 seconds
     getAnnouncements: function (req, res) {
         verifyKey(req.header('Authorization'), 'Admin')
             .then((isVerified) => {
@@ -14,6 +15,7 @@ module.exports = {
                         .find({
                             private: false
                         })
+                        .populate('files')
                         .then((announcements) => {
                             res.json(announcements);
                         })

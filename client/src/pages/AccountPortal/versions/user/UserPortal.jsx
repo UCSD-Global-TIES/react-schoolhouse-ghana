@@ -4,10 +4,15 @@ import { Link } from "react-router-dom"
 import API from "../../../../utils/API"
 import SimpleListView from "../../../../components/SimpleListView"
 import { Grid, Typography, CardActionArea, CardContent, CardMedia, Card } from "@material-ui/core";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faSchool, faPencilRuler } from "@fortawesome/free-solid-svg-icons"
 import "../../../../utils/flowHeaders.min.css";
 import "./main.css";
 import clsx from "clsx"
+import AccessDenied from "../../../../components/AccessDenied";
+import PageSpinner from "../../../../components/PageSpinner";
+import AnnouncementViewer from "../../../../components/AnnouncementViewer";
+
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -59,7 +64,7 @@ function UserPortal(props) {
         // Get 'Grade' associated with user account, populating subjects and their announcements
         // promises.push(API.getStudentGrade(props.user.profile.grade, props.user.key))
 
-        promises.push(API.getUserGrade("5e4f3142a83ec542204faeb7", props.user.key))
+        promises.push(API.getUserGrade("5e4f4d3c7811a40f88a8b12f", props.user.key))
 
         // Get school announcements
         promises.push(API.getSchoolAnnouncements(props.user.key))
@@ -88,9 +93,7 @@ function UserPortal(props) {
     }, [])
 
     if (loading) {
-        return (<>
-            {/* Replace with user portal skeleton */}
-        </>)
+        return <PageSpinner />
     }
 
     return (
@@ -108,7 +111,7 @@ function UserPortal(props) {
                             pageMax={MAX_ANN}
                             icon={faSchool}
                             labelField={"title"}
-                            contentField={"content"}
+                            viewer={AnnouncementViewer}
                         />
                         <SimpleListView
                             title={"Grade Announcements"}
@@ -116,7 +119,7 @@ function UserPortal(props) {
                             pageMax={MAX_ANN}
                             icon={faPencilRuler}
                             labelField={"title"}
-                            contentField={"content"}
+                            viewer={AnnouncementViewer}
                         />
 
                     </div>
