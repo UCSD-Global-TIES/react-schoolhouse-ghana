@@ -52,7 +52,7 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-function ClassEditor(props) {
+function SubjectEditor(props) {
   const classes = useStyles();
   const [checked, setChecked] = useState([]);
 
@@ -123,4 +123,4 @@ function ClassEditor(props) {
   );
 }
 
-export default ClassEditor;
+export default SubjectEditor;

@@ -88,7 +88,9 @@ function UserPortal(props) {
     }, [])
 
     if (loading) {
-        return (<> Loading </>)
+        return (<>
+            {/* Replace with user portal skeleton */}
+        </>)
     }
 
     return (
