@@ -101,14 +101,14 @@ export default {
     }); // SECURE
   },
   // Get a specified subject
-  // getSubjects: function (key) {
-  //   const config = {
-  //     'Authorization': key
-  //   };
-  //   return axios.get(`/api/subject/`, {
-  //     headers: config
-  //   }); // SECURE
-  // },
+  getSubjects: function (key) {
+    const config = {
+      'Authorization': key
+    };
+    return axios.get(`/api/subject/`, {
+      headers: config
+    }); // SECURE
+  },
   // Create a 'Subject' -> Add 'Subject' to 'Grade' subjects
   addSubject: function (name, grade_id, gradePath, key) {
     const config = {
@@ -157,7 +157,16 @@ export default {
     const config = {
       'Authorization': key
     };
-    return axios.get(`/api/general/ann`, {
+    return axios.get(`/api/general/ann?private=false`, {
+      headers: config
+    }); // SECURE
+  },
+  // Get all 'Announcement' documents that are not 'private'
+  getAnnouncements: function (key) {
+    const config = {
+      'Authorization': key
+    };
+    return axios.get(`/api/general/ann?all=true`, {
       headers: config
     }); // SECURE
   },

@@ -11,10 +11,14 @@ module.exports = {
         verifyKey(req.header('Authorization'), 'Admin')
             .then((isVerified) => {
                 if (isVerified) {
+                    let query;
+
+                    if (req.query.private === "false") query = {
+                        private: false
+                    }
+
                     announcementDb
-                        .find({
-                            private: false
-                        })
+                        .find(query)
                         .populate('files')
                         .then((announcements) => {
                             res.json(announcements);

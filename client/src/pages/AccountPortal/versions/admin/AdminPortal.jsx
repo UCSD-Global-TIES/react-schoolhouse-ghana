@@ -17,6 +17,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUsers, faBullhorn, faChalkboardTeacher, faShapes, faServer, faFile } from "@fortawesome/free-solid-svg-icons";
 import DocumentEditor from '../../../../components/DocumentEditor'
 import FilesForm from "../../../../components/FilesForm";
+import API from "../../../../utils/API";
 
 const drawerWidth = 220;
 
@@ -71,9 +72,9 @@ function AdminPortal(props) {
             path: `${props.match.url}/grades`
         },
         {
-            label: "Classes",
+            label: "Subjects",
             icon: faChalkboardTeacher,
-            path: `${props.match.url}/classes`
+            path: `${props.match.url}/subjects`
         },
 
     ]
@@ -134,35 +135,52 @@ function AdminPortal(props) {
             FormComponent: (p) =>
                 <AnnouncementsForm user={props.user} {...p} />,
             primary: "title",
-            path: `${props.match.path}/announcements`
+            path: `${props.match.path}/announcements`,
+            api: {
+                get: API.getAnnouncements,
+                put: API.updateAnnouncement
+                // delete: API.dele
+            }
         },
         {
             collection: "Grades",
             icon: faShapes,
             FormComponent: GradesForm,
             primary: "title",
-            path: `${props.match.path}/grades`
+            path: `${props.match.path}/grades`,
+            api: {
+                get: API.getGrades
+            }
         },
         {
-            collection: "Classes",
+            collection: "Subjects",
             icon: faChalkboardTeacher,
             FormComponent: ClassesForm,
             primary: "title",
-            path: `${props.match.path}/classes`
+            path: `${props.match.path}/subjects`,
+            api: {
+                get: API.getSubjects
+            }
         },
         {
             collection: "Accounts",
             icon: faUsers,
             FormComponent: AccountsForm,
             primary: "title",
-            path: `${props.match.path}/accounts`
+            path: `${props.match.path}/accounts`,
+            api: {
+                // get: API.getAccounts
+            }
         },
         {
             collection: "Files",
             icon: faFile,
             FormComponent: FilesForm,
             primary: "nickname",
-            path: `${props.match.path}/files`
+            path: `${props.match.path}/files`,
+            api: {
+                get: API.getFiles
+            }
         }
     ]
 
@@ -177,6 +195,7 @@ function AdminPortal(props) {
                     collection={page.collection}
                     icon={page.icon}
                     FormComponent={page.FormComponent}
+                    getDocuments={page.api.get}
                     {...props} />
         })
     })

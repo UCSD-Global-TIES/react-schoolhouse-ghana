@@ -39,16 +39,10 @@ const textFields = [
         helper: "This is the main content of this announcement."
     },
     {
-        name: "author",
-        label: "Author ID",
+        name: "authorName",
+        label: "Author Name",
         disabled: true,
-        helper: "This is the account ID of the announcement's author."
-    },
-    {
-        name: "authorType",
-        label: "Author Type",
-        disabled: true,
-        helper: "This is the account type of the announcement's author."
+        helper: "This is the name of the announcement's author."
     },
     {
         name: "createdAt",
@@ -75,6 +69,8 @@ function AnnouncementsForm(props) {
     const [fileOptions, setFileOptions] = useState([]);
     const [selectedFiles, setSelectedFiles] = useState(props.document.files || []);
     const [options, setOptions] = useState([]);
+    const [subjectValue, setSubjectValue] = useState({});
+    const [PROPS, setProps] = useState(props)
 
     const handleSwitchToggle = name => e => {
         const event = {
@@ -84,7 +80,7 @@ function AnnouncementsForm(props) {
             }
         }
 
-        props.handleChange(event)
+        PROPS.handleChange(event)
     }
 
     const handleAutocompleteChange = (e, value, name) => {
@@ -96,7 +92,7 @@ function AnnouncementsForm(props) {
                 }
             }
 
-            props.handleChange(event)
+            PROPS.handleChange(event)
         }
     }
 
@@ -109,13 +105,13 @@ function AnnouncementsForm(props) {
                 value: selectedDocs
             }
         }
-        props.handleChange(event)
+        PROPS.handleChange(event)
     }
 
     useEffect(() => {
         const promises = [];
-        promises.push(API.getGrades(props.user.key));
-        promises.push(API.getFiles(props.user.key))
+        promises.push(API.getGrades(PROPS.user.key));
+        promises.push(API.getFiles(PROPS.user.key))
 
         Promise.all(promises)
             .then((results) => {
@@ -129,14 +125,45 @@ function AnnouncementsForm(props) {
                     }
                 }
 
+                
+                const selected = [];
+                if (props.document.files) {
+                    for (const file of props.document.files) {
+                        selected.push(file._id)
+                    }
+                }
+                setSelectedFiles(selected)
+                
                 // Set options and loading flag to false
                 setOptions(subjectOptions);
                 setFileOptions([...results[1].data]);
                 setLoading(false);
+                
+                // Set default autocomplete value
+                for (const option of subjectOptions) {
+                    if (option._id === PROPS.document.subject) {
+                        setSubjectValue(option);
+                        return;
+                    }
+                }
 
             })
 
+
     }, []);
+
+    useEffect(() => {
+        setProps(props);
+
+        // Set default autocomplete value
+        for (const option of options) {
+            if (option._id === PROPS.document.subject) {
+                setSubjectValue(option);
+                return;
+            }
+        }
+
+    }, [props])
 
     return (
         <div className={classes.root}>
@@ -148,8 +175,8 @@ function AnnouncementsForm(props) {
                         </Box>
                         <Box >
                             <Switch
-                                disabled={!props.isCreate}
-                                checked={props.document['private'] || false}
+                                disabled={!PROPS.isCreate}
+                                checked={PROPS.document['private'] || false}
                                 onChange={handleSwitchToggle('private')}
                                 color="primary"
                                 inputProps={{ 'aria-label': 'primary checkbox' }}
@@ -159,7 +186,8 @@ function AnnouncementsForm(props) {
 
                     <Autocomplete
                         onChange={(e, value) => handleAutocompleteChange(e, value, 'subject')}
-                        disabled={!props.document['private']}
+                        value={subjectValue}
+                        disabled={!PROPS.document['private']}
                         className={classes.field}
                         loading={loading}
                         // Sort by category tag (sort by increasing grade)
@@ -196,11 +224,11 @@ function AnnouncementsForm(props) {
                             className={classes.field}
                             label={item.label}
                             name={item.name}
-                            placeholder={(item.disabled || (item.updateOnly && props.isCreate)) ? disabledMsg : ""}
-                            disabled={(item.disabled || (item.updateOnly && props.isCreate))}
-                            value={(props.isDate ? parseTime(props.document[item.name]) : null) || props.document[item.name] || ""}
+                            placeholder={(item.disabled || (item.updateOnly && PROPS.isCreate)) ? disabledMsg : ""}
+                            disabled={(item.disabled || (item.updateOnly && PROPS.isCreate))}
+                            value={(item.isDate ? parseTime(PROPS.document[item.name]) : null) || PROPS.document[item.name] || ""}
                             helperText={item.helper}
-                            onChange={props.handleChange}
+                            onChange={PROPS.handleChange}
                             fullWidth
                             autoComplete={'off'}
                             margin="normal"

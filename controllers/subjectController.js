@@ -118,21 +118,21 @@ module.exports = {
                 }
             })
     },
-    // getSubjects: function (req, res) {
-    //     verifyKey(req.header('Authorization'), 'Admin')
-    //         .then((isVerified) => {
-    //             if (isVerified) {
-    //                 subjectDb
-    //                     .find({})
-    //                     .populate('grade')
-    //                     .then(subjectDoc => res.json(subjectDoc))
-    //                     .catch(err => res.status(422).json(err));
+    getSubjects: function (req, res) {
+        verifyKey(req.header('Authorization'), 'Admin')
+            .then((isVerified) => {
+                if (isVerified) {
+                    subjectDb
+                        .find({})
+                        .populate('grade')
+                        .then(subjectDoc => res.json(subjectDoc))
+                        .catch(err => res.status(422).json(err));
 
-    //             } else {
-    //                 res.status(403).json(null);
-    //             }
-    //         })
-    // },
+                } else {
+                    res.status(403).json(null);
+                }
+            })
+    },
     getSubject: function (req, res) {
         verifyKey(req.header('Authorization'), 'Student,Teacher,Admin')
             .then((isVerified) => {

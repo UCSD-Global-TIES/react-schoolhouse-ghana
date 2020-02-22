@@ -182,9 +182,7 @@ function DocumentEditor(props) {
             // Inform user of redirect to previous document (inform user -> wait 1 sec. -> redirect)
             setTimeout( () => props.history.goBack(), 1000 );
         }
-
-        setDialogOpen(isOpen);
-
+        
         if (document) {
             setCurrentDocument(document);
             // If the document is empty (passed when creating a document)
@@ -194,6 +192,8 @@ function DocumentEditor(props) {
                 setDocumentAction({ text: "Update", function: handleSave });
             }
         }
+
+        setDialogOpen(isOpen);
     }
 
     const handleFormChange = (event) => {
@@ -224,72 +224,16 @@ function DocumentEditor(props) {
     }
 
     useEffect(() => {
-        // API.getSchoolAnnouncements(props.user.key)
-        //     .then((result) => {
-        //         setAnnouncements(result.data);
-        //         setLoading(false);
-        //     })
-        setTimeout(() => {
-            const testDocuments = [
-                {
-                    _id: "1",
-                    private: false,
-                    title: "Title 0",
-                    content: "Content 0",
-                    date_created: new Date(1581452252),
-                    last_updated: new Date(1581527252)
-                },
-                {
-                    _id: "2",
-                    title: "Title 1",
-                    content: "Content 1",
-                    date_created: new Date(1481452252)
-                },
-                {
-                    _id: "2",
-                    title: "Title 1",
-                    content: "Content 1",
-                    date_created: new Date(1481452252)
-                },
-                {
-                    _id: "2",
-                    title: "Title 1",
-                    content: "Content 1",
-                    date_created: new Date(1481452252)
-                },
-                {
-                    _id: "2",
-                    title: "Title 1",
-                    content: "Content 1",
-                    date_created: new Date(1481452252)
-                },
-
-                {
-                    _id: "2",
-                    title: "Title 1",
-                    content: "Content 1",
-                    date_created: new Date(1481452252)
-                },
-                {
-                    _id: "2",
-                    title: "Title 1",
-                    content: "Content 1",
-                    date_created: new Date(1481452252)
-                },
-                {
-                    _id: "2",
-                    title: "Title 1",
-                    content: "Content 1",
-                    date_created: new Date(1481452252)
-                },
-            ];
-            setLoading(false);
+        props.getDocuments(props.user.key)
+        .then((docData) => {
+            const docList = docData.data;
 
             // Initialize documents
-            setDocuments(testDocuments);
-            setFilteredDocuments(testDocuments);
-            setViewableDocuments(testDocuments.slice(0, MAX_ITEMS));
-
+            setDocuments(docList);
+            setFilteredDocuments(docList);
+            setViewableDocuments(docList.slice(0, MAX_ITEMS));
+            setLoading(false);
+            
             // If the user has requested a document in the route, set the document
             // with that _id in the editor; or if they wish to create a document with 
             // preset values
@@ -302,7 +246,7 @@ function DocumentEditor(props) {
                 if(_id) {
 
                     let isDocument = false;
-                    for (const document of testDocuments) {
+                    for (const document of docList) {
                         if (document._id == _id) {
                             handleDocument(true, document);
                             isDocument = true;
@@ -317,7 +261,7 @@ function DocumentEditor(props) {
                 // Check if the redirect flag exists, set the variable
                 if(redirect !== undefined) setRedirectOnExit(redirect);
             }
-        }, 1000);
+        });
 
     }, []);
 
@@ -361,7 +305,7 @@ function DocumentEditor(props) {
                             title={collection}
                             numSelected={selected.length}
                             handleCreate={() => handleDocument(true, {})}
-                            handleUpdate={() => handleDocument(true, documents[selected[0]])}
+                            handleUpdate={() => handleDocument(true, documents.filter((doc) => doc._id === selected[0])[0])}
                             handleDelete={() => handleConfirm(true)}
                         />
 
@@ -412,7 +356,7 @@ function DocumentEditor(props) {
                                                                     inputProps={{ 'aria-labelledby': labelId }}
                                                                 />
                                                             </ListItemIcon>
-                                                            <ListItemText id={labelId} primary={document[primary]} secondary={document.last_updated ? `Updated: ${parseTime(document.last_updated, true)}` : `Created: ${parseTime(document.date_created, true)}`} />
+                                                            <ListItemText id={labelId} primary={document[primary]} secondary={`Created: ${parseTime(document.createdAt, true)}`} />
                                                             <ListItemSecondaryAction>
                                                                 <FontAwesomeIcon icon={icon} />
                                                             </ListItemSecondaryAction>

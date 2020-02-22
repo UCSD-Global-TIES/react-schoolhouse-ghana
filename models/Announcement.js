@@ -22,7 +22,11 @@ const announcementSchema = new Schema({
   files: [{
     type: Schema.Types.ObjectId,
     ref: 'File'
-  }]
+  }],
+  subject: {
+    type: Schema.Types.ObjectId,
+    ref: 'Subject'
+  }
 }, { timestamps: true });
 
 const Announcement = mongoose.model("Announcement", announcementSchema);
