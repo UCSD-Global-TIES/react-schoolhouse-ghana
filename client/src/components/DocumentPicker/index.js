@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { parseTime } from "../../utils/misc";
 import { Pagination } from '@material-ui/lab'
 import clsx from "clsx"
-import { Toolbar, FormControl, Input, InputLabel, InputAdornment, Snackbar, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Checkbox, Typography } from "@material-ui/core";
+import { Tooltip, Switch, Toolbar, FormControl, Input, InputLabel, InputAdornment, Snackbar, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Checkbox, Typography } from "@material-ui/core";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import SearchIcon from '@material-ui/icons/Search';
 import { lighten, makeStyles } from '@material-ui/core/styles';
@@ -83,6 +83,9 @@ function DocumentSelector(props) {
     const [viewableDocuments, setViewableDocuments] = useState([]);
     const [page, setPage] = React.useState(1);
     const [searchQuery, setSearchQuery] = useState("");
+    const [state, setState] = React.useState({
+        selectedToggle: false
+      });
 
     // HANDLE PAGE CHANGE
     const handlePageChange = (event, value) => {
@@ -132,6 +135,24 @@ function DocumentSelector(props) {
         props.handleChange(newSelected);
     };
 
+    const handleFilterSelectedToggle = name => event => {
+        setState({ ...state, [name]: event.target.checked });
+
+        // Reset page 
+        setPage(0)
+
+        if(event.target.checked) {
+
+            const currentViewableDocs = filteredDocuments.filter(document => props.selected.includes(document._id));
+            setFilteredDocuments(currentViewableDocs);
+            setViewableDocuments(currentViewableDocs.slice(0, props.pageMax));
+        } else {
+            const currentViewableDocs = documents.filter(document => document[primary].toLowerCase().includes(searchQuery.toLowerCase()));
+            setFilteredDocuments(currentViewableDocs);
+            setViewableDocuments(currentViewableDocs.slice(0, props.pageMax));
+        }
+      };
+
     useEffect(() => {
         // DOCUMENTS NOT PROPERLY BEING SET (TODO)
         setDocuments(props.docs);
@@ -153,16 +174,27 @@ function DocumentSelector(props) {
                             disableGutters
                         >
                             {props.selected.length > 0 ? (
-                                <Typography className={classes.title} color="inherit" variant="subtitle1">
-                                    {props.selected.length} selected
-                        </Typography>
+                                <>
+                                    <Typography className={classes.title} color="inherit" variant="subtitle1">
+                                        {props.selected.length} selected
+                                    </Typography>
+                                    <Tooltip title={`Show ONLY Selected `}>
+                                        <Switch
+                                            checked={state.selectedToggle}
+                                            onChange={handleFilterSelectedToggle('selectedToggle')}
+                                            value="selectFilter"
+                                        />
+                                    </Tooltip>
+                                </>
                             ) : (
                                     <Typography className={classes.title} variant="h6" id="tableTitle">
                                         {props.title}
                                     </Typography>
                                 )}
 
-                        </Toolbar>                        <FormControl className={classes.searchbar}>
+                        </Toolbar>
+
+                        <FormControl className={classes.searchbar}>
                             <InputLabel htmlFor="standard-adornment-amount">Search {collection.toLowerCase()}</InputLabel>
                             <Input
                                 value={searchQuery}

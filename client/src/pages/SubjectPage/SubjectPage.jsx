@@ -96,33 +96,67 @@ function SubjectPage(props) {
 
   const pagesInfo = [
     {
-      component: (props) => (
-        <SimpleListView
-          title={"Announcements"}
-          items={subjectInfo.announcements || []}
-          pageMax={5}
-          icon={faBullhorn}
-          labelField={"title"}
-          viewer={AnnouncementViewer}
-          searchbar
-          {...props}
-        />
-      ),
+      component: 
+      // props.user.type === "Student" ?
+        (props) => (
+          <SimpleListView
+            title={"Announcements"}
+            items={subjectInfo.announcements || []}
+            pageMax={5}
+            icon={faBullhorn}
+            labelField={"title"}
+            viewer={AnnouncementViewer}
+            searchbar
+            {...props}
+          />
+        )
+        // :
+        // (props) => (
+        //   <DocumentEditor
+        //     primary={"title"}
+        //     collection={"Announcements"}
+        //     icon={faBullhorn}
+        //     FormComponent={}
+        //     get={}
+        //     post={}
+        //     put={}
+        //     delete={}
+        //     {...props}
+        //   />
+        // )
+        ,
       path: `${props.match.path}/announcements`
     },
     {
-      component: (props) => (
-        <SimpleListView
-          title={"Resources"}
-          items={subjectInfo.files || []}
-          pageMax={5}
-          icon={faFile}
-          labelField={"nickname"}
-          viewer={FileViewer}
-          searchbar
-          {...props}
-        />
-      ),
+      component: 
+      // props.user.type === "Student" ?
+        (props) => (
+          <SimpleListView
+            title={"Resources"}
+            items={subjectInfo.files || []}
+            pageMax={5}
+            icon={faFile}
+            labelField={"nickname"}
+            viewer={FileViewer}
+            searchbar
+            {...props}
+          />
+        )
+        // :
+        // (props) => (
+        //   <DocumentPicker
+        //     title={"Attached Files"}
+        //     docs={fileOptions}
+        //     pageMax={5}
+        //     selected={selectedFiles}
+        //     icon={faFile}
+        //     collection={"Files"}
+        //     primary={"nickname"}
+        //     handleChange={(docs) => handlePickChange('files', docs)}
+        //   />
+
+        // )
+        ,
       path: `${props.match.path}/resources`
     }
   ]
