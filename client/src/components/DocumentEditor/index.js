@@ -11,7 +11,6 @@ import FullScreenDialog from "../FullScreenDialog";
 import ConfirmDialog from "../ConfirmDialog";
 import "../../utils/flowHeaders.min.css";
 
-
 const useStyles = makeStyles(theme => ({
     root: {
         display: 'flex',
@@ -55,7 +54,7 @@ const useStyles = makeStyles(theme => ({
 function DocumentEditor(props) {
     const MAX_ITEMS = 5;
 
-    const { API, FormComponent, icon, collection, primary } = props;
+    const { FormComponent, icon, collection, primary } = props;
     const classes = useStyles();
     // DOCUMENTS EDITOR
     const [selected, setSelected] = useState([]);
@@ -161,6 +160,8 @@ function DocumentEditor(props) {
             .then(() => {
                 setDialogOpen(false);
                 setCurrentAlert({ isOpen: true, severity: "success", message: `The ${collection.toLowerCase()} has been successfully created!` });
+
+                // Send message on web-socket
 
                 if (redirectOnExit) {
                     // Inform user of redirect to previous document (inform user -> wait 1 sec. -> redirect)

@@ -10,6 +10,7 @@ const config = require("./nasConfig");
 const app = express();
 var http = require('http').createServer(app);
 var io = require('socket.io')(http);
+require("./socket")(io);
 const PORT = process.env.PORT || 3001;
 // Track the number of connections to the server
 let connections = 0;

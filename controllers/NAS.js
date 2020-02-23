@@ -98,6 +98,8 @@ module.exports = {
     // https://codeforgeek.com/multiple-file-upload-node-js/
     // https://stackoverflow.com/questions/38458570/multer-uploading-array-of-files-fail/38476327
     // https://code.tutsplus.com/tutorials/file-upload-with-multer-in-node--cms-32088
+    // https://medium.com/@bmshamsnahid/nodejs-file-upload-using-multer-3a904516f6d2
+    // https://stackoverflow.com/questions/51566797/accessing-upload-data-in-react-from-multer-node-server
     uploadFile: function (req, res) {
         new Promise((resolve, reject) => {
             const FOLDER_PATH = config.path;
