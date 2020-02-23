@@ -10,6 +10,7 @@ import EnhancedListToolbar from "../EnhancedListToolbar";
 import FullScreenDialog from "../FullScreenDialog";
 import ConfirmDialog from "../ConfirmDialog";
 import "../../utils/flowHeaders.min.css";
+import SocketContext from "../../socket-context"
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -52,6 +53,7 @@ const useStyles = makeStyles(theme => ({
 // icon - used for no documents message and for list
 // Form - component used for document dialog
 function DocumentEditor(props) {
+    const socket = React.useContext(SocketContext)
     const MAX_ITEMS = 5;
 
     const { FormComponent, icon, collection, primary } = props;
@@ -76,6 +78,39 @@ function DocumentEditor(props) {
 
     // COMPONENT STATUS
     const [loading, setLoading] = useState(true);
+
+    const handleRefresh = () => {
+        setLoading(true);
+        setSelected([]);
+
+        props.get(props.user.key)
+            .then((docData) => {
+                const docList = docData.data;
+
+                // Initialize documents
+                setDocuments(docList);
+
+                setPage(0)
+
+                if (searchQuery.length) {
+                    const filteredDocuments = docList.filter(document => document[primary].toLowerCase().includes(searchQuery.toLowerCase()));
+                    setFilteredDocuments(filteredDocuments);
+                    setViewableDocuments(filteredDocuments.slice(0, MAX_ITEMS));
+
+                } else {
+                    // Reset the filtered documents to ALL documents
+                    setFilteredDocuments(docList);
+                    setViewableDocuments(docList.slice(0, MAX_ITEMS));
+                }
+
+                setLoading(false);
+            })
+    }
+
+    const notifyServer = () => {
+        // Send message on web-socket
+        socket.emit('documents-changed', collection.toLowerCase())
+    }
 
     // HANDLE PAGE CHANGE
     const handlePageChange = (event, value) => {
@@ -145,6 +180,9 @@ function DocumentEditor(props) {
             .then(() => {
                 handleConfirm(false);
                 setCurrentAlert({ isOpen: true, severity: "success", message: `The ${collection.toLowerCase()}(s) have been successfully deleted!` });
+
+                notifyServer();
+
             })
     }
 
@@ -161,7 +199,7 @@ function DocumentEditor(props) {
                 setDialogOpen(false);
                 setCurrentAlert({ isOpen: true, severity: "success", message: `The ${collection.toLowerCase()} has been successfully created!` });
 
-                // Send message on web-socket
+                notifyServer();
 
                 if (redirectOnExit) {
                     // Inform user of redirect to previous document (inform user -> wait 1 sec. -> redirect)
@@ -176,6 +214,8 @@ function DocumentEditor(props) {
             .then(() => {
                 setDialogOpen(false);
                 setCurrentAlert({ isOpen: true, severity: "success", message: `The ${collection.toLowerCase()} has been successfully updated!` });
+
+                notifyServer();
 
                 if (redirectOnExit) {
                     // Inform user of redirect to previous document (inform user -> wait 1 sec. -> redirect)
@@ -272,6 +312,9 @@ function DocumentEditor(props) {
                 }
             });
 
+        socket.on(`refresh-${collection.toLowerCase()}`, function () {
+            handleRefresh();
+        })
     }, []);
 
     return (

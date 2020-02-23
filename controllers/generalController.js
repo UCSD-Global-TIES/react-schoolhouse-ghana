@@ -58,8 +58,6 @@ module.exports = {
                     .then(doc => {
                         doc.remove();
 
-                        console.log(doc)
-
                         if (doc.subject) {
                             subjectDb
                                 .update({

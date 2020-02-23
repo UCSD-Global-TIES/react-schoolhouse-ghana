@@ -97,5 +97,9 @@ io.on('connection', function (client) {
     console.log(`A user has disconnected from the server: ${--connections} connection(s)`);
   });
 
+  client.on('documents-changed', function (type) {
+    io.emit(`refresh-${type}`)
+  })
+
 
 });
