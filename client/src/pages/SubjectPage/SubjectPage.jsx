@@ -18,6 +18,7 @@ import FileViewer from "../../components/FileViewer";
 import DocumentEditor from "../../components/DocumentEditor";
 import AnnouncementViewer from "../../components/AnnouncementViewer";
 import SubjectAnnouncementsForm from "../../components/SubjectAnnouncementsForm";
+import SubjectFilesForm from "../../components/SubjectFilesForm";
 
 const drawerWidth = 220;
 
@@ -135,7 +136,7 @@ function SubjectPage(props) {
     },
     {
       component:
-        // props.user.type === "Student" ?
+        props.user.type === "Student" ?
         (props) => (
           <SimpleListView
             title={"Resources"}
@@ -148,20 +149,14 @@ function SubjectPage(props) {
             {...props}
           />
         )
-      // :
-      // (props) => (
-      //   <DocumentPicker
-      //     title={"Attached Files"}
-      //     docs={fileOptions}
-      //     pageMax={5}
-      //     selected={selectedFiles}
-      //     icon={faFile}
-      //     collection={"Files"}
-      //     primary={"nickname"}
-      //     handleChange={(docs) => handlePickChange('files', docs)}
-      //   />
+      :
+      (props) => (
+        <SubjectFilesForm
+          document={subjectInfo}
+          {...props}
+        />
 
-      // )
+      )
       ,
       path: `${props.match.path}/resources`
     }
