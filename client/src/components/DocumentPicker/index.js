@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { getQueries, parseTime } from "../../utils/misc";
-import { Alert, Skeleton, Pagination } from '@material-ui/lab'
-import { FormControl, Input, InputLabel, InputAdornment, Snackbar, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Checkbox, Typography } from "@material-ui/core";
+import { parseTime } from "../../utils/misc";
+import { Pagination } from '@material-ui/lab'
+import clsx from "clsx"
+import { Tooltip, Switch, Toolbar, FormControl, Input, InputLabel, InputAdornment, Snackbar, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Checkbox, Typography } from "@material-ui/core";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import SearchIcon from '@material-ui/icons/Search';
-import { makeStyles } from '@material-ui/core/styles';
-import EnhancedListToolbar from "../EnhancedListToolbar";
-import ConfirmDialog from "../ConfirmDialog";
+import { lighten, makeStyles } from '@material-ui/core/styles';
 import "../../utils/flowHeaders.min.css";
 
 
@@ -41,7 +40,24 @@ const useStyles = makeStyles(theme => ({
     searchbar: {
         margin: "0.5rem 0rem",
         width: "100%"
-    }
+    },
+    highlight:
+        theme.palette.type === 'light'
+            ? {
+                color: theme.palette.secondary.main,
+                backgroundColor: lighten(theme.palette.secondary.light, 0.85),
+                paddingLeft: theme.spacing(2),
+
+            }
+            : {
+                color: theme.palette.text.primary,
+                backgroundColor: theme.palette.secondary.dark,
+                paddingLeft: theme.spacing(2),
+
+            },
+    title: {
+        flex: '1 1 100%',
+    },
 }));
 
 // _id of document that is being updated
@@ -58,34 +74,28 @@ const useStyles = makeStyles(theme => ({
 
 // Link to redirect to for editing and creating documents
 // link = { "/edit/classes/"}
-function DocumentEditorLink(props) {
-    const MAX_ITEMS = 5;
-
-    // REDIRECT
-    const { presetField, delete: deleteDocuments, link, docs, icon, collection, primary, match, docId, history } = props;
+function DocumentSelector(props) {
+    const { icon, collection, primary } = props;
     const classes = useStyles();
     // DOCUMENTS EDITOR
-    const [selected, setSelected] = useState([]);
-    const [documents, setDocuments] = useState(docs);
-    const [filteredDocuments, setFilteredDocuments] = useState(docs);
-    const [viewableDocuments, setViewableDocuments] = useState(docs.slice(0, MAX_ITEMS));
+    const [documents, setDocuments] = useState([]);
+    const [filteredDocuments, setFilteredDocuments] = useState([]);
+    const [viewableDocuments, setViewableDocuments] = useState([]);
     const [page, setPage] = React.useState(1);
     const [searchQuery, setSearchQuery] = useState("");
-
-    // ALERTS
-    const [currentAlert, setCurrentAlert] = useState({ isOpen: false, severity: "", message: "" });
-    const [confirmOpen, setConfirmOpen] = useState(false);
-
+    const [state, setState] = React.useState({
+        selectedToggle: false
+      });
 
     // HANDLE PAGE CHANGE
     const handlePageChange = (event, value) => {
         setPage(value);
 
-        if (MAX_ITEMS * value >= filteredDocuments.length)
-            setViewableDocuments(filteredDocuments.slice((value - 1) * MAX_ITEMS));
+        if (props.pageMax * value >= filteredDocuments.length)
+            setViewableDocuments(filteredDocuments.slice((value - 1) * props.pageMax));
         else
             setViewableDocuments(
-                filteredDocuments.slice((value - 1) * MAX_ITEMS, value * MAX_ITEMS)
+                filteredDocuments.slice((value - 1) * props.pageMax, value * props.pageMax)
             );
     };
 
@@ -102,32 +112,19 @@ function DocumentEditorLink(props) {
         if (value.length) {
             const filteredDocuments = documents.filter(document => document[primary].toLowerCase().includes(value.toLowerCase()));
             setFilteredDocuments(filteredDocuments);
-            setViewableDocuments(filteredDocuments.slice(0, MAX_ITEMS));
+            setViewableDocuments(filteredDocuments.slice(0, props.pageMax));
 
         } else {
             // Reset the filtered documents to ALL documents
             setFilteredDocuments(documents);
-            setViewableDocuments(documents.slice(0, MAX_ITEMS));
+            setViewableDocuments(documents.slice(0, props.pageMax));
         }
     }
 
-    // Closing snackbar alerts
-    const handleAlertClose = (event, reason) => {
-        if (reason === 'clickaway') {
-            return;
-        }
-
-        let tmp = currentAlert;
-
-        tmp.isOpen = false;
-
-        setCurrentAlert({ ...tmp });
-    };
-
     // Handle checkbox selection
     const handleSelect = value => {
-        const currentIndex = selected.indexOf(value);
-        const newSelected = [...selected];
+        const currentIndex = props.selected.indexOf(value);
+        const newSelected = [...props.selected];
 
         if (currentIndex === -1) {
             newSelected.push(value);
@@ -135,113 +132,67 @@ function DocumentEditorLink(props) {
             newSelected.splice(currentIndex, 1);
         }
 
-        setSelected(newSelected);
+        props.handleChange(newSelected);
     };
 
-    // Handle deletion of document
-    const handleDelete = () => {
-        deleteDocuments(selected, props.user.key)
-        .then(() => {
-            handleConfirm(false);
-            setCurrentAlert({ isOpen: true, severity: "success", message: `The ${collection.toLowerCase()}(s) have been successfully deleted!` });
-            
-            // Remove deleted documents
-            const remainingDocuments = documents.filter(document => !selected.includes(document._id));
-            setDocuments(remainingDocuments);
-            const filteredDocuments = remainingDocuments.filter(document => document[primary].toLowerCase().includes(searchQuery.toLowerCase()));
-            setFilteredDocuments(filteredDocuments);
-            setViewableDocuments(filteredDocuments.slice(0, MAX_ITEMS));
+    const handleFilterSelectedToggle = name => event => {
+        setState({ ...state, [name]: event.target.checked });
 
-            // Reset selected
-            setSelected([]);
-        })
+        // Reset page 
+        setPage(0)
 
-        
-    }
+        if(event.target.checked) {
 
-    const handleCreate = () => {
-        // Redirect to specified link with create params
-        handleRouteChange(link, true)
-    }
-
-    const handleUpdate = () => {
-        // Redirect to specified link with update params
-        handleRouteChange(link, false, selected[0])
-    }
-
-    // Handle opening/closing of confirmation
-    const handleConfirm = (isOpen) => {
-        setConfirmOpen(isOpen);
-    }
-
-    const handleRouteChange = (destination, isCreate, _id) => {
-        // Replace the current history item as the current path with the open document
-        // you are navigating away from
-        let route;
-        // If the current path does not have an document query, append one
-        if (!match.url.includes("_id")) {
-            if (match.url.includes("?")) {
-                route = `${match.url}&_id=${docId}`;
-            }
-            else {
-                route = `${match.url}?_id=${docId}`;
-            }
-            history.replace(route);
-        }
-
-        // Travel to the new specified route with the redirect param as true
-        // Inform user of redirect
-        if (isCreate) {
-            // Travel to the specified destination with the create flag, intial values, and redirect flag
-            const presetDoc = { [presetField]: docId }
-            history.push(`${destination}?preset=${JSON.stringify(presetDoc)}&redirect=true`);
+            const currentViewableDocs = filteredDocuments.filter(document => props.selected.includes(document._id));
+            setFilteredDocuments(currentViewableDocs);
+            setViewableDocuments(currentViewableDocs.slice(0, props.pageMax));
         } else {
-            // Travel to the specified destination with the document _id to update and redirect flag
-            history.push(`${destination}?_id=${_id}&redirect=true`);
-
+            const currentViewableDocs = documents.filter(document => document[primary].toLowerCase().includes(searchQuery.toLowerCase()));
+            setFilteredDocuments(currentViewableDocs);
+            setViewableDocuments(currentViewableDocs.slice(0, props.pageMax));
         }
-
-    }
+      };
 
     useEffect(() => {
-
-    }, []);
+        // DOCUMENTS NOT PROPERLY BEING SET (TODO)
+        setDocuments(props.docs);
+        setFilteredDocuments(props.docs);
+        setViewableDocuments(props.docs.slice(0, props.pageMax))
+    }, [props.docs]);
 
     return (
         <>
-            {/* ALERTS FOR API ACTIONS */}
-            <Snackbar
-                anchorOrigin={{ vertical: "top", horizontal: "right" }}
-                open={currentAlert.isOpen}
-                autoHideDuration={6000}
-                onClose={handleAlertClose}
-            >
-                <Alert onClose={handleAlertClose} severity={currentAlert.severity}>
-                    {currentAlert.message}
-                </Alert>
-            </Snackbar>
-
-            {/* DELETE DOCUMENT(S) DIALOG */}
-            <ConfirmDialog
-                open={confirmOpen}
-                handleClose={() => handleConfirm(false)}
-                handleAction={handleDelete}>
-                Are you sure you would like to delete all selected {selected.length} {collection.toLowerCase()}(s)?
-            </ConfirmDialog>
 
             {/* DOCUMENTS */}
             <div style={{ display: "flex", width: "100%", height: "100%" }}>
                 <div style={{ margin: "auto" }} className={classes.content}>
                     <>
-                        <EnhancedListToolbar
-                            title={collection}
-                            numSelected={selected.length}
-                            // Link to specified link with create params
-                            handleCreate={handleCreate}
-                            // Link to specified link with update params
-                            handleUpdate={handleUpdate}
-                            handleDelete={() => handleConfirm(true)}
-                        />
+                        <Toolbar
+                            className={clsx(classes.root, {
+                                [classes.highlight]: props.selected.length > 0,
+                            })}
+                            disableGutters
+                        >
+                            {props.selected.length > 0 ? (
+                                <>
+                                    <Typography className={classes.title} color="inherit" variant="subtitle1">
+                                        {props.selected.length} selected
+                                    </Typography>
+                                    <Tooltip title={`Show ONLY Selected `}>
+                                        <Switch
+                                            checked={state.selectedToggle}
+                                            onChange={handleFilterSelectedToggle('selectedToggle')}
+                                            value="selectFilter"
+                                        />
+                                    </Tooltip>
+                                </>
+                            ) : (
+                                    <Typography className={classes.title} variant="h6" id="tableTitle">
+                                        {props.title}
+                                    </Typography>
+                                )}
+
+                        </Toolbar>
 
                         <FormControl className={classes.searchbar}>
                             <InputLabel htmlFor="standard-adornment-amount">Search {collection.toLowerCase()}</InputLabel>
@@ -261,7 +212,7 @@ function DocumentEditorLink(props) {
                                             <Pagination
                                                 size="small"
                                                 color={"primary"}
-                                                count={Math.ceil(filteredDocuments.length / MAX_ITEMS)}
+                                                count={Math.ceil(filteredDocuments.length / props.pageMax)}
                                                 page={page}
                                                 onChange={handlePageChange}
                                             />
@@ -279,7 +230,7 @@ function DocumentEditorLink(props) {
                                                         <ListItemIcon>
                                                             <Checkbox
                                                                 edge="start"
-                                                                checked={selected.indexOf(document._id) !== -1}
+                                                                checked={props.selected.indexOf(document._id) !== -1}
                                                                 tabIndex={-1}
                                                                 disableRipple
                                                                 inputProps={{ 'aria-labelledby': labelId }}
@@ -315,4 +266,4 @@ function DocumentEditorLink(props) {
     )
 };
 
-export default DocumentEditorLink;
+export default DocumentSelector;

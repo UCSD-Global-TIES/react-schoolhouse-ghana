@@ -8,6 +8,7 @@ html {
 
 body {
     margin: 0;
+    background-color: transparent !important;
 }
 
 /* Fixes weird alignment for inline FA icons */

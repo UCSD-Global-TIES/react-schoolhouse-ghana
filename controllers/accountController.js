@@ -5,7 +5,6 @@ const TeacherDb = require("../models/Teacher");
 const AdminDb = require("../models/Admin");
 const classDb = require("../models/Admin");
 
-// TODO
 const {
     verifyKey
 } = require("./verifyController");
@@ -323,6 +322,23 @@ module.exports = {
 
                         })
 
+                } else {
+                    res.status(403).json(null);
+                }
+            })
+    },
+    getAccounts: function (req, res) {
+        verifyKey(req.header('Authorization'), 'Admin')
+            .then((isVerified) => {
+                if (isVerified) {
+                    
+                    accountDb
+                        .find({}, {username: 0, password: 0})
+                        .populate('profile')
+                        .then((accounts) => {
+                            res.json(accounts);
+                        })
+                        .catch((err) => res.status(422).json(err));
                 } else {
                     res.status(403).json(null);
                 }

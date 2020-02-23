@@ -6,14 +6,18 @@ const gradeSchema = new Schema({
     type: Number,
     required: true
   },
-  classes: [{
+  subjects: [{
     type: Schema.Types.ObjectId,
-    ref: 'Class'
+    ref: 'Subject'
   }],
-  path: {
-    type: String,
-    required: true
-  }
+  teachers: [{
+    type: Schema.Types.ObjectId,
+    ref: 'Teacher'
+  }],
+  students: [{
+    type: Schema.Types.ObjectId,
+    ref: 'Student'
+  }]
 }, { timestamps: true });
 
 const Grade = mongoose.model("Grade", gradeSchema);

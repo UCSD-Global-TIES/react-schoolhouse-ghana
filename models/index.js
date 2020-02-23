@@ -3,7 +3,7 @@ module.exports = {
     Teacher: require("./Teacher"),
     Admin: require("./Admin"),
     Announcement: require("./Announcement"),
-    Class: require("./Class"),
+    Subject: require("./Subject"),
     Account: require("./Account"),
     File: require("./File"),
     Grade: require("./Grade")

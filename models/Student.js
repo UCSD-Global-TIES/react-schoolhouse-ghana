@@ -9,15 +9,6 @@ const studentSchema = new Schema({
   last_name: {
     type: String,
     required: true
-  },
-  classes: [{
-    type: Schema.Types.ObjectId,
-    ref: 'Class'
-  }],
-  grade: {
-    type: Schema.Types.ObjectId,
-    required: true,
-    ref: 'Grade'
   }
 }, { timestamps: true });
 

@@ -4,8 +4,6 @@ import "./main.css";
 import API from "../../../../utils/API";
 import { makeStyles } from "@material-ui/core/styles";
 import { Grid } from "@material-ui/core";
-import PropTypes from "prop-types";
-import Typography from "@material-ui/core/Typography";
 import Box from "@material-ui/core/Box";
 import AnnouncementView from "../../../../components/Announcement";
 import SimpleResource from "../../../../components/Resource";
@@ -81,7 +79,7 @@ const resources = [
     }
 ];
 
-function ClassViewer(props) {
+function SubjectViewer(props) {
 
     const [classInfo, setClassInfo] = useState({});
 
@@ -106,15 +104,15 @@ function ClassViewer(props) {
     useEffect(() => {
         setTimeout(() => {
             const testClass = {
-                "_id" : "5e46ded505551964a01e9cc0",
-                "class_id" : "1",
-                "name" : "math",
-                "path" : "1",
-                "teachers" : [],
-                "students" : [],
-                "files" : [],
-                "grade" : 1,
-                "announcements" : []
+                "_id": "5e46ded505551964a01e9cc0",
+                "class_id": "1",
+                "name": "math",
+                "path": "1",
+                "teachers": [],
+                "students": [],
+                "files": [],
+                "grade": 1,
+                "announcements": []
             }
             setClassInfo(testClass);
 
@@ -122,8 +120,8 @@ function ClassViewer(props) {
         // API.getClass(props.match.params.id, props.user.key)
         //     .then((result) => {
         //         setClassInfo(result.data); 
-        
-            
+
+
         //     })
     }, [])
 
@@ -169,4 +167,4 @@ function ClassViewer(props) {
 
 
 
-export default ClassViewer;
+export default SubjectViewer;

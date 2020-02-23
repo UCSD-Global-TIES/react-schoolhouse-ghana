@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { NavLink, Switch, Redirect } from "react-router-dom";
 import AnnouncementsForm from "../../../../components/AnnouncementsForm";
 import GradesForm from "../../../../components/GradesForm";
-import ClassesForm from "../../../../components/ClassesForm";
+import SubjectsForm from "../../../../components/SubjectsForm";
 import AccountsForm from "../../../../components/AccountsForm";
 import ServerDash from "../../../../components/ServerDash"
 import ProtectedRoute from "../../../../components/ProtectedRoute"
@@ -17,6 +17,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUsers, faBullhorn, faChalkboardTeacher, faShapes, faServer, faFile } from "@fortawesome/free-solid-svg-icons";
 import DocumentEditor from '../../../../components/DocumentEditor'
 import FilesForm from "../../../../components/FilesForm";
+import API from "../../../../utils/API";
 
 const drawerWidth = 220;
 
@@ -71,9 +72,9 @@ function AdminPortal(props) {
             path: `${props.match.url}/grades`
         },
         {
-            label: "Classes",
+            label: "Subjects",
             icon: faChalkboardTeacher,
-            path: `${props.match.url}/classes`
+            path: `${props.match.url}/subjects`
         },
 
     ]
@@ -131,37 +132,64 @@ function AdminPortal(props) {
         {
             collection: "Announcements",
             icon: faBullhorn,
-            FormComponent: AnnouncementsForm,
+            FormComponent: (p) =>
+                <AnnouncementsForm user={props.user} {...p} />,
             primary: "title",
-            path: `${props.match.path}/announcements`
+            path: `${props.match.path}/announcements`,
+            api: {
+                get: API.getAnnouncements,
+                post: API.addAnnouncement,
+                put: API.updateAnnouncement,
+                delete: API.deleteAnnouncements
+            }
         },
         {
             collection: "Grades",
             icon: faShapes,
-            FormComponent: GradesForm,
-            primary: "title",
-            path: `${props.match.path}/grades`
+            FormComponent: (p) =>
+                <GradesForm user={props.user} {...p} />,
+            primary: "level",
+            path: `${props.match.path}/grades`,
+            api: {
+                get: API.getGrades,
+                post: API.addGrade,
+                put: API.updateGrade,
+                delete: API.deleteGrades
+            }
         },
         {
-            collection: "Classes",
+            collection: "Subjects",
             icon: faChalkboardTeacher,
-            FormComponent: ClassesForm,
-            primary: "title",
-            path: `${props.match.path}/classes`
+            FormComponent: (p) =>
+                <SubjectsForm user={props.user} {...p} />,
+            primary: "name",
+            path: `${props.match.path}/subjects`,
+            api: {
+                get: API.getSubjects,
+                post: API.addSubject,
+                put: API.updateSubject,
+                delete: API.deleteSubjects
+            }
         },
         {
             collection: "Accounts",
             icon: faUsers,
             FormComponent: AccountsForm,
             primary: "title",
-            path: `${props.match.path}/accounts`
+            path: `${props.match.path}/accounts`,
+            api: {
+                // get: API.getAccounts
+            }
         },
         {
             collection: "Files",
             icon: faFile,
             FormComponent: FilesForm,
             primary: "nickname",
-            path: `${props.match.path}/files`
+            path: `${props.match.path}/files`,
+            api: {
+                get: API.getFiles
+            }
         }
     ]
 
@@ -176,6 +204,10 @@ function AdminPortal(props) {
                     collection={page.collection}
                     icon={page.icon}
                     FormComponent={page.FormComponent}
+                    get={page.api.get}
+                    post={page.api.post}
+                    put={page.api.put}
+                    delete={page.api.delete}
                     {...props} />
         })
     })
@@ -226,23 +258,23 @@ function AdminPortal(props) {
             <main className={classes.content} style={{ marginLeft: !isSmallDevice ? drawerWidth : 0, }}>
                 <div className={classes.toolbar} />
 
-                <TransitionGroup>
+                {/* <TransitionGroup>
                     <CSSTransition
                         key={props.location.key}
                         timeout={300}
                         classNames='fade'
-                    >
-                        <Switch location={props.location}>
-                            {
-                                pages.map((page, idx) => (
-                                    <ProtectedRoute key={`page-${idx}`} exact path={page.path} component={page.component} user={props.user} />
+                    > */}
+                <Switch location={props.location}>
+                    {
+                        pages.map((page, idx) => (
+                            <ProtectedRoute key={`page-${idx}`} exact path={page.path} component={page.component} user={props.user} />
 
-                                ))
-                            }
-                            <Redirect to={defaultRoute} />
-                        </Switch>
-                    </CSSTransition>
-                </TransitionGroup>
+                        ))
+                    }
+                    <Redirect to={defaultRoute} />
+                </Switch>
+                {/* </CSSTransition>
+                </TransitionGroup> */}
             </main>
         </div>
 

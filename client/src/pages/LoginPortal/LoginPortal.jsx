@@ -9,7 +9,7 @@ import { Snackbar, FormControl, InputLabel, Input, InputAdornment, Fab, Typograp
 import AccountCircle from "@material-ui/icons/AccountCircle";
 import Key from "@material-ui/icons/VpnKey";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSignInAlt, faChalkboardTeacher } from '@fortawesome/free-solid-svg-icons'
+import { faSignInAlt, faChalkboardTeacher, faSpinner } from '@fortawesome/free-solid-svg-icons'
 import FullScreenDialog from "../../components/FullScreenDialog";
 
 const useStyles = makeStyles(theme => ({
@@ -33,18 +33,32 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const socket = window.socket;
+const errorSeverity = "error";
+const successSeverity = "success";
+const loginError = "Your username or password was incorrect."
+const seedError = "Database seeding failed.";
+const seedSuccess = "Database seeding succeeded!";
 
 function LoginPortal(props) {
     const classes = useStyles();
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [seedDialogOpen, setSeedDialogOpen] = useState(false);
-    const [loginError, setLoginError] = useState(false);
+    const [seedLoading, setSeedLoading] = useState(false);
     const [createdUser, setCreatedUser] = useState({});
+    const [alertOpen, setAlertOpen] = useState(false);
+    const [alertSeverity, setAlertSeverity] = useState("error");
+    const [alertMessage, setAlertMessage] = useState(loginError);
 
     const set = {
         username: setUsername,
         password: setPassword
+    }
+
+    const handleSendAlert = (severity, message) => {
+        setAlertSeverity(severity);
+        setAlertMessage(message);
+        setAlertOpen(true);
     }
 
     const handleChange = (e) => {
@@ -56,11 +70,17 @@ function LoginPortal(props) {
     }
 
     const handleSeedDatabase = () => {
-        setTimeout(() => {
-            // Send alert
-            console.log("Documents seeded!");
-            handleCloseSeedDialog();
-        }, 1500);
+        setSeedLoading(true);
+        API.seedDatabase()
+            .then((result) => {
+                if (result) {
+                    // Send alert
+                    handleCloseSeedDialog();
+                    handleSendAlert(successSeverity, seedSuccess);
+                } else {
+                    handleSendAlert(errorSeverity, seedError);
+                }
+            })
     }
 
     const handleLogin = (username, password) => {
@@ -70,14 +90,16 @@ function LoginPortal(props) {
 
                     if (user.data) {
                         props.setUser(user.data);
-                        setLoginError(false);
-                        socket.emit('authentication', `${user.data.first_name} has connected!`)
+                        setAlertOpen(false);
+                        if (socket) {
+                            socket.emit('authentication', `${user.data.first_name} has connected!`)
+                        }
                     }
 
                     // Login failed, show error message
                     // Clear password
                     else {
-                        setLoginError(true);
+                        handleSendAlert(errorSeverity, loginError);
                         setPassword("");
                     }
                 })
@@ -85,7 +107,7 @@ function LoginPortal(props) {
     }
 
     const handleAlertClose = () => {
-        setLoginError(false);
+        setAlertOpen(false);
     }
 
     useEffect(() => {
@@ -110,19 +132,20 @@ function LoginPortal(props) {
             {/* ALERTS FOR ERRORS */}
             <Snackbar
                 anchorOrigin={{ vertical: "top", horizontal: "right" }}
-                open={loginError}
+                open={alertOpen}
                 autoHideDuration={6000}
                 onClose={handleAlertClose}
             >
-                <Alert onClose={handleAlertClose} severity={"error"}>
-                    Your username or password was incorrect.
+                <Alert onClose={handleAlertClose} severity={alertSeverity}>
+                    {alertMessage}
                 </Alert>
             </Snackbar>
             <FullScreenDialog
                 open={seedDialogOpen}
                 handleClose={handleCloseSeedDialog}
                 type={"Welcome to Schoolhouse Ghana!"}
-                action={{ text: "Seed", function: handleSeedDatabase }}
+                action={handleSeedDatabase}
+                buttonText={seedLoading ? <FontAwesomeIcon icon={faSpinner} spin /> : "Seed"}
             >
                 <div style={{ height: "100%", width: "100%", display: "flex" }}>
                     <div style={{ margin: "auto", maxWidth: "400px", width: "70%" }}>
@@ -174,7 +197,7 @@ function LoginPortal(props) {
                                 />
                             </FormControl>
                         </div>
-                </div>
+                    </div>
                 </div>
             </FullScreenDialog>
             <div style={{ display: "flex", width: "100%", height: "100vh" }}>
@@ -221,12 +244,12 @@ function LoginPortal(props) {
                         </div>
                         <div style={{ display: "flex", width: "100%", margin: "10px 0" }}>
 
-                             <div style={{ margin: "auto" }}>
-                        <Fab style={{backgroundColor: "rgb(0, 182, 112)", color: "white"}} aria-label="login" onClick={() => handleLogin(username, password)}>
-                            <FontAwesomeIcon icon={faSignInAlt} size="lg" />
-                        </Fab>
+                            <div style={{ margin: "auto" }}>
+                                <Fab style={{ backgroundColor: "rgb(0, 182, 112)", color: "white" }} aria-label="login" onClick={() => handleLogin(username, password)}>
+                                    <FontAwesomeIcon icon={faSignInAlt} size="lg" />
+                                </Fab>
 
-                    </div>
+                            </div>
                         </div>
 
 

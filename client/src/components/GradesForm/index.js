@@ -2,12 +2,11 @@ import React, { useEffect, useState } from "react";
 import { TextField, Box, Switch, Typography, CircularProgress } from "@material-ui/core";
 import { makeStyles } from '@material-ui/core/styles';
 import { parseTime } from '../../utils/misc';
-import { Autocomplete } from '@material-ui/lab';
-import { faChalkboardTeacher } from "@fortawesome/free-solid-svg-icons";
-import DocumentEditorLink from '../DocumentEditorLink'
-
+import DocumentPicker from "../DocumentPicker"
 
 import "../../utils/flowHeaders.min.css";
+import API from "../../utils/API";
+import { faChalkboardTeacher, faAppleAlt, faUserGraduate } from "@fortawesome/free-solid-svg-icons";
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -21,7 +20,7 @@ const useStyles = makeStyles(theme => ({
         maxWidth: "500px",
         width: "90%",
         margin: "auto"
-    }
+    },
 }));
 
 const disabledMsg = `This field will be populated after grade creation.`
@@ -33,12 +32,6 @@ const textFields = [
         helper: "This is the numerical level of this grade.",
         createOnly: true,
         isNumber: true
-    },
-    {
-        name: "path",
-        label: "Folder Path",
-        disabled: true,
-        helper: "This is the folder path of this grade on the NAS."
     },
     {
         name: "createdAt",
@@ -56,18 +49,18 @@ const textFields = [
     },
 
 ]
-
 // Private field is special use case
 
+const MIN_GRADE = 1;
 function GradesForm(props) {
     const classes = useStyles();
-    const MIN_GRADE = 1;
-    const testClasses = [
-        {
-            _id: "1",
-            name: "English"
-        }
-    ]
+    const [subjectOptions, setSubjectOptions] = useState([]);
+    const [selectedSubjects, setSelectedSubjects] = useState(props.document.subjects || []);
+    const [studentOptions, setStudentOptions] = useState([]);
+    const [selectedStudents, setSelectedStudents] = useState(props.document.students || []);
+    const [teacherOptions, setTeacherOptions] = useState([]);
+    const [selectedTeachers, setSelectedTeachers] = useState(props.document.teachers || []);
+    const [PROPS, setProps] = useState(props)
 
     const handleNumberChange = (e) => {
         const { value, name } = e.target;
@@ -86,13 +79,74 @@ function GradesForm(props) {
         props.handleChange(tmp);
     }
 
+
+    const handlePickChange = (name, selectedDocs) => {
+        switch(name) {
+            case "subjects":
+                setSelectedSubjects(selectedDocs);
+            break;
+            case "students":
+                setSelectedStudents(selectedDocs);
+            break;
+            case "teachers":
+                setSelectedTeachers(selectedDocs);
+            break;
+        }
+
+        const event = {
+            target: {
+                name,
+                value: selectedDocs
+            }
+        }
+        PROPS.handleChange(event)
+    }
+
     useEffect(() => {
+        const promises = [];
+        promises.push(API.getSubjects(props.user.key));
+        promises.push(API.getUsers(props.user.key));
+
+        Promise.all(promises)
+            .then((results) => {
+                const subjectIDs = [];
+                if(props.document.subjects) {
+                    for(const subject of props.document.subjects) {
+                        subjectIDs.push(subject._id);
+                    }
+                }
+
+                setSelectedSubjects(subjectIDs)
+
+                setSelectedStudents(props.document.students || [])
+
+                setSelectedTeachers(props.document.teachers || [])
+
+                const students = [];
+                const teachers = [];
+                for(const account of results[1].data) {
+                    if(account.type === "Student") students.push(account.profile)
+                    if(account.type === "Teacher") teachers.push(account.profile)
+                }
+
+                // Set options and loading flag to false
+                setSubjectOptions([...results[0].data]);
+                setStudentOptions([...students]);
+                setTeacherOptions([...teachers]);
+
+            })
+
 
     }, []);
+
+    useEffect(() => {
+        setProps(props);
+    }, [props])
 
     return (
         <div className={classes.root}>
             <div className={classes.vc}>
+
                 {
                     textFields.map((item, idx) => (
                         <TextField
@@ -102,11 +156,11 @@ function GradesForm(props) {
                             className={classes.field}
                             label={item.label}
                             name={item.name}
-                            placeholder={(item.disabled || (item.updateOnly && props.isCreate)) ? disabledMsg : ""}
-                            disabled={(item.disabled || (item.updateOnly && props.isCreate) || (item.createOnly && !props.isCreate))}
-                            value={(props.isDate ? parseTime(props.document[item.name]) : null) || ((item.isNumber && !props.document[item.name]) ? MIN_GRADE : null) || props.document[item.name] || ""}
+                            placeholder={(item.disabled || (item.updateOnly && PROPS.isCreate)) ? disabledMsg : ""}
+                            disabled={(item.disabled || (item.updateOnly && PROPS.isCreate) || (item.createOnly && !PROPS.isCreate))}
+                            value={(item.isDate ? parseTime(PROPS.document[item.name]) : null) || ((item.isNumber && !PROPS.document[item.name]) ? MIN_GRADE : null) || PROPS.document[item.name] || ""}
                             helperText={item.helper}
-                            onChange={item.isNumber ? handleNumberChange : props.handleChange}
+                            onChange={item.isNumber ? handleNumberChange : PROPS.handleChange}
                             fullWidth
                             autoComplete={'off'}
                             margin="normal"
@@ -118,20 +172,39 @@ function GradesForm(props) {
                             variant="outlined"
                         />
                     ))}
-                {/* Only show if document was already created */}
-                {
-                    props.document['_id'] &&
-                    <DocumentEditorLink
-                        // _id of document that is being updated
-                        docId={props.document['_id']}
-                        primary={'name'}
-                        collection={'Classes'}
-                        icon={faChalkboardTeacher}
-                        link={"/edit/classes/"}
-                        docs={testClasses}
-                        {...props}
-                    />
-                }
+
+                <DocumentPicker
+                    title={"Grade Subjects"}
+                    docs={subjectOptions}
+                    pageMax={5}
+                    selected={selectedSubjects}
+                    icon={faChalkboardTeacher}
+                    collection={"Subjects"}
+                    primary={"name"}
+                    handleChange={(docs) => handlePickChange('subjects', docs)}
+                />
+
+                <DocumentPicker
+                    title={"Students"}
+                    docs={studentOptions}
+                    pageMax={5}
+                    selected={selectedStudents}
+                    icon={faUserGraduate}
+                    collection={"Students"}
+                    primary={"first_name"}
+                    handleChange={(docs) => handlePickChange('students', docs)}
+                />
+
+                <DocumentPicker
+                    title={"Teachers"}
+                    docs={teacherOptions}
+                    pageMax={5}
+                    selected={selectedTeachers}
+                    icon={faAppleAlt}
+                    collection={"Teachers"}
+                    primary={"first_name"}
+                    handleChange={(docs) => handlePickChange('teachers', docs)}
+                />
 
             </div>
         </div>

@@ -9,11 +9,7 @@ const teacherSchema = new Schema({
   last_name: {
     type: String,
     required: true
-  },
-  classes: [{
-    type: Schema.Types.ObjectId,
-    ref: 'Class'
-  }]
+  }
 }, { timestamps: true });
 
 const Teacher = mongoose.model("Teacher", teacherSchema);

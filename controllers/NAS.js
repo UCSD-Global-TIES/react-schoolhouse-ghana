@@ -121,8 +121,8 @@ module.exports = {
                     return resolve(null);
                 }
                 resolve({
-                    name: `${Date.now()}-${file.originalname}`,
-                    path: `${FOLDER_PATH}/${req.file.originalname}`,
+                    name: `${Date.now()}-${req.file.originalname}`,
+                    path: `${FOLDER_PATH}/${Date.now()}-${req.file.originalname}`,
                     created: Date.now()
                 });
             });
