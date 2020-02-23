@@ -137,26 +137,26 @@ function SubjectPage(props) {
     {
       component:
         props.user.type === "Student" ?
-        (props) => (
-          <SimpleListView
-            title={"Resources"}
-            items={subjectInfo.files || []}
-            pageMax={5}
-            icon={faFile}
-            labelField={"nickname"}
-            viewer={FileViewer}
-            searchbar
-            {...props}
-          />
-        )
-      :
-      (props) => (
-        <SubjectFilesForm
-          document={subjectInfo}
-          {...props}
-        />
+          (props) => (
+            <SimpleListView
+              title={"Resources"}
+              items={subjectInfo.files || []}
+              pageMax={5}
+              icon={faFile}
+              labelField={"nickname"}
+              viewer={FileViewer}
+              searchbar
+              {...props}
+            />
+          )
+          :
+          (props) => (
+            <SubjectFilesForm
+              document={subjectInfo}
+              {...props}
+            />
 
-      )
+          )
       ,
       path: `${props.match.path}/resources`
     }

@@ -5,6 +5,7 @@ const session = require('express-session');
 const morgan = require('morgan');
 const mongoose = require("mongoose");
 const routes = require("./routes");
+const config = require("./nasConfig");
 
 const app = express();
 var http = require('http').createServer(app);
@@ -52,6 +53,10 @@ app.use((req, res, next) => {
 // Serve up static assets (usually on heroku)
 if (process.env.NODE_ENV === "production") {
   app.use(express.static("client/build"));
+} else {
+  // Set up location of NAS storage path
+  app.use('/static', express.static(config.path));
+
 }
 
 // Add routes, both API and view
