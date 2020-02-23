@@ -161,10 +161,17 @@ export default {
     }); // SECURE
   },
   // Get all 'Announcement' documents that are not 'private'
-  getAnnouncements: function (key) {
+  getAnnouncements: function (key, subject_id) {
     const config = {
       'Authorization': key
     };
+
+    if(subject_id) {
+      return axios.get(`/api/subject/${subject_id}/ann`, {
+        headers: config
+      }); // SECURE
+    }
+
     return axios.get(`/api/general/ann?all=true`, {
       headers: config
     }); // SECURE

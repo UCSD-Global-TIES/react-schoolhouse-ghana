@@ -10,13 +10,14 @@ import API from "../../utils/API";
 
 import "./main.css";
 import NavBarAdmin from "../../components/NavBarAdmin";
-import AccessDenied from "../../components/AccessDenied";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBullhorn, faFile } from "@fortawesome/free-solid-svg-icons";
 import SimpleListView from "../../components/SimpleListView";
 import PageSpinner from "../../components/PageSpinner";
 import FileViewer from "../../components/FileViewer";
+import DocumentEditor from "../../components/DocumentEditor";
 import AnnouncementViewer from "../../components/AnnouncementViewer";
+import SubjectAnnouncementsForm from "../../components/SubjectAnnouncementsForm";
 
 const drawerWidth = 220;
 
@@ -96,40 +97,45 @@ function SubjectPage(props) {
 
   const pagesInfo = [
     {
-      component: 
-      // props.user.type === "Student" ?
-        (props) => (
-          <SimpleListView
-            title={"Announcements"}
-            items={subjectInfo.announcements || []}
-            pageMax={5}
-            icon={faBullhorn}
-            labelField={"title"}
-            viewer={AnnouncementViewer}
-            searchbar
-            {...props}
-          />
-        )
-        // :
-        // (props) => (
-        //   <DocumentEditor
-        //     primary={"title"}
-        //     collection={"Announcements"}
-        //     icon={faBullhorn}
-        //     FormComponent={}
-        //     get={}
-        //     post={}
-        //     put={}
-        //     delete={}
-        //     {...props}
-        //   />
-        // )
-        ,
+      component:
+        props.user.type === "Student" ?
+          (props) => (
+            <SimpleListView
+              title={"Announcements"}
+              items={subjectInfo.announcements || []}
+              pageMax={5}
+              icon={faBullhorn}
+              labelField={"title"}
+              viewer={AnnouncementViewer}
+              searchbar
+              {...props}
+            />
+          )
+          :
+          (p) => (
+            <DocumentEditor
+              primary={"title"}
+              collection={"Subject Announcements"}
+              icon={faBullhorn}
+              FormComponent={(p) =>
+                <SubjectAnnouncementsForm user={props.user} {...p} />}
+              get={(key) => API.getAnnouncements(key, subject_id)}
+              post={(doc, key, user) => {
+                let newA = doc;
+                newA.subject = subject_id;
+                return API.addAnnouncement(newA, key, user)
+              }}
+              put={API.updateAnnouncement}
+              delete={API.deleteAnnouncements}
+              {...p}
+            />
+          )
+      ,
       path: `${props.match.path}/announcements`
     },
     {
-      component: 
-      // props.user.type === "Student" ?
+      component:
+        // props.user.type === "Student" ?
         (props) => (
           <SimpleListView
             title={"Resources"}
@@ -142,21 +148,21 @@ function SubjectPage(props) {
             {...props}
           />
         )
-        // :
-        // (props) => (
-        //   <DocumentPicker
-        //     title={"Attached Files"}
-        //     docs={fileOptions}
-        //     pageMax={5}
-        //     selected={selectedFiles}
-        //     icon={faFile}
-        //     collection={"Files"}
-        //     primary={"nickname"}
-        //     handleChange={(docs) => handlePickChange('files', docs)}
-        //   />
+      // :
+      // (props) => (
+      //   <DocumentPicker
+      //     title={"Attached Files"}
+      //     docs={fileOptions}
+      //     pageMax={5}
+      //     selected={selectedFiles}
+      //     icon={faFile}
+      //     collection={"Files"}
+      //     primary={"nickname"}
+      //     handleChange={(docs) => handlePickChange('files', docs)}
+      //   />
 
-        // )
-        ,
+      // )
+      ,
       path: `${props.match.path}/resources`
     }
   ]

@@ -158,6 +158,20 @@ module.exports = {
                 }
             })
     },
+    getAnnouncements: function (req, res) {
+        verifyKey(req.header('Authorization'), 'Teacher,Admin')
+            .then((isVerified) => {
+                if (isVerified) {
+                    announcementDb
+                        .find({subject: req.params.sid})
+                        .then(subjectAnns => res.json(subjectAnns))
+                        .catch(err => res.status(422).json(err));
+
+                } else {
+                    res.status(403).json(null);
+                }
+            })
+    },
     addSubject: function (req, res) {
         verifyKey(req.header('Authorization'), 'Admin')
             .then((isVerified) => {

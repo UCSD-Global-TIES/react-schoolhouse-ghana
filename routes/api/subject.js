@@ -19,6 +19,7 @@ router.route("/:sid")
 
 // Matches with "/api/subject/:sid/ann"
 router.route("/:sid/ann")
+  .get(subjectController.getAnnouncements)
   // Create a Subject announcement
   .post(subjectController.addAnnouncement)
 
