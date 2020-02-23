@@ -33,6 +33,7 @@
     "express": "^4.17.1",
     "express-session": "^1.17.0",
     "generate-password": "^1.5.0",
+    "http-server": "^0.12.1",
     "if-env": "^1.0.4",
     "loadtest": "^4.1.0",
     "moment": "^2.24.0",
