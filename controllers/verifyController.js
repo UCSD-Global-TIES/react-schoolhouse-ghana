@@ -143,9 +143,11 @@ module.exports = {
                     .create(annDocs)
                     .then((newDocs) => {
                         let subjectDoc = subjectSeeds;
+                        let privateAnn;
                         for (let newDoc of newDocs) {
                             if (newDoc.private) {
                                 subjectDoc.announcements = [newDoc._id];
+                                privateAnn = newDoc;
                             }
                         }
                         subjectDoc.files = [newF._id];
@@ -155,14 +157,20 @@ module.exports = {
                             .create(subjectDoc)
                             .then((newS) => {
                                 let gradeDoc = gradeSeeds;
-                                gradeDoc.subjects = [newS._id]
+                                gradeDoc.subjects = [newS._id];
 
-                                // 4
-                                gradeDb
-                                    .create(gradeDoc)
+                                const promises = [];
+                                promises.push(gradeDb.create(gradeDoc));
+
+                                privateAnn.subject = newS._id
+                                promises.push(announcementDb.findOneAndUpdate({ _id: privateAnn._id }, privateAnn))
+
+                                Promise.all(promises)
                                     .then(() => {
                                         res.json({});
+
                                     })
+
                             })
 
 

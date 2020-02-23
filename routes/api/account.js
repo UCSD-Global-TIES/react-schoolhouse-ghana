@@ -5,6 +5,7 @@ const accountController = require("../../controllers/accountController");
 router.route("/")
   // Creates a new user account
   .post(accountController.addAccount)
+  .get(accountController.getAccounts)
 
 // Matches with "/api/account/:aid"
 router.route("/:aid")

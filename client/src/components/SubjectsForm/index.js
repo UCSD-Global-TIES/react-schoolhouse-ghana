@@ -4,10 +4,11 @@ import { makeStyles } from '@material-ui/core/styles';
 import { parseTime } from '../../utils/misc';
 import { Autocomplete } from '@material-ui/lab';
 import DocumentPicker from "../DocumentPicker"
+import DocumentEditorLink from '../DocumentEditorLink'
 
 import "../../utils/flowHeaders.min.css";
 import API from "../../utils/API";
-import { faFile } from "@fortawesome/free-solid-svg-icons";
+import { faFile, faBullhorn } from "@fortawesome/free-solid-svg-icons";
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -24,27 +25,14 @@ const useStyles = makeStyles(theme => ({
     },
 }));
 
-const disabledMsg = `This field will be populated after announcement creation.`
+const disabledMsg = `This field will be populated after subject creation.`
 
 const textFields = [
     {
-        name: "title",
-        label: "Title",
+        name: "name",
+        label: "Subject Name",
         required: true,
-        helper: "This is an informative title of this announcement."
-    },
-    {
-        name: "content",
-        label: "Content",
-        multiline: true,
-        required: true,
-        helper: "This is the main content of this announcement."
-    },
-    {
-        name: "authorName",
-        label: "Author Name",
-        disabled: true,
-        helper: "This is the name of the announcement's author."
+        helper: "This is the name of this subject."
     },
     {
         name: "createdAt",
@@ -63,27 +51,14 @@ const textFields = [
 
 ]
 
-// Private field is special use case
-
-function AnnouncementsForm(props) {
+function SubjectsForm(props) {
     const classes = useStyles();
     const [loading, setLoading] = useState(true);
     const [fileOptions, setFileOptions] = useState([]);
     const [selectedFiles, setSelectedFiles] = useState(props.document.files || []);
     const [options, setOptions] = useState([]);
-    const [subjectValue, setSubjectValue] = useState(null);
+    const [gradeValue, setGradeValue] = useState({});
     const [PROPS, setProps] = useState(props)
-
-    const handleSwitchToggle = name => e => {
-        const event = {
-            target: {
-                name,
-                value: e.target.checked
-            }
-        }
-
-        PROPS.handleChange(event)
-    }
 
     const handleAutocompleteChange = (e, value, name) => {
         if (e && value && name) {
@@ -119,34 +94,32 @@ function AnnouncementsForm(props) {
             .then((results) => {
                 // Retrieve grades and populate subjects
                 // For every grade...
-                let subjectOptions = [];
-                for (const gradeDoc of results[0].data) {
-                    for (const subjectDoc of gradeDoc.subjects) {
-                    // Push object containing class name, grade level, and class_id (see 'subjectOptions')
-                        subjectOptions.push({ name: subjectDoc.name, grade: gradeDoc.level, _id: subjectDoc._id })
-                }
-                }
+                let gradeOptions = results[0].data;
 
                 const selected = [];
                 if (props.document.files) {
-                    for (const file of props.document.files) {
-                        selected.push(file._id)
+                    for (const fileID of props.document.files) {
+                        selected.push(fileID)
                     }
                 }
                 setSelectedFiles(selected)
 
                 // Set options and loading flag to false
-                setOptions(subjectOptions);
+                setOptions(gradeOptions);
                 setFileOptions([...results[1].data]);
                 setLoading(false);
 
-                // Set default autocomplete value
-                for (const option of subjectOptions) {
-                    if (option._id === PROPS.document.subject) {
-                        setSubjectValue(option);
-                        return;
+                // // Set default autocomplete value
+                if (!PROPS.isCreate) {
+                    for (const option of gradeOptions) {
+                        for (const optionSubject of option.subjects) {
+                            if (optionSubject._id == PROPS.document._id) {
+                                setGradeValue(option);
+                                return;
+                            }
+                        }
                     }
-                }
+                } 
 
             })
 
@@ -156,13 +129,18 @@ function AnnouncementsForm(props) {
     useEffect(() => {
         setProps(props);
 
-        // Set default autocomplete value
-        for (const option of options) {
-            if (option._id === PROPS.document.subject) {
-                setSubjectValue(option);
-                return;
+        // // Set default autocomplete value
+        if (!PROPS.isCreate) {
+            for (const option of options) {
+                for (const optionSubject of option.subjects) {
+                    if (optionSubject._id == PROPS.document._id) {
+                        setGradeValue(option);
+                        return;
+                    }
+                }
             }
         }
+      
 
     }, [props])
 
@@ -170,38 +148,21 @@ function AnnouncementsForm(props) {
         <div className={classes.root}>
             <div className={classes.vc}>
                 <div style={{ width: "100%" }}>
-                    <Box className={classes.field} display="flex">
-                        <Box flexGrow={1}>
-                            Subject-Specific <Typography display='inline' variant='caption' color='textSecondary'> Specifies if this announcement is viewable to the entire school.</Typography>
-                        </Box>
-                        <Box >
-                            <Switch
-                                disabled={!PROPS.isCreate}
-                                checked={PROPS.document['private'] || false}
-                                onChange={handleSwitchToggle('private')}
-                                color="primary"
-                                inputProps={{ 'aria-label': 'primary checkbox' }}
-                            />
-                        </Box>
-                    </Box>
 
                     <Autocomplete
-                        onChange={(e, value) => handleAutocompleteChange(e, value, 'subject')}
-                        value={subjectValue}
-                        disabled={!PROPS.document['private'] || !PROPS.isCreate}
+                        onChange={(e, value) => handleAutocompleteChange(e, value, 'grade')}
+                        value={options.find(option => option._id == PROPS.document['grade']) || gradeValue || {}}
                         className={classes.field}
                         loading={loading}
                         // Sort by category tag (sort by increasing grade)
-                        options={options.sort((a, b) => a.grade - b.grade)}
-                        // Option category tag (Sort by grade)
-                        groupBy={option => `Grade ${option.grade}`}
+                        options={options.sort((a, b) => a.level - b.level)}
                         // Option text
-                        getOptionLabel={option => option.name}
+                        getOptionLabel={option => option.level ? `Grade ${option.level}`: ""}
                         renderInput={params => (
                             <TextField
                                 {...params}
-                                label="Subject Name"
-                                helperText="This announcement will only be viewable to this subject's grade."
+                                label="Grade Name"
+                                helperText="This subject will only be viewable to this grade."
                                 fullWidth
                                 variant="outlined"
                                 InputProps={{
@@ -243,6 +204,22 @@ function AnnouncementsForm(props) {
                         />
                     ))}
 
+                {!PROPS.isCreate &&
+                    <DocumentEditorLink
+                        link={'/edit/announcements'}
+                        docs={PROPS.document.announcements || []}
+                        icon={faBullhorn}
+                        collection={"Subject Announcements"}
+                        primary={"title"}
+                        match={PROPS.match}
+                        docId={PROPS.document._id}
+                        history={PROPS.history}
+                        delete={API.deleteAnnouncements}
+                        user={PROPS.user}
+                        presetField="subject"
+                    />
+                }
+
                 <DocumentPicker
                     title={"Attached Files"}
                     docs={fileOptions}
@@ -259,4 +236,4 @@ function AnnouncementsForm(props) {
     )
 };
 
-export default AnnouncementsForm;
+export default SubjectsForm;

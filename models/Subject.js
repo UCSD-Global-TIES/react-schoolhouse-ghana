@@ -13,11 +13,7 @@ const subjectSchema = new Schema({
   files: [{
     type: Schema.Types.ObjectId,
     ref: 'File'
-  }],
-  grade: {
-    type: Schema.Types.ObjectId,
-    ref: 'Grade'
-  }
+  }]
 }, { timestamps: true });
 
 const Subject = mongoose.model("Subject", subjectSchema);

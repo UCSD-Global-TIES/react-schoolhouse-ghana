@@ -62,9 +62,7 @@ function DocumentEditorLink(props) {
     const MAX_ITEMS = 5;
 
     // REDIRECT
-    const presetField = 'grade';
-
-    const { link, docs, icon, collection, primary, match, docId, history } = props;
+    const { presetField, delete: deleteDocuments, link, docs, icon, collection, primary, match, docId, history } = props;
     const classes = useStyles();
     // DOCUMENTS EDITOR
     const [selected, setSelected] = useState([]);
@@ -141,10 +139,24 @@ function DocumentEditorLink(props) {
     };
 
     // Handle deletion of document
-    const handleDelete = (id) => {
-        console.log(`Deleting ${collection.toLowerCase()}(s): `, selected.join(" "));
-        handleConfirm(false);
-        setCurrentAlert({ isOpen: true, severity: "success", message: `The ${collection.toLowerCase()}(s) have been successfully deleted!` });
+    const handleDelete = () => {
+        deleteDocuments(selected, props.user.key)
+        .then(() => {
+            handleConfirm(false);
+            setCurrentAlert({ isOpen: true, severity: "success", message: `The ${collection.toLowerCase()}(s) have been successfully deleted!` });
+            
+            // Remove deleted documents
+            const remainingDocuments = documents.filter(document => !selected.includes(document._id));
+            setDocuments(remainingDocuments);
+            const filteredDocuments = remainingDocuments.filter(document => document[primary].toLowerCase().includes(searchQuery.toLowerCase()));
+            setFilteredDocuments(filteredDocuments);
+            setViewableDocuments(filteredDocuments.slice(0, MAX_ITEMS));
+
+            // Reset selected
+            setSelected([]);
+        })
+
+        
     }
 
     const handleCreate = () => {
@@ -273,7 +285,7 @@ function DocumentEditorLink(props) {
                                                                 inputProps={{ 'aria-labelledby': labelId }}
                                                             />
                                                         </ListItemIcon>
-                                                        <ListItemText id={labelId} primary={document[primary]} secondary={document.last_updated ? `Updated: ${parseTime(document.last_updated, true)}` : `Created: ${parseTime(document.date_created, true)}`} />
+                                                        <ListItemText id={labelId} primary={document[primary]} secondary={`Created: ${parseTime(document.createdAt, true)}`} />
                                                         <ListItemSecondaryAction>
                                                             <FontAwesomeIcon icon={icon} />
                                                         </ListItemSecondaryAction>

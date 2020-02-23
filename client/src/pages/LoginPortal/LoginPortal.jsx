@@ -144,7 +144,8 @@ function LoginPortal(props) {
                 open={seedDialogOpen}
                 handleClose={handleCloseSeedDialog}
                 type={"Welcome to Schoolhouse Ghana!"}
-                action={{ text: seedLoading ? <FontAwesomeIcon icon={faSpinner} spin /> : "Seed", function: handleSeedDatabase }}
+                action={handleSeedDatabase}
+                buttonText={seedLoading ? <FontAwesomeIcon icon={faSpinner} spin /> : "Seed"}
             >
                 <div style={{ height: "100%", width: "100%", display: "flex" }}>
                     <div style={{ margin: "auto", maxWidth: "400px", width: "70%" }}>

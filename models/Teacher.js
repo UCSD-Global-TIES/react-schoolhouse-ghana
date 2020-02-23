@@ -9,10 +9,6 @@ const teacherSchema = new Schema({
   last_name: {
     type: String,
     required: true
-  },
-  grade: {
-    type: Schema.Types.ObjectId,
-    ref: 'Grade'
   }
 }, { timestamps: true });
 

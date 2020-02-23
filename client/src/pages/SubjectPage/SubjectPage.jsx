@@ -141,9 +141,9 @@ function SubjectPage(props) {
 
   }, []);
 
-  if (props.user.type === "Student" || props.user.type === "Teacher") {
-    if (!props.user.profile.grade !== subjectInfo.grade) { return <AccessDenied /> }
-  }
+  // if (props.user.type === "Student" || props.user.type === "Teacher") {
+  //   if (!props.user.profile.grade !== subjectInfo.grade) { return <AccessDenied /> }
+  // }
 
   if (loading) {
     return <PageSpinner />

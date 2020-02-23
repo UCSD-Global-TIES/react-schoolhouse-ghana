@@ -12,32 +12,33 @@ const {
 
 module.exports = {
     addAnnouncement: function (req, res) {
-        verifyKey(req.header('Authorization'), 'Teacher,Admin').then((isVerified) => {
-            if (isVerified) {
-                const sid = req.params.sid;
-                announcementDb
-                    .create(req.body)
-                    .then(newA => {
-                        // Add to subject' announcements
-                        const aid = newA._id;
+        verifyKey(req.header('Authorization'), 'Teacher,Admin')
+            .then((isVerified) => {
+                if (isVerified) {
+                    const sid = req.params.sid;
+                    announcementDb
+                        .create(req.body)
+                        .then(newA => {
+                            // Add to subject' announcements
+                            const aid = newA._id;
 
-                        subjectDb
-                            .update({
-                                _id: sid
-                            }, {
-                                $push: {
-                                    announcements: aid
-                                }
-                            })
-                            .then(() => {
-                                res.json(newA);
-                            })
-                    })
-                    .catch(err => res.status(422).json(err));
-            } else {
-                res.status(403).json(null);
-            }
-        })
+                            subjectDb
+                                .update({
+                                    _id: sid
+                                }, {
+                                    $push: {
+                                        announcements: aid
+                                    }
+                                })
+                                .then(() => {
+                                    res.json(newA);
+                                })
+                        })
+                        .catch(err => res.status(422).json(err));
+                } else {
+                    res.status(403).json(null);
+                }
+            })
 
     },
     deleteAnnouncement: function (req, res) {
@@ -124,7 +125,7 @@ module.exports = {
                 if (isVerified) {
                     subjectDb
                         .find({})
-                        .populate('grade')
+                        .populate('announcements')
                         .then(subjectDoc => res.json(subjectDoc))
                         .catch(err => res.status(422).json(err));
 
@@ -161,16 +162,18 @@ module.exports = {
         verifyKey(req.header('Authorization'), 'Admin')
             .then((isVerified) => {
                 if (isVerified) {
-                    // Create folder
-                    let subjectDoc = req.body.document;
+                    let subjectDoc = req.body;
+                    const gradeID = subjectDoc.grade;
+                    subjectDoc.grade = null;
+
                     // Create subject document 
                     subjectDb
                         .create(subjectDoc)
                         .then((newS) => {
-                            if (newS.grade) {
+                            if (gradeID) {
                                 gradeDb
                                     .updateOne({
-                                        _id: newS.grade
+                                        _id: gradeID
                                     }, {
                                         $push: {
                                             subjects: newS._id
@@ -195,11 +198,54 @@ module.exports = {
             .then((isVerified) => {
                 if (isVerified) {
                     const sid = req.params.sid;
+                    let subjectDoc = req.body;
+                    const gradeID = subjectDoc.grade;
+                    subjectDoc.grade = null;
+
                     subjectDb
                         .findOneAndUpdate({
                             _id: sid
-                        }, req.body)
-                        .then(newS => res.json(newS))
+                        }, subjectDoc)
+                        .then(newS => {
+                            // If the subject is assigned a grade, remove reference to subject from all other grades
+                            if (gradeID) {
+
+                                // Find all grades whose field 'students'/'teachers'/'subjects' has an identical _id in newG's corresponding fields and pull that _id the respective field 
+                                gradeDb.updateMany(
+                                    {
+                                        subjects: {
+                                            $elemMatch: {
+                                                $eq: newS._id
+                                            }
+                                        }
+                                    },
+                                    {
+                                        $pull: {
+                                            subjects: newS._id
+                                        }
+                                    }
+
+                                ).then(() => {
+
+                                    gradeDb
+                                        .updateOne({
+                                            _id: gradeID
+                                        }, {
+                                            $push: {
+                                                subjects: newS._id
+                                            }
+                                        })
+                                        .then(() => {
+                                            res.json(newS)
+                                        })
+
+                                })
+                            }
+                            else {
+                                res.json(newS)
+                            }
+
+                        })
                         .catch(err => res.status(422).json(err));
 
                 } else {
@@ -218,17 +264,21 @@ module.exports = {
                             _id: sid
                         })
                         .then((deleted_subject) => {
-                            gradeDb
-                                .update({
-                                    _id: deleted_subject.grade
-                                }, {
+                            // If the subject is assigned a grade, remove reference to subject from all other grades
+
+                            // Find all grades whose field 'students'/'teachers'/'subjects' has an identical _id in newG's corresponding fields and pull that _id the respective field 
+                            gradeDb.updateMany(
+                                {},
+                                {
                                     $pull: {
                                         subjects: deleted_subject._id
                                     }
-                                })
-                                .then(() => {
-                                    res.json({});
-                                })
+                                }
+
+                            ).then(() => {
+                                announcementDb.deleteMany({subject: deleted_subject._id})
+                                .then(() => res.json({}))
+                            })
                         })
 
                 } else {

@@ -71,7 +71,7 @@ function DocumentEditor(props) {
 
     // DOCUMENT DIALOG
     const [dialogOpen, setDialogOpen] = useState(false);
-    const [documentAction, setDocumentAction] = useState({ text: "", function: () => { } });
+    const [isCreate, setCreateFlag] = useState(true);
     const [currentDocument, setCurrentDocument] = useState({});
     const [redirectOnExit, setRedirectOnExit] = useState(false);
 
@@ -140,10 +140,13 @@ function DocumentEditor(props) {
     };
 
     // Handle deletion of document
-    const handleDelete = (id) => {
-        console.log(`Deleting ${collection.toLowerCase()}(s): `, selected.join(" "));
-        handleConfirm(false);
-        setCurrentAlert({ isOpen: true, severity: "success", message: `The ${collection.toLowerCase()}(s) have been successfully deleted!` });
+    const handleDelete = () => {
+
+        props.delete(selected, props.user.key)
+            .then(() => {
+                handleConfirm(false);
+                setCurrentAlert({ isOpen: true, severity: "success", message: `The ${collection.toLowerCase()}(s) have been successfully deleted!` });
+            })
     }
 
     // Handle opening/closing of confirmation
@@ -152,44 +155,49 @@ function DocumentEditor(props) {
     }
 
     // Handle creation of document
-    const handleCreate = () => {
-        console.log(`Creating ${collection}(s) `);
-        setDialogOpen(false);
-        setCurrentAlert({ isOpen: true, severity: "success", message: `The ${collection.toLowerCase()} has been successfully created!` });
-        
-        if (redirectOnExit) {
-            // Inform user of redirect to previous document (inform user -> wait 1 sec. -> redirect)
-            setTimeout( () => props.history.goBack(), 1000 );
-        }
+    const handleCreate = (doc) => {
+
+        props.post(doc, props.user.key, props.user.profile)
+            .then(() => {
+                setDialogOpen(false);
+                setCurrentAlert({ isOpen: true, severity: "success", message: `The ${collection.toLowerCase()} has been successfully created!` });
+
+                if (redirectOnExit) {
+                    // Inform user of redirect to previous document (inform user -> wait 1 sec. -> redirect)
+                    setTimeout(() => props.history.goBack(), 1000);
+                }
+            })
     }
 
     // Handle saving of document
-    const handleSave = () => {
-        console.log(`Updating ${collection.toLowerCase()}: `, currentDocument._id);
-        setDialogOpen(false);
-        setCurrentAlert({ isOpen: true, severity: "success", message: `The ${collection.toLowerCase()} has been successfully updated!` });
+    const handleSave = (doc) => {
+        props.put(doc, props.user.key)
+            .then(() => {
+                setDialogOpen(false);
+                setCurrentAlert({ isOpen: true, severity: "success", message: `The ${collection.toLowerCase()} has been successfully updated!` });
 
-        if (redirectOnExit) {
-            // Inform user of redirect to previous document (inform user -> wait 1 sec. -> redirect)
-            setTimeout( () => props.history.goBack(), 1000 );
-        }
+                if (redirectOnExit) {
+                    // Inform user of redirect to previous document (inform user -> wait 1 sec. -> redirect)
+                    setTimeout(() => props.history.goBack(), 1000);
+                }
+            })
     }
 
     // Handle opening/closing of document 
-    const handleDocument = (isOpen, document) => {
+    const handleDocument = (isOpen, document, isPreset) => {
         // Redirect to previous page in history if redirect param is true
         if (redirectOnExit) {
             // Inform user of redirect to previous document (inform user -> wait 1 sec. -> redirect)
-            setTimeout( () => props.history.goBack(), 1000 );
+            setTimeout(() => props.history.goBack(), 1000);
         }
-        
+
         if (document) {
             setCurrentDocument(document);
             // If the document is empty (passed when creating a document)
-            if (!Object.keys(document).length) {
-                setDocumentAction({ text: "Create", function: handleCreate });
+            if (!Object.keys(document).length || isPreset) {
+                setCreateFlag(true);
             } else {
-                setDocumentAction({ text: "Update", function: handleSave });
+                setCreateFlag(false);
             }
         }
 
@@ -201,7 +209,7 @@ function DocumentEditor(props) {
         let tmp = { ...currentDocument };
         tmp[name] = value;
 
-        setCurrentDocument({ ...tmp });
+        setCurrentDocument(JSON.parse(JSON.stringify(tmp)));
     }
 
     const handleRouteChange = (destination, _id) => {
@@ -224,44 +232,44 @@ function DocumentEditor(props) {
     }
 
     useEffect(() => {
-        props.getDocuments(props.user.key)
-        .then((docData) => {
-            const docList = docData.data;
+        props.get(props.user.key)
+            .then((docData) => {
+                const docList = docData.data;
 
-            // Initialize documents
-            setDocuments(docList);
-            setFilteredDocuments(docList);
-            setViewableDocuments(docList.slice(0, MAX_ITEMS));
-            setLoading(false);
-            
-            // If the user has requested a document in the route, set the document
-            // with that _id in the editor; or if they wish to create a document with 
-            // preset values
-            if (props.location.search) {
-                const _id = getQueries(props.location.search)._id;
-                const presetStr = getQueries(props.location.search).preset;
-                const redirect = getQueries(props.location.search).redirect;
+                // Initialize documents
+                setDocuments(docList);
+                setFilteredDocuments(docList);
+                setViewableDocuments(docList.slice(0, MAX_ITEMS));
+                setLoading(false);
 
-                // Check if the specified document exists 
-                if(_id) {
+                // If the user has requested a document in the route, set the document
+                // with that _id in the editor; or if they wish to create a document with 
+                // preset values
+                if (props.location.search) {
+                    const _id = getQueries(props.location.search)._id;
+                    const presetStr = getQueries(props.location.search).preset;
+                    const redirect = getQueries(props.location.search).redirect;
 
-                    let isDocument = false;
-                    for (const document of docList) {
-                        if (document._id == _id) {
-                            handleDocument(true, document);
-                            isDocument = true;
+                    // Check if the specified document exists 
+                    if (_id) {
+
+                        let isDocument = false;
+                        for (const document of docList) {
+                            if (document._id == _id) {
+                                handleDocument(true, document);
+                                isDocument = true;
+                            }
                         }
-                    }
-    
-                    if (!isDocument) setCurrentAlert({ isOpen: true, severity: "error", message: `A ${collection.toLowerCase()} with ID ${_id} could not be found.` });
-                }
 
-                // Check if the presetStr exists, and if so parse and open the document with the preset values
-                if(presetStr !== undefined) handleDocument(true, JSON.parse(presetStr));
-                // Check if the redirect flag exists, set the variable
-                if(redirect !== undefined) setRedirectOnExit(redirect);
-            }
-        });
+                        if (!isDocument) setCurrentAlert({ isOpen: true, severity: "error", message: `A ${collection.toLowerCase()} with ID ${_id} could not be found.` });
+                    }
+
+                    // Check if the presetStr exists, and if so parse and open the document with the preset values
+                    if (presetStr !== undefined) handleDocument(true, JSON.parse(presetStr), true);
+                    // Check if the redirect flag exists, set the variable
+                    if (redirect !== undefined) setRedirectOnExit(redirect);
+                }
+            });
 
     }, []);
 
@@ -284,9 +292,10 @@ function DocumentEditor(props) {
                 open={dialogOpen}
                 handleClose={() => handleDocument(false)}
                 type={`${collection} Editor`}
-                action={documentAction}
+                buttonText={isCreate ? "Create" : "Update"}
+                action={isCreate ? () => handleCreate(currentDocument) : () => handleSave(currentDocument)}
             >
-                <FormComponent history={props.history} match={props.match} isCreate={documentAction.text === "Create"} document={currentDocument} handleRouteChange={handleRouteChange} handleChange={handleFormChange} />
+                <FormComponent history={props.history} match={props.match} isCreate={isCreate} document={currentDocument} handleRouteChange={handleRouteChange} handleChange={handleFormChange} />
             </FullScreenDialog>
 
             {/* DELETE DOCUMENT(S) DIALOG */}
@@ -305,7 +314,7 @@ function DocumentEditor(props) {
                             title={collection}
                             numSelected={selected.length}
                             handleCreate={() => handleDocument(true, {})}
-                            handleUpdate={() => handleDocument(true, documents.filter((doc) => doc._id === selected[0])[0])}
+                            handleUpdate={() => handleDocument(true, documents.find((doc) => doc._id === selected[0]))}
                             handleDelete={() => handleConfirm(true)}
                         />
 
