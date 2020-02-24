@@ -45,7 +45,7 @@ export default function FullScreenDialog(props) {
             <Typography variant="h6" className={clsx(classes.title, "flow-text")}>
               {props.type}
             </Typography>
-            <Button autoFocus color="inherit" onClick={props.action}>
+            <Button disabled={props.buttonDisabled} autoFocus color="inherit" onClick={props.action}>
               {props.buttonText}
             </Button>
           </Toolbar>

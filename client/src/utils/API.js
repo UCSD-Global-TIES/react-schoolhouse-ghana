@@ -119,7 +119,7 @@ export default {
     const config = {
       'Authorization': key
     };
-   
+
     return axios.post(`/api/subject`, newS, {
       headers: config
     }); // SECURE
@@ -166,7 +166,7 @@ export default {
       'Authorization': key
     };
 
-    if(subject_id) {
+    if (subject_id) {
       return axios.get(`/api/subject/${subject_id}/ann`, {
         headers: config
       }); // SECURE
@@ -279,7 +279,7 @@ export default {
     }
 
     return Promise.all(promises)
-    
+
   },
   // GRADE MEMBERS
   // ---------------------------------------------------------------
@@ -373,34 +373,60 @@ export default {
   destroySession: function () {
     return axios.delete(`/api/verify/session`);
   },
-  // // Add an 'Account' of ANY type -> Add 'Account' to 'Grade'
-  // addAccount: function (first_name, last_name, type, grade_id, key) {
-  //   const config = {
-  //     'Authorization': key
-  //   };
-  //   let newA = {
-  //     first_name,
-  //     last_name,
-  //     type
-  //   };
-  //   if (grade_id) newA.grade = grade_id;
+  getAccounts: function (key) {
+    const config = {
+      'Authorization': key
+    };
 
-  //   return axios.post(`/api/account`, newA, {
-  //     headers: config
-  //   }); // SECURE 
-  // },
-  // // Updates 'Account' name 
-  // updateAccountName: function (acc_id, first_name, last_name, key) {
-  //   const config = {
-  //     'Authorization': key
-  //   };
-  //   return axios.put(`/api/account/${acc_id}?field=name`, {
-  //     first_name,
-  //     last_name
-  //   }, {
-  //     headers: config
-  //   }); // SECURE
-  // },
+    return axios.get(`/api/account`, {
+      headers: config
+    }); // SECURE 
+  },
+  // Add an 'Account' of ANY type -> Add 'Account' to 'Grade'
+  addAccount: function (newU, key) {
+    const config = {
+      'Authorization': key
+    };
+
+    const { first_name, last_name, password, type, grade } = newU;
+
+    const newP = { first_name, last_name, grade };
+    const newA = { password, type }
+
+    return axios.post(`/api/account`, { profile: newP, account: newA }, {
+      headers: config
+    }); // SECURE 
+  },
+  // Updates 'Account' name 
+  updateAccount: function (newU, key) {
+    const config = {
+      'Authorization': key
+    };
+    const { _id, profile_id, first_name, last_name, password, grade, type } = newU;
+
+    const newP = { _id: profile_id, first_name, last_name, grade };
+    const newA = { _id, password, type }
+
+    return axios.put(`/api/account/${newA._id}`, { profile: newP, account: newA }, {
+      headers: config
+    }); // SECURE
+  },
+  // Delete 'Account' and associated profile
+  deleteAccounts: function (acc_id_list, key) {
+    const config = {
+      'Authorization': key
+    };
+
+    const promises = [];
+
+    for (const acc_id of acc_id_list) {
+      promises.push(axios.delete(`/api/account/${acc_id}`, {
+        headers: config
+      }))
+    }
+
+    return Promise.all(promises)
+  },
   // // Updates 'Account' password
   // updateAccountPassword: function (acc_id, oldPassword, newPassword, key) {
   //   const config = JSON.stringify({
@@ -415,15 +441,6 @@ export default {
   //     headers: config
   //   }); // SECURE
   // },
-  // // Delete 'Account' and associated profile
-  // deleteAccount: function (acc_id, key) {
-  //   const config = {
-  //     'Authorization': key
-  //   };
-  //   return axios.delete(`/api/account/${acc_id}`, {
-  //     headers: config
-  //   }); // SECURE
-  // },
 
   // Get all accounts (omitting username and password)
   getUsers: function (key) {
@@ -434,5 +451,5 @@ export default {
       headers: config
     }); // SECURE
   }
-  
+
 };

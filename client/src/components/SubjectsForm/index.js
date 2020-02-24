@@ -119,7 +119,7 @@ function SubjectsForm(props) {
                             }
                         }
                     }
-                } 
+                }
 
             })
 
@@ -129,18 +129,18 @@ function SubjectsForm(props) {
     useEffect(() => {
         setProps(props);
 
-        // // Set default autocomplete value
-        if (!PROPS.isCreate) {
-            for (const option of options) {
-                for (const optionSubject of option.subjects) {
-                    if (optionSubject._id == PROPS.document._id) {
-                        setGradeValue(option);
-                        return;
-                    }
-                }
-            }
-        }
-      
+        // // // Set default autocomplete value
+        // if (!PROPS.isCreate) {
+        //     for (const option of options) {
+        //         for (const optionSubject of option.subjects) {
+        //             if (optionSubject._id == PROPS.document._id) {
+        //                 setGradeValue(option);
+        //                 return;
+        //             }
+        //         }
+        //     }
+        // }
+
 
     }, [props])
 
@@ -157,7 +157,7 @@ function SubjectsForm(props) {
                         // Sort by category tag (sort by increasing grade)
                         options={options.sort((a, b) => a.level - b.level)}
                         // Option text
-                        getOptionLabel={option => option.level ? `Grade ${option.level}`: ""}
+                        getOptionLabel={option => option.level ? `Grade ${option.level}` : ""}
                         renderInput={params => (
                             <TextField
                                 {...params}

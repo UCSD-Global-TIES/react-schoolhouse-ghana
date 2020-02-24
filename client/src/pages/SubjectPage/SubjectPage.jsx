@@ -174,6 +174,8 @@ function SubjectPage(props) {
         setLoading(false);
       })
 
+
+    // LISTEN FOR MODIFIED SUBJECT
   }, []);
 
   // if (props.user.type === "Student" || props.user.type === "Teacher") {

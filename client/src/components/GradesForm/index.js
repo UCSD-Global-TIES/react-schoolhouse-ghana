@@ -81,16 +81,16 @@ function GradesForm(props) {
 
 
     const handlePickChange = (name, selectedDocs) => {
-        switch(name) {
+        switch (name) {
             case "subjects":
                 setSelectedSubjects(selectedDocs);
-            break;
+                break;
             case "students":
                 setSelectedStudents(selectedDocs);
-            break;
+                break;
             case "teachers":
                 setSelectedTeachers(selectedDocs);
-            break;
+                break;
         }
 
         const event = {
@@ -110,8 +110,8 @@ function GradesForm(props) {
         Promise.all(promises)
             .then((results) => {
                 const subjectIDs = [];
-                if(props.document.subjects) {
-                    for(const subject of props.document.subjects) {
+                if (props.document.subjects) {
+                    for (const subject of props.document.subjects) {
                         subjectIDs.push(subject._id);
                     }
                 }
@@ -124,9 +124,18 @@ function GradesForm(props) {
 
                 const students = [];
                 const teachers = [];
-                for(const account of results[1].data) {
-                    if(account.type === "Student") students.push(account.profile)
-                    if(account.type === "Teacher") teachers.push(account.profile)
+                for (const account of results[1].data) {
+                    const { first_name, last_name, profile_id: _id, profile_createdAt: createdAt, profile_updatedAt: updatedAt } = account;
+                    const profileObj = {
+                        first_name,
+                        last_name,
+                        _id,
+                        createdAt,
+                        updatedAt
+                    }
+
+                    if (account.type === "Student") students.push(profileObj)
+                    if (account.type === "Teacher") teachers.push(profileObj)
                 }
 
                 // Set options and loading flag to false

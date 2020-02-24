@@ -113,7 +113,7 @@ module.exports = {
                                         $in: gradeDoc.subjects
                                     }
                                 },
-                                
+
                             ]
                         },
                         {
@@ -153,8 +153,8 @@ module.exports = {
                     // Create folder
                     let gradeDoc = req.body;
 
-                     // Find all grades whose field 'students'/'teachers'/'subjects' has an identical _id in newG's corresponding fields and pull that _id the respective field 
-                     gradeDb.updateMany(
+                    // Find all grades whose field 'students'/'teachers'/'subjects' has an identical _id in newG's corresponding fields and pull that _id the respective field 
+                    gradeDb.updateMany(
                         {
                             $or: [
                                 {
@@ -172,7 +172,7 @@ module.exports = {
                                         $in: gradeDoc.subjects
                                     }
                                 },
-                                
+
                             ]
                         },
                         {

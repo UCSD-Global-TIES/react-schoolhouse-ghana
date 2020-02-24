@@ -9,7 +9,7 @@ const {
 module.exports = {
     // SLOW ~ 2 seconds
     getAnnouncements: function (req, res) {
-        verifyKey(req.header('Authorization'), 'Admin')
+        verifyKey(req.header('Authorization'), 'Student,Teacher,Admin')
             .then((isVerified) => {
                 if (isVerified) {
                     let query;

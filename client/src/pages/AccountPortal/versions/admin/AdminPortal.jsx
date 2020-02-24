@@ -174,11 +174,15 @@ function AdminPortal(props) {
         {
             collection: "Accounts",
             icon: faUsers,
-            FormComponent: AccountsForm,
-            primary: "title",
+            FormComponent: (p) =>
+                <AccountsForm user={props.user} {...p} />,
+            primary: "first_name",
             path: `${props.match.path}/accounts`,
             api: {
-                // get: API.getAccounts
+                get: API.getAccounts,
+                post: API.addAccount,
+                put: API.updateAccount,
+                delete: API.deleteAccounts
             }
         },
         {

@@ -122,9 +122,9 @@ function AnnouncementsForm(props) {
                 let subjectOptions = [];
                 for (const gradeDoc of results[0].data) {
                     for (const subjectDoc of gradeDoc.subjects) {
-                    // Push object containing class name, grade level, and class_id (see 'subjectOptions')
+                        // Push object containing class name, grade level, and class_id (see 'subjectOptions')
                         subjectOptions.push({ name: subjectDoc.name, grade: gradeDoc.level, _id: subjectDoc._id })
-                }
+                    }
                 }
 
                 const selected = [];
@@ -154,15 +154,17 @@ function AnnouncementsForm(props) {
     }, []);
 
     useEffect(() => {
-        setProps(props);
-
-        // Set default autocomplete value
-        for (const option of options) {
-            if (option._id === PROPS.document.subject) {
-                setSubjectValue(option);
-                return;
+        if (PROPS.document.subject !== props.document.subject) {
+            // Set default autocomplete value
+            for (const option of options) {
+                if (option._id === PROPS.document.subject) {
+                    setSubjectValue(option);
+                    return;
+                }
             }
         }
+
+        setProps(props);
 
     }, [props])
 

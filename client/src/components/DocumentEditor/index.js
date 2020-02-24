@@ -73,6 +73,7 @@ function DocumentEditor(props) {
     // DOCUMENT DIALOG
     const [dialogOpen, setDialogOpen] = useState(false);
     const [isCreate, setCreateFlag] = useState(true);
+    const [initialDocument, setInitialDocument] = useState({});
     const [currentDocument, setCurrentDocument] = useState({});
     const [redirectOnExit, setRedirectOnExit] = useState(false);
 
@@ -233,6 +234,7 @@ function DocumentEditor(props) {
         }
 
         if (document) {
+            setInitialDocument(document);
             setCurrentDocument(document);
             // If the document is empty (passed when creating a document)
             if (!Object.keys(document).length || isPreset) {
@@ -248,7 +250,12 @@ function DocumentEditor(props) {
     const handleFormChange = (event) => {
         const { name, value } = event.target;
         let tmp = { ...currentDocument };
-        tmp[name] = value;
+
+        if (!value.length) {
+            tmp[name] = undefined;
+        } else {
+            tmp[name] = value;
+        }
 
         setCurrentDocument(JSON.parse(JSON.stringify(tmp)));
     }
@@ -336,6 +343,7 @@ function DocumentEditor(props) {
                 open={dialogOpen}
                 handleClose={() => handleDocument(false)}
                 type={`${collection} Editor`}
+                buttonDisabled={JSON.stringify(initialDocument) == JSON.stringify(currentDocument)}
                 buttonText={isCreate ? "Create" : "Update"}
                 action={isCreate ? () => handleCreate(currentDocument) : () => handleSave(currentDocument)}
             >
