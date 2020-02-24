@@ -206,7 +206,7 @@ function LoginPortal(props) {
                 <div style={{ margin: "auto" }}>
                     <div className={classes.portal}>
 
-                        <Typography align='center' variant="h6" className={classes.title}>
+                        <Typography align='center' variant="h4" className={classes.title}>
                             login <FontAwesomeIcon icon={faChalkboardTeacher} size="lg" />
                         </Typography>
 

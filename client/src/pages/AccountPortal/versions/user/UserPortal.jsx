@@ -70,14 +70,17 @@ function UserPortal(props) {
         Promise.all(promises)
             .then((promiseResults) => {
                 // Get & set grade's subjects info
-                setSubjects(promiseResults[0].data.subjects);
+                setSubjects(promiseResults[0].data ? promiseResults[0].data.subjects : []);
 
                 // Get & Set school announcements
                 setSchoolAnnouncements(promiseResults[1].data);
 
+                
                 let subjectAnnList = []
-                for (const subjectDoc of promiseResults[0].data.subjects) {
-                    subjectAnnList = subjectAnnList.concat(subjectDoc.announcements)
+                if(promiseResults[0].data) {
+                    for (const subjectDoc of promiseResults[0].data.subjects) {
+                        subjectAnnList = subjectAnnList.concat(subjectDoc.announcements)
+                    }
                 }
 
                 // Get & Set Subject announcements

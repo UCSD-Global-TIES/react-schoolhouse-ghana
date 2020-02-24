@@ -223,6 +223,7 @@ function AnnouncementsForm(props) {
                 {
                     textFields.map((item, idx) => (
                         <TextField
+                            error={PROPS.error[item.name] ? PROPS.error[item.name].exists : null}
                             required={item.required}
                             key={`${item.name}-form-${idx}`}
                             className={classes.field}
@@ -231,7 +232,7 @@ function AnnouncementsForm(props) {
                             placeholder={(item.disabled || (item.updateOnly && PROPS.isCreate)) ? disabledMsg : ""}
                             disabled={(item.disabled || (item.updateOnly && PROPS.isCreate))}
                             value={(item.isDate ? parseTime(PROPS.document[item.name]) : null) || PROPS.document[item.name] || ""}
-                            helperText={item.helper}
+                            helperText={PROPS.error[item.name] ? (PROPS.error[item.name].exists ? PROPS.error[item.name].message : item.helper) : item.helper}
                             onChange={PROPS.handleChange}
                             fullWidth
                             autoComplete={'off'}

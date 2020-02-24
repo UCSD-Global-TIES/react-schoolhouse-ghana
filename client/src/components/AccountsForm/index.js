@@ -48,6 +48,7 @@ const textFields = [
     {
         name: "password",
         label: "Password",
+        required: true,
         isHidden: true,
         helper: "This is the password for this account."
     },
@@ -161,8 +162,9 @@ function AccountsForm(props) {
                         renderInput={params => (
                             <TextField
                                 {...params}
+                                error={PROPS.error['type'] ? PROPS.error['type'].exists : null}
                                 label="Account Type"
-                                helperText="This is the account type."
+                                helperText={PROPS.error['type'] ? (PROPS.error['type'].exists ? PROPS.error['type'].message : "This is the account type.") : "This is the account type."}
                                 fullWidth
                                 variant="outlined"
                                 InputProps={{
@@ -213,6 +215,7 @@ function AccountsForm(props) {
                 {
                     textFields.map((item, idx) => (
                         <TextField
+                            error={PROPS.error[item.name] ? PROPS.error[item.name].exists : null}
                             required={item.required}
                             key={`${item.name}-form-${idx}`}
                             className={classes.field}
@@ -221,7 +224,7 @@ function AccountsForm(props) {
                             placeholder={(item.disabled || (item.updateOnly && PROPS.isCreate)) ? disabledMsg : ""}
                             disabled={(item.disabled || (item.updateOnly && PROPS.isCreate))}
                             value={(item.isDate ? parseTime(PROPS.document[item.name]) : null) || PROPS.document[item.name] || ""}
-                            helperText={item.helper}
+                            helperText={PROPS.error[item.name] ? (PROPS.error[item.name].exists ? PROPS.error[item.name].message : item.helper) : item.helper}
                             onChange={PROPS.handleChange}
                             fullWidth
                             autoComplete={'off'}

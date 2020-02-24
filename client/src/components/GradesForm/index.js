@@ -31,7 +31,8 @@ const textFields = [
         label: "Grade Level",
         helper: "This is the numerical level of this grade.",
         createOnly: true,
-        isNumber: true
+        isNumber: true,
+        required: true
     },
     {
         name: "createdAt",
@@ -160,6 +161,8 @@ function GradesForm(props) {
                     textFields.map((item, idx) => (
                         <TextField
                             // Just for Grade 'level' field
+                            error={PROPS.error[item.name] ? PROPS.error[item.name].exists : null}
+                            required={item.required}
                             type={item.isNumber ? "number" : "text"}
                             key={`${item.name}-form-${idx}`}
                             className={classes.field}
@@ -168,7 +171,7 @@ function GradesForm(props) {
                             placeholder={(item.disabled || (item.updateOnly && PROPS.isCreate)) ? disabledMsg : ""}
                             disabled={(item.disabled || (item.updateOnly && PROPS.isCreate) || (item.createOnly && !PROPS.isCreate))}
                             value={(item.isDate ? parseTime(PROPS.document[item.name]) : null) || ((item.isNumber && !PROPS.document[item.name]) ? MIN_GRADE : null) || PROPS.document[item.name] || ""}
-                            helperText={item.helper}
+                            helperText={PROPS.error[item.name] ? (PROPS.error[item.name].exists ? PROPS.error[item.name].message : item.helper) : item.helper}
                             onChange={item.isNumber ? handleNumberChange : PROPS.handleChange}
                             fullWidth
                             autoComplete={'off'}
