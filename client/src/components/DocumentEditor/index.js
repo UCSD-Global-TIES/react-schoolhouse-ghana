@@ -4,13 +4,15 @@ import clsx from "clsx";
 import { Alert, Skeleton, Pagination } from '@material-ui/lab'
 import { FormControl, Input, InputLabel, InputAdornment, Snackbar, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Checkbox, Typography } from "@material-ui/core";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSpinner } from "@fortawesome/free-solid-svg-icons";
+
 import SearchIcon from '@material-ui/icons/Search';
 import { makeStyles } from '@material-ui/core/styles';
 import EnhancedListToolbar from "../EnhancedListToolbar";
 import FullScreenDialog from "../FullScreenDialog";
 import ConfirmDialog from "../ConfirmDialog";
 import "../../utils/flowHeaders.min.css";
-
+import SocketContext from "../../socket-context"
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -53,9 +55,10 @@ const useStyles = makeStyles(theme => ({
 // icon - used for no documents message and for list
 // Form - component used for document dialog
 function DocumentEditor(props) {
+    const socket = React.useContext(SocketContext)
     const MAX_ITEMS = 5;
 
-    const { API, FormComponent, icon, collection, primary } = props;
+    const { FormComponent, icon, collection, primary, validation } = props;
     const classes = useStyles();
     // DOCUMENTS EDITOR
     const [selected, setSelected] = useState([]);
@@ -72,11 +75,48 @@ function DocumentEditor(props) {
     // DOCUMENT DIALOG
     const [dialogOpen, setDialogOpen] = useState(false);
     const [isCreate, setCreateFlag] = useState(true);
+    const [initialDocument, setInitialDocument] = useState({});
     const [currentDocument, setCurrentDocument] = useState({});
+    const [errorDocument, setErrorDocument] = useState({});
     const [redirectOnExit, setRedirectOnExit] = useState(false);
+    const [actionPending, setActionPending] = useState(false);
+    const [refreshing, setRefreshing] = useState(false);
 
     // COMPONENT STATUS
     const [loading, setLoading] = useState(true);
+
+    const handleRefresh = () => {
+        setRefreshing(true);
+        setSelected([]);
+
+        props.get(props.user.key)
+            .then((docData) => {
+                const docList = docData.data;
+
+                // Initialize documents
+                setDocuments(docList);
+
+                setPage(0)
+
+                if (searchQuery.length) {
+                    const filteredDocuments = docList.filter(document => document[primary].toLowerCase().includes(searchQuery.toLowerCase()));
+                    setFilteredDocuments(filteredDocuments);
+                    setViewableDocuments(filteredDocuments.slice(0, MAX_ITEMS));
+
+                } else {
+                    // Reset the filtered documents to ALL documents
+                    setFilteredDocuments(docList);
+                    setViewableDocuments(docList.slice(0, MAX_ITEMS));
+                }
+
+                setRefreshing(false);
+            })
+    }
+
+    const notifyServer = () => {
+        // Send message on web-socket
+        socket.emit('documents-changed', collection.toLowerCase())
+    }
 
     // HANDLE PAGE CHANGE
     const handlePageChange = (event, value) => {
@@ -146,6 +186,9 @@ function DocumentEditor(props) {
             .then(() => {
                 handleConfirm(false);
                 setCurrentAlert({ isOpen: true, severity: "success", message: `The ${collection.toLowerCase()}(s) have been successfully deleted!` });
+
+                notifyServer();
+
             })
     }
 
@@ -154,33 +197,88 @@ function DocumentEditor(props) {
         setConfirmOpen(isOpen);
     }
 
+    const validateForm = (doc) => {
+        return new Promise((resolve, reject) => {
+            const promises = [];
+
+            for (const field of Object.keys(validation)) {
+                promises.push(validation[field].validate(doc[field]));
+            }
+
+            Promise.all(promises)
+                .then((result) => {
+                    const errorDoc = {};
+                    const validationResults = result;
+                    for (let i = 0; i < validationResults.length; i++) {
+                        const isCorrect = validationResults[i];
+                        const field = Object.keys(validation)[i]
+
+                        if (!isCorrect && (isCreate || initialDocument[field] !== doc[field])) {
+                            errorDoc[field] = {
+                                exists: !isCorrect,
+                                message: validation[field].message
+                            }
+                        };
+
+                    }
+
+                    setErrorDocument(JSON.parse(JSON.stringify(errorDoc)));
+                    if (!Object.keys(errorDoc).length) resolve(true);
+                    else resolve(false);
+
+                })
+
+        })
+    }
+
     // Handle creation of document
     const handleCreate = (doc) => {
+        validateForm(doc)
+            .then((isValid) => {
+                if (isValid) {
+                    setActionPending(true);
+                    props.post(doc, props.user.key, props.user.profile)
+                        .then(() => {
+                            setActionPending(false);
+                            setDialogOpen(false);
+                            setCurrentAlert({ isOpen: true, severity: "success", message: `The ${collection.toLowerCase()}(s) have been successfully created!` });
 
-        props.post(doc, props.user.key, props.user.profile)
-            .then(() => {
-                setDialogOpen(false);
-                setCurrentAlert({ isOpen: true, severity: "success", message: `The ${collection.toLowerCase()} has been successfully created!` });
+                            notifyServer();
 
-                if (redirectOnExit) {
-                    // Inform user of redirect to previous document (inform user -> wait 1 sec. -> redirect)
-                    setTimeout(() => props.history.goBack(), 1000);
+                            if (redirectOnExit) {
+                                // Inform user of redirect to previous document (inform user -> wait 1 sec. -> redirect)
+                                setTimeout(() => props.history.goBack(), 1000);
+                            }
+                        })
                 }
             })
+
     }
 
     // Handle saving of document
     const handleSave = (doc) => {
-        props.put(doc, props.user.key)
-            .then(() => {
-                setDialogOpen(false);
-                setCurrentAlert({ isOpen: true, severity: "success", message: `The ${collection.toLowerCase()} has been successfully updated!` });
+        validateForm(doc)
+            .then((isValid) => {
+                if (isValid) {
+                    setActionPending(true);
+                    props.put(doc, props.user.key)
+                        .then(() => {
+                            setActionPending(false);
+                            setDialogOpen(false);
+                            setCurrentAlert({ isOpen: true, severity: "success", message: `The ${collection.toLowerCase()} has been successfully updated!` });
 
-                if (redirectOnExit) {
-                    // Inform user of redirect to previous document (inform user -> wait 1 sec. -> redirect)
-                    setTimeout(() => props.history.goBack(), 1000);
+                            notifyServer();
+
+                            if (redirectOnExit) {
+                                // Inform user of redirect to previous document (inform user -> wait 1 sec. -> redirect)
+                                setTimeout(() => props.history.goBack(), 1000);
+                            }
+                        })
+
                 }
+
             })
+
     }
 
     // Handle opening/closing of document 
@@ -192,6 +290,7 @@ function DocumentEditor(props) {
         }
 
         if (document) {
+            setInitialDocument(document);
             setCurrentDocument(document);
             // If the document is empty (passed when creating a document)
             if (!Object.keys(document).length || isPreset) {
@@ -206,10 +305,13 @@ function DocumentEditor(props) {
 
     const handleFormChange = (event) => {
         const { name, value } = event.target;
-        let tmp = { ...currentDocument };
+        let tmp = JSON.parse(JSON.stringify(currentDocument));
+
         tmp[name] = value;
 
+
         setCurrentDocument(JSON.parse(JSON.stringify(tmp)));
+        if (errorDocument !== {}) setErrorDocument({})
     }
 
     const handleRouteChange = (destination, _id) => {
@@ -271,6 +373,9 @@ function DocumentEditor(props) {
                 }
             });
 
+        socket.on(`refresh-${collection.toLowerCase()}`, function () {
+            handleRefresh();
+        })
     }, []);
 
     return (
@@ -287,15 +392,27 @@ function DocumentEditor(props) {
                 </Alert>
             </Snackbar>
 
+            {/* ALERTS FOR API ACTIONS */}
+            <Snackbar
+                anchorOrigin={{ vertical: "top", horizontal: "right" }}
+                open={refreshing}
+            >
+                <Alert severity={'info'}>
+                    Refreshing...
+                </Alert>
+            </Snackbar>
+
+
             {/* UPDATE DOCUMENT DIALOG */}
             <FullScreenDialog
                 open={dialogOpen}
                 handleClose={() => handleDocument(false)}
                 type={`${collection} Editor`}
-                buttonText={isCreate ? "Create" : "Update"}
+                buttonDisabled={JSON.stringify(initialDocument) == JSON.stringify(currentDocument)}
+                buttonText={actionPending ? <FontAwesomeIcon icon={faSpinner} spin /> : isCreate ? "Create" : "Update"}
                 action={isCreate ? () => handleCreate(currentDocument) : () => handleSave(currentDocument)}
             >
-                <FormComponent history={props.history} match={props.match} isCreate={isCreate} document={currentDocument} handleRouteChange={handleRouteChange} handleChange={handleFormChange} />
+                <FormComponent error={errorDocument} history={props.history} match={props.match} isCreate={isCreate} document={currentDocument} handleRouteChange={handleRouteChange} handleChange={handleFormChange} />
             </FullScreenDialog>
 
             {/* DELETE DOCUMENT(S) DIALOG */}

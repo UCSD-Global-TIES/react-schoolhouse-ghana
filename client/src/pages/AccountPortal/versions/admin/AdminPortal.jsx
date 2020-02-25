@@ -54,7 +54,6 @@ function AdminPortal(props) {
         query: '(max-width: 600px)'
     })
 
-
     const handleDrawerToggle = () => {
         setMobileOpen(!mobileOpen);
     };
@@ -141,6 +140,20 @@ function AdminPortal(props) {
                 post: API.addAnnouncement,
                 put: API.updateAnnouncement,
                 delete: API.deleteAnnouncements
+            },
+            validation: {
+                title: {
+                    validate: value => new Promise((resolve, reject) => {
+                        resolve(value)
+                    }),
+                    message: "You must enter an announcement title."
+                },
+                content: {
+                    validate: value => new Promise((resolve, reject) => {
+                        resolve(value)
+                    }),
+                    message: "You must enter some announcement content."
+                },
             }
         },
         {
@@ -155,6 +168,24 @@ function AdminPortal(props) {
                 post: API.addGrade,
                 put: API.updateGrade,
                 delete: API.deleteGrades
+            },
+            validation: {
+                level: {
+                    validate: value => new Promise((resolve, reject) => {
+
+                        API.getGrades(props.user.key)
+                            .then((result) => {
+                                const grades = result.data;
+
+                                for (const grade of grades) {
+                                    if (grade.level === parseInt(value)) resolve(false)
+                                }
+                                resolve(true)
+                            })
+
+                    }),
+                    message: "You must enter a grade level that does not yet exist."
+                }
             }
         },
         {
@@ -169,16 +200,70 @@ function AdminPortal(props) {
                 post: API.addSubject,
                 put: API.updateSubject,
                 delete: API.deleteSubjects
+            },
+            validation: {
+                name: {
+                    validate: value => new Promise((resolve, reject) => {
+
+                        if (!value) resolve(false);
+
+                        API.getSubjects(props.user.key)
+                            .then((result) => {
+                                const subjects = result.data;
+
+                                for (const subject of subjects) {
+                                    if (subject.name === value) resolve(false)
+                                }
+                                resolve(true)
+                            })
+
+                    }),
+                    message: "You must enter a subject name, one that does not already exist"
+                }
             }
         },
         {
             collection: "Accounts",
             icon: faUsers,
-            FormComponent: AccountsForm,
-            primary: "title",
+            FormComponent: (p) =>
+                <AccountsForm user={props.user} {...p} />,
+            primary: "first_name",
             path: `${props.match.path}/accounts`,
             api: {
-                // get: API.getAccounts
+                get: API.getAccounts,
+                post: API.addAccount,
+                put: API.updateAccount,
+                delete: API.deleteAccounts
+            },
+            validation: {
+                first_name: {
+                    validate: value => new Promise((resolve, reject) => {
+                        resolve(value);
+                    }),
+                    message: "You must enter the user's first name."
+                },
+                last_name: {
+                    validate: value => new Promise((resolve, reject) => {
+                        resolve(value);
+                    }),
+                    message: "You must enter the user's last name."
+                },
+                type: {
+                    validate: value => new Promise((resolve, reject) => {
+                        resolve(value);
+                    }),
+                    message: "You must select the user's account type."
+                },
+                password: {
+                    validate: value => new Promise((resolve, reject) => {
+
+                        if (!value) resolve(false);
+
+                        if (value.length >= 5) resolve(true);
+                        else resolve(false)
+                    }),
+                    message: "You must enter a password longer than five characters."
+                }
             }
         },
         {
@@ -208,6 +293,7 @@ function AdminPortal(props) {
                     post={page.api.post}
                     put={page.api.put}
                     delete={page.api.delete}
+                    validation={page.validation}
                     {...props} />
         })
     })

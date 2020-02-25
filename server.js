@@ -5,10 +5,12 @@ const session = require('express-session');
 const morgan = require('morgan');
 const mongoose = require("mongoose");
 const routes = require("./routes");
+const config = require("./nasConfig");
 
 const app = express();
 var http = require('http').createServer(app);
 var io = require('socket.io')(http);
+require("./socket")(io);
 const PORT = process.env.PORT || 3001;
 // Track the number of connections to the server
 let connections = 0;
@@ -52,6 +54,10 @@ app.use((req, res, next) => {
 // Serve up static assets (usually on heroku)
 if (process.env.NODE_ENV === "production") {
   app.use(express.static("client/build"));
+} else {
+  // Set up location of NAS storage path
+  app.use('/static', express.static(config.path));
+
 }
 
 // Add routes, both API and view
@@ -90,6 +96,10 @@ io.on('connection', function (client) {
   client.on('disconnect', function () {
     console.log(`A user has disconnected from the server: ${--connections} connection(s)`);
   });
+
+  client.on('documents-changed', function (type) {
+    io.emit(`refresh-${type}`)
+  })
 
 
 });

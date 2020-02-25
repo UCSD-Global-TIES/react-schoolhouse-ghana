@@ -31,7 +31,8 @@ const textFields = [
         label: "Grade Level",
         helper: "This is the numerical level of this grade.",
         createOnly: true,
-        isNumber: true
+        isNumber: true,
+        required: true
     },
     {
         name: "createdAt",
@@ -81,16 +82,16 @@ function GradesForm(props) {
 
 
     const handlePickChange = (name, selectedDocs) => {
-        switch(name) {
+        switch (name) {
             case "subjects":
                 setSelectedSubjects(selectedDocs);
-            break;
+                break;
             case "students":
                 setSelectedStudents(selectedDocs);
-            break;
+                break;
             case "teachers":
                 setSelectedTeachers(selectedDocs);
-            break;
+                break;
         }
 
         const event = {
@@ -110,8 +111,8 @@ function GradesForm(props) {
         Promise.all(promises)
             .then((results) => {
                 const subjectIDs = [];
-                if(props.document.subjects) {
-                    for(const subject of props.document.subjects) {
+                if (props.document.subjects) {
+                    for (const subject of props.document.subjects) {
                         subjectIDs.push(subject._id);
                     }
                 }
@@ -124,9 +125,18 @@ function GradesForm(props) {
 
                 const students = [];
                 const teachers = [];
-                for(const account of results[1].data) {
-                    if(account.type === "Student") students.push(account.profile)
-                    if(account.type === "Teacher") teachers.push(account.profile)
+                for (const account of results[1].data) {
+                    const { first_name, last_name, profile_id: _id, profile_createdAt: createdAt, profile_updatedAt: updatedAt } = account;
+                    const profileObj = {
+                        first_name,
+                        last_name,
+                        _id,
+                        createdAt,
+                        updatedAt
+                    }
+
+                    if (account.type === "Student") students.push(profileObj)
+                    if (account.type === "Teacher") teachers.push(profileObj)
                 }
 
                 // Set options and loading flag to false
@@ -151,6 +161,8 @@ function GradesForm(props) {
                     textFields.map((item, idx) => (
                         <TextField
                             // Just for Grade 'level' field
+                            error={PROPS.error[item.name] ? PROPS.error[item.name].exists : null}
+                            required={item.required}
                             type={item.isNumber ? "number" : "text"}
                             key={`${item.name}-form-${idx}`}
                             className={classes.field}
@@ -159,7 +171,7 @@ function GradesForm(props) {
                             placeholder={(item.disabled || (item.updateOnly && PROPS.isCreate)) ? disabledMsg : ""}
                             disabled={(item.disabled || (item.updateOnly && PROPS.isCreate) || (item.createOnly && !PROPS.isCreate))}
                             value={(item.isDate ? parseTime(PROPS.document[item.name]) : null) || ((item.isNumber && !PROPS.document[item.name]) ? MIN_GRADE : null) || PROPS.document[item.name] || ""}
-                            helperText={item.helper}
+                            helperText={PROPS.error[item.name] ? (PROPS.error[item.name].exists ? PROPS.error[item.name].message : item.helper) : item.helper}
                             onChange={item.isNumber ? handleNumberChange : PROPS.handleChange}
                             fullWidth
                             autoComplete={'off'}

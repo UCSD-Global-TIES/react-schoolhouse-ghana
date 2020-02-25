@@ -31,7 +31,10 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import AdminPortal from "./pages/AccountPortal/versions/admin/AdminPortal";
 
-const socket = window.socket;
+import SocketContext from './socket-context'
+import * as io from 'socket.io-client'
+
+const socket = io()
 
 function App() {
   // const testUser = null;
@@ -60,32 +63,36 @@ function App() {
   }, []);
 
   return (
-    <div className="App">
-      <header>
-        {/* Place navigation bar here */}
-        <NavBar user={userInfo} logout={handleLogout} />
-      </header>
+    <SocketContext.Provider value={socket}>
 
-      {
-        loading ?
-          <div style={{ display: "flex", width: "100vw", height: "100vh" }}>
-            <div style={{ margin: "auto" }}>
-              <FontAwesomeIcon icon={faSpinner} size="2x" spin />
+      <div className="App">
+        <header>
+          {/* Place navigation bar here */}
+          <NavBar user={userInfo} logout={handleLogout} />
+        </header>
+
+        {
+          loading ?
+            <div style={{ display: "flex", width: "100vw", height: "100vh" }}>
+              <div style={{ margin: "auto" }}>
+                <FontAwesomeIcon icon={faSpinner} size="2x" spin />
+              </div>
+
             </div>
+            :
+            <Switch>
+              {/* Portal component should check account type and render the correct component */}
+              <ProtectedRoute exact path="/" component={AccountPortal} user={userInfo} />
+              {/* Class component should check account type and render the correct component */}
+              <ProtectedRoute path="/subject/:id" component={SubjectPage} logout={handleLogout} user={userInfo} />
+              <ProtectedRoute path="/edit" component={AdminPortal} logout={handleLogout} user={userInfo} />
+              <Route exact path="/login" component={props => <LoginPortal {...props} user={userInfo} setUser={setUser} />} />
+              <Route component={NoMatch} />
+            </Switch>
+        }
+      </div>
 
-          </div>
-          :
-          <Switch>
-            {/* Portal component should check account type and render the correct component */}
-            <ProtectedRoute exact path="/" component={AccountPortal} user={userInfo} />
-            {/* Class component should check account type and render the correct component */}
-            <ProtectedRoute path="/subject/:id" component={SubjectPage} user={userInfo} />
-            <ProtectedRoute path="/edit" component={AdminPortal} logout={handleLogout} user={userInfo} />
-            <Route exact path="/login" component={props => <LoginPortal {...props} user={userInfo} setUser={setUser} />} />
-            <Route component={NoMatch} />
-          </Switch>
-      }
-    </div>
+    </SocketContext.Provider>
   );
 }
 

@@ -163,7 +163,7 @@ module.exports = {
             .then((isVerified) => {
                 if (isVerified) {
                     announcementDb
-                        .find({subject: req.params.sid})
+                        .find({ subject: req.params.sid })
                         .then(subjectAnns => res.json(subjectAnns))
                         .catch(err => res.status(422).json(err));
 
@@ -208,7 +208,7 @@ module.exports = {
             })
     },
     updateSubject: function (req, res) {
-        verifyKey(req.header('Authorization'), 'Admin')
+        verifyKey(req.header('Authorization'), 'Teacher,Admin')
             .then((isVerified) => {
                 if (isVerified) {
                     const sid = req.params.sid;
@@ -290,8 +290,8 @@ module.exports = {
                                 }
 
                             ).then(() => {
-                                announcementDb.deleteMany({subject: deleted_subject._id})
-                                .then(() => res.json({}))
+                                announcementDb.deleteMany({ subject: deleted_subject._id })
+                                    .then(() => res.json({}))
                             })
                         })
 

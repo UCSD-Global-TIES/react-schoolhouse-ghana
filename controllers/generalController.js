@@ -9,7 +9,7 @@ const {
 module.exports = {
     // SLOW ~ 2 seconds
     getAnnouncements: function (req, res) {
-        verifyKey(req.header('Authorization'), 'Admin')
+        verifyKey(req.header('Authorization'), 'Student,Teacher,Admin')
             .then((isVerified) => {
                 if (isVerified) {
                     let query;
@@ -47,7 +47,7 @@ module.exports = {
 
     },
     deleteAnnouncement: function (req, res) {
-        verifyKey(req.header('Authorization'), 'Admin').then((isVerified) => {
+        verifyKey(req.header('Authorization'), 'Teacher,Admin').then((isVerified) => {
             if (isVerified) {
                 const aid = req.params.aid;
 
@@ -58,21 +58,19 @@ module.exports = {
                     .then(doc => {
                         doc.remove();
 
-                        console.log(doc)
-
-                        if(doc.subject) {
+                        if (doc.subject) {
                             subjectDb
-                            .update({
-                                _id: doc.subject
-                            }, {
-                                $pull: {
-                                    announcements: doc._id
-                                }
-                            })
-                            .then(() => {
-                                res.json({});
-                            })
-                            .catch(err => res.status(422).json(err));
+                                .update({
+                                    _id: doc.subject
+                                }, {
+                                    $pull: {
+                                        announcements: doc._id
+                                    }
+                                })
+                                .then(() => {
+                                    res.json({});
+                                })
+                                .catch(err => res.status(422).json(err));
                         } else {
                             res.json({});
                         }

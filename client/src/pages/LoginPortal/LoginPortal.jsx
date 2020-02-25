@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import "../../utils/flowHeaders.min.css";
 import "./main.css";
 import API from "../../utils/API"
@@ -11,6 +11,8 @@ import Key from "@material-ui/icons/VpnKey";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSignInAlt, faChalkboardTeacher, faSpinner } from '@fortawesome/free-solid-svg-icons'
 import FullScreenDialog from "../../components/FullScreenDialog";
+import SocketContext from '../../socket-context'
+
 
 const useStyles = makeStyles(theme => ({
     formInput: {
@@ -32,7 +34,7 @@ const useStyles = makeStyles(theme => ({
 
 }));
 
-const socket = window.socket;
+// const socket = window.socket;
 const errorSeverity = "error";
 const successSeverity = "success";
 const loginError = "Your username or password was incorrect."
@@ -40,6 +42,8 @@ const seedError = "Database seeding failed.";
 const seedSuccess = "Database seeding succeeded!";
 
 function LoginPortal(props) {
+    const socket = useContext(SocketContext);
+
     const classes = useStyles();
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
@@ -91,9 +95,7 @@ function LoginPortal(props) {
                     if (user.data) {
                         props.setUser(user.data);
                         setAlertOpen(false);
-                        if (socket) {
-                            socket.emit('authentication', `${user.data.first_name} has connected!`)
-                        }
+                        socket.emit('authentication', `${user.data.profile.first_name} has connected!`)
                     }
 
                     // Login failed, show error message
@@ -204,7 +206,7 @@ function LoginPortal(props) {
                 <div style={{ margin: "auto" }}>
                     <div className={classes.portal}>
 
-                        <Typography align='center' variant="h6" className={classes.title}>
+                        <Typography align='center' variant="h4" className={classes.title}>
                             login <FontAwesomeIcon icon={faChalkboardTeacher} size="lg" />
                         </Typography>
 

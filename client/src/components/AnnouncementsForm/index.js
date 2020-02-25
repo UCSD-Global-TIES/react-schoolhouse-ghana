@@ -113,7 +113,8 @@ function AnnouncementsForm(props) {
     useEffect(() => {
         const promises = [];
         promises.push(API.getGrades(PROPS.user.key));
-        promises.push(API.getFiles(PROPS.user.key))
+        promises.push(API.getFiles(PROPS.user.key));
+
 
         Promise.all(promises)
             .then((results) => {
@@ -122,9 +123,9 @@ function AnnouncementsForm(props) {
                 let subjectOptions = [];
                 for (const gradeDoc of results[0].data) {
                     for (const subjectDoc of gradeDoc.subjects) {
-                    // Push object containing class name, grade level, and class_id (see 'subjectOptions')
+                        // Push object containing class name, grade level, and class_id (see 'subjectOptions')
                         subjectOptions.push({ name: subjectDoc.name, grade: gradeDoc.level, _id: subjectDoc._id })
-                }
+                    }
                 }
 
                 const selected = [];
@@ -144,7 +145,6 @@ function AnnouncementsForm(props) {
                 for (const option of subjectOptions) {
                     if (option._id === PROPS.document.subject) {
                         setSubjectValue(option);
-                        return;
                     }
                 }
 
@@ -154,15 +154,16 @@ function AnnouncementsForm(props) {
     }, []);
 
     useEffect(() => {
-        setProps(props);
-
-        // Set default autocomplete value
-        for (const option of options) {
-            if (option._id === PROPS.document.subject) {
-                setSubjectValue(option);
-                return;
+        if (PROPS.document.subject !== props.document.subject) {
+            // Set default autocomplete value
+            for (const option of options) {
+                if (option._id === props.document.subject) {
+                    setSubjectValue(option);
+                }
             }
         }
+        setProps(props);
+
 
     }, [props])
 
@@ -221,6 +222,7 @@ function AnnouncementsForm(props) {
                 {
                     textFields.map((item, idx) => (
                         <TextField
+                            error={PROPS.error[item.name] ? PROPS.error[item.name].exists : null}
                             required={item.required}
                             key={`${item.name}-form-${idx}`}
                             className={classes.field}
@@ -229,7 +231,7 @@ function AnnouncementsForm(props) {
                             placeholder={(item.disabled || (item.updateOnly && PROPS.isCreate)) ? disabledMsg : ""}
                             disabled={(item.disabled || (item.updateOnly && PROPS.isCreate))}
                             value={(item.isDate ? parseTime(PROPS.document[item.name]) : null) || PROPS.document[item.name] || ""}
-                            helperText={item.helper}
+                            helperText={PROPS.error[item.name] ? (PROPS.error[item.name].exists ? PROPS.error[item.name].message : item.helper) : item.helper}
                             onChange={PROPS.handleChange}
                             fullWidth
                             autoComplete={'off'}

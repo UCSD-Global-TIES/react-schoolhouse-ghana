@@ -2,7 +2,8 @@ import React, { useEffect, useState } from "react";
 import { NavLink, Switch, Redirect } from "react-router-dom";
 import ProtectedRoute from "../../components/ProtectedRoute"
 import { makeStyles, useTheme } from '@material-ui/core/styles';
-import { Drawer, Hidden, List, ListItem, ListItemIcon, ListItemText, CssBaseline } from "@material-ui/core"
+import { Alert } from '@material-ui/lab'
+import { Snackbar, Drawer, Hidden, List, ListItem, ListItemIcon, ListItemText, CssBaseline } from "@material-ui/core"
 // import { TransitionGroup, CSSTransition } from 'react-transition-group'
 import { useMediaQuery } from 'react-responsive';
 import "../../utils/flowHeaders.min.css";
@@ -11,7 +12,7 @@ import API from "../../utils/API";
 import "./main.css";
 import NavBarAdmin from "../../components/NavBarAdmin";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBullhorn, faFile } from "@fortawesome/free-solid-svg-icons";
+import { faBullhorn, faFile, faSpinner } from "@fortawesome/free-solid-svg-icons";
 import SimpleListView from "../../components/SimpleListView";
 import PageSpinner from "../../components/PageSpinner";
 import FileViewer from "../../components/FileViewer";
@@ -19,6 +20,7 @@ import DocumentEditor from "../../components/DocumentEditor";
 import AnnouncementViewer from "../../components/AnnouncementViewer";
 import SubjectAnnouncementsForm from "../../components/SubjectAnnouncementsForm";
 import SubjectFilesForm from "../../components/SubjectFilesForm";
+import SocketContext from "../../socket-context"
 
 const drawerWidth = 220;
 
@@ -48,7 +50,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 function SubjectPage(props) {
-
+  const socket = React.useContext(SocketContext)
   const classes = useStyles();
   const theme = useTheme();
   const [mobileOpen, setMobileOpen] = React.useState(false);
@@ -59,6 +61,7 @@ function SubjectPage(props) {
 
   const [subjectInfo, setSubjectInfo] = useState({});
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
@@ -124,10 +127,25 @@ function SubjectPage(props) {
               post={(doc, key, user) => {
                 let newA = doc;
                 newA.subject = subject_id;
+                newA.private = true;
                 return API.addAnnouncement(newA, key, user)
               }}
               put={API.updateAnnouncement}
               delete={API.deleteAnnouncements}
+              validation={{
+                title: {
+                  validate: value => new Promise((resolve, reject) => {
+                    resolve(value)
+                  }),
+                  message: "You must enter an announcement title."
+                },
+                content: {
+                  validate: value => new Promise((resolve, reject) => {
+                    resolve(value)
+                  }),
+                  message: "You must enter some announcement content."
+                },
+              }}
               {...p}
             />
           )
@@ -137,30 +155,42 @@ function SubjectPage(props) {
     {
       component:
         props.user.type === "Student" ?
-        (props) => (
-          <SimpleListView
-            title={"Resources"}
-            items={subjectInfo.files || []}
-            pageMax={5}
-            icon={faFile}
-            labelField={"nickname"}
-            viewer={FileViewer}
-            searchbar
-            {...props}
-          />
-        )
-      :
-      (props) => (
-        <SubjectFilesForm
-          document={subjectInfo}
-          {...props}
-        />
+          (props) => (
+            <SimpleListView
+              title={"Resources"}
+              items={subjectInfo.files || []}
+              pageMax={5}
+              icon={faFile}
+              labelField={"nickname"}
+              viewer={FileViewer}
+              searchbar
+              {...props}
+            />
+          )
+          :
+          (props) => (
+            <SubjectFilesForm
+              document={subjectInfo}
+              {...props}
+            />
 
-      )
+          )
       ,
       path: `${props.match.path}/resources`
     }
   ]
+
+  const handleRefresh = () => {
+    setRefreshing(true);
+
+    API
+      .getSubject(subject_id, props.user.key)
+      .then((subjectDoc) => {
+        setRefreshing(false);
+        setSubjectInfo(subjectDoc.data);
+      })
+  }
+
 
   // SET DEFAULT MENU
   const defaultRoute = `${props.match.path}/announcements`;
@@ -174,6 +204,14 @@ function SubjectPage(props) {
         setLoading(false);
       })
 
+    // LISTEN FOR MODIFIED SUBJECT (INCOMPLETE)
+    const collections = ['subjects', 'announcements', `subject-files-${subject_id}`];
+    for (const collection of collections) {
+      socket.on(`refresh-${collection}`, function () {
+        handleRefresh();
+      })
+    }
+
   }, []);
 
   // if (props.user.type === "Student" || props.user.type === "Teacher") {
@@ -186,6 +224,16 @@ function SubjectPage(props) {
 
   return (
     <div className={classes.root}>
+      {/* ALERTS FOR API ACTIONS */}
+      <Snackbar
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        open={refreshing}
+      >
+        <Alert severity={'info'}>
+          Refreshing...
+        </Alert>
+      </Snackbar>
+
       <CssBaseline />
       <NavBarAdmin logout={props.logout} handleDrawerToggle={handleDrawerToggle} />
       <nav className={classes.drawer}>

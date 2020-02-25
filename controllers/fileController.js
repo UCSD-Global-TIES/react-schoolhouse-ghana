@@ -1,4 +1,6 @@
 const fileDb = require("../models/File");
+const ip = require("ip");
+const API_PORT = process.env.PORT || 3001;
 const {
     deleteFile,
     uploadFile
@@ -71,6 +73,9 @@ module.exports = {
                     fileDb
                         .findOne({ _id: fid })
                         .then((file) => {
+                            // Return path of file on NAS
+                            file.path = `http://${ip.address()}:${API_PORT}/static/${file.filename}`
+
                             res.json(file)
                         })
 

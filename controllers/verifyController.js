@@ -15,8 +15,6 @@ const {
     verifyPassword
 } = require("../scripts/encrypt");
 
-
-
 module.exports = {
     // https://stackoverflow.com/questions/44072750/how-to-send-basic-auth-with-axios
     verifyAccount: function (req, res) {
