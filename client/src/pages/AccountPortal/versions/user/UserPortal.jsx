@@ -3,7 +3,8 @@ import { makeStyles } from '@material-ui/core/styles';
 import { Link } from "react-router-dom"
 import API from "../../../../utils/API"
 import SimpleListView from "../../../../components/SimpleListView"
-import { Grid, Typography, CardActionArea, CardContent, CardMedia, Card } from "@material-ui/core";
+import { Snackbar, Grid, Typography, CardActionArea, CardContent, CardMedia, Card } from "@material-ui/core";
+import { Alert } from '@material-ui/lab';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faSchool, faPencilRuler, faChalkboardTeacher } from "@fortawesome/free-solid-svg-icons"
 import "../../../../utils/flowHeaders.min.css";
@@ -12,6 +13,7 @@ import clsx from "clsx"
 import AccessDenied from "../../../../components/AccessDenied";
 import PageSpinner from "../../../../components/PageSpinner";
 import AnnouncementViewer from "../../../../components/AnnouncementViewer";
+import SocketContext from "../../../../socket-context"
 
 
 const useStyles = makeStyles(theme => ({
@@ -38,6 +40,8 @@ const useStyles = makeStyles(theme => ({
 }));
 
 function UserPortal(props) {
+    const socket = React.useContext(SocketContext)
+
     const classes = useStyles();
     const MAX_ANN = 3;
 
@@ -53,10 +57,49 @@ function UserPortal(props) {
     // If loading, show loading screen
     const [loading, setLoading] = useState(true);
 
+    const [refreshing, setRefreshing] = useState(false);
+
     // Route user to clicked subject page
     const handleOpenSubject = (subject_id) => {
         props.history.push(`/subject/${subject_id}`);
     }
+
+    const handleRefresh = () => {
+        setRefreshing(true);
+
+        const promises = [];
+
+        // Get 'Grade' associated with user account, populating subjects and their announcements
+        promises.push(API.getUserGrade(props.user.profile._id, props.user.key))
+
+        // Get school announcements
+        promises.push(API.getSchoolAnnouncements(props.user.key))
+
+        Promise.all(promises)
+            .then((promiseResults) => {
+                // Get & set grade's subjects info
+                setSubjects(promiseResults[0].data ? promiseResults[0].data.subjects : []);
+
+                // Get & Set school announcements
+                setSchoolAnnouncements(promiseResults[1].data);
+
+
+                let subjectAnnList = []
+                if (promiseResults[0].data) {
+                    for (const subjectDoc of promiseResults[0].data.subjects) {
+                        subjectAnnList = subjectAnnList.concat(subjectDoc.announcements)
+                    }
+                }
+
+                // Get & Set Subject announcements
+                setGradeAnnouncements(subjectAnnList);
+
+                // Set loading false, so the loading screen goes away
+                setRefreshing(false);
+
+            })
+    }
+
 
     useEffect(() => {
         const promises = [];
@@ -75,9 +118,9 @@ function UserPortal(props) {
                 // Get & Set school announcements
                 setSchoolAnnouncements(promiseResults[1].data);
 
-                
+
                 let subjectAnnList = []
-                if(promiseResults[0].data) {
+                if (promiseResults[0].data) {
                     for (const subjectDoc of promiseResults[0].data.subjects) {
                         subjectAnnList = subjectAnnList.concat(subjectDoc.announcements)
                     }
@@ -91,8 +134,12 @@ function UserPortal(props) {
 
             })
 
-        // LISTEN FOR MODIFIED SCHOOL ANNOUNCEMENTS
-        // LISTEN FOR MODIFIED SUBJECT ANNOUNCEMENTS FOR THIS GRADE
+        const collections = ['announcements']
+        for (const collection of collections) {
+            socket.on(`refresh-${collection}`, function () {
+                handleRefresh();
+            })
+        }
 
     }, [])
 
@@ -102,6 +149,16 @@ function UserPortal(props) {
 
     return (
         <div style={{ display: "flex", width: "100%", marginTop: "5rem" }}>
+
+            {/* ALERTS FOR API ACTIONS */}
+            <Snackbar
+                anchorOrigin={{ vertical: "top", horizontal: "right" }}
+                open={refreshing}
+            >
+                <Alert severity={'info'}>
+                    Refreshing...
+                </Alert>
+            </Snackbar>
 
             <Grid spacing={5} container style={{ padding: "2rem", width: "100%" }}>
                 <Grid item xs={12}><Typography style={{ padding: "2rem" }} align='center' className={clsx(classes.textGlow, "flow-text")} variant="h3">welcome back, {props.user.profile.first_name} 😄</Typography> </Grid>

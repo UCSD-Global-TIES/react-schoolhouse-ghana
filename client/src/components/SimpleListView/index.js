@@ -136,9 +136,9 @@ function SimpleListView(props) {
                 {
                     filteredDocuments.length ?
 
-                        filteredDocuments.slice(pageIdx * props.pageMax, (pageIdx + 1) * props.pageMax).map((item) => (
+                        filteredDocuments.slice(pageIdx * props.pageMax, (pageIdx + 1) * props.pageMax).map((item, idx) => (
 
-                            <a target="_blank" style={{ textDecoration: "none" }} key={item} href={props.link ? item[props.link] : null}>
+                            <a target="_blank" style={{ textDecoration: "none" }} key={`${props.title.toLowerCase()}-${idx}`} href={props.link ? item[props.link] : null}>
                                 <ListItem button onClick={() => handleItemClick(item)} alignItems="flex-start">
                                     <ListItemIcon>
                                         <FontAwesomeIcon icon={props.icon} />

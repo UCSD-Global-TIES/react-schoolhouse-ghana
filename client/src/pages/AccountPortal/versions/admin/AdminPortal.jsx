@@ -257,12 +257,12 @@ function AdminPortal(props) {
                 password: {
                     validate: value => new Promise((resolve, reject) => {
 
-                        if(!value) resolve(false);
+                        if (!value) resolve(false);
 
-                        if(value.length >= 6) resolve(true);
+                        if (value.length >= 5) resolve(true);
                         else resolve(false)
                     }),
-                    message: "You must enter a password longer than six characters."
+                    message: "You must enter a password longer than five characters."
                 }
             }
         },

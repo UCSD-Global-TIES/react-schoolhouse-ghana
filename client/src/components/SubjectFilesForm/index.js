@@ -10,6 +10,7 @@ import "../../utils/flowHeaders.min.css";
 import API from "../../utils/API";
 import { faFile } from "@fortawesome/free-solid-svg-icons";
 import SaveIcon from '@material-ui/icons/Save';
+import SocketContext from "../../socket-context"
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -29,6 +30,7 @@ const useStyles = makeStyles(theme => ({
 // Private field is special use case
 
 function SubjectFilesForm(props) {
+    const socket = React.useContext(SocketContext)
     const classes = useStyles();
     const [fileOptions, setFileOptions] = useState([]);
     const [selectedFiles, setSelectedFiles] = useState(props.document.files || []);
@@ -36,6 +38,12 @@ function SubjectFilesForm(props) {
 
     // ALERTS
     const [currentAlert, setCurrentAlert] = useState({ isOpen: false, severity: "", message: "" });
+
+
+    const notifyServer = () => {
+        // Send message on web-socket
+        socket.emit('documents-changed', `subject-files-${props.document._id}`)
+    }
 
     // Closing snackbar alerts
     const handleAlertClose = (event, reason) => {
@@ -61,6 +69,7 @@ function SubjectFilesForm(props) {
         }, PROPS.user.key)
             .then(() => {
                 setCurrentAlert({ isOpen: true, severity: "success", message: `The subject files were successfully saved!` });
+                notifyServer();
             })
     }
 
@@ -103,15 +112,15 @@ function SubjectFilesForm(props) {
             </Snackbar>
             <div className={classes.vc}>
                 <div style={{ marginBottom: "2rem", display: "flex", justifyContent: "flex-end" }}>
-                        <Button
-                            variant="contained"
-                            color="primary"
-                            size="large"
-                            startIcon={<SaveIcon />}
-                            onClick={handleSave}
-                            disabled={JSON.stringify(selectedFiles) === JSON.stringify(props.document.files.map((file) => file._id))}
-                        >
-                            Save
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        size="large"
+                        startIcon={<SaveIcon />}
+                        onClick={handleSave}
+                        disabled={JSON.stringify(selectedFiles) === JSON.stringify(props.document.files.map((file) => file._id))}
+                    >
+                        Save
                         </Button>
 
                 </div>

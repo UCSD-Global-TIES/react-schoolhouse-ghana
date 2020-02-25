@@ -113,7 +113,8 @@ function AnnouncementsForm(props) {
     useEffect(() => {
         const promises = [];
         promises.push(API.getGrades(PROPS.user.key));
-        promises.push(API.getFiles(PROPS.user.key))
+        promises.push(API.getFiles(PROPS.user.key));
+
 
         Promise.all(promises)
             .then((results) => {
@@ -144,7 +145,6 @@ function AnnouncementsForm(props) {
                 for (const option of subjectOptions) {
                     if (option._id === PROPS.document.subject) {
                         setSubjectValue(option);
-                        return;
                     }
                 }
 
@@ -157,14 +157,13 @@ function AnnouncementsForm(props) {
         if (PROPS.document.subject !== props.document.subject) {
             // Set default autocomplete value
             for (const option of options) {
-                if (option._id === PROPS.document.subject) {
+                if (option._id === props.document.subject) {
                     setSubjectValue(option);
-                    return;
                 }
             }
         }
-
         setProps(props);
+
 
     }, [props])
 

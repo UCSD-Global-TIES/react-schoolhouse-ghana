@@ -80,12 +80,13 @@ function DocumentEditor(props) {
     const [errorDocument, setErrorDocument] = useState({});
     const [redirectOnExit, setRedirectOnExit] = useState(false);
     const [actionPending, setActionPending] = useState(false);
+    const [refreshing, setRefreshing] = useState(false);
 
     // COMPONENT STATUS
     const [loading, setLoading] = useState(true);
 
     const handleRefresh = () => {
-        setLoading(true);
+        setRefreshing(true);
         setSelected([]);
 
         props.get(props.user.key)
@@ -108,7 +109,7 @@ function DocumentEditor(props) {
                     setViewableDocuments(docList.slice(0, MAX_ITEMS));
                 }
 
-                setLoading(false);
+                setRefreshing(false);
             })
     }
 
@@ -199,34 +200,34 @@ function DocumentEditor(props) {
     const validateForm = (doc) => {
         return new Promise((resolve, reject) => {
             const promises = [];
-            
+
             for (const field of Object.keys(validation)) {
                 promises.push(validation[field].validate(doc[field]));
             }
-            
+
             Promise.all(promises)
-            .then((result) => {
-                const errorDoc = {};
-                const validationResults = result;
-                for (let i = 0; i < validationResults.length; i++) {
-                    const isCorrect = validationResults[i];
-                    const field = Object.keys(validation)[i]
+                .then((result) => {
+                    const errorDoc = {};
+                    const validationResults = result;
+                    for (let i = 0; i < validationResults.length; i++) {
+                        const isCorrect = validationResults[i];
+                        const field = Object.keys(validation)[i]
 
-                    if (!isCorrect) {
-                        errorDoc[field] = {
-                            exists: !isCorrect,
-                            message: validation[field].message
-                        }
-                    };
+                        if (!isCorrect && (isCreate || initialDocument[field] !== doc[field])) {
+                            errorDoc[field] = {
+                                exists: !isCorrect,
+                                message: validation[field].message
+                            }
+                        };
 
-                }
+                    }
 
-                setErrorDocument(JSON.parse(JSON.stringify(errorDoc)));
-                if (!Object.keys(errorDoc).length) resolve(true);
-                else resolve(false);
+                    setErrorDocument(JSON.parse(JSON.stringify(errorDoc)));
+                    if (!Object.keys(errorDoc).length) resolve(true);
+                    else resolve(false);
 
-            })
-    
+                })
+
         })
     }
 
@@ -240,7 +241,7 @@ function DocumentEditor(props) {
                         .then(() => {
                             setActionPending(false);
                             setDialogOpen(false);
-                            setCurrentAlert({ isOpen: true, severity: "success", message: `The ${collection.toLowerCase()} has been successfully created!` });
+                            setCurrentAlert({ isOpen: true, severity: "success", message: `The ${collection.toLowerCase()}(s) have been successfully created!` });
 
                             notifyServer();
 
@@ -304,13 +305,10 @@ function DocumentEditor(props) {
 
     const handleFormChange = (event) => {
         const { name, value } = event.target;
-        let tmp = { ...currentDocument };
+        let tmp = JSON.parse(JSON.stringify(currentDocument));
 
-        if (!value.length) {
-            tmp[name] = undefined;
-        } else {
-            tmp[name] = value;
-        }
+        tmp[name] = value;
+
 
         setCurrentDocument(JSON.parse(JSON.stringify(tmp)));
         if (errorDocument !== {}) setErrorDocument({})
@@ -393,6 +391,17 @@ function DocumentEditor(props) {
                     {currentAlert.message}
                 </Alert>
             </Snackbar>
+
+            {/* ALERTS FOR API ACTIONS */}
+            <Snackbar
+                anchorOrigin={{ vertical: "top", horizontal: "right" }}
+                open={refreshing}
+            >
+                <Alert severity={'info'}>
+                    Refreshing...
+                </Alert>
+            </Snackbar>
+
 
             {/* UPDATE DOCUMENT DIALOG */}
             <FullScreenDialog
