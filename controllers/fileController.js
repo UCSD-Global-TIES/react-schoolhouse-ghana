@@ -1,4 +1,6 @@
 const fileDb = require("../models/File");
+const subjectDb = require("../models/Subject");
+const announcementDb = require("../models/Announcement");
 const ip = require("ip");
 const API_PORT = process.env.PORT || 3001;
 const {
@@ -91,14 +93,51 @@ module.exports = {
 
                     const fid = req.params.fid;
                     fileDb
-                        .findOneAndDelete({ _id: fid })
-                        .then((deletedF) => {
+                        .findOne({ _id: fid })
+                        .then((fileObj) => {
                             // Delete file from NAS
-                            deleteFile(deletedF.path)
+                            deleteFile(fileObj.filename)
                                 .then((result) => {
-                                    if (!result) res.json(null);
+                                    if (!result) {
+                                        res.json(null);
+                                        return;
+                                    };
 
-                                    res.json({});
+                                    fileDb.deleteOne({ _id: fid })
+                                        .then(() => {
+                                            const promises = [];
+
+                                            promises.push(subjectDb.updateMany(
+                                                {
+                                                    files: {
+                                                        $elemMatch: {
+                                                            $eq: fid
+                                                        }
+                                                    }
+                                                },
+                                                {
+                                                    $pull: {
+                                                        files: fid
+                                                    }
+                                                }))
+
+                                            promises.push(announcementDb.updateMany(
+                                                {
+                                                    files: {
+                                                        $elemMatch: {
+                                                            $eq: fid
+                                                        }
+                                                    }
+                                                },
+                                                {
+                                                    $pull: {
+                                                        files: fid
+                                                    }
+                                                }))
+
+                                            Promise.all(promises)
+                                                .then(() => res.json({}))
+                                        })
                                 })
                                 .catch(err => res.status(500).json(err));
                         })

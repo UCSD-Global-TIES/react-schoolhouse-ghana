@@ -89,7 +89,7 @@ module.exports = {
             fs.unlink(`${config.path}/${filename}`, function (err) {
                 if (err) resolve(null);
                 // if no error, file has been deleted successfully
-                resolve({});
+                else resolve({});
             });
         })
     },

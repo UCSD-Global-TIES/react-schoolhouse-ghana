@@ -273,7 +273,17 @@ function AdminPortal(props) {
             primary: "nickname",
             path: `${props.match.path}/files`,
             api: {
-                get: API.getFiles
+                get: API.getFiles,
+                put: API.updateFile,
+                delete: API.deleteFiles
+            },
+            validation: {
+                nickname: {
+                    validate: value => new Promise((resolve, reject) => {
+                        resolve(value);
+                    }),
+                    message: "You must enter an informative file nickname"
+                }
             }
         }
     ]

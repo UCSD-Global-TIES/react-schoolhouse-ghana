@@ -73,27 +73,31 @@ export default {
     }); // SECURE
   },
   // // Delete a 'File'
-  // deleteFile: function (file_id, key) {
-  //   const config = {
-  //     'Authorization': key
-  //   };
-  //   return axios.delete(`/api/file/${file_id}`, {
-  //     headers: config
-  //   }); // SECURE
-  // },
+  deleteFiles: function (file_id_list, key) {
+    const config = {
+      'Authorization': key
+    };
+
+    const promises = [];
+
+    for (const file_id of file_id_list) {
+      promises.push(axios.delete(`/api/file/${file_id}`, {
+        headers: config
+      })) // SECURE
+    }
+
+    return Promise.all(promises);
+  },
   // // Update a 'File'
-  // updateFile: function (file_id, nickname, key) {
-  //   const config = {
-  //     'Authorization': key
-  //   };
-  //   const newF = {
-  //     nickname,
-  //     last_updated: Date.now()
-  //   }
-  //   return axios.put(`/api/file/${file_id}`, newF, {
-  //     headers: config
-  //   }); // SECURE
-  // },
+  updateFile: function (newF, key) {
+    const config = {
+      'Authorization': key
+    };
+
+    return axios.put(`/api/file/${newF._id}`, newF, {
+      headers: config
+    }); // SECURE
+  },
   // SUBJECTS
   // ---------------------------------------------------------------
   // Get a specified subject

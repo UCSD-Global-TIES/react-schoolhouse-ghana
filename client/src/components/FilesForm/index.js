@@ -1,11 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { TextField, Box, Switch, Typography, CircularProgress } from "@material-ui/core";
+import { TextField } from "@material-ui/core";
 import { makeStyles } from '@material-ui/core/styles';
 import { parseTime } from '../../utils/misc';
-import { Autocomplete } from '@material-ui/lab';
-import { faChalkboardTeacher } from "@fortawesome/free-solid-svg-icons";
-import DocumentEditorLink from '../DocumentEditorLink'
-
 
 import "../../utils/flowHeaders.min.css";
 
@@ -65,17 +61,22 @@ const textFields = [
 
 function FilesForm(props) {
     const classes = useStyles();
+    const [PROPS, setProps] = useState(props)
+
 
     useEffect(() => {
 
-    }, []);
+        setProps(props);
+
+
+    }, [props])
 
     return (
         <div className={classes.root}>
             <div className={classes.vc}>
                 {/* Add field to upload file */}
                 {/* for websites - upload folder but mark path to the index.html file */}
-                
+
                 {/* Add file preview */}
                 {/* iFrame - websites */}
                 {/* react-pdf - pdfs */}
@@ -84,16 +85,17 @@ function FilesForm(props) {
                 {
                     textFields.map((item, idx) => (
                         <TextField
-
+                            error={PROPS.error[item.name] ? PROPS.error[item.name].exists : null}
+                            required={item.required}
                             key={`${item.name}-form-${idx}`}
                             className={classes.field}
                             label={item.label}
                             name={item.name}
-                            placeholder={(item.disabled || (item.updateOnly && props.isCreate)) ? disabledMsg : ""}
-                            disabled={(item.disabled || (item.updateOnly && props.isCreate) || (item.createOnly && !props.isCreate))}
-                            value={(props.isDate ? parseTime(props.document[item.name]) : null) || ""}
-                            helperText={item.helper}
-                            onChange={props.handleChange}
+                            placeholder={(item.disabled || (item.updateOnly && PROPS.isCreate)) ? disabledMsg : ""}
+                            disabled={(item.disabled || (item.updateOnly && PROPS.isCreate))}
+                            value={(item.isDate ? parseTime(PROPS.document[item.name]) : null) || PROPS.document[item.name] || ""}
+                            helperText={PROPS.error[item.name] ? (PROPS.error[item.name].exists ? PROPS.error[item.name].message : item.helper) : item.helper}
+                            onChange={PROPS.handleChange}
                             fullWidth
                             autoComplete={'off'}
                             margin="normal"

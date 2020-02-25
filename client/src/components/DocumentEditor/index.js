@@ -183,11 +183,22 @@ function DocumentEditor(props) {
     const handleDelete = () => {
 
         props.delete(selected, props.user.key)
-            .then(() => {
-                handleConfirm(false);
-                setCurrentAlert({ isOpen: true, severity: "success", message: `The ${collection.toLowerCase()}(s) have been successfully deleted!` });
+            .then((results) => {
+                let error = false;
 
-                notifyServer();
+                for (const result of results) {
+                    if (!result.data) error = true
+                }
+
+                if (!error) {
+                    handleConfirm(false);
+                    setCurrentAlert({ isOpen: true, severity: "success", message: `The ${collection.toLowerCase()}(s) have been successfully deleted!` });
+
+                    notifyServer();
+                } else {
+                    handleConfirm(false);
+                    setCurrentAlert({ isOpen: true, severity: "error", message: `The ${collection.toLowerCase()}(s) failed to be deleted.` });
+                }
 
             })
     }
