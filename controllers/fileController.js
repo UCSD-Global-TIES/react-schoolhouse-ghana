@@ -21,7 +21,13 @@ module.exports = {
                     fileDb
                         .find({})
                         .then((files) => {
-                            res.json(files)
+                            const filesWithPaths = [];
+                            for(let file of files) {
+                                file.path = `http://${ip.address()}:${API_PORT}${file.path}`;
+                                filesWithPaths.push(file);
+                            }
+
+                            res.json(filesWithPaths)
                         })
 
                 } else {
@@ -76,7 +82,7 @@ module.exports = {
                         .findOne({ _id: fid })
                         .then((file) => {
                             // Return path of file on NAS
-                            file.path = `http://${ip.address()}:${API_PORT}/static/${file.filename}`
+                            file.path = `http://${ip.address()}:${API_PORT}${file.path}`
 
                             res.json(file)
                         })

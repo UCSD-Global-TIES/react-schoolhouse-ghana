@@ -11,11 +11,7 @@ const config = require("./nasConfig");
 const app = express();
 var http = require('http').createServer(app);
 var io = require('socket.io')(http);
-require("./socket")(io);
 const PORT = process.env.PORT || 3001;
-// Track the number of connections to the server
-let connections = 0;
-let users = 0;
 
 // Define middleware here
 app.use(express.urlencoded({
@@ -84,73 +80,27 @@ const startServer = () => {
 
 startServer();
 
+io.on('connection', function (client) {
+  const uploader = new siofu();
+  uploader.dir = config.path;
+  uploader.listen(client);
+  require("./server-socket")(io, client, uploader);
+})
+
 // LINUX ONLY (POTENTIAL TO CONNECT TO LINUX SERVER)
 // https://www.clamav.net/documents/installing-clamav-on-windows
 // const NodeClam = require('clamscan');
 
 // const scanFile = async function (path) {
-//   try {
-//     // Get instance by resolving ClamScan promise object
-//     const clamscan = await new NodeClam().init();
-//     const { is_infected, file, viruses } = await clamscan.is_infected("/client/public");
+  //   try {
+    //     // Get instance by resolving ClamScan promise object
+    //     const clamscan = await new NodeClam().init();
+    //     const { is_infected, file, viruses } = await clamscan.is_infected("/client/public");
 
 
-//   } catch (err) {
-//     // Handle any errors raised by the code in the try block
-//     console.log(err)
-//   }
-// }
+    //   } catch (err) {
+      //     // Handle any errors raised by the code in the try block
+      //     console.log(err)
+      //   }
+      // }
 
-// BINDING LISTENER FUNCTIONS
-// On connection of a user
-io.on('connection', function (client) {
-  // The socket is attached to the user that 
-  console.log(`A device has connected to the server: ${++connections} connection(s)`);
-
-  // Emit on the channel 'chat message' the payload msg
-  client.on('authentication', function (msg) {
-    console.log(msg);
-    console.log(`A user has logged in: ${++users} user(s)`);
-
-  })
-
-  client.on('disconnect', function () {
-    console.log(`A user has disconnected from the server: ${--connections} connection(s)`);
-  });
-
-  client.on('documents-changed', function (type) {
-    io.emit(`refresh-${type}`)
-  })
-
-  // File Upload with Socket.io
-  const uploader = new siofu()
-  uploader.dir = config.path;
-  uploader.listen(client);
-
-  // Do something when a file starts saving:
-  uploader.on("start", function (event) {
-    const { name, mtime, size, bytesLoaded, success, pathName } = event.file;
-    console.log(name, "has started downloading!");
-  });
-
-  // Do something when a file is saved:
-  uploader.on("progress", function (event) {
-    var percent = (event.file.bytesLoaded / event.file.size) * 100;
-    console.log(event.file.name, "is", percent.toFixed(2), "% loaded");
-  });
-
-  // Do something when a file is saved:
-  uploader.on("saved", function (event) {
-    const { name, mtime, size, bytesLoaded, success, pathName } = event.file;
-    console.log(name, mtime, size, bytesLoaded, success, pathName)
-
-
-  });
-
-  // Error handler:
-  uploader.on("error", function (event) {
-    console.log("Error from uploader", event);
-  });
-
-
-});

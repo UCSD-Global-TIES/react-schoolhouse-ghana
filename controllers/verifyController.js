@@ -3,6 +3,9 @@ const gradeDb = require("../models/Grade");
 const subjectDb = require("../models/Subject");
 const fileDb = require("../models/File");
 const announcementDb = require("../models/Announcement");
+const config = require("../nasConfig");
+const path = require("path");
+const fs = require("fs")
 const adminDb = require("../models/Admin");
 const loadtest = require('loadtest');
 const gradeSeeds = require('../seeds/grades')
@@ -127,54 +130,71 @@ module.exports = {
     },
     seedDefault: function (req, res) {
         // Seed the database with example documents
-        // 1
-        fileDb
-            .create(fileSeeds)
-            .then((newF) => {
-                let annDocs = announcementSeeds;
-                for (let annDoc of annDocs) {
-                    annDoc.files = [newF._id];
+        const filePath = `${config.path}/${fileSeeds.filename}`
+        fs.writeFile(filePath, 'Hello World!', 'utf8',
+            (err) => {
+                if (err) throw err;
+
+                const { size } = fs.statSync(filePath);
+                const { nickname, type, filename } = fileSeeds;
+                const fileObj = {
+                    nickname, type, filename, path: `${config.publicPath}/${filename}`, absolutePath: filePath, size
                 }
 
-                // 2
-                announcementDb
-                    .create(annDocs)
-                    .then((newDocs) => {
-                        let subjectDoc = subjectSeeds;
-                        let privateAnn;
-                        for (let newDoc of newDocs) {
-                            if (newDoc.private) {
-                                subjectDoc.announcements = [newDoc._id];
-                                privateAnn = newDoc;
-                            }
+                // 1
+                fileDb
+                    .create(fileObj)
+                    .then((newF) => {
+                        let annDocs = announcementSeeds;
+                        for (let annDoc of annDocs) {
+                            annDoc.files = [newF._id];
                         }
-                        subjectDoc.files = [newF._id];
 
-                        // 3
-                        subjectDb
-                            .create(subjectDoc)
-                            .then((newS) => {
-                                let gradeDoc = gradeSeeds;
-                                gradeDoc.subjects = [newS._id];
+                        // 2
+                        announcementDb
+                            .create(annDocs)
+                            .then((newDocs) => {
+                                let subjectDoc = subjectSeeds;
+                                let privateAnn;
+                                for (let newDoc of newDocs) {
+                                    if (newDoc.private) {
+                                        subjectDoc.announcements = [newDoc._id];
+                                        privateAnn = newDoc;
+                                    }
+                                }
+                                subjectDoc.files = [newF._id];
 
-                                const promises = [];
-                                promises.push(gradeDb.create(gradeDoc));
+                                // 3
+                                subjectDb
+                                    .create(subjectDoc)
+                                    .then((newS) => {
+                                        let gradeDoc = gradeSeeds;
+                                        gradeDoc.subjects = [newS._id];
 
-                                privateAnn.subject = newS._id
-                                promises.push(announcementDb.findOneAndUpdate({ _id: privateAnn._id }, privateAnn))
+                                        const promises = [];
+                                        promises.push(gradeDb.create(gradeDoc));
 
-                                Promise.all(promises)
-                                    .then(() => {
-                                        res.json({});
+                                        privateAnn.subject = newS._id
+                                        promises.push(announcementDb.findOneAndUpdate({ _id: privateAnn._id }, privateAnn))
+
+                                        Promise.all(promises)
+                                            .then(() => {
+                                                res.json({});
+
+                                            })
 
                                     })
 
-                            })
 
+                            })
 
                     })
 
-            })
+            }
+
+        );
+
+
 
     },
     verifyLatency: function (req, res) {

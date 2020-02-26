@@ -236,7 +236,7 @@ function DocumentSelector(props) {
                                                                 inputProps={{ 'aria-labelledby': labelId }}
                                                             />
                                                         </ListItemIcon>
-                                                        <ListItemText id={labelId} primary={document[primary]} secondary={`Created: ${parseTime(document.createdAt, true)}`} />
+                                                        <ListItemText id={labelId} primary={document[primary]} secondary={props.secondary ? document[props.secondary] : `Created: ${parseTime(document.createdAt, true)}`} />
                                                         <ListItemSecondaryAction>
                                                             <FontAwesomeIcon icon={icon} />
                                                         </ListItemSecondaryAction>
