@@ -1,7 +1,9 @@
-import React, { useEffect, useState } from "react";
-import { TextField } from "@material-ui/core";
+import React, { useEffect, useState, useContext } from "react";
+import { TextField, Button } from "@material-ui/core";
 import { makeStyles } from '@material-ui/core/styles';
 import { parseTime } from '../../utils/misc';
+import SocketContext from "../../socket-context";
+import SocketIOFileUpload from "socketio-file-upload"
 
 import "../../utils/flowHeaders.min.css";
 
@@ -61,13 +63,18 @@ const textFields = [
 
 function FilesForm(props) {
     const classes = useStyles();
+    const socket = useContext(SocketContext);
+    const siofu = new SocketIOFileUpload(socket);
     const [PROPS, setProps] = useState(props)
+    const [selectedFiles, setSelectedFiles] = useState([]);
 
+    const handleFileChange = (e) => {
+        setSelectedFiles(e.target.files)
+    }
 
     useEffect(() => {
 
         setProps(props);
-
 
     }, [props])
 
@@ -81,7 +88,10 @@ function FilesForm(props) {
                 {/* iFrame - websites */}
                 {/* react-pdf - pdfs */}
                 {/* react-file-viewer - images, csv, docx, mp4 */}
-
+                <Button size="medium" onClick={() => siofu.submitFiles(selectedFiles)} >
+                    Submit
+                </Button>
+                <input onChange={handleFileChange} type="file" multiple />
                 {
                     textFields.map((item, idx) => (
                         <TextField

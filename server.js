@@ -4,6 +4,7 @@ const cookieParser = require('cookie-parser');
 const session = require('express-session');
 const morgan = require('morgan');
 const mongoose = require("mongoose");
+const siofu = require("socketio-file-upload")
 const routes = require("./routes");
 const config = require("./nasConfig");
 
@@ -21,6 +22,9 @@ app.use(express.urlencoded({
   extended: true
 }));
 app.use(express.json());
+
+// Use socketio-file-upload
+app.use(siofu.router)
 
 // set morgan to log info about our requests for development use.
 app.use(morgan('dev'));
@@ -80,6 +84,23 @@ const startServer = () => {
 
 startServer();
 
+// LINUX ONLY (POTENTIAL TO CONNECT TO LINUX SERVER)
+// https://www.clamav.net/documents/installing-clamav-on-windows
+// const NodeClam = require('clamscan');
+
+// const scanFile = async function (path) {
+//   try {
+//     // Get instance by resolving ClamScan promise object
+//     const clamscan = await new NodeClam().init();
+//     const { is_infected, file, viruses } = await clamscan.is_infected("/client/public");
+
+
+//   } catch (err) {
+//     // Handle any errors raised by the code in the try block
+//     console.log(err)
+//   }
+// }
+
 // BINDING LISTENER FUNCTIONS
 // On connection of a user
 io.on('connection', function (client) {
@@ -100,6 +121,36 @@ io.on('connection', function (client) {
   client.on('documents-changed', function (type) {
     io.emit(`refresh-${type}`)
   })
+
+  // File Upload with Socket.io
+  const uploader = new siofu()
+  uploader.dir = config.path;
+  uploader.listen(client);
+
+  // Do something when a file starts saving:
+  uploader.on("start", function (event) {
+    const { name, mtime, size, bytesLoaded, success, pathName } = event.file;
+    console.log(name, "has started downloading!");
+  });
+
+  // Do something when a file is saved:
+  uploader.on("progress", function (event) {
+    var percent = (event.file.bytesLoaded / event.file.size) * 100;
+    console.log(event.file.name, "is", percent.toFixed(2), "% loaded");
+  });
+
+  // Do something when a file is saved:
+  uploader.on("saved", function (event) {
+    const { name, mtime, size, bytesLoaded, success, pathName } = event.file;
+    console.log(name, mtime, size, bytesLoaded, success, pathName)
+
+
+  });
+
+  // Error handler:
+  uploader.on("error", function (event) {
+    console.log("Error from uploader", event);
+  });
 
 
 });
