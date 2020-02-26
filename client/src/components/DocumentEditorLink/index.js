@@ -141,22 +141,22 @@ function DocumentEditorLink(props) {
     // Handle deletion of document
     const handleDelete = () => {
         deleteDocuments(selected, props.user.key)
-        .then(() => {
-            handleConfirm(false);
-            setCurrentAlert({ isOpen: true, severity: "success", message: `The ${collection.toLowerCase()}(s) have been successfully deleted!` });
-            
-            // Remove deleted documents
-            const remainingDocuments = documents.filter(document => !selected.includes(document._id));
-            setDocuments(remainingDocuments);
-            const filteredDocuments = remainingDocuments.filter(document => document[primary].toLowerCase().includes(searchQuery.toLowerCase()));
-            setFilteredDocuments(filteredDocuments);
-            setViewableDocuments(filteredDocuments.slice(0, MAX_ITEMS));
+            .then(() => {
+                handleConfirm(false);
+                setCurrentAlert({ isOpen: true, severity: "success", message: `The ${collection.toLowerCase()}(s) have been successfully deleted!` });
 
-            // Reset selected
-            setSelected([]);
-        })
+                // Remove deleted documents
+                const remainingDocuments = documents.filter(document => !selected.includes(document._id));
+                setDocuments(remainingDocuments);
+                const filteredDocuments = remainingDocuments.filter(document => document[primary].toLowerCase().includes(searchQuery.toLowerCase()));
+                setFilteredDocuments(filteredDocuments);
+                setViewableDocuments(filteredDocuments.slice(0, MAX_ITEMS));
 
-        
+                // Reset selected
+                setSelected([]);
+            })
+
+
     }
 
     const handleCreate = () => {
@@ -275,7 +275,7 @@ function DocumentEditorLink(props) {
                                                 const labelId = `${collection.toLowerCase()}-${idx}`;
 
                                                 return (
-                                                    <ListItem key={labelId} role={undefined} dense button onClick={() => handleSelect(document._id)}>
+                                                    <ListItem alignItems="flex-start" key={labelId} role={undefined} dense button onClick={() => handleSelect(document._id)}>
                                                         <ListItemIcon>
                                                             <Checkbox
                                                                 edge="start"
@@ -285,7 +285,7 @@ function DocumentEditorLink(props) {
                                                                 inputProps={{ 'aria-labelledby': labelId }}
                                                             />
                                                         </ListItemIcon>
-                                                        <ListItemText id={labelId} primary={document[primary]} secondary={`Created: ${parseTime(document.createdAt, true)}`} />
+                                                        <ListItemText style={{ overflowWrap: "break-word" }} id={labelId} primary={document[primary]} secondary={`Created: ${parseTime(document.createdAt, true)}`} />
                                                         <ListItemSecondaryAction>
                                                             <FontAwesomeIcon icon={icon} />
                                                         </ListItemSecondaryAction>

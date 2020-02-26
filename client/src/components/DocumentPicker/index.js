@@ -232,7 +232,7 @@ function DocumentSelector(props) {
                                                 const labelId = `${collection.toLowerCase()}-${idx}`;
 
                                                 return (
-                                                    <ListItem alignItems="flex-start" key={labelId} role={undefined} dense button onClick={() => handleSelect(document._id)}>
+                                                    <ListItem key={labelId} role={undefined} dense button onClick={() => handleSelect(document._id)}>
                                                         <ListItemIcon>
                                                             <Checkbox
                                                                 edge="start"
@@ -242,7 +242,7 @@ function DocumentSelector(props) {
                                                                 inputProps={{ 'aria-labelledby': labelId }}
                                                             />
                                                         </ListItemIcon>
-                                                        <ListItemText id={labelId} primary={primary(document)} secondary={props.secondary ? document[props.secondary] : `Created: ${parseTime(document.createdAt, true)}`} />
+                                                        <ListItemText style={{ overflowWrap: "break-word" }} id={labelId} primary={primary(document)} secondary={props.secondary ? document[props.secondary] : `Created: ${parseTime(document.createdAt, true)}`} />
                                                         <ListItemSecondaryAction>
                                                             {
                                                                 PROPS.link ?

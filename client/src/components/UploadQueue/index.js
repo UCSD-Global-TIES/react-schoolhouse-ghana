@@ -202,6 +202,7 @@ function UploadQueue(props) {
                                                 </Avatar>
                                             </ListItemAvatar>
                                             <ListItemText
+                                                style={{ overflowWrap: "break-word" }}
                                                 primary={file.name}
                                                 secondary={
                                                     <React.Fragment>
@@ -210,10 +211,10 @@ function UploadQueue(props) {
                                                             variant="body2"
                                                             className={classes.inline}
                                                             style={{
-                                                                color: 
-                                                                file.status === "Pending" ? "orange"
-                                                                : file.status === "Complete" ? "green"
-                                                                : "red"
+                                                                color:
+                                                                    file.status === "Pending" ? "orange"
+                                                                        : file.status === "Complete" ? "green"
+                                                                            : "red"
                                                             }}
                                                             color="textPrimary"
                                                         >
@@ -221,8 +222,8 @@ function UploadQueue(props) {
                                                         </Typography>
                                                         <span style={{ display: "block" }}>
                                                             {file.percent} % | {convertFileSize(file.bytesLoaded)} of {convertFileSize(file.size)}
+                                                            <LinearProgress color={file.status === "Error" ? "secondary" : "primary"} variant="determinate" value={parseFloat(file.percent)} />
                                                         </span>
-                                                        <LinearProgress color={file.status === "Error" ? "secondary" : "primary"} variant="determinate" value={parseFloat(file.percent)} />
                                                     </React.Fragment>
                                                 }
                                             />

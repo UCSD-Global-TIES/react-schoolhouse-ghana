@@ -144,6 +144,7 @@ function SimpleListView(props) {
                                         <FontAwesomeIcon icon={props.icon} />
                                     </ListItemIcon>
                                     <ListItemText
+                                        style={{ overflowWrap: "break-word" }}
                                         primary={
                                             item[props.labelField]
                                         }

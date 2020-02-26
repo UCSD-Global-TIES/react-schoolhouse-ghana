@@ -113,7 +113,7 @@ function AdminPortal(props) {
                     <NavLink to={item.path} key={index} className={classes.buttonLink}>
                         <ListItem selected={props.location.pathname.includes(item.path)} button>
                             <ListItemIcon>{<FontAwesomeIcon icon={item.icon} />}</ListItemIcon>
-                            <ListItemText primary={item.label} />
+                            <ListItemText style={{ overflowWrap: "break-word" }} primary={item.label} />
                         </ListItem>
                     </NavLink>
                 ))}
@@ -125,7 +125,7 @@ function AdminPortal(props) {
                     <NavLink to={item.path} key={index} className={classes.buttonLink}>
                         <ListItem button selected={props.location.pathname.includes(item.path)} >
                             <ListItemIcon>{<FontAwesomeIcon icon={item.icon} />}</ListItemIcon>
-                            <ListItemText primary={item.label} />
+                            <ListItemText style={{ overflowWrap: "break-word" }} primary={item.label} />
                         </ListItem>
                     </NavLink>
                 ))}

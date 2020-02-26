@@ -107,7 +107,7 @@ function SubjectEditor(props) {
                       inputProps={{ 'aria-labelledby': labelId }}
                     />
                   </ListItemIcon>
-                  <ListItemText id={labelId} primary={announcement.date} />
+                  <ListItemText style={{ overflowWrap: "break-word" }} id={labelId} primary={announcement.date} />
                   <ListItemSecondaryAction>
                     <IconButton edge="end" aria-label="comments">
                       <FontAwesomeIcon icon={faBullhorn} size="sm" />

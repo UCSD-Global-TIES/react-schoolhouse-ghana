@@ -185,24 +185,24 @@ function DocumentEditor(props) {
 
         props.delete(selected, props.user.key)
             .then((results) => {
-                
+
                 let error = false;
-                
+
                 for (const result of results) {
                     if (!result.data) error = true
                 }
-                
+
                 if (!error) {
                     handleConfirm(false);
                     setCurrentAlert({ isOpen: true, severity: "success", message: `The ${collection.toLowerCase()}(s) have been successfully deleted!` });
-                    
+
                     notifyServer();
                 } else {
                     handleConfirm(false);
                     setCurrentAlert({ isOpen: true, severity: "error", message: `The ${collection.toLowerCase()}(s) failed to be deleted.` });
                 }
-                
-                setTimeout( () => setActionPending(false), 1000 );
+
+                setTimeout(() => setActionPending(false), 1000);
             })
     }
 
@@ -214,28 +214,28 @@ function DocumentEditor(props) {
     const validateForm = (doc) => {
         return new Promise((resolve, reject) => {
             const promises = [];
-            
+
             for (const field of Object.keys(validation)) {
                 promises.push(validation[field].validate(doc[field]));
             }
-            
+
             Promise.all(promises)
-            .then((result) => {
-                const errorDoc = {};
-                const validationResults = result;
-                for (let i = 0; i < validationResults.length; i++) {
-                    const isCorrect = validationResults[i];
-                    const field = Object.keys(validation)[i]
-                    
-                    if (!validation[field].updateOnly && !isCorrect && (isCreate || initialDocument[field] !== doc[field])) {
-                        errorDoc[field] = {
-                            exists: !isCorrect,
-                            message: validation[field].message
-                        }
-                    };
-                    
-                }
-                
+                .then((result) => {
+                    const errorDoc = {};
+                    const validationResults = result;
+                    for (let i = 0; i < validationResults.length; i++) {
+                        const isCorrect = validationResults[i];
+                        const field = Object.keys(validation)[i]
+
+                        if (!validation[field].updateOnly && !isCorrect && (isCreate || initialDocument[field] !== doc[field])) {
+                            errorDoc[field] = {
+                                exists: !isCorrect,
+                                message: validation[field].message
+                            }
+                        };
+
+                    }
+
                     setErrorDocument(JSON.parse(JSON.stringify(errorDoc)));
                     if (!Object.keys(errorDoc).length) resolve(true);
                     else resolve(false);
@@ -255,17 +255,17 @@ function DocumentEditor(props) {
                         .then(() => {
                             setDialogOpen(false);
                             setCurrentAlert({ isOpen: true, severity: "success", message: `The ${collection.toLowerCase()}(s) have been successfully created!` });
-                            
+
                             notifyServer();
-                            
+
                             if (redirectOnExit) {
                                 // Inform user of redirect to previous document (inform user -> wait 1 sec. -> redirect)
                                 setTimeout(() => props.history.goBack(), 1000);
                             }
 
-                            setTimeout( () => setActionPending(false), 1000 );
+                            setTimeout(() => setActionPending(false), 1000);
                         })
-                    }
+                }
             })
 
     }
@@ -288,7 +288,7 @@ function DocumentEditor(props) {
                                 setTimeout(() => props.history.goBack(), 1000);
                             }
 
-                            setTimeout( () => setActionPending(false), 1000 );
+                            setTimeout(() => setActionPending(false), 1000);
 
                         })
 
@@ -322,11 +322,11 @@ function DocumentEditor(props) {
 
     const handleFormChange = (event) => {
         const { name, value } = event.target;
-        let tmp = {...currentDocument};
+        let tmp = { ...currentDocument };
 
         tmp[name] = value;
 
-        setCurrentDocument({...tmp});
+        setCurrentDocument({ ...tmp });
         if (errorDocument !== {}) setErrorDocument({})
     }
 
@@ -489,7 +489,7 @@ function DocumentEditor(props) {
                                                     const labelId = `${collection.toLowerCase()}-${idx}`;
 
                                                     return (
-                                                        <ListItem key={labelId} role={undefined} dense button onClick={() => handleSelect(document._id)}>
+                                                        <ListItem alignItems="flex-start" key={labelId} role={undefined} dense button onClick={() => handleSelect(document._id)}>
                                                             <ListItemIcon>
                                                                 <Checkbox
                                                                     edge="start"
@@ -499,19 +499,19 @@ function DocumentEditor(props) {
                                                                     inputProps={{ 'aria-labelledby': labelId }}
                                                                 />
                                                             </ListItemIcon>
-                                                            <ListItemText id={labelId} primary={primary(document)} secondary={`Created: ${parseTime(document.createdAt, true)}`} />
+                                                            <ListItemText id={labelId} style={{ overflowWrap: "break-word" }} primary={primary(document)} secondary={`Created: ${parseTime(document.createdAt, true)}`} />
                                                             <ListItemSecondaryAction>
-                                                            {
-                                                                props.link ?
-                                                                    <a target="_blank" href={props.link(document)} style={{ textDecoration: "none", fontSize: "1rem" }}>
-                                                                        <IconButton aria-label="create" >
-                                                                            <FontAwesomeIcon icon={faExternalLinkAlt} size="xs" />
-                                                                        </IconButton>
-                                                                    </a>
-                                                                    :
-                                                                    <FontAwesomeIcon icon={icon} />
+                                                                {
+                                                                    props.link ?
+                                                                        <a target="_blank" href={props.link(document)} style={{ textDecoration: "none", fontSize: "1rem" }}>
+                                                                            <IconButton aria-label="create" >
+                                                                                <FontAwesomeIcon icon={faExternalLinkAlt} size="xs" />
+                                                                            </IconButton>
+                                                                        </a>
+                                                                        :
+                                                                        <FontAwesomeIcon icon={icon} />
 
-                                                            }                                                            </ListItemSecondaryAction>
+                                                                }                                                            </ListItemSecondaryAction>
                                                         </ListItem>
                                                     );
                                                 })
