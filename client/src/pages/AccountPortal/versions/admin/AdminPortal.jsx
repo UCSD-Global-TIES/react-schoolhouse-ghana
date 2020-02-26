@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useContext } from "react";
 import { NavLink, Switch, Redirect } from "react-router-dom";
 import AnnouncementsForm from "../../../../components/AnnouncementsForm";
 import GradesForm from "../../../../components/GradesForm";
@@ -17,7 +17,11 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUsers, faBullhorn, faChalkboardTeacher, faShapes, faServer, faFile } from "@fortawesome/free-solid-svg-icons";
 import DocumentEditor from '../../../../components/DocumentEditor'
 import FilesForm from "../../../../components/FilesForm";
+
 import API from "../../../../utils/API";
+import SocketContext from "../../../../socket-context";
+import SocketIOFileUpload from "socketio-file-upload"
+import UploadQueue from "../../../../components/UploadQueue";
 
 const drawerWidth = 220;
 
@@ -52,7 +56,9 @@ function AdminPortal(props) {
     const [mobileOpen, setMobileOpen] = React.useState(false);
     const isSmallDevice = useMediaQuery({
         query: '(max-width: 600px)'
-    })
+    });
+    const socket = useContext(SocketContext);
+    const siofu = new SocketIOFileUpload(socket);
 
     const handleDrawerToggle = () => {
         setMobileOpen(!mobileOpen);
@@ -89,11 +95,11 @@ function AdminPortal(props) {
             icon: faFile,
             path: `${props.match.url}/files`
         },
-        {
-            label: "Server",
-            icon: faServer,
-            path: `${props.match.url}/server`
-        },
+        // {
+        //     label: "Server",
+        //     icon: faServer,
+        //     path: `${props.match.url}/server`
+        // },
     ]
 
     const drawer = (
@@ -275,10 +281,19 @@ function AdminPortal(props) {
             api: {
                 get: API.getFiles,
                 put: API.updateFile,
-                delete: API.deleteFiles
+                delete: API.deleteFiles,
+                post: (doc) => {
+                    return new Promise((resolve, reject) => {
+                        siofu.submitFiles(doc.files);
+                        resolve({
+                            data: {}
+                        })
+                    })
+                }
             },
             validation: {
                 nickname: {
+                    updateOnly: true,
                     validate: value => new Promise((resolve, reject) => {
                         resolve(value);
                     }),
@@ -290,7 +305,7 @@ function AdminPortal(props) {
 
     let pages = [];
 
-    pagesInfo.map((page, idx) => {
+    pagesInfo.slice(0, pagesInfo.length - 1).map((page, idx) => {
         pages.push({
             path: page.path,
             component: (props) =>
@@ -308,8 +323,29 @@ function AdminPortal(props) {
         })
     })
 
+    pagesInfo.slice(pagesInfo.length - 1).map((page, idx) => {
+        pages.push({
+            path: page.path,
+            component: (props) =>
+                <>
+                    <DocumentEditor
+                        primary={page.primary}
+                        collection={page.collection}
+                        icon={page.icon}
+                        FormComponent={page.FormComponent}
+                        get={page.api.get}
+                        post={page.api.post}
+                        put={page.api.put}
+                        delete={page.api.delete}
+                        validation={page.validation}
+                        {...props} />
+                    <UploadQueue />
+                </>
+        })
+    })
+
     // ADD SERVER MANAGEMENT PAGE
-    pages.push({ path: `${props.match.path}/server`, component: ServerDash })
+    // pages.push({ path: `${props.match.path}/server`, component: ServerDash })
 
     // SET DEFAULT MENU
     const defaultRoute = `${props.match.path}/announcements`;

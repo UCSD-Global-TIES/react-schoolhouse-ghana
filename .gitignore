@@ -60,3 +60,6 @@ client/.env
 
 # next.js build output
 .next
+
+# storage directories
+client/public/storage/*

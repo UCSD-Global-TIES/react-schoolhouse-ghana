@@ -16,6 +16,12 @@ const fileSchema = new Schema({
   },
   path: {
     type: String
+  },
+  absolutePath: {
+    type: String
+  },
+  size: {
+    type: String
   }
 }, { timestamps: true });
 

@@ -211,28 +211,28 @@ function DocumentEditor(props) {
     const validateForm = (doc) => {
         return new Promise((resolve, reject) => {
             const promises = [];
-
+            
             for (const field of Object.keys(validation)) {
                 promises.push(validation[field].validate(doc[field]));
             }
-
+            
             Promise.all(promises)
-                .then((result) => {
-                    const errorDoc = {};
-                    const validationResults = result;
-                    for (let i = 0; i < validationResults.length; i++) {
-                        const isCorrect = validationResults[i];
-                        const field = Object.keys(validation)[i]
-
-                        if (!isCorrect && (isCreate || initialDocument[field] !== doc[field])) {
-                            errorDoc[field] = {
-                                exists: !isCorrect,
-                                message: validation[field].message
-                            }
-                        };
-
-                    }
-
+            .then((result) => {
+                const errorDoc = {};
+                const validationResults = result;
+                for (let i = 0; i < validationResults.length; i++) {
+                    const isCorrect = validationResults[i];
+                    const field = Object.keys(validation)[i]
+                    
+                    if (!validation[field].updateOnly && !isCorrect && (isCreate || initialDocument[field] !== doc[field])) {
+                        errorDoc[field] = {
+                            exists: !isCorrect,
+                            message: validation[field].message
+                        }
+                    };
+                    
+                }
+                
                     setErrorDocument(JSON.parse(JSON.stringify(errorDoc)));
                     if (!Object.keys(errorDoc).length) resolve(true);
                     else resolve(false);
@@ -316,12 +316,11 @@ function DocumentEditor(props) {
 
     const handleFormChange = (event) => {
         const { name, value } = event.target;
-        let tmp = JSON.parse(JSON.stringify(currentDocument));
+        let tmp = {...currentDocument};
 
         tmp[name] = value;
 
-
-        setCurrentDocument(JSON.parse(JSON.stringify(tmp)));
+        setCurrentDocument({...tmp});
         if (errorDocument !== {}) setErrorDocument({})
     }
 
@@ -435,7 +434,7 @@ function DocumentEditor(props) {
             </ConfirmDialog>
 
             {/* DOCUMENTS */}
-            <div style={{ display: "flex", width: "100%", height: "100%" }}>
+            <div style={{ display: "flex", width: "100%" }}>
                 <div style={{ margin: "auto" }} className={classes.content}>
                     <>
                         <EnhancedListToolbar

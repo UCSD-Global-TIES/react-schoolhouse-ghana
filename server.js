@@ -4,23 +4,23 @@ const cookieParser = require('cookie-parser');
 const session = require('express-session');
 const morgan = require('morgan');
 const mongoose = require("mongoose");
+const siofu = require("socketio-file-upload")
 const routes = require("./routes");
 const config = require("./nasConfig");
 
 const app = express();
 var http = require('http').createServer(app);
 var io = require('socket.io')(http);
-require("./socket")(io);
 const PORT = process.env.PORT || 3001;
-// Track the number of connections to the server
-let connections = 0;
-let users = 0;
 
 // Define middleware here
 app.use(express.urlencoded({
   extended: true
 }));
 app.use(express.json());
+
+// Use socketio-file-upload
+app.use(siofu.router)
 
 // set morgan to log info about our requests for development use.
 app.use(morgan('dev'));
@@ -80,26 +80,27 @@ const startServer = () => {
 
 startServer();
 
-// BINDING LISTENER FUNCTIONS
-// On connection of a user
 io.on('connection', function (client) {
-  // The socket is attached to the user that 
-  console.log(`A device has connected to the server: ${++connections} connection(s)`);
+  const uploader = new siofu();
+  uploader.dir = config.path;
+  uploader.listen(client);
+  require("./server-socket")(io, client, uploader);
+})
 
-  // Emit on the channel 'chat message' the payload msg
-  client.on('authentication', function (msg) {
-    console.log(msg);
-    console.log(`A user has logged in: ${++users} user(s)`);
+// LINUX ONLY (POTENTIAL TO CONNECT TO LINUX SERVER)
+// https://www.clamav.net/documents/installing-clamav-on-windows
+// const NodeClam = require('clamscan');
 
-  })
-
-  client.on('disconnect', function () {
-    console.log(`A user has disconnected from the server: ${--connections} connection(s)`);
-  });
-
-  client.on('documents-changed', function (type) {
-    io.emit(`refresh-${type}`)
-  })
+// const scanFile = async function (path) {
+  //   try {
+    //     // Get instance by resolving ClamScan promise object
+    //     const clamscan = await new NodeClam().init();
+    //     const { is_infected, file, viruses } = await clamscan.is_infected("/client/public");
 
 
-});
+    //   } catch (err) {
+      //     // Handle any errors raised by the code in the try block
+      //     console.log(err)
+      //   }
+      // }
+
