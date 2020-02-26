@@ -88,7 +88,6 @@ module.exports = function (server, client, uploader) {
                 
             }
 
-
         });
 
         // Error handler:
