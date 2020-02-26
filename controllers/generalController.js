@@ -1,5 +1,7 @@
 const announcementDb = require("../models/Announcement");
 const subjectDb = require("../models/Subject");
+const ip = require("ip")
+const API_PORT = process.env.PORT || 3001;
 
 // TODO
 const {
@@ -22,6 +24,20 @@ module.exports = {
                         .find(query)
                         .populate('files')
                         .then((announcements) => {
+
+                            for (let i = 0; i < announcements.length; i++) {
+                                const annFilesWithPaths = [];
+                                let currentAnnouncement = announcements[i];
+                                for (const file of currentAnnouncement.files) {
+                                    let newFile = { ...file }
+
+                                    newFile = newFile._doc
+                                    newFile.path = `http://${ip.address()}:${API_PORT}${file.path}`;
+                                    annFilesWithPaths.push(newFile);
+                                }
+                                currentAnnouncement.files = annFilesWithPaths;
+                            }
+
                             res.json(announcements);
                         })
                         .catch(err => res.status(422).json(err));

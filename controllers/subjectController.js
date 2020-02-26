@@ -1,10 +1,8 @@
 const gradeDb = require("../models/Grade");
 const subjectDb = require("../models/Subject");
 const announcementDb = require("../models/Announcement");
-const {
-    createDir,
-    removeDir
-} = require("./NAS");
+const ip = require("ip")
+const API_PORT = process.env.PORT || 3001;
 
 const {
     verifyKey
@@ -150,7 +148,36 @@ module.exports = {
                         })
                         .populate('files')
                         .populate('grade')
-                        .then(subjectDoc => res.json(subjectDoc))
+                        .then(subjectDoc => {
+                            let popSubject = { ...subjectDoc };
+                            popSubject = popSubject._doc;
+                            // Replace files with absolute paths based on new IP address
+                            const filesWithPaths = [];
+                            for (let file of popSubject.files) {
+                                let newFile = { ...file };
+                                newFile = newFile._doc;
+                                newFile.path = `http://${ip.address()}:${API_PORT}${file.path}`;
+                                filesWithPaths.push(newFile);
+                            }
+
+                            popSubject.files = filesWithPaths
+
+                            // Replace files for announcements
+                            for (let i = 0; i < popSubject.announcements.length; i++) {
+                                const currentAnnouncement = popSubject.announcements[i]
+                                const annFilesWithPaths = [];
+                                for (const file of currentAnnouncement.files) {
+                                    let newFile = { ...file };
+                                    newFile = newFile._doc;
+                                    newFile.path = `http://${ip.address()}:${API_PORT}${file.path}`;
+                                    annFilesWithPaths.push(newFile);
+
+                                }
+                                popSubject.announcements[i].files = annFilesWithPaths;
+                            }
+
+                            res.json(popSubject)
+                        })
                         .catch(err => res.status(422).json(err));
 
                 } else {

@@ -1,12 +1,6 @@
 const gradeDb = require("../models/Grade");
-const studentDb = require("../models/Student");
-const teacherDb = require("../models/Teacher");
-
-const {
-    createDir,
-    removeDir,
-    NAS_PATH
-} = require("./NAS");
+const ip = require("ip")
+const API_PORT = process.env.PORT || 3001;
 
 const {
     verifyKey
@@ -59,7 +53,26 @@ module.exports = {
                             }
                         })
 
-                        .then(gradeDoc => res.json(gradeDoc))
+                        .then(gradeDoc => {
+
+                            // Replace files for announcements
+                            for (let i = 0; i < gradeDoc.subjects.length; i++) {
+                                const currentSubject = gradeDoc.subjects[i]
+                                for (let i = 0; i < currentSubject.announcements.length; i++) {
+                                    const annFilesWithPaths = [];
+                                    const currentAnnouncement = currentSubject.announcements[i]
+                                    for (const file of currentAnnouncement.files) {
+                                        let newFile = { ...file }
+                                        newFile = newFile._doc
+                                        newFile.path = `http://${ip.address()}:${API_PORT}${file.path}`;
+                                        annFilesWithPaths.push(newFile);
+                                    }
+                                    currentSubject.announcements[i].files = annFilesWithPaths;
+                                }
+                            }
+
+                            res.json(gradeDoc)
+                        })
                         .catch(err => res.status(422).json(err));
 
                 } else {

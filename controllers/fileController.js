@@ -22,7 +22,7 @@ module.exports = {
                         .find({})
                         .then((files) => {
                             const filesWithPaths = [];
-                            for(let file of files) {
+                            for (let file of files) {
                                 file.path = `http://${ip.address()}:${API_PORT}${file.path}`;
                                 filesWithPaths.push(file);
                             }

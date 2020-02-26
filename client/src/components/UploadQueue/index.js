@@ -84,13 +84,13 @@ function UploadQueue(props) {
 
     function convertFileSize(bytes, decimals = 2) {
         if (bytes === 0) return '0 Bytes';
-    
+
         const k = 1024;
         const dm = decimals < 0 ? 0 : decimals;
         const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
-    
+
         const i = Math.floor(Math.log(bytes) / Math.log(k));
-    
+
         return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
     }
 
@@ -98,10 +98,10 @@ function UploadQueue(props) {
         // Locate file in uploads
         const isFile = file => file.name === fileData.name;
         const idx = uploads.findIndex(isFile);
-        
+
         const tmp = uploads;
         // If it does, update
-        if(idx !== -1) {
+        if (idx !== -1) {
             tmp.splice(idx, 1, fileData)
         }
         // If it doesn't exist, push into array
@@ -113,7 +113,7 @@ function UploadQueue(props) {
         // Set uploads to new array
         setUploads(JSON.parse(JSON.stringify(tmp)))
         // Set filtered uploads based on new uploads and searchQuery
-        setFilteredUploads(JSON.parse(JSON.stringify(tmp.filter(document => document['name'].toLowerCase().includes(searchQuery.toLowerCase()) ))))
+        setFilteredUploads(JSON.parse(JSON.stringify(tmp.filter(document => document['name'].toLowerCase().includes(searchQuery.toLowerCase())))))
 
     }
 
@@ -121,16 +121,16 @@ function UploadQueue(props) {
         // Return proper icon for specified file type
         let icon;
 
-        if(type === "txt") icon = faFileAlt;
-        else if(type === "doc" || type === "docx") icon = faFileWord
-        else if(type === "mp3" || type==="wav" || type==="flac" || type==="aac") icon = faFileAudio;
-        else if(type === "html" || type === "js" || type === "c" || type === "cpp" || type === "jsx" || type === "java" || type === "json" || type === "css") icon = faFileCode;
-        else if(type === "pdf") icon = faFilePdf;
-        else if(type === "mov" || type==="flv" || type==="avi" || type==="qt" || type==="mp4" || type==="mpg" || type==="mpeg" || type==="m4v") icon = faFileVideo;
-        else if(type==="csv") icon = faFileCsv;
-        else if(type === "xls" || type==="xlsx") icon = faFileExcel;
-        else if(type === "gif" || type==="jpeg" || type==="jpg" || type==="tiff" || type==="png" || type==="svg") icon=faFileImage;
-        else if(type === "zip" || type==="gzip" || type==="tar" || type==="rar" || type==="iso" || type==="7z" || type==="dmg" || type==="jar") icon = faFileArchive;
+        if (type === "txt") icon = faFileAlt;
+        else if (type === "doc" || type === "docx") icon = faFileWord
+        else if (type === "mp3" || type === "wav" || type === "flac" || type === "aac") icon = faFileAudio;
+        else if (type === "html" || type === "js" || type === "c" || type === "cpp" || type === "jsx" || type === "java" || type === "json" || type === "css") icon = faFileCode;
+        else if (type === "pdf") icon = faFilePdf;
+        else if (type === "mov" || type === "flv" || type === "avi" || type === "qt" || type === "mp4" || type === "mpg" || type === "mpeg" || type === "m4v") icon = faFileVideo;
+        else if (type === "csv") icon = faFileCsv;
+        else if (type === "xls" || type === "xlsx") icon = faFileExcel;
+        else if (type === "gif" || type === "jpeg" || type === "jpg" || type === "tiff" || type === "png" || type === "svg") icon = faFileImage;
+        else if (type === "zip" || type === "gzip" || type === "tar" || type === "rar" || type === "iso" || type === "7z" || type === "dmg" || type === "jar") icon = faFileArchive;
         else icon = faFileUpload;
 
         return icon;
@@ -141,7 +141,7 @@ function UploadQueue(props) {
 
         const events = ['download-progress', 'download-end', 'download-error']
 
-        for(const event of events) {
+        for (const event of events) {
             socket.on(event, data => handleQueueUpdate(data))
         }
 
@@ -164,7 +164,7 @@ function UploadQueue(props) {
 
                 <Dialog onClose={handleClose} aria-labelledby="simple-dialog-title" open={modalShow} >
                     <DialogTitle id="simple-dialog-title">Uploads ({uploads.filter((item) => item.status === "Pending").length} pending)</DialogTitle>
-                    <div style={{ padding: "2rem", width: "85vw", maxWidth: "500px"}}>
+                    <div style={{ padding: "2rem", width: "85vw", maxWidth: "500px" }}>
 
 
                         <FormControl className={classes.searchbar}>
@@ -195,32 +195,32 @@ function UploadQueue(props) {
 
                                     filteredUploads.slice(pageIdx * pageMax, (pageIdx + 1) * pageMax).map((file, idx) => (
 
-                                        <ListItem alignItems="flex-start" key={file.name+idx}>
-                                        <ListItemAvatar>
-                                          <Avatar> 
-                                              <FontAwesomeIcon icon={getFileIcon(file.type)} />
-                                          </Avatar>
-                                        </ListItemAvatar>
-                                        <ListItemText
-                                          primary={file.name}
-                                          secondary={
-                                            <React.Fragment>
-                                              <Typography
-                                                component="span"
-                                                variant="body2"
-                                                className={classes.inline}
-                                                color="textPrimary"
-                                              >
-                                                {file.status}
-                                              </Typography>
-                                                <span style={{display: "block"}}>
-                                                    {file.percent} % | {convertFileSize(file.bytesLoaded)} of {convertFileSize(file.size)}
-                                                </span>
-                                              <LinearProgress variant="determinate" value={file.percent} />
-                                            </React.Fragment>
-                                          }
-                                        />
-                                      </ListItem>
+                                        <ListItem alignItems="flex-start" key={file.name + idx}>
+                                            <ListItemAvatar>
+                                                <Avatar>
+                                                    <FontAwesomeIcon icon={getFileIcon(file.type)} />
+                                                </Avatar>
+                                            </ListItemAvatar>
+                                            <ListItemText
+                                                primary={file.name}
+                                                secondary={
+                                                    <React.Fragment>
+                                                        <Typography
+                                                            component="span"
+                                                            variant="body2"
+                                                            className={classes.inline}
+                                                            color="textPrimary"
+                                                        >
+                                                            {file.status}
+                                                        </Typography>
+                                                        <span style={{ display: "block" }}>
+                                                            {file.percent} % | {convertFileSize(file.bytesLoaded)} of {convertFileSize(file.size)}
+                                                        </span>
+                                                        <LinearProgress variant="determinate" value={parseFloat(file.percent)} />
+                                                    </React.Fragment>
+                                                }
+                                            />
+                                        </ListItem>
 
 
                                     ))

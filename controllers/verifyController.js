@@ -84,7 +84,9 @@ module.exports = {
                     _id: key
                 })
                 .then((account) => {
-                    resolve(types.includes(account.type));
+                    if (account) {
+                        resolve(types.includes(account.type));
+                    } else resolve(undefined)
                 })
         })
     },
