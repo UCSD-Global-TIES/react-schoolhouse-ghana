@@ -6,7 +6,7 @@
   "scripts": {
     "start": "if-env NODE_ENV=production && npm run start:prod || npm run start:dev",
     "start:prod": "node server.js",
-    "start:dev": "concurrently \"nodemon --ignore './client/public/storage/*'\" \"npm run client\"",
+    "start:dev": "concurrently \"nodemon --ignore './client/public/storage/*' --ignore 'logs/*'\" \"npm run client\"",
     "client": "cd client && npm run start",
     "seed": "node scripts/seedDB.js",
     "install": "cd client && npm install",
@@ -41,6 +41,7 @@
     "mongoose": "^5.7.11",
     "morgan": "^1.9.1",
     "multer": "^1.4.2",
+    "react-beforeunload": "^2.1.0",
     "react-moment": "^0.9.6",
     "react-router-dom": "^5.1.2",
     "socket.io": "^2.3.0",

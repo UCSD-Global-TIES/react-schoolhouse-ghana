@@ -3,6 +3,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import { ListItemAvatar, Avatar, LinearProgress, Badge, Dialog, DialogTitle, Fab, List, ListItem, ListItemIcon, ListItemText, ListSubheader, Button, ButtonGroup, InputAdornment, FormControl, InputLabel, Input, Typography } from "@material-ui/core";
 import SearchIcon from '@material-ui/icons/Search';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Beforeunload } from 'react-beforeunload';
 import moment from "moment"
 
 import "../../utils/flowHeaders.min.css";
@@ -16,9 +17,9 @@ const useStyles = makeStyles(theme => ({
         backgroundColor: theme.palette.background.paper,
     },
     fab: {
-        position: 'absolute',
-        bottom: theme.spacing(5),
-        right: theme.spacing(5),
+        position: 'fixed',
+        bottom: "3rem",
+        right: "3rem",
     },
     field: {
         margin: "1rem 0px"
@@ -161,6 +162,8 @@ function UploadQueue(props) {
                     <Badge color="secondary" badgeContent={uploads.filter((item) => item.status === "Pending").length} children={<FontAwesomeIcon size="lg" icon={faCloudUploadAlt} />} />
 
                 </Fab>
+
+                <Beforeunload onBeforeunload={uploads.filter((item) => item.status === "Pending").length ? () => "You have pending uploads, are you sure you want to leave this page? (uploads will be deleted)" : (e) => e} />
 
                 <Dialog onClose={handleClose} aria-labelledby="simple-dialog-title" open={modalShow} >
                     <DialogTitle id="simple-dialog-title">Uploads ({uploads.filter((item) => item.status === "Pending").length} pending)</DialogTitle>
