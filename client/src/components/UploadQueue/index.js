@@ -209,6 +209,12 @@ function UploadQueue(props) {
                                                             component="span"
                                                             variant="body2"
                                                             className={classes.inline}
+                                                            style={{
+                                                                color: 
+                                                                file.status === "Pending" ? "orange"
+                                                                : file.status === "Complete" ? "green"
+                                                                : "red"
+                                                            }}
                                                             color="textPrimary"
                                                         >
                                                             {file.status}
@@ -216,7 +222,7 @@ function UploadQueue(props) {
                                                         <span style={{ display: "block" }}>
                                                             {file.percent} % | {convertFileSize(file.bytesLoaded)} of {convertFileSize(file.size)}
                                                         </span>
-                                                        <LinearProgress variant="determinate" value={parseFloat(file.percent)} />
+                                                        <LinearProgress color={file.status === "Error" ? "secondary" : "primary"} variant="determinate" value={parseFloat(file.percent)} />
                                                     </React.Fragment>
                                                 }
                                             />

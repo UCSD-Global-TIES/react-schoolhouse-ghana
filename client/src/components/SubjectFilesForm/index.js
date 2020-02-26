@@ -82,7 +82,7 @@ function SubjectFilesForm(props) {
                         selected.push(file._id)
                     }
                 }
-                setSelectedFiles(selected)
+                setSelectedFiles(selected);
 
                 // Set options and loading flag to false
                 setFileOptions([...result.data]);
@@ -125,13 +125,14 @@ function SubjectFilesForm(props) {
 
                 </div>
                 <DocumentPicker
+                    link={(doc) => doc.path}
                     title={"Attached Files"}
                     docs={fileOptions}
                     pageMax={5}
                     selected={selectedFiles}
                     icon={faFile}
                     collection={"Files"}
-                    primary={"nickname"}
+                    primary={doc => doc.nickname}
                     handleChange={(docs) => handlePickChange(docs)}
                 />
 

@@ -2,9 +2,9 @@ import React, { useEffect, useState } from "react";
 import { getQueries, parseTime } from "../../utils/misc";
 import clsx from "clsx";
 import { Alert, Skeleton, Pagination } from '@material-ui/lab'
-import { FormControl, Input, InputLabel, InputAdornment, Snackbar, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Checkbox, Typography } from "@material-ui/core";
+import { IconButton, FormControl, Input, InputLabel, InputAdornment, Snackbar, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Checkbox, Typography } from "@material-ui/core";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSpinner } from "@fortawesome/free-solid-svg-icons";
+import { faSpinner, faExternalLinkAlt } from "@fortawesome/free-solid-svg-icons";
 
 import SearchIcon from '@material-ui/icons/Search';
 import { makeStyles } from '@material-ui/core/styles';
@@ -99,7 +99,7 @@ function DocumentEditor(props) {
                 setPage(0)
 
                 if (searchQuery.length) {
-                    const filteredDocuments = docList.filter(document => document[primary].toLowerCase().includes(searchQuery.toLowerCase()));
+                    const filteredDocuments = docList.filter(document => primary(document).toLowerCase().includes(searchQuery.toLowerCase()));
                     setFilteredDocuments(filteredDocuments);
                     setViewableDocuments(filteredDocuments.slice(0, MAX_ITEMS));
 
@@ -141,7 +141,7 @@ function DocumentEditor(props) {
 
         // Filter documents
         if (value.length) {
-            const filteredDocuments = documents.filter(document => document[primary].toLowerCase().includes(value.toLowerCase()));
+            const filteredDocuments = documents.filter(document => primary(document).toLowerCase().includes(value.toLowerCase()));
             setFilteredDocuments(filteredDocuments);
             setViewableDocuments(filteredDocuments.slice(0, MAX_ITEMS));
 
@@ -181,25 +181,28 @@ function DocumentEditor(props) {
 
     // Handle deletion of document
     const handleDelete = () => {
+        setActionPending(true);
 
         props.delete(selected, props.user.key)
             .then((results) => {
+                
                 let error = false;
-
+                
                 for (const result of results) {
                     if (!result.data) error = true
                 }
-
+                
                 if (!error) {
                     handleConfirm(false);
                     setCurrentAlert({ isOpen: true, severity: "success", message: `The ${collection.toLowerCase()}(s) have been successfully deleted!` });
-
+                    
                     notifyServer();
                 } else {
                     handleConfirm(false);
                     setCurrentAlert({ isOpen: true, severity: "error", message: `The ${collection.toLowerCase()}(s) failed to be deleted.` });
                 }
-
+                
+                setTimeout( () => setActionPending(false), 1000 );
             })
     }
 
@@ -250,18 +253,19 @@ function DocumentEditor(props) {
                     setActionPending(true);
                     props.post(doc, props.user.key, props.user.profile)
                         .then(() => {
-                            setActionPending(false);
                             setDialogOpen(false);
                             setCurrentAlert({ isOpen: true, severity: "success", message: `The ${collection.toLowerCase()}(s) have been successfully created!` });
-
+                            
                             notifyServer();
-
+                            
                             if (redirectOnExit) {
                                 // Inform user of redirect to previous document (inform user -> wait 1 sec. -> redirect)
                                 setTimeout(() => props.history.goBack(), 1000);
                             }
+
+                            setTimeout( () => setActionPending(false), 1000 );
                         })
-                }
+                    }
             })
 
     }
@@ -274,7 +278,6 @@ function DocumentEditor(props) {
                     setActionPending(true);
                     props.put(doc, props.user.key)
                         .then(() => {
-                            setActionPending(false);
                             setDialogOpen(false);
                             setCurrentAlert({ isOpen: true, severity: "success", message: `The ${collection.toLowerCase()} has been successfully updated!` });
 
@@ -284,6 +287,9 @@ function DocumentEditor(props) {
                                 // Inform user of redirect to previous document (inform user -> wait 1 sec. -> redirect)
                                 setTimeout(() => props.history.goBack(), 1000);
                             }
+
+                            setTimeout( () => setActionPending(false), 1000 );
+
                         })
 
                 }
@@ -428,6 +434,7 @@ function DocumentEditor(props) {
             {/* DELETE DOCUMENT(S) DIALOG */}
             <ConfirmDialog
                 open={confirmOpen}
+                buttonText={actionPending ? <FontAwesomeIcon icon={faSpinner} spin /> : "Confirm"}
                 handleClose={() => handleConfirm(false)}
                 handleAction={handleDelete}>
                 Are you sure you would like to delete all selected {selected.length} {collection.toLowerCase()}(s)?
@@ -492,10 +499,19 @@ function DocumentEditor(props) {
                                                                     inputProps={{ 'aria-labelledby': labelId }}
                                                                 />
                                                             </ListItemIcon>
-                                                            <ListItemText id={labelId} primary={document[primary]} secondary={`Created: ${parseTime(document.createdAt, true)}`} />
+                                                            <ListItemText id={labelId} primary={primary(document)} secondary={`Created: ${parseTime(document.createdAt, true)}`} />
                                                             <ListItemSecondaryAction>
-                                                                <FontAwesomeIcon icon={icon} />
-                                                            </ListItemSecondaryAction>
+                                                            {
+                                                                props.link ?
+                                                                    <a target="_blank" href={props.link(document)} style={{ textDecoration: "none", fontSize: "1rem" }}>
+                                                                        <IconButton aria-label="create" >
+                                                                            <FontAwesomeIcon icon={faExternalLinkAlt} size="xs" />
+                                                                        </IconButton>
+                                                                    </a>
+                                                                    :
+                                                                    <FontAwesomeIcon icon={icon} />
+
+                                                            }                                                            </ListItemSecondaryAction>
                                                         </ListItem>
                                                     );
                                                 })

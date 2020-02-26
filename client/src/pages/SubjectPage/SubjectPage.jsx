@@ -118,7 +118,7 @@ function SubjectPage(props) {
           :
           (p) => (
             <DocumentEditor
-              primary={"title"}
+              primary={doc => doc.title}
               collection={"Subject Announcements"}
               icon={faBullhorn}
               FormComponent={(p) =>

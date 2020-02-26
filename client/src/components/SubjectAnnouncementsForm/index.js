@@ -88,7 +88,7 @@ function SubjectAnnouncementsForm(props) {
                 const selected = [];
                 if (props.document.files) {
                     for (const file of props.document.files) {
-                        selected.push(file._id)
+                        selected.push(file)
                     }
                 }
                 setSelectedFiles(selected)
@@ -142,7 +142,7 @@ function SubjectAnnouncementsForm(props) {
                     selected={selectedFiles}
                     icon={faFile}
                     collection={"Files"}
-                    primary={"nickname"}
+                    primary={doc => doc.nickname}
                     handleChange={(docs) => handlePickChange('files', docs)}
                 />
 

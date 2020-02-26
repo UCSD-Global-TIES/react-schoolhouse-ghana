@@ -252,7 +252,7 @@ function AnnouncementsForm(props) {
                     selected={selectedFiles}
                     icon={faFile}
                     collection={"Files"}
-                    primary={"nickname"}
+                    primary={(doc) => doc.nickname}
                     handleChange={(docs) => handlePickChange('files', docs)}
                 />
 

@@ -192,7 +192,7 @@ function GradesForm(props) {
                     selected={selectedSubjects}
                     icon={faChalkboardTeacher}
                     collection={"Subjects"}
-                    primary={"name"}
+                    primary={(doc) => doc.name}
                     handleChange={(docs) => handlePickChange('subjects', docs)}
                 />
 
@@ -203,7 +203,7 @@ function GradesForm(props) {
                     selected={selectedStudents}
                     icon={faUserGraduate}
                     collection={"Students"}
-                    primary={"first_name"}
+                    primary={(doc) => `${doc.first_name} ${doc.last_name}`}
                     handleChange={(docs) => handlePickChange('students', docs)}
                 />
 
@@ -214,7 +214,7 @@ function GradesForm(props) {
                     selected={selectedTeachers}
                     icon={faAppleAlt}
                     collection={"Teachers"}
-                    primary={"first_name"}
+                    primary={(doc) => `${doc.first_name} ${doc.last_name}`}
                     handleChange={(docs) => handlePickChange('teachers', docs)}
                 />
 

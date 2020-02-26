@@ -222,13 +222,14 @@ function SubjectsForm(props) {
                 }
 
                 <DocumentPicker
+                    link={(doc) => doc.path}
                     title={"Attached Files"}
                     docs={fileOptions}
                     pageMax={5}
                     selected={selectedFiles}
                     icon={faFile}
                     collection={"Files"}
-                    primary={"nickname"}
+                    primary={(doc) => doc.nickname}
                     handleChange={(docs) => handlePickChange('files', docs)}
                 />
 

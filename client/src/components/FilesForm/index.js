@@ -209,7 +209,7 @@ function FilesForm(props) {
                                 selected={selectedFiles}
                                 icon={faFile}
                                 collection={"Files"}
-                                primary={"name"}
+                                primary={(doc) => doc.name}
                                 secondary={"size"}
                                 handleChange={(docs) => handlePickChange(docs)}
                             />

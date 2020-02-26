@@ -139,7 +139,7 @@ function AdminPortal(props) {
             icon: faBullhorn,
             FormComponent: (p) =>
                 <AnnouncementsForm user={props.user} {...p} />,
-            primary: "title",
+            primary: (doc) => doc.title,
             path: `${props.match.path}/announcements`,
             api: {
                 get: API.getAnnouncements,
@@ -167,7 +167,7 @@ function AdminPortal(props) {
             icon: faShapes,
             FormComponent: (p) =>
                 <GradesForm user={props.user} {...p} />,
-            primary: "level",
+            primary: (doc) => `Grade ${doc.level}`,
             path: `${props.match.path}/grades`,
             api: {
                 get: API.getGrades,
@@ -196,10 +196,11 @@ function AdminPortal(props) {
         },
         {
             collection: "Subjects",
+            link: (doc) => `/subject/${doc._id}`,
             icon: faChalkboardTeacher,
             FormComponent: (p) =>
                 <SubjectsForm user={props.user} {...p} />,
-            primary: "name",
+            primary: doc => doc.name,
             path: `${props.match.path}/subjects`,
             api: {
                 get: API.getSubjects,
@@ -233,7 +234,7 @@ function AdminPortal(props) {
             icon: faUsers,
             FormComponent: (p) =>
                 <AccountsForm user={props.user} {...p} />,
-            primary: "first_name",
+            primary: (doc) => `${doc.first_name} ${doc.last_name}`,
             path: `${props.match.path}/accounts`,
             api: {
                 get: API.getAccounts,
@@ -274,9 +275,10 @@ function AdminPortal(props) {
         },
         {
             collection: "Files",
+            link: (doc) => doc.path,
             icon: faFile,
             FormComponent: FilesForm,
-            primary: "nickname",
+            primary: (doc) => doc.nickname,
             path: `${props.match.path}/files`,
             api: {
                 get: API.getFiles,
@@ -310,6 +312,7 @@ function AdminPortal(props) {
             path: page.path,
             component: (props) =>
                 <DocumentEditor
+                    link={page.link}
                     primary={page.primary}
                     collection={page.collection}
                     icon={page.icon}
@@ -329,6 +332,7 @@ function AdminPortal(props) {
             component: (props) =>
                 <>
                     <DocumentEditor
+                        link={page.link}
                         primary={page.primary}
                         collection={page.collection}
                         icon={page.icon}

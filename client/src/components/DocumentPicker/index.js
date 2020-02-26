@@ -2,11 +2,12 @@ import React, { useEffect, useState } from "react";
 import { parseTime } from "../../utils/misc";
 import { Pagination } from '@material-ui/lab'
 import clsx from "clsx"
-import { Tooltip, Switch, Toolbar, FormControl, Input, InputLabel, InputAdornment, Snackbar, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Checkbox, Typography } from "@material-ui/core";
+import { Tooltip, Switch, Toolbar, FormControl, Input, InputLabel, IconButton, InputAdornment, Snackbar, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Checkbox, Typography } from "@material-ui/core";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import SearchIcon from '@material-ui/icons/Search';
 import { lighten, makeStyles } from '@material-ui/core/styles';
 import "../../utils/flowHeaders.min.css";
+import { faExternalLinkAlt } from "@fortawesome/free-solid-svg-icons";
 
 
 const useStyles = makeStyles(theme => ({
@@ -82,10 +83,11 @@ function DocumentSelector(props) {
     const [filteredDocuments, setFilteredDocuments] = useState([]);
     const [viewableDocuments, setViewableDocuments] = useState([]);
     const [page, setPage] = React.useState(1);
+    const [PROPS, setProps] = useState(props)
     const [searchQuery, setSearchQuery] = useState("");
     const [state, setState] = React.useState({
         selectedToggle: false
-      });
+    });
 
     // HANDLE PAGE CHANGE
     const handlePageChange = (event, value) => {
@@ -110,7 +112,7 @@ function DocumentSelector(props) {
 
         // Filter documents
         if (value.length) {
-            const filteredDocuments = documents.filter(document => document[primary].toLowerCase().includes(value.toLowerCase()));
+            const filteredDocuments = documents.filter(document => primary(document).toLowerCase().includes(value.toLowerCase()));
             setFilteredDocuments(filteredDocuments);
             setViewableDocuments(filteredDocuments.slice(0, props.pageMax));
 
@@ -141,24 +143,25 @@ function DocumentSelector(props) {
         // Reset page 
         setPage(0)
 
-        if(event.target.checked) {
+        if (event.target.checked) {
 
             const currentViewableDocs = filteredDocuments.filter(document => props.selected.includes(document._id));
             setFilteredDocuments(currentViewableDocs);
             setViewableDocuments(currentViewableDocs.slice(0, props.pageMax));
         } else {
-            const currentViewableDocs = documents.filter(document => document[primary].toLowerCase().includes(searchQuery.toLowerCase()));
+            const currentViewableDocs = documents.filter(document => primary(document).toLowerCase().includes(searchQuery.toLowerCase()));
             setFilteredDocuments(currentViewableDocs);
             setViewableDocuments(currentViewableDocs.slice(0, props.pageMax));
         }
-      };
+    };
 
     useEffect(() => {
         // DOCUMENTS NOT PROPERLY BEING SET (TODO)
         setDocuments(props.docs);
         setFilteredDocuments(props.docs);
         setViewableDocuments(props.docs.slice(0, props.pageMax))
-    }, [props.docs]);
+        setProps(props);
+    }, [props]);
 
     return (
         <>
@@ -173,7 +176,7 @@ function DocumentSelector(props) {
                             })}
                             disableGutters
                         >
-                            {props.selected.length > 0 ? (
+                            {PROPS.selected.length > 0 ? (
                                 <>
                                     <Typography className={classes.title} color="inherit" variant="subtitle1">
                                         {props.selected.length} selected
@@ -186,11 +189,14 @@ function DocumentSelector(props) {
                                         />
                                     </Tooltip>
                                 </>
-                            ) : (
-                                    <Typography className={classes.title} variant="h6" id="tableTitle">
-                                        {props.title}
-                                    </Typography>
-                                )}
+                            ) :
+
+
+                                <Typography className={classes.title} variant="h6" id="tableTitle">
+                                    {props.title}
+                                </Typography>
+
+                            }
 
                         </Toolbar>
 
@@ -226,7 +232,7 @@ function DocumentSelector(props) {
                                                 const labelId = `${collection.toLowerCase()}-${idx}`;
 
                                                 return (
-                                                    <ListItem key={labelId} role={undefined} dense button onClick={() => handleSelect(document._id)}>
+                                                    <ListItem alignItems="flex-start" key={labelId} role={undefined} dense button onClick={() => handleSelect(document._id)}>
                                                         <ListItemIcon>
                                                             <Checkbox
                                                                 edge="start"
@@ -236,9 +242,19 @@ function DocumentSelector(props) {
                                                                 inputProps={{ 'aria-labelledby': labelId }}
                                                             />
                                                         </ListItemIcon>
-                                                        <ListItemText id={labelId} primary={document[primary]} secondary={props.secondary ? document[props.secondary] : `Created: ${parseTime(document.createdAt, true)}`} />
+                                                        <ListItemText id={labelId} primary={primary(document)} secondary={props.secondary ? document[props.secondary] : `Created: ${parseTime(document.createdAt, true)}`} />
                                                         <ListItemSecondaryAction>
-                                                            <FontAwesomeIcon icon={icon} />
+                                                            {
+                                                                PROPS.link ?
+                                                                    <a target="_blank" href={props.link(document)} style={{ textDecoration: "none", fontSize: "1rem" }}>
+                                                                        <IconButton aria-label="create" >
+                                                                            <FontAwesomeIcon icon={faExternalLinkAlt} size="xs" />
+                                                                        </IconButton>
+                                                                    </a>
+                                                                    :
+                                                                    <FontAwesomeIcon icon={icon} />
+
+                                                            }
                                                         </ListItemSecondaryAction>
                                                     </ListItem>
                                                 );

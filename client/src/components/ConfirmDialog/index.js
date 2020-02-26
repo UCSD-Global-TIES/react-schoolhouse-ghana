@@ -24,7 +24,7 @@ export default function AlertDialog(props) {
             Cancel
           </Button>
           <Button onClick={props.handleAction} color="primary" autoFocus>
-            Confirm
+            {props.buttonText}
           </Button>
         </DialogActions>
       </Dialog>
