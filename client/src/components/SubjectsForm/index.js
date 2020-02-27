@@ -217,7 +217,7 @@ function SubjectsForm(props) {
                         history={PROPS.history}
                         delete={API.deleteAnnouncements}
                         user={PROPS.user}
-                        presetField="subject"
+                        preset={(doc) => { return { subject: doc._id, private: true } }}
                     />
                 }
 

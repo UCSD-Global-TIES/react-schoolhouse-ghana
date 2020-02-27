@@ -62,7 +62,7 @@ function DocumentEditorLink(props) {
     const MAX_ITEMS = 5;
 
     // REDIRECT
-    const { presetField, delete: deleteDocuments, link, docs, icon, collection, primary, match, docId, history } = props;
+    const { preset, delete: deleteDocuments, link, docs, icon, collection, primary, match, docId, history } = props;
     const classes = useStyles();
     // DOCUMENTS EDITOR
     const [selected, setSelected] = useState([]);
@@ -193,7 +193,7 @@ function DocumentEditorLink(props) {
         // Inform user of redirect
         if (isCreate) {
             // Travel to the specified destination with the create flag, intial values, and redirect flag
-            const presetDoc = { [presetField]: docId }
+            const presetDoc = preset({ _id: docId })
             history.push(`${destination}?preset=${JSON.stringify(presetDoc)}&redirect=true`);
         } else {
             // Travel to the specified destination with the document _id to update and redirect flag
