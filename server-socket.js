@@ -1,6 +1,7 @@
 const config = require("./nasConfig");
 const fileDb = require("./models/File")
 const { deleteFile } = require("./controllers/NAS")
+const fs = require("fs")
 
 // import socket from server.js
 module.exports = function (server, client, uploader) {
@@ -50,12 +51,16 @@ module.exports = function (server, client, uploader) {
 
     // Do something when a file is saved:
     uploader.on("saved", function (event) {
-        const { name, size, bytesLoaded, success, base, pathName } = event.file;
+        const { name, size, bytesLoaded, success, base, pathName, meta } = event.file;
         const type = name.split(".")[name.split(".").length - 1];
         const percent = ((bytesLoaded / size) * 100).toFixed(2);
         const filename = `${base}.${type}`
 
         if (success) {
+
+            // Move from tmp to main folder
+            fs.renameSync(pathName, `${config.path}/${filename}` );
+            
             fileDb.findOne({ filename })
                 .then((result) => {
                     if (!result) {
@@ -66,7 +71,7 @@ module.exports = function (server, client, uploader) {
                                     type,
                                     path: `${config.publicPath}/${filename}`,
                                     filename,
-                                    absolutePath: pathName,
+                                    absolutePath: `${config.path}/${filename}`,
                                     size
                                 }
                             )
@@ -93,7 +98,7 @@ module.exports = function (server, client, uploader) {
 
     // Error handler:
     uploader.on("error", function (event) {
-        const { name, base, size, bytesLoaded } = event.file;
+        const { name, base, size, bytesLoaded, pathName } = event.file;
         const type = name.split(".")[name.split(".").length - 1];
         const filename = `${base}.${type}`
         const percent = ((bytesLoaded / size) * 100).toFixed(2);
@@ -108,7 +113,7 @@ module.exports = function (server, client, uploader) {
         }
 
         // Delete file 
-        deleteFile(filename)
+        deleteFile(pathName)
             .then(() => server.emit("download-error", fileData))
 
 

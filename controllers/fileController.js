@@ -102,7 +102,7 @@ module.exports = {
                         .findOne({ _id: fid })
                         .then((fileObj) => {
                             // Delete file from NAS
-                            deleteFile(fileObj.filename)
+                            deleteFile(fileObj.absolutePath)
                                 .then((result) => {
                                     if (!result) {
                                         res.json(null);

@@ -79,7 +79,6 @@ const textFields = [
 function FilesForm(props) {
     const classes = useStyles();
     const socket = useContext(SocketContext);
-    const siofu = new SocketIOFileUpload(socket);
     const [PROPS, setProps] = useState(props);
     const [fileOptions, setFileOptions] = useState([]);
     const [selectedFiles, setSelectedFiles] = useState([]);
@@ -102,9 +101,11 @@ function FilesForm(props) {
 
         // Generate new file options to be rendered in list form
         const newFileOptions = [];
-        for(const file of fileObjects) {
-            const { name, size, lastModified } = file;
+        for(let file of fileObjects) {
+            const { name, size, lastModified, webkitRelativePath } = file;
             const _id = `${name}-${lastModified}`;
+            let fileMeta = file;
+            fileMeta.meta = {webkitRelativePath}
             
             if(!fileOptions.find((item) => item._id === _id )) {
                 newFileOptions.push({
@@ -112,7 +113,7 @@ function FilesForm(props) {
                     name, 
                     size: convertFileSize(size),
                     createdAt: lastModified,
-                    file
+                    file: fileMeta
                 })
             }
         }
@@ -126,7 +127,7 @@ function FilesForm(props) {
         const selectedFileObjects = [];
         for(const option of fileOptions.concat(newFileOptions)) {
             if (currentlySelected.includes(option._id)) {
-                selectedFileObjects.push(option.file)
+                selectedFileObjects.push(option.file);
             }
         }
         
@@ -170,6 +171,10 @@ function FilesForm(props) {
 
     }, [props])
 
+    useEffect(() => {
+
+    }, [])
+
     return (
         <div className={classes.root}>
             <div className={classes.vc}>
@@ -189,7 +194,9 @@ function FilesForm(props) {
                                 {/* <Button size="medium" onClick={() => siofu.submitFiles(selectedFiles)} >
                                         Submit
                                     </Button> */}
-                                <input onChange={handleFileChange} id="file-upload-button" type="file" multiple style={{ display: "none" }} />
+                                <input onChange={handleFileChange} id="file-upload-button" type="file" webkitdirectory={""} directory={""} multiple style={{ display: "none" }} />
+
+                                {/* <input onChange={handleFileChange} id="file-upload-button" type="file" multiple style={{ display: "none" }} /> */}
                                 <label htmlFor="file-upload-button">
                                     <Button
                                         variant="contained"

@@ -82,7 +82,7 @@ startServer();
 
 io.on('connection', function (client) {
   const uploader = new siofu();
-  uploader.dir = config.path;
+  uploader.dir = config.path + "/tmp";
   uploader.listen(client);
   require("./server-socket")(io, client, uploader);
 })

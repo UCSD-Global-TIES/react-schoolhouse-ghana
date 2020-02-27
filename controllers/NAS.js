@@ -84,9 +84,9 @@ module.exports = {
     // },
     // WRITE: Deleting a file
     // ---------------------------------------------------------------
-    deleteFile: function (filename) {
+    deleteFile: function (path) {
         return new Promise((resolve, reject) => {
-            fs.unlink(`${config.path}/${filename}`, function (err) {
+            fs.unlink(path, function (err) {
                 if (err) resolve(null);
                 // if no error, file has been deleted successfully
                 else resolve({});
