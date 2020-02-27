@@ -50,8 +50,13 @@ module.exports = {
         verifyKey(req.header('Authorization'), 'Admin')
             .then((isVerified) => {
                 if (isVerified) {
+                    const { title, content, authorName, files } = req.body;
+                    const newSchoolA = {
+                        title, content, authorName, files, private: false
+                    }
+
                     announcementDb
-                        .create(req.body)
+                        .create({ ...newSchoolA })
                         .then(newA => {
                             res.json(newA);
                         })

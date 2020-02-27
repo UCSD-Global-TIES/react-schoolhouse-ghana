@@ -8,6 +8,7 @@ import moment from "moment";
 import "../../utils/flowHeaders.min.css";
 
 import { faChevronLeft, faChevronRight, faSpinner } from "@fortawesome/free-solid-svg-icons";
+import { set } from "mongoose";
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -34,9 +35,10 @@ function SimpleListView(props) {
     const [currentDocument, setCurrentDocument] = useState({});
     const [filteredDocuments, setFilteredDocuments] = useState(props.items);
     const [searchQuery, setSearchQuery] = useState("");
+    const [PROPS, setProps] = useState(props);
 
     const handleItemClick = (doc) => {
-        if (props.link) {
+        if (PROPS.link) {
             return;
         }
         else {
@@ -57,12 +59,12 @@ function SimpleListView(props) {
 
         // Filter documents
         if (value.length) {
-            const filteredDocuments = props.items.filter(document => document[props.labelField].toLowerCase().includes(value.toLowerCase()));
+            const filteredDocuments = PROPS.items.filter(document => document[PROPS.labelField].toLowerCase().includes(value.toLowerCase()));
             setFilteredDocuments(filteredDocuments);
 
         } else {
             // Reset the filtered documents to ALL documents
-            setFilteredDocuments(props.items);
+            setFilteredDocuments(PROPS.items);
         }
     }
 
@@ -75,11 +77,22 @@ function SimpleListView(props) {
 
     }
 
-    const DocumentViewer = props.viewer;
+    useEffect(() => {
+        // Reset page 
+        setPageIdx(0)
+
+        // Filter documents
+        const filteredDocuments = props.items.filter(document => document[PROPS.labelField].toLowerCase().includes(searchQuery.toLowerCase()));
+        setFilteredDocuments(filteredDocuments);
+
+        setProps(props);
+    }, [props.items])
+
+    const DocumentViewer = PROPS.viewer;
 
     return (
-        <div style={{ ...props.style }}>
-            {currentDocument[props.labelField] && DocumentViewer &&
+        <div style={{ ...PROPS.style }}>
+            {currentDocument[PROPS.labelField] && DocumentViewer &&
                 <Dialog
 
                     open={dialogOpen}
@@ -90,7 +103,7 @@ function SimpleListView(props) {
                     aria-describedby="alert-dialog-slide-description"
                 >
                     <DialogTitle style={{ padding: "10px 24px" }}
-                        align="center" id="alert-dialog-slide-title">{currentDocument[props.labelField]}</DialogTitle>
+                        align="center" id="alert-dialog-slide-title">{currentDocument[PROPS.labelField]}</DialogTitle>
 
 
                     <DialogContent style={{ width: "70vw", maxWidth: "500px", padding: "0px 24px" }}>
@@ -109,9 +122,9 @@ function SimpleListView(props) {
             }
 
             {
-                props.searchbar &&
+                PROPS.searchbar &&
                 <FormControl className={classes.searchbar}>
-                    <InputLabel htmlFor="standard-adornment-amount">Search {props.title.toLowerCase()}</InputLabel>
+                    <InputLabel htmlFor="standard-adornment-amount">Search {PROPS.title.toLowerCase()}</InputLabel>
                     <Input
                         value={searchQuery}
                         onChange={handleQueryChange}
@@ -123,30 +136,30 @@ function SimpleListView(props) {
                 className={classes.root}
                 subheader={
                     <ListSubheader component="div" style={{ display: "flex", justifyContent: "space-between" }}>
-                        <span>{props.title}</span>
+                        <span>{PROPS.title}</span>
                         <ButtonGroup size="small" aria-label="small outlined button group" style={{
                             paddingTop: "9px",
                             height: "2rem"
                         }}>
                             <Button size="small" disabled={pageIdx === 0} onClick={() => handlePageChange(-1)}><FontAwesomeIcon icon={faChevronLeft} /></Button>
-                            <Button size="small" disabled={pageIdx === Math.ceil(props.items.length / props.pageMax) - 1 || props.items.length === 0} onClick={() => handlePageChange(1)}><FontAwesomeIcon icon={faChevronRight} /></Button>
+                            <Button size="small" disabled={pageIdx === Math.ceil(PROPS.items.length / PROPS.pageMax) - 1 || PROPS.items.length === 0} onClick={() => handlePageChange(1)}><FontAwesomeIcon icon={faChevronRight} /></Button>
                         </ButtonGroup>
                     </ListSubheader>}
             >
                 {
                     filteredDocuments.length ?
 
-                        filteredDocuments.slice(pageIdx * props.pageMax, (pageIdx + 1) * props.pageMax).map((item, idx) => (
+                        filteredDocuments.slice(pageIdx * PROPS.pageMax, (pageIdx + 1) * PROPS.pageMax).map((item, idx) => (
 
-                            <a target="_blank" style={{ textDecoration: "none" }} key={`${props.title.toLowerCase()}-${idx}`} href={props.link ? item[props.link] : null}>
+                            <a target="_blank" style={{ textDecoration: "none" }} key={`${PROPS.title.toLowerCase()}-${idx}`} href={PROPS.link ? item[PROPS.link] : null}>
                                 <ListItem button onClick={() => handleItemClick(item)} alignItems="flex-start">
                                     <ListItemIcon>
-                                        <FontAwesomeIcon icon={props.icon} />
+                                        <FontAwesomeIcon icon={PROPS.icon} />
                                     </ListItemIcon>
                                     <ListItemText
                                         style={{ overflowWrap: "break-word" }}
                                         primary={
-                                            item[props.labelField]
+                                            item[PROPS.labelField]
                                         }
                                         secondary={
                                             moment(item.createdAt).format('MMMM Do YYYY, h:mm a')
@@ -162,8 +175,8 @@ function SimpleListView(props) {
 
                         <div style={{ display: "flex", marginTop: "2rem" }}>
                             <div style={{ margin: "auto", padding: "3rem" }}>
-                                <Typography className="flow-text" style={{ color: "grey" }} variant="h5">No {props.title.toLowerCase()} were found.</Typography>
-                                <p style={{ textAlign: "center", color: "grey" }}><FontAwesomeIcon icon={props.icon} size="5x" /></p>
+                                <Typography className="flow-text" style={{ color: "grey" }} variant="h5">No {PROPS.title.toLowerCase()} were found.</Typography>
+                                <p style={{ textAlign: "center", color: "grey" }}><FontAwesomeIcon icon={PROPS.icon} size="5x" /></p>
                             </div>
                         </div>
 

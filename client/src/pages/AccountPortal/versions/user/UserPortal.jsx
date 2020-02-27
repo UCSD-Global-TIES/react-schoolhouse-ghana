@@ -81,7 +81,7 @@ function UserPortal(props) {
                 setSubjects(promiseResults[0].data ? promiseResults[0].data.subjects : []);
 
                 // Get & Set school announcements
-                setSchoolAnnouncements(promiseResults[1].data);
+                setSchoolAnnouncements([...promiseResults[1].data]);
 
 
                 let subjectAnnList = []
@@ -92,7 +92,7 @@ function UserPortal(props) {
                 }
 
                 // Get & Set Subject announcements
-                setGradeAnnouncements(subjectAnnList);
+                setGradeAnnouncements([...subjectAnnList]);
 
                 // Set loading false, so the loading screen goes away
                 setRefreshing(false);

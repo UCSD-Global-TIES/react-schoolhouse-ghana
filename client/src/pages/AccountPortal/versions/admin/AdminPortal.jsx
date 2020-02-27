@@ -234,7 +234,7 @@ function AdminPortal(props) {
             icon: faUsers,
             FormComponent: (p) =>
                 <AccountsForm user={props.user} {...p} />,
-            primary: (doc) => `${doc.first_name} ${doc.last_name}`,
+            primary: (doc) => `${doc.first_name} ${doc.last_name} (${doc.type})`,
             path: `${props.match.path}/accounts`,
             api: {
                 get: API.getAccounts,

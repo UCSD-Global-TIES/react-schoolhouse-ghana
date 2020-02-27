@@ -159,9 +159,10 @@ module.exports = {
                 if (isVerified) {
 
                     const fid = req.params.fid;
-                    const fileObj = req.body;
+                    const { nickname } = req.body;
+                    // Don't update path with dynamic path
                     fileDb
-                        .updateOne({ _id: fid }, fileObj)
+                        .updateOne({ _id: fid }, { nickname })
                         .then((newF) => {
                             res.json(newF)
                         })

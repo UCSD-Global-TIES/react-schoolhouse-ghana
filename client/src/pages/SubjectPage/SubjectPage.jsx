@@ -3,7 +3,7 @@ import { NavLink, Switch, Redirect } from "react-router-dom";
 import ProtectedRoute from "../../components/ProtectedRoute"
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 import { Alert } from '@material-ui/lab'
-import { Snackbar, Drawer, Hidden, List, ListItem, ListItemIcon, ListItemText, CssBaseline } from "@material-ui/core"
+import { Typography, Snackbar, Drawer, Hidden, List, ListItem, ListItemIcon, ListItemText, CssBaseline } from "@material-ui/core"
 // import { TransitionGroup, CSSTransition } from 'react-transition-group'
 import { useMediaQuery } from 'react-responsive';
 import "../../utils/flowHeaders.min.css";
@@ -21,6 +21,7 @@ import AnnouncementViewer from "../../components/AnnouncementViewer";
 import SubjectAnnouncementsForm from "../../components/SubjectAnnouncementsForm";
 import SubjectFilesForm from "../../components/SubjectFilesForm";
 import SocketContext from "../../socket-context"
+import clsx from "clsx"
 
 const drawerWidth = 220;
 
@@ -46,7 +47,11 @@ const useStyles = makeStyles(theme => ({
   buttonLink: {
     color: "inherit",
     textDecoration: "none"
-  }
+  },
+  textGlow: {
+    color: "white",
+    textShadow: "2px 2px 7px #787676"
+  },
 }));
 
 function SubjectPage(props) {
@@ -268,6 +273,9 @@ function SubjectPage(props) {
       </nav>
       <main className={classes.content} style={{ marginLeft: !isSmallDevice ? drawerWidth : 0, }}>
         {/* <div className={classes.toolbar} /> */}
+
+        <Typography style={{ padding: "1rem" }} align='center' className={clsx(classes.textGlow, "flow-text")} variant="h3"> {subjectInfo.name} </Typography>
+
 
         {/* <TransitionGroup>
           <CSSTransition
