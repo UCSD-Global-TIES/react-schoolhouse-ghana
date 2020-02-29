@@ -194,9 +194,9 @@ function FilesForm(props) {
                                 {/* <Button size="medium" onClick={() => siofu.submitFiles(selectedFiles)} >
                                         Submit
                                     </Button> */}
-                                <input onChange={handleFileChange} id="file-upload-button" type="file" webkitdirectory={""} directory={""} multiple style={{ display: "none" }} />
+                                {/* <input onChange={handleFileChange} id="file-upload-button" type="file" webkitdirectory={""} directory={""} multiple style={{ display: "none" }} /> */}
 
-                                {/* <input onChange={handleFileChange} id="file-upload-button" type="file" multiple style={{ display: "none" }} /> */}
+                                <input onChange={handleFileChange} id="file-upload-button" type="file" multiple style={{ display: "none" }} />
                                 <label htmlFor="file-upload-button">
                                     <Button
                                         variant="contained"

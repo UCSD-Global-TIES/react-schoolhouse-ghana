@@ -72,16 +72,16 @@ module.exports = {
     //         if (err) throw err;
     //     });
     // },
-    // // WRITE: Renaming a file
-    // // ---------------------------------------------------------------
-    // renameFile: function (old_filename, oldFilePath, new_filename) {
+    // WRITE: Renaming a file
+    // ---------------------------------------------------------------
+    renameFile: function (old_filename, oldFilePath, new_filename, cb) {
 
-    //     const newFilePath = oldFilePath.replace(old_filename, new_filename);
-    //     console.log(newFilePath)
-    //     fs.rename(oldFilePath, newFilePath, function (err) {
-    //         if (err) throw err;
-    //     });
-    // },
+        const newFilePath = oldFilePath.replace(old_filename, new_filename);
+        fs.rename(oldFilePath, newFilePath, function (err) {
+            if (err) throw err;
+            cb()
+        });
+    },
     // WRITE: Deleting a file
     // ---------------------------------------------------------------
     deleteFile: function (path) {
