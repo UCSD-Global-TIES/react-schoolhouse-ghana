@@ -1,4 +1,4 @@
-const fs = require('fs');
+const fs = require('file-system');
 const checkDiskSpace = require('check-disk-space');
 const multer = require('multer');
 const config = require('../nasConfig');
@@ -86,11 +86,19 @@ module.exports = {
     // ---------------------------------------------------------------
     deleteFile: function (path) {
         return new Promise((resolve, reject) => {
-            fs.unlink(path, function (err) {
-                if (err) resolve(null);
-                // if no error, file has been deleted successfully
-                else resolve({});
-            });
+            const isDir = fs.lstatSync(path).isDirectory();
+            console.log(isDir)
+            if(isDir) {
+                fs.rmdirSync(path);
+                resolve({});
+            } 
+            else {
+                fs.unlink(path, function (err) {
+                    if (err) resolve(null);
+                    // if no error, file has been deleted successfully
+                    else resolve({});
+                });
+            }
         })
     },
     // WRITE: Uploading a file to directory
