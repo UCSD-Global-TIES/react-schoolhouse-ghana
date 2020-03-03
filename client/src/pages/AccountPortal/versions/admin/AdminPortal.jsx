@@ -355,6 +355,7 @@ function AdminPortal(props) {
     const defaultRoute = `${props.match.path}/announcements`;
 
     useEffect(() => {
+
     }, [])
 
     return (

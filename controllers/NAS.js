@@ -72,21 +72,21 @@ module.exports = {
     //         if (err) throw err;
     //     });
     // },
-    // // WRITE: Renaming a file
-    // // ---------------------------------------------------------------
-    // renameFile: function (old_filename, oldFilePath, new_filename) {
+    // WRITE: Renaming a file
+    // ---------------------------------------------------------------
+    renameFile: function (old_filename, oldFilePath, new_filename, cb) {
 
-    //     const newFilePath = oldFilePath.replace(old_filename, new_filename);
-    //     console.log(newFilePath)
-    //     fs.rename(oldFilePath, newFilePath, function (err) {
-    //         if (err) throw err;
-    //     });
-    // },
+        const newFilePath = oldFilePath.replace(old_filename, new_filename);
+        fs.rename(oldFilePath, newFilePath, function (err) {
+            if (err) throw err;
+            cb()
+        });
+    },
     // WRITE: Deleting a file
     // ---------------------------------------------------------------
-    deleteFile: function (filename) {
+    deleteFile: function (path) {
         return new Promise((resolve, reject) => {
-            fs.unlink(`${config.path}/${filename}`, function (err) {
+            fs.unlink(path, function (err) {
                 if (err) resolve(null);
                 // if no error, file has been deleted successfully
                 else resolve({});
