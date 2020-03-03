@@ -5,6 +5,7 @@ const session = require('express-session');
 const morgan = require('morgan');
 const mongoose = require("mongoose");
 const siofu = require("socketio-file-upload")
+const fs = require("fs")
 const routes = require("./routes");
 const config = require("./nasConfig");
 
@@ -51,12 +52,19 @@ app.use((req, res, next) => {
   next();
 });
 
+// Create directories for file storage
+if (!fs.existsSync(config.path)){
+  fs.mkdirSync(config.path);
+  fs.mkdirSync(config.tmp);
+
+}
+
 // Serve up static assets (usually on heroku)
 if (process.env.NODE_ENV === "production") {
   app.use(express.static("client/build"));
 } else {
   // Set up location of NAS storage path
-  app.use('/static', express.static(config.path));
+  app.use(config.publicPath, express.static(config.path));
 
 }
 

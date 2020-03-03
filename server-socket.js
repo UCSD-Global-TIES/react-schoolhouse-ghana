@@ -36,7 +36,7 @@ module.exports = function (server, client, uploader) {
         const { name, size, bytesLoaded, base } = event.file;
         const type = name.split(".")[name.split(".").length - 1];
         const percent = ((bytesLoaded / size) * 100).toFixed(2);
-        const filename = decodeURI(`${base}.${type}`);
+        const filename = decodeURIComponent(`${base}.${type}`);
 
         const fileData = {
             name: filename,
@@ -57,7 +57,7 @@ module.exports = function (server, client, uploader) {
         const { name, size, bytesLoaded, success, base, pathName, meta } = event.file;
         const type = name.split(".")[name.split(".").length - 1];
         const percent = ((bytesLoaded / size) * 100).toFixed(2);
-        const filename = decodeURI(`${base}.${type}`);
+        const filename = decodeURIComponent(`${base}.${type}`);
 
         const createFileDocument = (path, absolutePath, size) => {
             fileDb.findOne({ filename })
@@ -66,7 +66,7 @@ module.exports = function (server, client, uploader) {
                         fileDb
                             .create(
                                 {
-                                    nickname: decodeURI(base),
+                                    nickname: decodeURIComponent(base),
                                     type,
                                     path,
                                     filename,
@@ -102,7 +102,8 @@ module.exports = function (server, client, uploader) {
 
                 // 1. .webzip -> .zip
                 const zipPath = pathName.replace("webzip", "zip")
-                const folderPath = `${config.path}/${base}`
+                const folderName = Date.now();
+                const folderPath = `${config.path}/${folderName}`
                 let indexPath = "";
                 fs.renameSync(pathName, zipPath);
 
@@ -111,19 +112,16 @@ module.exports = function (server, client, uploader) {
                     .pipe(unzipper.Extract({ path: folderPath }))
                     .on("finish", () => {
 
-                        // 3. Locate path to index.html within hostname folder
-                        // Extract hostname from filename
-                        let hostname = base.split("(")[base.split("(").length - 1];
-                        hostname = hostname.split(")")[0];
-                        find.file(`${folderPath}/${hostname}`, function (files) {
+                        // 3. Locate path to index.html within folder
+                        find.file(folderPath, function (files) {
                             indexPath = files.find(filename => filename.includes("index.html"));
                             
                             // 4. Remove .zip from tmp directory
                             fs.unlink(zipPath, () => {})
                             
                             // 5. Create file document 
-                            const path = `${config.publicPath}${decodeURI(indexPath).replace(config.path, "")}`;
-                            const absolutePath = folderPath
+                            const path = `${config.publicPath === "/" ? "" : config.publicPath}${decodeURIComponent(indexPath).replace(config.path, "")}`; 
+                            const absolutePath = folderPath;
                             
                             getSize(absolutePath, (err, numBytes) => {
                                 if (err) { throw err; }
@@ -138,8 +136,9 @@ module.exports = function (server, client, uploader) {
             } else {
                 // Move from tmp to main folder
                 // DOESN'T CORRECTLY OPEN IN BROWSER
-                const path = `${config.publicPath}/${decodeURI(filename)}`;
+                const path = `${config.publicPath === "/" ? "" : config.publicPath}/${decodeURIComponent(filename)}`; 
                 const absolutePath = `${config.path}/${filename}`;
+
                 fs.renameSync(pathName, absolutePath);
                 createFileDocument(path, absolutePath, size)
             }
@@ -152,7 +151,7 @@ module.exports = function (server, client, uploader) {
     uploader.on("error", function (event) {
         const { name, base, size, bytesLoaded, pathName } = event.file;
         const type = name.split(".")[name.split(".").length - 1];
-        const filename = decodeURI(`${base}.${type}`);
+        const filename = decodeURIComponent(`${base}.${type}`);
         const percent = ((bytesLoaded / size) * 100).toFixed(2);
 
         const fileData = {
