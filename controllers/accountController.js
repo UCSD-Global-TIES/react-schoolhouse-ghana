@@ -1,5 +1,4 @@
 const accountDb = require("../models/Account");
-const announcementDb = require("../models/Account");
 const StudentDb = require("../models/Student");
 const TeacherDb = require("../models/Teacher");
 const AdminDb = require("../models/Admin");
@@ -10,14 +9,14 @@ const {
 } = require("./verifyController");
 
 const {
-    generatePassword,
+    // generatePassword,
     encryptPassword,
-    verifyPassword
+    // verifyPassword
 } = require("../scripts/encrypt");
 
-const PASSWORD_LENGTH = 6;
-const PASSWORD_NUMBERS = true;
-const PASSWORD_SYMBOLS = false;
+// const PASSWORD_LENGTH = 6;
+// const PASSWORD_NUMBERS = true;
+// const PASSWORD_SYMBOLS = false;
 
 const generateUniqueUsername = (first_name, last_name) => {
     const MAX_LASTNAME_LENGTH = 3;
