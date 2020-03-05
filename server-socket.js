@@ -130,8 +130,9 @@ module.exports = function (server, client, uploader) {
                 // Move from tmp to main folder
 
                 // VIDEOS NOT SAVED DIRECTLY, CANNOT OPEN IN BROWSER
-                const path = `${config.publicPath === "/" ? "" : config.publicPath}/${encodeURIComponent(filename)}`; 
-                const absolutePath = `${config.path}/${encodeURIComponent(filename)}`;
+                const dateID = Date.now();
+                const path = `${config.publicPath === "/" ? "" : config.publicPath}/${dateID}.${type}`; 
+                const absolutePath = `${config.path}/${dateID}.${type}`;
 
                 fs.renameSync(pathName, absolutePath);
                 createFileDocument(path, absolutePath, size)
