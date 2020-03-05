@@ -1,7 +1,6 @@
 import axios from "axios";
 // import encrypt from "./encrypt";
 
-// ROUTES UNSECURED
 // CONVERT ALL API FUNCTIONS SO YOU PASS IN VARIABLES NOT A OBJECT
 export default {
   // SUBJECT ANNOUNCEMENTS
@@ -26,34 +25,6 @@ export default {
     }
 
   },
-  // // Delete an 'Announcement' -> Pull 'Announcement' from 'Subject' announcements
-  // deleteSubjectAnnouncement: function (subject_id, ann_id, key) {
-  //   const config = {
-  //     'Authorization': key
-  //   };
-  //   return axios.delete(`/api/subject/${subject_id}/ann/${ann_id}`, {
-  //     headers: config
-  //   }); // SECURE
-  // },
-  // FILES
-  // ---------------------------------------------------------------
-  // https://programmingwithmosh.com/javascript/react-file-upload-proper-server-side-nodejs-easy/
-
-  // // Create a 'File'
-  // addFile: function (file, nickname, type, path, key) {
-  //   const config = {
-  //     'Authorization': key
-  //   };
-  //   const fileData = new FormData();
-  //   fileData.append('file', file);
-  //   fileData.append('name', nickname);
-  //   fileData.append('type', type);
-  //   fileData.append('path', path);
-
-  //   return axios.post(`/api/file`, fileData, {
-  //     headers: config
-  //   }); // SECURE
-  // },
   // // Get all 'File' documents
   getFiles: function (key) {
     const config = {
@@ -180,22 +151,6 @@ export default {
       headers: config
     }); // SECURE
   },
-  // // Create a public 'Announcement'
-  // addSchoolAnnouncement: function (title, content, files, authorName, key) {
-  //   const config = {
-  //     'Authorization': key
-  //   };
-  //   let doc = {
-  //     title,
-  //     content,
-  //     authorName,
-  //     files,
-  //     private: false
-  //   };
-  //   return axios.post(`/api/general/ann`, doc, {
-  //     headers: config
-  //   }); // SECURE
-  // },
   // Deletes an array of 'Announcement'
   deleteAnnouncements: function (ann_id_list, key) {
     const config = {
@@ -285,63 +240,6 @@ export default {
     return Promise.all(promises)
 
   },
-  // GRADE MEMBERS
-  // ---------------------------------------------------------------
-  // // Add a 'Student' to 'Grade' students 
-  // addStudent: function (grade_id, sid, key) {
-  //   const config = {
-  //     'Authorization': key
-  //   };
-  //   return axios.post(`/api/grade/${grade_id}/student/${sid}`, {
-  //     headers: config
-  //   }); // SECURE
-  // },
-  // // Remove a 'Student' from 'Grade' students
-  // deleteStudent: function (grade_id, sid, key) {
-  //   const config = {
-  //     'Authorization': key
-  //   };
-  //   return axios.delete(`/api/grade/${grade_id}/student/${sid}`, {
-  //     headers: config
-  //   }); // SECURE
-  // },
-  // // Add a 'Teacher' to 'Grade' teachers 
-  // addTeacher: function (grade_id, tid, key) {
-  //   const config = {
-  //     'Authorization': key
-  //   };
-  //   return axios.post(`/api/grade/${grade_id}/teacher/${tid}`, {
-  //     headers: config
-  //   }); // SECURE
-  // },
-  // // Remove a 'Teacher' from 'Grade' teachers
-  // deleteTeacher: function (grade_id, tid, key) {
-  //   const config = {
-  //     'Authorization': key
-  //   };
-  //   return axios.delete(`/api/grade/${grade_id}/teacher/${tid}`, {
-  //     headers: config
-  //   }); // SECURE
-  // },
-  // // Add a 'Subject' to 'Grade' subjects 
-  // addSubject: function (grade_id, sid, key) {
-  //   const config = {
-  //     'Authorization': key
-  //   };
-  //   return axios.post(`/api/grade/${grade_id}/subject/${sid}`, {
-  //     headers: config
-  //   }); // SECURE
-  // },
-  // // Remove a 'Subject' from 'Grade' subjects
-  // deleteSubject: function (grade_id, sid, key) {
-  //   const config = {
-  //     'Authorization': key
-  //   };
-  //   return axios.delete(`/api/grade/${grade_id}/subject/${sid}`, {
-  //     headers: config
-  //   }); // SECURE
-  // },
-
   // ACCOUNTS
   // ---------------------------------------------------------------
   // Gets 'Account' profile matching the specified username and password

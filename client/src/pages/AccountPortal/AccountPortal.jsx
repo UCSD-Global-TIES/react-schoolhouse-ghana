@@ -4,7 +4,6 @@ import "./main.css";
 
 import UserPortal from "./versions/user/UserPortal.jsx";
 import { Redirect } from "react-router-dom";
-// import AdminPortal from "./versions/admin/AdminPortal.jsx";
 
 const AdminRedirect = () => <Redirect to="/edit" />;
 

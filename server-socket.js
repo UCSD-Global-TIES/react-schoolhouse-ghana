@@ -12,20 +12,13 @@ module.exports = function (server, client, uploader) {
     // Track the number of connections to the server
     // let connections = 0;
     let users = 0;
-
-    // // The socket is attached to the user that 
-    // console.log(`A device has connected to the server: ${++connections} connection(s)`);
-
+    
     // Emit on the channel 'chat message' the payload msg
     client.on('authentication', function (msg) {
         console.log(msg);
         console.log(`A user has logged in: ${++users} user(s)`);
 
     })
-
-    // client.on('disconnect', function () {
-    //     console.log(`A user has disconnected from the server: ${--connections} connection(s)`);
-    // });
 
     client.on('documents-changed', function (type) {
         server.emit(`refresh-${type}`)
@@ -135,9 +128,11 @@ module.exports = function (server, client, uploader) {
                     });
             } else {
                 // Move from tmp to main folder
-                // DOESN'T CORRECTLY OPEN IN BROWSER
-                const path = `${config.publicPath === "/" ? "" : config.publicPath}/${decodeURIComponent(filename)}`; 
-                const absolutePath = `${config.path}/${filename}`;
+
+                // VIDEOS NOT SAVED DIRECTLY, CANNOT OPEN IN BROWSER
+                const dateID = Date.now();
+                const path = `${config.publicPath === "/" ? "" : config.publicPath}/${dateID}.${type}`; 
+                const absolutePath = `${config.path}/${dateID}.${type}`;
 
                 fs.renameSync(pathName, absolutePath);
                 createFileDocument(path, absolutePath, size)
