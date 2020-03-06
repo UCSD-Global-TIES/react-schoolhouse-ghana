@@ -3,7 +3,8 @@ const fileDb = require("./models/File")
 const { deleteFile } = require("./controllers/NAS")
 const fs = require("fs")
 const getSize = require('get-folder-size');
-const unzipper = require("unzipper");
+// const unzipper = require("unzipper");
+const extract = require('extract-zip');
 const find = require("find");
 
 // import socket from server.js
@@ -101,9 +102,11 @@ module.exports = function (server, client, uploader) {
                 fs.renameSync(pathName, zipPath);
 
                 // 2. Unzip to storage directory
-                fs.createReadStream(zipPath)
-                    .pipe(unzipper.Extract({ path: folderPath }))
-                    .on("finish", () => {
+                // fs.createReadStream(zipPath)
+                //     .pipe(unzipper.Extract({ path: folderPath }))
+                //     .on("finish", () => 
+                extract( zipPath, {dir: folderPath},  () =>
+                    {
 
                         // 3. Locate path to index.html within folder
                         find.file(folderPath, function (files) {

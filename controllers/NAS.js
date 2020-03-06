@@ -87,7 +87,6 @@ module.exports = {
     deleteFile: function (path) {
         return new Promise((resolve, reject) => {
             const isDir = fs.lstatSync(path).isDirectory();
-            console.log(isDir)
             if(isDir) {
                 fs.rmdirSync(path);
                 resolve({});
