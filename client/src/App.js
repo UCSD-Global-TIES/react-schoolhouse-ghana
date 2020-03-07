@@ -5,7 +5,8 @@ import React, {
 
 import {
   Route,
-  Switch
+  Switch,
+  Redirect
 } from "react-router-dom";
 
 import "./App.css";
@@ -88,6 +89,8 @@ function App() {
               <ProtectedRoute path="/edit" component={AdminPortal} logout={handleLogout} user={userInfo} />
               <Route exact path="/login" component={props => <LoginPortal {...props} user={userInfo} setUser={setUser} />} />
               <Route component={NoMatch} />
+              {/* <Redirect to="/" /> */}
+
             </Switch>
         }
       </div>

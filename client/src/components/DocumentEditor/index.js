@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
+import {Link} from "react-router-dom"
 import { getQueries, parseTime } from "../../utils/misc";
-import clsx from "clsx";
 import { Alert, Skeleton, Pagination } from '@material-ui/lab'
 import { IconButton, FormControl, Input, InputLabel, InputAdornment, Snackbar, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Checkbox, Typography } from "@material-ui/core";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSpinner, faExternalLinkAlt } from "@fortawesome/free-solid-svg-icons";
+import { faSpinner, faExternalLinkAlt, faArrowAltCircleRight } from "@fortawesome/free-solid-svg-icons";
 
 import SearchIcon from '@material-ui/icons/Search';
 import { makeStyles } from '@material-ui/core/styles';
@@ -503,11 +503,23 @@ function DocumentEditor(props) {
                                                             <ListItemSecondaryAction>
                                                                 {
                                                                     props.link ?
-                                                                        <a target="_blank" href={props.link(document)} style={{ textDecoration: "none", fontSize: "1rem" }}>
-                                                                            <IconButton aria-label="create" >
-                                                                                <FontAwesomeIcon icon={faExternalLinkAlt} size="xs" />
-                                                                            </IconButton>
-                                                                        </a>
+                                                                        <>
+                                                                        {
+                                                                            !props.link(document).includes("http") ?
+                                                                                <Link to={props.link(document)} style={{ textDecoration: "none", fontSize: "1rem" }}>
+                                                                                    <IconButton aria-label="create" >
+                                                                                        <FontAwesomeIcon icon={faArrowAltCircleRight} size="xs" />
+                                                                                    </IconButton>
+                                                                                </Link>
+                                                                            : 
+
+                                                                            <a target={"_blank"} href={props.link(document)} style={{ textDecoration: "none", fontSize: "1rem" }}>
+                                                                                <IconButton aria-label="create" >
+                                                                                    <FontAwesomeIcon icon={faExternalLinkAlt} size="xs" />
+                                                                                </IconButton>
+                                                                            </a>
+                                                                        }
+                                                                        </>
                                                                         :
                                                                         <FontAwesomeIcon icon={icon} />
 

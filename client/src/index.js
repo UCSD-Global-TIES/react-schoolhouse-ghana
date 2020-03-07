@@ -17,7 +17,9 @@ const onRedirectCallback = appState => {
 };
 
 ReactDOM.render(
-        <BrowserRouter>
+        <BrowserRouter 
+        basename="/home"
+        >
             <App />
         </BrowserRouter>
     ,

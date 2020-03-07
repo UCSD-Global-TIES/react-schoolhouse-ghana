@@ -8,6 +8,8 @@ const siofu = require("socketio-file-upload")
 const fs = require("fs")
 const routes = require("./routes");
 const config = require("./nasConfig");
+const open = require("open")
+const path = require("path")
 
 const app = express();
 var http = require('http').createServer(app);
@@ -62,6 +64,11 @@ if (!fs.existsSync(config.path)){
 // Serve up static assets (usually on heroku)
 if (process.env.NODE_ENV === "production") {
   app.use(express.static("client/build"));
+  app.get('/', function (req, res) {
+    res.sendFile(path.join(__dirname, 'client/build', 'index.html'));
+  });
+  // Set up location of NAS storage path
+  app.use(config.publicPath, express.static(config.path));
 } else {
   // Set up location of NAS storage path
   app.use(config.publicPath, express.static(config.path));
@@ -82,6 +89,10 @@ const startServer = () => {
   // Start the API server
   http.listen(PORT, function () {
     console.log(`🌎  ==> API Server now listening on PORT ${PORT}!`);
+    if (process.env.NODE_ENV === "production") {
+      open(`http://localhost:${PORT}`);
+      console.log(`The web server is now live at http://localhost:${PORT} !`);
+    }
   });
 
 }
