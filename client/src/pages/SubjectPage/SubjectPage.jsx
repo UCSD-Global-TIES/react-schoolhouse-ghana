@@ -210,7 +210,7 @@ function SubjectPage(props) {
       })
 
     // LISTEN FOR MODIFIED SUBJECT (INCOMPLETE)
-    const collections = ['subjects', 'announcements', `subject-files-${subject_id}`];
+    const collections = ['subjects', 'announcements', 'subject announcements', `subject-files-${subject_id}`];
     for (const collection of collections) {
       socket.on(`refresh-${collection}`, function () {
         handleRefresh();
