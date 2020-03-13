@@ -140,7 +140,7 @@ module.exports = {
                 const { size } = fs.statSync(filePath);
                 const { nickname, type, filename } = fileSeeds;
                 const fileObj = {
-                    nickname, type, filename, path: `${config.publicPath}/${filename}`, absolutePath: filePath, size
+                    nickname, type, filename, path: `${config.publicPath !== "/" ? config.publicPath : ""}/${filename}`, absolutePath: filePath, size
                 }
 
                 // 1

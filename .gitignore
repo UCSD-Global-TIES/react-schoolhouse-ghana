@@ -63,3 +63,6 @@ client/.env
 
 # storage directories
 client/public/storage/*
+
+# production build
+client/build/
