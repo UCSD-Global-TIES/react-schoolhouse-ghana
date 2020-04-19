@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { TextField, CircularProgress, InputAdornment, IconButton } from "@material-ui/core";
 import { makeStyles } from '@material-ui/core/styles';
-import { parseTime } from '../../utils/misc';
+import { generatePassword, parseTime } from '../../utils/misc';
 import { Autocomplete } from '@material-ui/lab';
 import Visibility from '@material-ui/icons/Visibility';
 import VisibilityOff from '@material-ui/icons/VisibilityOff';
 
 import "../../utils/flowHeaders.min.css";
-import API from "../../utils/API";
+import API from "../../utils/API"; 
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -69,7 +69,8 @@ const textFields = [
 
 ]
 
-const accountTypes = ['Student', 'Teacher', 'Admin']
+const accountTypes = ['Student', 'Teacher', 'Admin'];
+
 function AccountsForm(props) {
     const classes = useStyles();
     const [loading, setLoading] = useState(true);
@@ -104,6 +105,17 @@ function AccountsForm(props) {
         }
     }
 
+    const handleDefaultPassword = () => {
+        const event = {
+            target: {
+                name: "password",
+                value: generatePassword()
+            }
+        }
+
+        PROPS.handleChange(event);
+    };
+
     const handleClickShowPassword = () => {
         setShowPassword(!showPassword)
     };
@@ -112,6 +124,14 @@ function AccountsForm(props) {
         event.preventDefault();
     };
 
+    const getTextFieldValue = (item) => {
+        const dateString = (item.isDate ? parseTime(PROPS.document[item.name]) : null);
+        // const password = (item.isHidden ? generatedPassword : null);
+        const password = (item.isHidden ? PROPS.document["password"] : null);
+        return dateString || PROPS.document[item.name] || password || "";
+    }
+
+    if (!PROPS.document["password"]) handleDefaultPassword();
 
     useEffect(() => {
         const promises = [];
@@ -213,7 +233,9 @@ function AccountsForm(props) {
 
                 </div>
                 {
-                    textFields.map((item, idx) => (
+                    textFields.map((item, idx) => {
+
+                        return (
                         <TextField
                             error={PROPS.error[item.name] ? PROPS.error[item.name].exists : null}
                             required={item.required}
@@ -223,7 +245,7 @@ function AccountsForm(props) {
                             name={item.name}
                             placeholder={(item.disabled || (item.updateOnly && PROPS.isCreate)) ? disabledMsg : ""}
                             disabled={(item.disabled || (item.updateOnly && PROPS.isCreate))}
-                            value={(item.isDate ? parseTime(PROPS.document[item.name]) : null) || PROPS.document[item.name] || ""}
+                            value={getTextFieldValue(item)}
                             helperText={PROPS.error[item.name] ? (PROPS.error[item.name].exists ? PROPS.error[item.name].message : item.helper) : item.helper}
                             onChange={PROPS.handleChange}
                             fullWidth
@@ -249,10 +271,12 @@ function AccountsForm(props) {
                                             {showPassword ? <Visibility /> : <VisibilityOff />}
                                         </IconButton>
                                     </InputAdornment>
+                                    
                                 }}
 
                         />
-                    ))}
+                    )})}
+                    
 
             </div>
         </div>
