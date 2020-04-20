@@ -131,9 +131,10 @@ function AccountsForm(props) {
         return dateString || PROPS.document[item.name] || password || "";
     }
 
-    if (!PROPS.document["password"]) handleDefaultPassword();
-
     useEffect(() => {
+        // Sets the default password
+        if (!PROPS.document["password"]) handleDefaultPassword();
+
         const promises = [];
 
         promises.push(API.getGrades(PROPS.user.key));
@@ -164,7 +165,6 @@ function AccountsForm(props) {
 
     useEffect(() => {
         setProps(props);
-
     }, [props])
 
     return (
