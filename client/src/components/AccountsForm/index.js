@@ -126,7 +126,6 @@ function AccountsForm(props) {
 
     const getTextFieldValue = (item) => {
         const dateString = (item.isDate ? parseTime(PROPS.document[item.name]) : null);
-        // const password = (item.isHidden ? generatedPassword : null);
         const password = (item.isHidden ? PROPS.document["password"] : null);
         return dateString || PROPS.document[item.name] || password || "";
     }
