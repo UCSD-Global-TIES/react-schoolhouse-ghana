@@ -158,8 +158,6 @@ function AccountsForm(props) {
                 }
 
             })
-
-
     }, []);
 
     useEffect(() => {
