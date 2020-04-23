@@ -20,6 +20,7 @@ import DocumentEditor from "../../components/DocumentEditor";
 import AnnouncementViewer from "../../components/AnnouncementViewer";
 import SubjectAnnouncementsForm from "../../components/SubjectAnnouncementsForm";
 import SubjectFilesForm from "../../components/SubjectFilesForm";
+import StudentList from "../../components/StudentList";
 import SocketContext from "../../socket-context"
 import clsx from "clsx"
 
@@ -84,7 +85,14 @@ function SubjectPage(props) {
       icon: faFile,
       path: `${props.match.url}/resources`
     }
-  ]
+  ];
+  if (props.user.type !== "Student") {
+    documentMenuItems.push(   {
+      label: "Students",
+      icon: faFile,
+      path: `${props.match.url}/students`
+    });
+  };
 
   const drawer = (
     <div
@@ -182,6 +190,14 @@ function SubjectPage(props) {
           )
       ,
       path: `${props.match.path}/resources`
+    },
+    {
+      component:
+        (props) => (
+          <StudentList props={props}/>
+        )
+      ,
+      path: `${props.match.path}/students`
     }
   ]
 
