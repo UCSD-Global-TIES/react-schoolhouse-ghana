@@ -141,7 +141,9 @@ function UserPortal(props) {
                 setGradeAnnouncements(subjectAnnList);
 
                 // Set Student List
-                setStudentList(promiseResults[0].data.students);
+                if (props.user.type === "Teacher") {
+                    setStudentList(promiseResults[0].data.students);
+                }
 
                 // Set loading false, so the loading screen goes away
                 setLoading(false);
@@ -178,10 +180,10 @@ function UserPortal(props) {
                     <DialogContent style={{ width: "70vw", maxWidth: "500px", padding: "0px 24px" }}>
 
                         {studentList.map((val, idx) => 
-                            <>
-                                <p key={"student-"+idx}>{val.firstName} {val.lastName}</p>
-                            </>
-                            
+                            <div className="row">
+                                <p key={"student-name"+idx}>{val.firstName} {val.lastName}</p>
+                                <p key={"student-user"+idx} style={{textAlign: "right"}}>{val.username}</p>
+                            </div>
                         )}
 
                     </DialogContent>
@@ -274,9 +276,14 @@ function UserPortal(props) {
                 </Grid>
 
                 <Grid>
-                    <div className={classes.boxShadow} style={{ marginLeft: "20px" }}>
-                        <Button style={{ backgroundColor: "white"}} onClick={() => setStudentDialog(true)} >Student List</Button>
-                    </div>
+                    {
+                        props.user.type === "Teacher" ? 
+                            <div className={classes.boxShadow} style={{ marginLeft: "20px" }}>
+                              <Button style={{ backgroundColor: "white"}} onClick={() => setStudentDialog(true)} >Student List</Button>
+                            </div>
+                        : null
+                    }
+                    
                 </Grid>
 
             </Grid>

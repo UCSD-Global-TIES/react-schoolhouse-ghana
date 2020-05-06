@@ -1,5 +1,6 @@
 const gradeDb = require("../models/Grade");
 const studentDb = require("../models/Student");
+const accountDb = require("../models/Account");
 const ip = require("ip")
 const API_PORT = process.env.PORT || 3001;
 
@@ -48,7 +49,7 @@ module.exports = {
                             path: 'subjects',
                             populate: {
                                 path: 'announcements',
-                                populate: {
+                                populate: { 
                                     path: 'files'
                                 }
                             }
@@ -72,17 +73,19 @@ module.exports = {
                             }
 
                             // Replace students with student object (names, etc)
-                            console.log(gradeDoc);
                             for (let i = 0; i < gradeDoc.students.length; i++) {
                                 const currentStudent = gradeDoc.students[i];
                                 const studentDoc = await studentDb.findById(currentStudent);
-                                const studentObj = {
+                                const accountDoc = await accountDb.findOne({ profile: currentStudent });
+                                console.log(accountDoc);
+                                
+                                gradeDoc.students[i] = {
                                     firstName: studentDoc["first_name"],
                                     lastName: studentDoc["last_name"],
-                                    id: studentDoc["_id"]
-                                }
-                                gradeDoc.students[i] = studentObj;
-                            }
+                                    id: studentDoc["_id"],
+                                    username: accountDoc["username"]
+                                };
+                            };
 
                             res.json(gradeDoc)
                         })
