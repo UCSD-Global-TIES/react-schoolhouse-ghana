@@ -5,7 +5,6 @@ import GradesForm from "../../../../components/GradesForm";
 import SubjectsForm from "../../../../components/SubjectsForm";
 import AccountsForm from "../../../../components/AccountsForm";
 import AssessmentForm from "../../../../components/AssessmentForm";
-
 import ServerDash from "../../../../components/ServerDash"
 import ProtectedRoute from "../../../../components/ProtectedRoute"
 import { makeStyles, useTheme } from '@material-ui/core/styles';
@@ -16,7 +15,7 @@ import "../../../../utils/flowHeaders.min.css";
 import "./main.css";
 import NavBarAdmin from "../../../../components/NavBarAdmin";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faUsers, faBullhorn, faChalkboardTeacher, faShapes, faServer, faFile } from "@fortawesome/free-solid-svg-icons";
+import { faUsers, faBullhorn, faChalkboardTeacher, faShapes, faCheckCircle, faFile } from "@fortawesome/free-solid-svg-icons";
 import DocumentEditor from '../../../../components/DocumentEditor'
 import FilesForm from "../../../../components/FilesForm";
 
@@ -93,15 +92,20 @@ function AdminPortal(props) {
             path: `${props.match.url}/accounts`
         },
         {
-            label: "Assessments",
-            icon: faServer,
-            path: `${props.match.url}/assessment`
-        },
-        {
             label: "Files",
             icon: faFile,
             path: `${props.match.url}/files`
+        },
+        {
+            label: "Assessment",
+            icon: faCheckCircle,
+            path:`${props.match.url}/assessment`
         }
+        // {
+        //     label: "Server",
+        //     icon: faServer,
+        //     path: `${props.match.url}/server`
+        // },
     ]
 
     const drawer = (
@@ -326,13 +330,27 @@ function AdminPortal(props) {
                     message: "You must enter an informative file nickname"
                 }
             }
+        },
+        {
+            collection: "Assessment",
+            link: (doc) => `/assessment/yolo`, // TODO: Set specific quiz ID into the URL once backend is finished 
+            icon: faCheckCircle,
+            FormComponent: (p) => <AssessmentForm user={props.user} {...p}/>,
+            primary: (doc) => doc.title,
+            path: `${props.match.path}/assessment`,
+            api: {
+                get: API.getAssessments 
+                // TODO: Other API requests once we start implementing ability to create tests
+            },
+            validation: {}
         }
         
     ]
 
     let pages = [];
 
-    pagesInfo.slice(0, pagesInfo.length - 1).map((page, idx) => {
+    pagesInfo.filter((obj) => obj.collection != "Files") .map((page, idx) => {
+        console.log(page.path)
         pages.push({
             path: page.path,
             component: (props) =>
@@ -349,9 +367,9 @@ function AdminPortal(props) {
                     validation={page.validation}
                     {...props} />
         })
-    })
+    });
 
-    pagesInfo.slice(pagesInfo.length - 1).map((page, idx) => {
+    pagesInfo.filter((obj) => obj.collection == "Files").map((page, idx) => {
         pages.push({
             path: page.path,
             component: (props) =>
