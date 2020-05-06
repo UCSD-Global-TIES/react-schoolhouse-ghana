@@ -279,28 +279,6 @@ function AdminPortal(props) {
                 }
             }
         },
-        // {
-        //     collection: "Assessments",
-        //     link: (doc) => doc.path, // TODO: this needs to be link to the quiz
-        //     icon: faFile, // TOOO: Find the icon 
-        //     FormComponent: AssessmentForm, // AssessmentForm,
-        //     primary: (doc) => doc.nickname, // Main Bolded Text. Secondary is also an option
-        //     path: `${props.match.path}/assessment`,
-        //     api: { // TODO: API functions to use to get the documents
-        //         get: API.getFiles,
-        //         put: API.updateFile,
-        //         delete: API.deleteFiles,
-        //         post: (doc) => {
-        //             return new Promise((resolve, reject) => {
-        //                 siofu.submitFiles(doc.files);
-        //                 resolve({
-        //                     data: {}
-        //                 })
-        //             })
-        //         }
-        //     },
-        //     validation: { }// TODO: Figure out what needs to be validated for creating forms
-        // },
         {
             collection: "Files",
             link: (doc) => doc.path,
@@ -450,7 +428,6 @@ function AdminPortal(props) {
                             <ProtectedRoute key={`page-${idx}`} exact path={page.path} component={page.component} user={props.user} />
                         ))
                     }
-                    <ProtectedRoute key={"page-assessment"} exact path={props.match.path+"/assessment"} component={AssessmentForm} user={props.user} />
                     <Redirect to={defaultRoute} />
                 </Switch>
                 {/* </CSSTransition>
