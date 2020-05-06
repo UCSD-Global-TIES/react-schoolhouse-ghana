@@ -39,7 +39,9 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-
+const Transition = React.forwardRef(function Transition(props, ref) {
+    return <Slide direction="up" ref={ref} {...props} />;
+});
 
 function UserPortal(props) {
     const socket = React.useContext(SocketContext)
@@ -63,9 +65,7 @@ function UserPortal(props) {
 
     const [studentDialog, setStudentDialog] = useState(false);
 
-    const Transition = React.forwardRef(function Transition(props, ref) {
-        return <Slide direction="up" ref={ref} {...props} />;
-    });
+    const [studentList, setStudentList] = useState([]);
 
     // Route user to clicked subject page
     const handleOpenSubject = (subject_id) => {
@@ -98,7 +98,7 @@ function UserPortal(props) {
                         subjectAnnList = subjectAnnList.concat(subjectDoc.announcements)
                     }
                 }
-
+                
                 // Get & Set Subject announcements
                 setGradeAnnouncements([...subjectAnnList]);
 
@@ -111,34 +111,6 @@ function UserPortal(props) {
     const handleCloseDocument = () => {
         setStudentDialog(false);
     }
-
-    const renderDialogBox = () => {
-        return (
-            <Dialog
-                    open={studentDialog}
-                    TransitionComponent={Transition}
-                    keepMounted
-                    onClose={handleCloseDocument}
-                    aria-labelledby="alert-dialog-slide-title"
-                    aria-describedby="alert-dialog-slide-description"
-                >
-                    <DialogTitle style={{ padding: "10px 24px" }}
-                        align="center" id="student-list">Student List</DialogTitle>
-
-
-                    <DialogContent style={{ width: "70vw", maxWidth: "500px", padding: "0px 24px" }}>
-
-                        {/* <DocumentViewer document={currentDocument} /> */}
-
-                    </DialogContent>
-                    <DialogActions>
-                        <Button onClick={handleCloseDocument} color="primary">
-                            Close
-                        </Button>
-                    </DialogActions>
-                </Dialog>
-        )
-    };
 
     useEffect(() => {
         const promises = [];
@@ -168,6 +140,9 @@ function UserPortal(props) {
                 // Get & Set Subject announcements
                 setGradeAnnouncements(subjectAnnList);
 
+                // Set Student List
+                setStudentList(promiseResults[0].data.students);
+
                 // Set loading false, so the loading screen goes away
                 setLoading(false);
 
@@ -185,6 +160,39 @@ function UserPortal(props) {
     if (loading) {
         return <PageSpinner />
     }
+
+
+    const renderDialogBox = () => {
+        return (
+            <Dialog
+                    open={studentDialog}
+                    TransitionComponent={Transition}
+                    keepMounted
+                    onClose={handleCloseDocument}
+                    aria-labelledby="alert-dialog-slide-title"
+                    aria-describedby="alert-dialog-slide-description"
+                >
+                    <DialogTitle style={{ padding: "10px 24px" }}
+                        align="center" id="student-list">Student List</DialogTitle>
+
+                    <DialogContent style={{ width: "70vw", maxWidth: "500px", padding: "0px 24px" }}>
+
+                        {studentList.map((val, idx) => 
+                            <>
+                                <p key={"student-"+idx}>{val.firstName} {val.lastName}</p>
+                            </>
+                            
+                        )}
+
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={handleCloseDocument} color="primary">
+                            Close
+                        </Button>
+                    </DialogActions>
+                </Dialog>
+        )
+    };
 
     return (
         <div style={{ display: "flex", width: "100%", marginTop: "5rem" }}>
