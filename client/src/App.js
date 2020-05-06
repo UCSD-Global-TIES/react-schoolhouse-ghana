@@ -24,6 +24,7 @@ import NoMatch from "./pages/NoMatch/index";
 import LoginPortal from "./pages/LoginPortal/index";
 import AccountPortal from "./pages/AccountPortal/index";
 import SubjectPage from "./pages/SubjectPage/index";
+import AssessmentPage from "./pages/AssessmentPage/index";
 import NavBar from "./components/NavBar";
 import { faSpinner } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -87,6 +88,7 @@ function App() {
               <ProtectedRoute path="/subject/:id" component={SubjectPage} logout={handleLogout} user={userInfo} />
               <ProtectedRoute path="/edit" component={AdminPortal} logout={handleLogout} user={userInfo} />
               <Route exact path="/login" component={props => <LoginPortal {...props} user={userInfo} setUser={setUser} />} />
+              <Route path="/assessment/:id" component={AssessmentPage} logout={handleLogout} user={userInfo} />
               <Route component={NoMatch} />
             </Switch>
         }

@@ -352,6 +352,16 @@ export default {
     return axios.get(`/api/account`, {
       headers: config
     }); // SECURE
+  },
+
+  /// Deals with Assessments
+  getAssessments: function (key) {
+    const config = {
+      'Authorization': key
+    };
+    return axios.get('/api/assessment', {
+      headers: config
+    });
   }
 
 };
