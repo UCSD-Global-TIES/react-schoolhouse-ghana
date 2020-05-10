@@ -55,6 +55,7 @@ npm start
 
 ##### Notes 
 - When the server is first launched, a master account will be created with administrative privileges; the credentials for this account will only be displayed ONCE, so make sure to mark them down
+- These credentials can also be found in the code
 
 
 

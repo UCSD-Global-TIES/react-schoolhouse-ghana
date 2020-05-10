@@ -350,10 +350,11 @@ function DocumentEditor(props) {
     }
 
     useEffect(() => {
-        props.get(props.user.key)
+        if (!!props.get) {
+            props.get(props.user.key)
             .then((docData) => {
                 const docList = docData.data;
-
+                
                 // Initialize documents
                 setDocuments(docList);
                 setFilteredDocuments(docList);
@@ -389,9 +390,11 @@ function DocumentEditor(props) {
                 }
             });
 
-        socket.on(`refresh-${collection.toLowerCase()}`, function () {
-            handleRefresh();
-        })
+            socket.on(`refresh-${collection.toLowerCase()}`, function () {
+                handleRefresh();
+            })
+        }
+        
     }, []);
 
     return (
@@ -499,7 +502,7 @@ function DocumentEditor(props) {
                                                                     inputProps={{ 'aria-labelledby': labelId }}
                                                                 />
                                                             </ListItemIcon>
-                                                            <ListItemText id={labelId} style={{ overflowWrap: "break-word" }} primary={primary(document)} secondary={`Created: ${parseTime(document.createdAt, true)}`} />
+                                                            <ListItemText id={labelId} style={{ overflowWrap: "break-word" }} primary={primary(document)} secondary={`Created: ${document.createdAt ? parseTime(document.createdAt, true) : document.createdBy}`} />
                                                             <ListItemSecondaryAction>
                                                                 {
                                                                     props.link ?
@@ -511,7 +514,8 @@ function DocumentEditor(props) {
                                                                         :
                                                                         <FontAwesomeIcon icon={icon} />
 
-                                                                }                                                            </ListItemSecondaryAction>
+                                                                }                                                            
+                                                            </ListItemSecondaryAction>
                                                         </ListItem>
                                                     );
                                                 })
@@ -529,9 +533,6 @@ function DocumentEditor(props) {
                                     </div>
                         }
                     </>
-
-
-
                 </div>
             </div>
         </>

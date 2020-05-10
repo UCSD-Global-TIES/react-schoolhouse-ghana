@@ -19,5 +19,15 @@ module.exports = {
 
         if (isShort) return moment(date).format("h:mm a on MM/DD/YY");
         return moment(date).format("dddd, MMMM Do YYYY, h:mm a");
+    },
+    generatePassword: () => {
+        // TODO: Make auth rules that require more conditions for the password (Ex. one lower case, one upper case, one symbol, etc)
+        var length = 8,
+            charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()",
+            retVal = "";
+        for (var i = 0, n = charset.length; i < length; ++i) {
+            retVal += charset.charAt(Math.floor(Math.random() * n));
+        }
+        return retVal;
     }
 }
