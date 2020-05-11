@@ -1,4 +1,6 @@
 const gradeDb = require("../models/Grade");
+const studentDb = require("../models/Student");
+const accountDb = require("../models/Account");
 const ip = require("ip")
 const API_PORT = process.env.PORT || 3001;
 
@@ -47,14 +49,13 @@ module.exports = {
                             path: 'subjects',
                             populate: {
                                 path: 'announcements',
-                                populate: {
+                                populate: { 
                                     path: 'files'
                                 }
                             }
                         })
 
-                        .then(gradeDoc => {
-
+                        .then(async (gradeDoc) => {
                             // Replace files for announcements
                             for (let i = 0; i < gradeDoc.subjects.length; i++) {
                                 const currentSubject = gradeDoc.subjects[i]
@@ -70,6 +71,21 @@ module.exports = {
                                     currentSubject.announcements[i].files = annFilesWithPaths;
                                 }
                             }
+
+                            // Replace students with student object (names, etc)
+                            for (let i = 0; i < gradeDoc.students.length; i++) {
+                                const currentStudent = gradeDoc.students[i];
+                                const studentDoc = await studentDb.findById(currentStudent);
+                                const accountDoc = await accountDb.findOne({ profile: currentStudent });
+                                console.log(accountDoc);
+                                
+                                gradeDoc.students[i] = {
+                                    firstName: studentDoc["first_name"],
+                                    lastName: studentDoc["last_name"],
+                                    id: studentDoc["_id"],
+                                    username: accountDoc["username"]
+                                };
+                            };
 
                             res.json(gradeDoc)
                         })

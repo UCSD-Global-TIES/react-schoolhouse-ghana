@@ -3,7 +3,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import { Link } from "react-router-dom"
 import API from "../../../../utils/API"
 import SimpleListView from "../../../../components/SimpleListView"
-import { Snackbar, Grid, Typography, CardActionArea, CardContent, CardMedia, Card } from "@material-ui/core";
+import { Snackbar, Grid, Typography, Dialog, DialogContent, DialogTitle, Slide, DialogActions, CardActionArea, CardContent, CardMedia, Card, Button } from "@material-ui/core";
 import { Alert } from '@material-ui/lab';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faSchool, faPencilRuler, faChalkboardTeacher } from "@fortawesome/free-solid-svg-icons"
@@ -39,6 +39,10 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
+const Transition = React.forwardRef(function Transition(props, ref) {
+    return <Slide direction="up" ref={ref} {...props} />;
+});
+
 function UserPortal(props) {
     const socket = React.useContext(SocketContext)
 
@@ -58,6 +62,10 @@ function UserPortal(props) {
     const [loading, setLoading] = useState(true);
 
     const [refreshing, setRefreshing] = useState(false);
+
+    const [studentDialog, setStudentDialog] = useState(false);
+
+    const [studentList, setStudentList] = useState([]);
 
     // Route user to clicked subject page
     const handleOpenSubject = (subject_id) => {
@@ -90,7 +98,7 @@ function UserPortal(props) {
                         subjectAnnList = subjectAnnList.concat(subjectDoc.announcements)
                     }
                 }
-
+                
                 // Get & Set Subject announcements
                 setGradeAnnouncements([...subjectAnnList]);
 
@@ -100,6 +108,9 @@ function UserPortal(props) {
             })
     }
 
+    const handleCloseDocument = () => {
+        setStudentDialog(false);
+    }
 
     useEffect(() => {
         const promises = [];
@@ -129,6 +140,11 @@ function UserPortal(props) {
                 // Get & Set Subject announcements
                 setGradeAnnouncements(subjectAnnList);
 
+                // Set Student List
+                if (props.user.type === "Teacher") {
+                    setStudentList(promiseResults[0].data.students);
+                }
+
                 // Set loading false, so the loading screen goes away
                 setLoading(false);
 
@@ -147,6 +163,39 @@ function UserPortal(props) {
         return <PageSpinner />
     }
 
+
+    const renderDialogBox = () => {
+        return (
+            <Dialog
+                    open={studentDialog}
+                    TransitionComponent={Transition}
+                    keepMounted
+                    onClose={handleCloseDocument}
+                    aria-labelledby="alert-dialog-slide-title"
+                    aria-describedby="alert-dialog-slide-description"
+                >
+                    <DialogTitle style={{ padding: "10px 24px" }}
+                        align="center" id="student-list">Student List</DialogTitle>
+
+                    <DialogContent style={{ width: "70vw", maxWidth: "500px", padding: "0px 24px" }}>
+
+                        {studentList.map((val, idx) => 
+                            <div className="row">
+                                <p key={"student-name"+idx}>{val.firstName} {val.lastName}</p>
+                                <p key={"student-user"+idx} style={{textAlign: "right"}}>{val.username}</p>
+                            </div>
+                        )}
+
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={handleCloseDocument} color="primary">
+                            Close
+                        </Button>
+                    </DialogActions>
+                </Dialog>
+        )
+    };
+
     return (
         <div style={{ display: "flex", width: "100%", marginTop: "5rem" }}>
 
@@ -159,6 +208,8 @@ function UserPortal(props) {
                     Refreshing...
                 </Alert>
             </Snackbar>
+
+            { renderDialogBox() }
 
             <Grid spacing={5} container style={{ padding: "2rem", width: "100%" }}>
                 <Grid item xs={12}><Typography style={{ padding: "2rem" }} align='center' className={clsx(classes.textGlow, "flow-text")} variant="h3">welcome back, {props.user.profile.first_name} 😄</Typography> </Grid>
@@ -182,9 +233,9 @@ function UserPortal(props) {
                             labelField={"title"}
                             viewer={AnnouncementViewer}
                         />
-
                     </div>
                 </Grid>
+
                 {/* Subjects */}
                 <Grid item xs={12} md={7} lg={8} xl={9}>
                     {
@@ -224,12 +275,18 @@ function UserPortal(props) {
 
                 </Grid>
 
+                <Grid>
+                    {
+                        props.user.type === "Teacher" ? 
+                            <div className={classes.boxShadow} style={{ marginLeft: "20px" }}>
+                              <Button style={{ backgroundColor: "white"}} onClick={() => setStudentDialog(true)} >Student List</Button>
+                            </div>
+                        : null
+                    }
+                    
+                </Grid>
+
             </Grid>
-
-
-
-
-
         </div>
 
     );

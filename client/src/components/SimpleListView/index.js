@@ -114,7 +114,7 @@ function SimpleListView(props) {
                     <DialogActions>
                         <Button onClick={handleCloseDocument} color="primary">
                             Close
-          </Button>
+                        </Button>
 
                     </DialogActions>
                 </Dialog>

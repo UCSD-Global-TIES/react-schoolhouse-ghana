@@ -1,0 +1,9 @@
+.row {
+    display: flex;
+    align-content: space-between;
+    justify-content: center;
+}
+
+.row > p {
+    flex: 50%;
+}
