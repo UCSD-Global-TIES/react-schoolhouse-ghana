@@ -4,13 +4,10 @@ import {
   CssBaseline,
   Button,
   TextField,
-  Box,
-  FormControl,
-  RadioGroup,
-  FormControlLabel,
-  Radio
+  Box
 } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
+import AssessmentForm from "../../components/AssessmentMCForm";
 const useStyles = makeStyles(theme => ({
   root: {
     display: "flex",
@@ -21,15 +18,10 @@ const useStyles = makeStyles(theme => ({
     maxWidth: "300px"
   }
 }));
-
 //TODO: Import the question from the database and update the state values
 
 function AssessmentPage(props) {
   const classes = useStyles();
-  const [value, setValue] = React.useState("");
-  const handleChange = event => {
-    setValue(event.target.value);
-  };
   const handleSubmit = () => {
     //TODO: store answers
   };
@@ -59,21 +51,13 @@ function AssessmentPage(props) {
       number: "4"
     },
     {
-      question: "This is the sixth question",
+      question: "This is the fifth question",
       type: "mc",
       answers: ["Choice 0", "Choice 1", "Choice 2", "Choice 3", "Choice 4"],
-      number: "6"
+      number: "5"
     }
   ];
   var states = {};
-
-  /*{
-question: "1. This is an example question",
-type: "mc", //sa representes short answer
-answers: ["Choice 0", "Choice 1", "Choice 2", "Choice 3", "Choice 4"],
-number: "1"
-}
-*/
 
   return (
     <React.Fragment>
@@ -110,20 +94,7 @@ number: "1"
                         justifyContent="center"
                         anchor="center"
                       >
-                        <FormControl component="fieldset">
-                          <RadioGroup value={value} onChange={handleChange} row>
-                            {states.answers.map(function(answer, i) {
-                              return (
-                                <FormControlLabel
-                                  value={states.answers[i]}
-                                  control={<Radio />}
-                                  label={states.answers[i]}
-                                  labelPlacement="bottom"
-                                />
-                              );
-                            })}
-                          </RadioGroup>
-                        </FormControl>
+                        <AssessmentForm answers={states.answers} />
                       </Box>
                       <Box
                         display="flex"
@@ -170,7 +141,7 @@ number: "1"
                 bottom="100%"
                 onClick={() => handleSubmit}
               >
-                "Submit"
+                Submit
               </Button>
             </Box>
           </div>
