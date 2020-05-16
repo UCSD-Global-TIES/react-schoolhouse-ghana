@@ -1,5 +1,0 @@
-Hello, this is a test.
-
-I am not supposed to be added.
-
-Testing, git add, git commit, git push....
