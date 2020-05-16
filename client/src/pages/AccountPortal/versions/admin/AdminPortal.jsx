@@ -322,6 +322,7 @@ function AdminPortal(props) {
             },
             validation: {}
         }
+        
     ]
 
     let pages = [];
@@ -425,7 +426,6 @@ function AdminPortal(props) {
                     {
                         pages.map((page, idx) => (
                             <ProtectedRoute key={`page-${idx}`} exact path={page.path} component={page.component} user={props.user} />
-
                         ))
                     }
                     <Redirect to={defaultRoute} />

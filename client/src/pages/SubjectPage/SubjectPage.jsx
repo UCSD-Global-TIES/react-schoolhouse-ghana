@@ -84,7 +84,7 @@ function SubjectPage(props) {
       icon: faFile,
       path: `${props.match.url}/resources`
     }
-  ]
+  ];
 
   const drawer = (
     <div
