@@ -182,7 +182,8 @@ function UserPortal(props) {
                         {studentList.map((val, idx) => 
                             <div className="row">
                                 <p key={"student-name"+idx}>{val.firstName} {val.lastName}</p>
-                                <p key={"student-user"+idx} style={{textAlign: "right"}}>{val.username}</p>
+                                <p key={"student-user"+idx}>{val.username}</p>
+                                <p key={"student-pw"+idx}>{val.password}</p>
                             </div>
                         )}
 
