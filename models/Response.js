@@ -2,13 +2,21 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 const responseSchema = new Schema({
-  Response: {
-    question: Questions,
-    answer: String,
-    explanation: String,
-    user: String
+  question: {
+    type: Schema.Types.ObjectId,
+    ref: "Question",
+    required: true
+  },
+  answer: {
+    type: Schema.Types.Mixed,
+    required: true
+  },
+  explanation: {
+    type: String
+  },
+  profile: {
+    type: Schema.Types.ObjectId,
   }
-
 }, { timestamps: true });
 
 const Response = mongoose.model("Response", responseSchema);
