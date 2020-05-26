@@ -111,6 +111,16 @@ function UserPortal(props) {
     const handleCloseDocument = () => {
         setStudentDialog(false);
     }
+     const showPassword = (username, password) => { 
+         var x = document.getElementsByClassName('myInput');
+         for (var i = 0; i < x.length; i++) { 
+             if (x.item(i).type === "password" && x.item(i).name === `${username}` && x.item(i).value === `${password}`) {
+                 x.item(i).type = "text";
+               } else {
+                 x.item(i).type = "password";
+               }
+         }  
+    }
 
     useEffect(() => {
         const promises = [];
@@ -163,7 +173,6 @@ function UserPortal(props) {
         return <PageSpinner />
     }
 
-
     const renderDialogBox = () => {
         return (
             <Dialog
@@ -178,12 +187,15 @@ function UserPortal(props) {
                         align="center" id="student-list">Student List</DialogTitle>
 
                     <DialogContent style={{ width: "70vw", maxWidth: "500px", padding: "0px 24px" }}>
-
+                        <div className="row"> <p> <b>Student Name</b></p>  <p><b>Username</b> </p> <p><b>Password</b></p> </div>
                         {studentList.map((val, idx) => 
                             <div className="row">
                                 <p key={"student-name"+idx}>{val.firstName} {val.lastName}</p>
                                 <p key={"student-user"+idx}>{val.username}</p>
-                                <p key={"student-pw"+idx}>{val.password}</p>
+                                <p key={"student-pw"+idx}> 
+                                    <input type="password" name={val.username} value={val.password} class= "myInput"></input> 
+                                    <Button  size="medium" onClick={() => showPassword(val.username, val.password)}>Show/Hide</Button> 
+                                </p>
                             </div>
                         )}
 
