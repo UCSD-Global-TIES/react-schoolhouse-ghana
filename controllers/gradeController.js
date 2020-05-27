@@ -77,13 +77,13 @@ module.exports = {
                                 const currentStudent = gradeDoc.students[i];
                                 const studentDoc = await studentDb.findById(currentStudent);
                                 const accountDoc = await accountDb.findOne({ profile: currentStudent });
-                                console.log(accountDoc);
                                 
                                 gradeDoc.students[i] = {
                                     firstName: studentDoc["first_name"],
                                     lastName: studentDoc["last_name"],
                                     id: studentDoc["_id"],
-                                    username: accountDoc["username"]
+                                    username: accountDoc["username"],
+                                    password: accountDoc["password"]
                                 };
                             };
 
