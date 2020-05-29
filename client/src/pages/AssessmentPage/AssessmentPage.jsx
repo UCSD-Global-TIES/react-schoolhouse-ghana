@@ -8,6 +8,8 @@ import {
 } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import AssessmentForm from "../../components/AssessmentMCForm";
+import API from "../../utils/API";
+
 const useStyles = makeStyles(theme => ({
   root: {
     display: "flex",
@@ -21,10 +23,9 @@ const useStyles = makeStyles(theme => ({
 //TODO: Import the question from the database and update the state values
 
 function AssessmentPage(props) {
+  console.log(props);
   const classes = useStyles();
-  const handleSubmit = () => {
-    //TODO: store answers
-  };
+
   const questions = [
     {
       question: "This is the first question",
@@ -57,7 +58,17 @@ function AssessmentPage(props) {
       number: "5"
     }
   ];
-  var states = {};
+  let states = {};
+
+  const handleSubmit = async () => {
+    //TODO: store answers
+    try {
+      const value = await API.postResponse(props.user.key, states);
+      console.log(value);
+    } catch (e) {
+      window.alert(e);
+    }
+  };
 
   return (
     <React.Fragment>

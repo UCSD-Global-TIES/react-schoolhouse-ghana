@@ -362,6 +362,14 @@ export default {
     return axios.get('/api/assessment', {
       headers: config
     });
-  }
+  },
 
+  postResponse: function(key, response) {
+    const config = {
+      'Authorization': key
+    };
+    return axios.post('/api/assessment', {response}, {
+      headers: config
+    });
+  }
 };

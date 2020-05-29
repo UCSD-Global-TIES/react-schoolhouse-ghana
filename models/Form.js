@@ -13,7 +13,18 @@ const formSchema = new Schema({
   annonymous: {
     type: Boolean,
     required: true
-  }
+  },
+  createdBy: {
+    type: String
+  },
+  numberOfResponses: {
+    type: Number,
+    required: true
+  },
+  usersAnswered: [{
+    type: Schema.Types.ObjectId,
+    ref: 'Account'
+  }]
 }, { timestamps: true });
 
 const Form = mongoose.model("Form", formSchema);

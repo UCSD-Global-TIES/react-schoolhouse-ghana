@@ -1,19 +1,24 @@
 {
     "title": "Test Assessment",
     "createdBy": "UCSD Global Ties",
+    "annonymous": false,
     "questions": [
         {
             "prompt": "How do you feel about this program?",
-            "type": "written"
+            "isFreeResponse": true
         },
         {
             "prompt": "Which of the following describes your emotions right now?",
-            "type": "multiple-choice",
             "choices": [
                 "Happy :)",
                 "Sad :(",
                 "Angry grrr"
             ]
+        },
+        {
+            "prompt": "Testing Testing",
+            "ratingStart": 0,
+            "ratingEnd": 10
         }
     ]
 }
