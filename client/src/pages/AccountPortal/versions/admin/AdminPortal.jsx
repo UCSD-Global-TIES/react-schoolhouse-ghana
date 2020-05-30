@@ -311,7 +311,7 @@ function AdminPortal(props) {
         },
         {
             collection: "Assessment",
-            link: (doc) => `/assessment/yolo`, // TODO: Set specific quiz ID into the URL once backend is finished 
+            link: (doc) => `/assessment/${doc._id}`, // TODO: Set specific quiz ID into the URL once backend is finished 
             icon: faCheckCircle,
             FormComponent: (p) => <AssessmentForm user={props.user} {...p}/>,
             primary: (doc) => doc.title,

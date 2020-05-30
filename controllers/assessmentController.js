@@ -12,13 +12,30 @@ const {
 } = require("./verifyController");
 
 module.exports = {
-    getAssessment: (req, res) => {
-        res.json([seed]);
+    getAssessments: (req, res) => {
+        // Gets all forms and assessments
+        formDb.find({}).then((formDocs) => res.json(formDocs))
+                            .catch((e) => res.status(410).send(e));
+    },
+
+    getAssessment: async (req, res) => {
+        // Gets form and all questions
+        const formId = req.params.formId;
+        let formObj = await formDb.findById(formId);
+        const getQuestions = formObj.questions.map((questionId) => questionDb.findById(questionId));
+
+        try {
+            const allQuestions = await Promise.all(getQuestions);
+            formObj.questions = allQuestions;
+            res.status(200).json(formObj);
+        } catch (e) {
+            res.status(410).json(e);
+        }
     },
 
     submitStudentResponse: async (req, res) => {
          // Required 
-        const formId = req.body.formId;
+        const formId = req.params.formId;
         const questionToResponseMap = req.body.responses;
 
         // Optional
@@ -92,13 +109,15 @@ module.exports = {
         }
     },
 
-    createForm: async (req, res) => {
-        // verifyKey(req.header('Authorization'), 'Student,Teacher,Admin')
-        //     .then((isVerified) => {
+    createForm: (req, res) => {
+        verifyKey(req.header('Authorization'), 'Student,Teacher,Admin')
+            .then(async (isVerified) => {
                 // Checks if user has been verified
-                // if (!isVerified) {
-                //     res.status(403).json(null);
-                // }
+                if (!isVerified) {
+                    res.status(403).json(null);
+                    return;
+                }
+
                 let questionDoc = seed.questions[0];
                 questionDoc["responses"] = [];
 
@@ -107,6 +126,8 @@ module.exports = {
                 for (let questionDoc of seed.questions) {
                     promises.push(questionDb.create(questionDoc));
                 }
+
+                console.log("yike")
                 
                 try {
                     let allQuestions = await Promise.all(promises);
@@ -125,10 +146,10 @@ module.exports = {
                 } catch (e) {
                     res.send(e);
                 }
-    },
+    })},
 
     deleteForm: async (req, res) => {
-        const formId = req.query.formId;
+        const formId = req.params.formId;
         if (!formId) {
             res.status(422).send("formId not specified");
             return;
@@ -157,14 +178,14 @@ module.exports = {
             const responsePromises = allResponseId.map((id) => responseDb.findByIdAndDelete(id));
             const allResponseObj = await Promise.all(responsePromises);
             
-            res.send(`Form ${formId} has been deleted`);
+            res.send(`Form ${formId} has been deleted, along with its questions and responses.`);
         } catch (e) {
             res.status(410).send(e);
         }
     },
 
     sendFileToDrive: async (req, res) => {
-        const formId = req.query.formId;
+        const formId = req.params.formId;
 
         if (!formId) {
             res.status(410).send("Form ID not provided in the query");

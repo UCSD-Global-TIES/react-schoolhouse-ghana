@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Typography,
   CssBaseline,
@@ -7,7 +7,9 @@ import {
   Box
 } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
-import AssessmentForm from "../../components/AssessmentMCForm";
+import AssessmentMCForm from "../../components/AssessmentMCForm";
+import AssessmentFRQForm from "../../components/AssessmentFRQForm";
+import AssessmentRateForm from "../../components/AssessmentRateForm";
 import API from "../../utils/API";
 
 const useStyles = makeStyles(theme => ({
@@ -20,51 +22,63 @@ const useStyles = makeStyles(theme => ({
     maxWidth: "300px"
   }
 }));
-//TODO: Import the question from the database and update the state values
+
+const questionType = {
+  MC: 'mc',
+  FRQ: 'free response',
+  RATE: 'rating'
+};
 
 function AssessmentPage(props) {
-  console.log(props);
   const classes = useStyles();
 
-  const questions = [
-    {
-      question: "This is the first question",
-      type: "mc",
-      answers: ["Choice 0", "Choice 1", "Choice 2", "Choice 3", "Choice 4"],
-      number: "1"
-    },
-    {
-      question: "This is the second question",
-      type: "sa",
-      answers: [],
-      number: "2"
-    },
-    {
-      question: "This is the third question",
-      type: "mc",
-      answers: ["Choice 0", "Choice 1", "Choice 2", "Choice 3", "Choice 4"],
-      number: "3"
-    },
-    {
-      question: "This is the fourth question",
-      type: "mc",
-      answers: ["Choice 0", "Choice 1", "Choice 2", "Choice 3", "Choice 4"],
-      number: "4"
-    },
-    {
-      question: "This is the fifth question",
-      type: "mc",
-      answers: ["Choice 0", "Choice 1", "Choice 2", "Choice 3", "Choice 4"],
-      number: "5"
-    }
-  ];
-  let states = {};
+  const formId = props.match.params.formId;
 
-  const handleSubmit = async () => {
+  const [questions, setQuestions] = useState([]);
+
+  useEffect(() => {
+    API.getAssessmentQuestions(props.user.key, formId)
+      .then((questionData) => {
+        setQuestions(questionData.data.questions);
+        console.log("Questions");
+        console.log(questionData.data);
+      })
+      .catch((err) => console.log(err));
+  }, []);
+
+  const getType = (questionObj) => {
+    if (!!questionObj.isFreeResponse) {
+      return questionType.FRQ;
+    } 
+
+    // Must use the in operator to avoid cases where the ratingStart value is 0
+    if ("ratingStart" in questionObj && "ratingEnd" in questionObj) {
+      return questionType.RATE;
+    }
+    if (questionObj.choices.length > 0) {
+      return questionType.MC;
+    }
+  }
+
+  const renderCorrectComponent = (questionObj) => {
+    console.log(questionObj);
+
+    switch (questionObj.type) {
+      case questionType.FRQ:
+        return <AssessmentFRQForm question={questionObj} />
+      case questionType.MC:
+        return <AssessmentMCForm answers={questionObj.choices} />
+      case questionType.RATE:
+        return <AssessmentRateForm question={questionObj} />
+      default:
+        return <></>
+    }
+  }
+
+  const handleSubmit = async (states) => {
     //TODO: store answers
     try {
       const value = await API.postResponse(props.user.key, states);
-      console.log(value);
     } catch (e) {
       window.alert(e);
     }
@@ -78,65 +92,62 @@ function AssessmentPage(props) {
         <div style={{ display: "flex", width: "90%", height: "75vh" }}>
           <div style={{ margin: "auto" }}>
             {questions.map(function(question, i) {
-              states = question;
-              return (
-                <div className={classes.question}>
-                  <div
-                    style={{ display: "flex", width: "100%", margin: "150px" }}
-                  >
-                    <div style={{ margin: "auto" }}>
-                      <Box
-                        display="flex"
-                        width={500}
-                        height={0}
-                        alignItems="center"
-                        justifyContent="left"
-                        anchor="center"
-                      >
-                        <Typography variant="h5" gutterBottom>
-                          {states.number}. {states.question}
-                        </Typography>
-                      </Box>
-                      <Box
-                        display={states.type === "sa" ? "none" : "flex"}
-                        width={500}
-                        height={100}
-                        alignItems="center"
-                        justifyContent="center"
-                        anchor="center"
-                      >
-                        <AssessmentForm answers={states.answers} />
-                      </Box>
-                      <Box
-                        display="flex"
-                        width={500}
-                        height={100}
-                        alignItems="center"
-                        justifyContent="center"
-                        anchor="center"
-                      >
-                        <TextField
-                          id="outlined-basic"
-                          label={
-                            states.type === "sa"
-                              ? "Answer"
-                              : "Explain (optional)"
-                          }
-                          variant="outlined"
+                question.type = getType(question);
+
+                return (
+                  <div className={classes.question}>
+                    <div
+                      style={{ display: "flex", width: "100%", margin: "150px" }}
+                    >
+                      <div style={{ margin: "auto" }}>
+                        <Box
+                          display="flex"
+                          width={500}
+                          height={0}
+                          alignItems="center"
+                          justifyContent="left"
                           anchor="center"
-                          size="small"
-                          fullWidth
-                          style={{ margin: 8 }}
-                          margin="normal"
-                          InputLabelProps={{
-                            shrink: true
-                          }}
-                        />
-                      </Box>
+                        >
+                          <Typography variant="h5" gutterBottom>
+                            {i+1}. {question.prompt}
+                          </Typography>
+                        </Box>
+                        <Box
+                          display={"flex"}
+                          width={500}
+                          height={100}
+                          alignItems="center"
+                          justifyContent="center"
+                          anchor="center"
+                        >
+                          {renderCorrectComponent(question)}
+                        </Box>
+                        <Box
+                          display="flex"
+                          width={500}
+                          height={100}
+                          alignItems="center"
+                          justifyContent="center"
+                          anchor="center"
+                        >
+                          <TextField
+                            id="outlined-basic"
+                            label="Explain (optional)"
+                            variant="outlined"
+                            anchor="center"
+                            size="small"
+                            fullWidth
+                            style={{ margin: 8 }}
+                            margin="normal"
+                            InputLabelProps={{
+                              shrink: true
+                            }}
+                          />
+                        </Box>
+                      </div>
                     </div>
                   </div>
-                </div>
-              );
+                );
             })}
             <Box
               display="flex"
@@ -150,7 +161,7 @@ function AssessmentPage(props) {
                 variant="contained"
                 color="primary"
                 bottom="100%"
-                onClick={() => handleSubmit}
+                onClick={(states) => handleSubmit}
               >
                 Submit
               </Button>
