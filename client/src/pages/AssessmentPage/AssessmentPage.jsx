@@ -29,56 +29,88 @@ const questionType = {
   RATE: 'rating'
 };
 
+const getType = (questionObj) => {
+  if (!!questionObj.isFreeResponse) {
+    return questionType.FRQ;
+  } 
+
+  // Must use the in operator to avoid cases where the ratingStart value is 0
+  if ("ratingStart" in questionObj && "ratingEnd" in questionObj) {
+    return questionType.RATE;
+  }
+  if (questionObj.choices.length > 0) {
+    return questionType.MC;
+  }
+}
+
+const getDefaultValue = (questionObj) => {
+  switch (getType(questionObj)) {
+    case questionType.FRQ:
+      return "";
+    case questionType.RATE:
+      return questionObj.ratingStart;
+    case questionType.MC:
+      return 0;
+  }
+}
+
 function AssessmentPage(props) {
   const classes = useStyles();
 
   const formId = props.match.params.formId;
 
   const [questions, setQuestions] = useState([]);
+  const [answersChosen, setAnswersChosen] = useState({});
 
+  // Grabs data through the AP 
   useEffect(() => {
     API.getAssessmentQuestions(props.user.key, formId)
       .then((questionData) => {
+        // Changes the states (in the future should restructure to only use one state)
         setQuestions(questionData.data.questions);
-        console.log("Questions");
-        console.log(questionData.data);
+        setAnswersChosen(questionData.data.questions.reduce((acc, curr) => {
+          acc[curr._id] = { answer: getDefaultValue(curr) };
+          return acc;
+        }, {}));
       })
       .catch((err) => console.log(err));
   }, []);
 
-  const getType = (questionObj) => {
-    if (!!questionObj.isFreeResponse) {
-      return questionType.FRQ;
-    } 
+  const handleResponseAnswer = (questionId, answer) => {
+    if (questionId in answersChosen) {
+      const answerObj = answersChosen[questionId];
+      answerObj["answer"] = answer;
+      setAnswersChosen(state => ({...state, questionId: answerObj}));
+    }
+  };
 
-    // Must use the in operator to avoid cases where the ratingStart value is 0
-    if ("ratingStart" in questionObj && "ratingEnd" in questionObj) {
-      return questionType.RATE;
+  const handleResponseExplanation = (questionId, explanation) => {
+    if (questionId in answersChosen) {
+      const answerObj = answersChosen[questionId];
+      answerObj["explanation"] = explanation;
+      setAnswersChosen(state => ({...state, questionId: answerObj}));
     }
-    if (questionObj.choices.length > 0) {
-      return questionType.MC;
-    }
-  }
+  };
 
   const renderCorrectComponent = (questionObj) => {
-    console.log(questionObj);
-
+    const proppedFunction = (answer) => handleResponseAnswer(questionObj._id, answer);
     switch (questionObj.type) {
       case questionType.FRQ:
-        return <AssessmentFRQForm question={questionObj} />
+        return <AssessmentFRQForm question={questionObj} handleResponseAnswer={proppedFunction}/>
       case questionType.MC:
-        return <AssessmentMCForm answers={questionObj.choices} />
+        return <AssessmentMCForm answers={questionObj.choices} handleResponseAnswer={proppedFunction}/>
       case questionType.RATE:
-        return <AssessmentRateForm question={questionObj} />
+        return <AssessmentRateForm question={questionObj} handleResponseAnswer={proppedFunction} />
       default:
         return <></>
     }
   }
 
-  const handleSubmit = async (states) => {
-    //TODO: store answers
+  const handleSubmit = async () => {
     try {
-      const value = await API.postResponse(props.user.key, states);
+      const value = await API.postResponse(props.user.key, answersChosen, formId);
+      window.alert("You have submitted the quiz! Going back to the Home page now!");
+      props.history.push("/");
     } catch (e) {
       window.alert(e);
     }
@@ -142,6 +174,7 @@ function AssessmentPage(props) {
                             InputLabelProps={{
                               shrink: true
                             }}
+                            onBlur={(e) => handleResponseExplanation(question._id, e.target.value)}
                           />
                         </Box>
                       </div>
@@ -161,7 +194,7 @@ function AssessmentPage(props) {
                 variant="contained"
                 color="primary"
                 bottom="100%"
-                onClick={(states) => handleSubmit}
+                onClick={handleSubmit}
               >
                 Submit
               </Button>

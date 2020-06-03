@@ -4,7 +4,7 @@ import {
     Typography
 } from "@material-ui/core";
 
-const AssessmentRateForm = ({ question }) => {
+const AssessmentRateForm = ({ question, handleResponseAnswer }) => {
 
     const valueText = (val) => `${val}`;
     const valueLabelFormat = (val) => val;
@@ -21,6 +21,7 @@ const AssessmentRateForm = ({ question }) => {
                 min={question.ratingStart}
                 max={question.ratingEnd}
                 valueLabelDisplay="auto"
+                onChange={(event, newValue) => handleResponseAnswer(newValue)}
             />
         </>
     );

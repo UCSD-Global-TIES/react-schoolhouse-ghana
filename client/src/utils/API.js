@@ -373,12 +373,16 @@ export default {
     });
   }, 
 
-  postResponse: function(key, response) {
+  postResponse: function(key, response, formId) {
     const config = {
       'Authorization': key
     };
-    return axios.post('/api/assessment', {response}, {
-      headers: config
+    return axios.put(`/api/assessment`, response, {
+      headers: config,
+      data: {
+        formId: formId,
+        responses: response
+      }
     });
   }
 };

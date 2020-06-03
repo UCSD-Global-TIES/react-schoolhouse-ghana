@@ -35,7 +35,7 @@ module.exports = {
 
     submitStudentResponse: async (req, res) => {
          // Required 
-        const formId = req.params.formId;
+        const formId = req.body.formId;
         const questionToResponseMap = req.body.responses;
 
         // Optional
@@ -58,7 +58,7 @@ module.exports = {
                 return;
             }
 
-            let createResponseObjs = Object.keys(questionToResponseMap).map(async (questionId) => {
+            const createResponseObjs = await Object.keys(questionToResponseMap).reduce(async (acc, questionId) => {
                 let responseObj = questionToResponseMap[questionId];
                 
                 // Sets rest of response object
@@ -68,20 +68,29 @@ module.exports = {
                 }
 
                 // Check if question exists in the database
-                const questionObj = await questionDb.findById(questionId);
-                if (!questionObj) {
-                    return null;
+                try {
+                    const questionObj = await questionDb.findById(questionId);
+                    if (!questionObj) {
+                        return acc;
+                    }
+
+                    const response = await responseDb.create(responseObj);
+                    acc.push(response);
+                    console.log(acc);
+                    return acc;   
+                } catch (e) {
+                    return acc;
                 }
 
-                return responseDb.create(responseObj);
-            }); 
+            }, []);
 
             // Resolve all the creations 
-            createResponseObjs = createResponseObjs.filter((val) => val !== null);
+            // createResponseObjs = createResponseObjs.filter((val) => val !== null);
             const allResponseObj = await Promise.all(createResponseObjs);
 
             // Creates list of pairs [questino id, response id]
             const allPairs = allResponseObj.map((obj) => [obj.question, obj._id]);
+            console.log(allPairs);
             const updateQuestionsPromises = allPairs.map(
                 // Arrow function that maps each pair to a Promise that updates in MongoDB
                 (pair) => questionDb.findOneAndUpdate({ _id: pair[0]},
@@ -105,7 +114,7 @@ module.exports = {
             res.status(200).send("Form has been updated.");
 
         } catch (e) {
-            res.status(410).send(e);
+            res.status(430).send(e.message);
         }
     },
 
@@ -126,8 +135,6 @@ module.exports = {
                 for (let questionDoc of seed.questions) {
                     promises.push(questionDb.create(questionDoc));
                 }
-
-                console.log("yike")
                 
                 try {
                     let allQuestions = await Promise.all(promises);
@@ -172,7 +179,7 @@ module.exports = {
 
             // Reduces all the questions in order to get one response array in the end
             const allResponseId = allQuestionObj.reduce(
-                (acc, questinoObj) => acc.concat(questinoObjs)
+                (acc, questinoObj) => acc.concat(questionObjs)
             , []);
 
             const responsePromises = allResponseId.map((id) => responseDb.findByIdAndDelete(id));

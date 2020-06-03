@@ -57,6 +57,8 @@ function UserPortal(props) {
     const [gradeAnnouncements, setGradeAnnouncements] = useState([])
     // Stores current school announcements
     const [schoolAnnouncements, setSchoolAnnouncements] = useState([])
+    // Stores impact assessments
+    const [assessments, setAssessments] = useState([])
 
     // If loading, show loading screen
     const [loading, setLoading] = useState(true);
@@ -243,6 +245,14 @@ function UserPortal(props) {
                             items={gradeAnnouncements}
                             pageMax={MAX_ANN}
                             icon={faPencilRuler}
+                            labelField={"title"}
+                            viewer={AnnouncementViewer}
+                        />
+                        <SimpleListView
+                            title={"Impact Assessments"}
+                            items={}
+                            pageMax={}
+                            icon={}
                             labelField={"title"}
                             viewer={AnnouncementViewer}
                         />
