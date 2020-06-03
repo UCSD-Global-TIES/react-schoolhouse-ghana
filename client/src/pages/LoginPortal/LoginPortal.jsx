@@ -5,7 +5,7 @@ import API from "../../utils/API"
 import { makeStyles } from '@material-ui/core/styles';
 import { Redirect } from "react-router-dom";
 import { Alert } from "@material-ui/lab";
-import { Snackbar, FormControl, InputLabel, Input, InputAdornment, Fab, Typography } from "@material-ui/core";
+import { Snackbar, FormControl, InputLabel, Input, InputAdornment, Fab, Typography, Button } from "@material-ui/core";
 import AccountCircle from "@material-ui/icons/AccountCircle";
 import Key from "@material-ui/icons/VpnKey";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -30,6 +30,9 @@ const useStyles = makeStyles(theme => ({
     portal: {
         width: "75vw",
         maxWidth: "300px"
+    },
+    navIcon: {
+        margin: "0 5px",
     }
 
 }));
@@ -247,9 +250,10 @@ function LoginPortal(props) {
                         <div style={{ display: "flex", width: "100%", margin: "10px 0" }}>
 
                             <div style={{ margin: "auto" }}>
-                                <Fab style={{ backgroundColor: "rgb(0, 182, 112)", color: "white" }} aria-label="login" onClick={() => handleLogin(username, password)}>
-                                    <FontAwesomeIcon icon={faSignInAlt} size="lg" />
-                                </Fab>
+                                <Button style={{ backgroundColor: "rgb(0, 182, 112)", color: "white" }} aria-label="login" onClick={() => handleLogin(username, password)}>
+                                    <div> Sign in </div>
+                                    <FontAwesomeIcon className={classes.navIcon} icon={faSignInAlt} size="lg" />
+                                </Button>
 
                             </div>
                         </div>
