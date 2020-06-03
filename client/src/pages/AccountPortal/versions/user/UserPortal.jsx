@@ -6,7 +6,7 @@ import SimpleListView from "../../../../components/SimpleListView"
 import { Snackbar, Grid, Typography, Dialog, DialogContent, DialogTitle, Slide, DialogActions, CardActionArea, CardContent, CardMedia, Card, Button } from "@material-ui/core";
 import { Alert } from '@material-ui/lab';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faSchool, faPencilRuler, faChalkboardTeacher } from "@fortawesome/free-solid-svg-icons"
+import { faSchool, faPencilRuler, faChalkboardTeacher, faCheck, faPager } from "@fortawesome/free-solid-svg-icons"
 import "../../../../utils/flowHeaders.min.css";
 import "./main.css";
 import clsx from "clsx"
@@ -59,6 +59,7 @@ function UserPortal(props) {
     const [schoolAnnouncements, setSchoolAnnouncements] = useState([])
     // Stores impact assessments
     const [assessments, setAssessments] = useState([])
+    console.log(assessments);
 
     // If loading, show loading screen
     const [loading, setLoading] = useState(true);
@@ -80,10 +81,13 @@ function UserPortal(props) {
         const promises = [];
 
         // Get 'Grade' associated with user account, populating subjects and their announcements
-        promises.push(API.getUserGrade(props.user.profile._id, props.user.key))
+        promises.push(API.getUserGrade(props.user.profile._id, props.user.key));
 
         // Get school announcements
-        promises.push(API.getSchoolAnnouncements(props.user.key))
+        promises.push(API.getSchoolAnnouncements(props.user.key));
+
+        // Get different impact assessments
+        promises.push(API.getAssessments(props.user.key));
 
         Promise.all(promises)
             .then((promiseResults) => {
@@ -93,13 +97,16 @@ function UserPortal(props) {
                 // Get & Set school announcements
                 setSchoolAnnouncements([...promiseResults[1].data]);
 
-
-                let subjectAnnList = []
+                // Get subject announcements
+                let subjectAnnList = [];
                 if (promiseResults[0].data) {
                     for (const subjectDoc of promiseResults[0].data.subjects) {
                         subjectAnnList = subjectAnnList.concat(subjectDoc.announcements)
                     }
                 }
+
+                // Get assessments and sets them
+                setAssessments([...promiseResults[2].data]);
                 
                 // Get & Set Subject announcements
                 setGradeAnnouncements([...subjectAnnList]);
@@ -110,10 +117,15 @@ function UserPortal(props) {
             })
     }
 
+    const handleOnAssessmentClick = (e) => {
+        console.log(e);
+    }
+
     const handleCloseDocument = () => {
         setStudentDialog(false);
     }
-     const showPassword = (username, password) => { 
+
+    const showPassword = (username, password) => { 
          var x = document.getElementsByClassName('myInput');
          for (var i = 0; i < x.length; i++) { 
              if (x.item(i).type === "password" && x.item(i).name === `${username}` && x.item(i).value === `${password}`) {
@@ -133,6 +145,9 @@ function UserPortal(props) {
         // Get school announcements
         promises.push(API.getSchoolAnnouncements(props.user.key))
 
+        // Get different impact assessments
+        promises.push(API.getAssessments(props.user.key));
+
         Promise.all(promises)
             .then((promiseResults) => {
                 // Get & set grade's subjects info
@@ -151,6 +166,9 @@ function UserPortal(props) {
 
                 // Get & Set Subject announcements
                 setGradeAnnouncements(subjectAnnList);
+
+                // Get assessments and sets them
+                setAssessments([...promiseResults[2].data]);
 
                 // Set Student List
                 if (props.user.type === "Teacher") {
@@ -250,11 +268,12 @@ function UserPortal(props) {
                         />
                         <SimpleListView
                             title={"Impact Assessments"}
-                            items={}
-                            pageMax={}
-                            icon={}
+                            items={assessments}
+                            pageMax={MAX_ANN}
+                            icon={faPager}
                             labelField={"title"}
-                            viewer={AnnouncementViewer}
+                            assessmentsLink={true}
+                            // onClick={props.history.push(`/assessments/`)}
                         />
                     </div>
                 </Grid>
