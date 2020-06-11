@@ -34,7 +34,7 @@ module.exports = {
     },
 
     submitStudentResponse: async (req, res) => {
-         // Required 
+        // Required 
         const formId = req.body.formId;
         const questionToResponseMap = req.body.responses;
 
@@ -118,14 +118,14 @@ module.exports = {
         }
     },
 
-    createForm: (req, res) => {
-        verifyKey(req.header('Authorization'), 'Student,Teacher,Admin')
-            .then(async (isVerified) => {
-                // Checks if user has been verified
-                if (!isVerified) {
-                    res.status(403).json(null);
-                    return;
-                }
+    createForm: async (req, res) => {
+        // verifyKey(req.header('Authorization'), 'Student,Teacher,Admin')
+        //     .then(async (isVerified) => {
+        //         // Checks if user has been verified
+        //         if (!isVerified) {
+        //             res.status(403).json(null);
+        //             return;
+        //         }
 
                 let questionDoc = seed.questions[0];
                 questionDoc["responses"] = [];
@@ -153,7 +153,7 @@ module.exports = {
                 } catch (e) {
                     res.send(e);
                 }
-    })},
+    },
 
     deleteForm: async (req, res) => {
         const formId = req.params.formId;
@@ -237,7 +237,6 @@ module.exports = {
             const result = await writeCSVFile(dataObj, formObj.title);
             res.status(200).json(dataObj);
         } catch (e) {
-            console.log("yeeeters");
             res.send(e);
         }
     }

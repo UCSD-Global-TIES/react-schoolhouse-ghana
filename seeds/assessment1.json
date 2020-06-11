@@ -1,24 +1,43 @@
 {
-    "title": "Impact Assessment Round 1",
+    "title": "Teachers Post-Implementation Questions",
     "createdBy": "UCSD Global Ties",
     "annonymous": false,
     "questions": [
         {
-            "prompt": "How do you feel about this program?",
+            "prompt": "What is your name?",
             "isFreeResponse": true
         },
         {
-            "prompt": "Which of the following describes your emotions right now?",
+
+            "prompt": "How has the ability to access information on the internet affected your teaching ability/style?",
+            "isFreeResponse": true
+        },
+        {
+            "prompt": "Have you seen an improvement in the performance of students on exams in the past year?",
             "choices": [
-                "Happy :)",
-                "Sad :(",
-                "Angry grrr"
+                "Yes",
+                "No"
             ]
         },
         {
-            "prompt": "Testing Testing",
-            "ratingStart": 0,
-            "ratingEnd": 10
+            "prompt": "Which features have been most useful to you?",
+            "isFreeResponse": true
+        },
+        {
+            "prompt": "Which additional features have been most useful to you?",
+            "isFreeResponse": true
+        },
+        {
+            "prompt": "Do you have any suggestions for improvement?",
+            "isFreeResponse": true
+        },
+        {
+            "prompt": "What subjects do students do the best in?",
+            "isFreeResponse": true
+        },
+        {
+            "prompt": "What subjects do students struggle in?",
+            "isFreeResponse": true
         }
     ]
 }
