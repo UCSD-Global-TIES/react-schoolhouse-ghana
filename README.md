@@ -26,7 +26,7 @@ To get started and launch the server, follow the instructions below.
 ### Installation 
 #### Clone the repository
 ```
-git clone https://github.com/matteuc/react-schoolhouse-ghana.git 
+git clone https://github.com/UCSD-Global-TIES/react-schoolhouse-ghana.git 
 ```
 #### Install the dependencies
 1. First, the package dependencies...
