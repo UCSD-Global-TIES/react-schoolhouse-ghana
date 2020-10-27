@@ -24,6 +24,13 @@ Schoolhouse Ghana presents the solution. A file-sharing platform designed specif
 To get started and launch the server, follow the instructions below.
 
 ### Installation 
+#### Prerequisites:
+1. An IDE of your choice. A good option to start with is [VSCode](https://code.visualstudio.com/download).
+
+2. [Node.js](https://nodejs.org/en/download/), a JavaScript runtime environment. 
+
+3. [Robo 3T](https://robomongo.org/download), a GUI for MongoDB.
+
 #### Clone the repository
 ```
 git clone https://github.com/UCSD-Global-TIES/react-schoolhouse-ghana.git 
