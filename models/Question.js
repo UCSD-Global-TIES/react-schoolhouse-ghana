@@ -18,7 +18,7 @@ const questionSchema = new Schema({
   isFreeResponse: {
     type: Boolean
   },
-  response: [{
+  responses: [{
     type: Schema.Types.ObjectId,
     ref: "Response"
   }]

@@ -76,7 +76,6 @@ module.exports = {
     }, // ~ 0.5 ms
     verifyKey: function (key, access_type) {
         const types = access_type.split(",");
-
         return new Promise((resolve, reject) => {
             // API KEY SHOULD NOT BE ACCOUNT _id (future feature)
             accountDb

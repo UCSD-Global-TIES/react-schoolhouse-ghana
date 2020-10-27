@@ -88,7 +88,7 @@ function App() {
               <ProtectedRoute path="/subject/:id" component={SubjectPage} logout={handleLogout} user={userInfo} />
               <ProtectedRoute path="/edit" component={AdminPortal} logout={handleLogout} user={userInfo} />
               <Route exact path="/login" component={props => <LoginPortal {...props} user={userInfo} setUser={setUser} />} />
-              <Route path="/assessment/:id" component={AssessmentPage} logout={handleLogout} user={userInfo} />
+              <ProtectedRoute exact path="/assessment/:formId" component={AssessmentPage} logout={handleLogout} user={userInfo} />
               <Route component={NoMatch} />
             </Switch>
         }

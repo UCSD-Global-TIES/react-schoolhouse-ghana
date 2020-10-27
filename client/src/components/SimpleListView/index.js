@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from "react";
+import { useHistory } from "react-router-dom";
+
 import { makeStyles } from '@material-ui/core/styles';
 
 import { Dialog, DialogContent, DialogTitle, Slide, DialogActions, List, ListItem, ListItemIcon, ListItemText, ListSubheader, Button, ButtonGroup, InputAdornment, FormControl, InputLabel, Input, Typography } from "@material-ui/core";
@@ -28,6 +30,7 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 
 function SimpleListView(props) {
     const classes = useStyles();
+    const history = useHistory();
 
     // HOOKS 
     const [pageIdx, setPageIdx] = useState(0);
@@ -38,6 +41,11 @@ function SimpleListView(props) {
     const [PROPS, setProps] = useState(props);
 
     const handleItemClick = (doc) => {
+        // Viewer that takes to assessment
+        if (PROPS.assessmentsLink) {
+            history.push(`assessment/${doc._id}`)
+        }
+
         if (PROPS.link) {
             return;
         }

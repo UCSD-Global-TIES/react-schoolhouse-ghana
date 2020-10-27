@@ -362,6 +362,27 @@ export default {
     return axios.get('/api/assessment', {
       headers: config
     });
-  }
+  },
 
+  getAssessmentQuestions: function (key, formId) {
+    const config = {
+      'Authorization': key
+    };
+    return axios.get(`/api/assessment/${formId}`, {
+      headers: config
+    });
+  }, 
+
+  postResponse: function(key, response, formId) {
+    const config = {
+      'Authorization': key
+    };
+    return axios.put(`/api/assessment`, response, {
+      headers: config,
+      data: {
+        formId: formId,
+        responses: response
+      }
+    });
+  }
 };
