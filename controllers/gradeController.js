@@ -57,6 +57,12 @@ module.exports = {
                         })
 
                         .then(async (gradeDoc) => {
+
+                            if (!gradeDoc) {
+                                res.json(null)
+
+                                return
+                            }
                             // Replace files for announcements
                             for (let i = 0; i < gradeDoc.subjects.length; i++) {
                                 const currentSubject = gradeDoc.subjects[i]
