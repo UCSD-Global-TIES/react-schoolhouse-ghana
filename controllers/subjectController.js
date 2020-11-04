@@ -7,6 +7,7 @@ const API_PORT = process.env.PORT || 3001;
 const {
     verifyKey
 } = require("./verifyController");
+const { processAnnouncements } = require("./processAnnouncements");
 
 module.exports = {
     addAnnouncement: function (req, res) {
@@ -162,19 +163,7 @@ module.exports = {
 
                             popSubject.files = filesWithPaths
 
-                            // Replace files for announcements
-                            for (let i = 0; i < popSubject.announcements.length; i++) {
-                                const currentAnnouncement = popSubject.announcements[i]
-                                const annFilesWithPaths = [];
-                                for (const file of currentAnnouncement.files) {
-                                    let newFile = { ...file };
-                                    newFile = newFile._doc;
-                                    newFile.path = `http://${ip.address()}:${API_PORT}${file.path}`;
-                                    annFilesWithPaths.push(newFile);
-
-                                }
-                                popSubject.announcements[i].files = annFilesWithPaths;
-                            }
+                            popSubject.announcements = processAnnouncements(popSubject.announcements)
 
                             res.json(popSubject)
                         })

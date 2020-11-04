@@ -82,8 +82,8 @@ function SimpleListView(props) {
         setPageIdx(0)
 
         // Filter documents
-        const filteredDocuments = props.items.filter(document => document[PROPS.labelField].toLowerCase().includes(searchQuery.toLowerCase()));
-        setFilteredDocuments(filteredDocuments);
+        const filteredDocuments = props.items.filter(document => document[PROPS.labelField]?.toLowerCase().includes(searchQuery.toLowerCase())
+        );
 
         setProps(props);
     }, [props.items])
