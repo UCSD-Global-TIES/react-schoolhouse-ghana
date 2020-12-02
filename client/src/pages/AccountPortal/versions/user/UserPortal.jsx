@@ -91,7 +91,6 @@ function UserPortal(props) {
                 // Get & Set school announcements
                 setSchoolAnnouncements([...promiseResults[1].data]);
 
-
                 let subjectAnnList = []
                 if (promiseResults[0].data) {
                     for (const subjectDoc of promiseResults[0].data.subjects) {
@@ -106,6 +105,7 @@ function UserPortal(props) {
                 setRefreshing(false);
 
             })
+        
     }
 
     const handleCloseDocument = () => {

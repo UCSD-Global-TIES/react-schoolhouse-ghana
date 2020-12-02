@@ -1,12 +1,14 @@
 const gradeDb = require("../models/Grade");
 const studentDb = require("../models/Student");
 const accountDb = require("../models/Account");
-const ip = require("ip")
 const API_PORT = process.env.PORT || 3001;
 
 const {
     verifyKey
 } = require("./verifyController");
+const {
+    processAnnouncements
+} = require("./processAnnouncements");
 module.exports = {
     getGrades: function (req, res) {
         verifyKey(req.header('Authorization'), 'Admin')
@@ -32,8 +34,7 @@ module.exports = {
 
                     gradeDb
                         .findOne({
-                            $or: [
-                                {
+                            $or: [{
                                     students: {
                                         $in: [uid]
                                     }
@@ -49,35 +50,35 @@ module.exports = {
                             path: 'subjects',
                             populate: {
                                 path: 'announcements',
-                                populate: { 
+                                populate: {
                                     path: 'files'
                                 }
                             }
                         })
 
                         .then(async (gradeDoc) => {
+
+                            if (!gradeDoc) {
+                                res.json(null)
+
+                                return
+                            }
                             // Replace files for announcements
                             for (let i = 0; i < gradeDoc.subjects.length; i++) {
                                 const currentSubject = gradeDoc.subjects[i]
-                                for (let i = 0; i < currentSubject.announcements.length; i++) {
-                                    const annFilesWithPaths = [];
-                                    const currentAnnouncement = currentSubject.announcements[i]
-                                    for (const file of currentAnnouncement.files) {
-                                        let newFile = { ...file }
-                                        newFile = newFile._doc
-                                        newFile.path = `http://${ip.address()}:${API_PORT}${file.path}`;
-                                        annFilesWithPaths.push(newFile);
-                                    }
-                                    currentSubject.announcements[i].files = annFilesWithPaths;
-                                }
+
+                                currentSubject.announcements = processAnnouncements(currentSubject.announcements)
                             }
+
 
                             // Replace students with student object (names, etc)
                             for (let i = 0; i < gradeDoc.students.length; i++) {
                                 const currentStudent = gradeDoc.students[i];
                                 const studentDoc = await studentDb.findById(currentStudent);
-                                const accountDoc = await accountDb.findOne({ profile: currentStudent });
-                                
+                                const accountDoc = await accountDb.findOne({
+                                    profile: currentStudent
+                                });
+
                                 gradeDoc.students[i] = {
                                     firstName: studentDoc["first_name"],
                                     lastName: studentDoc["last_name"],
@@ -124,42 +125,39 @@ module.exports = {
                     let gradeDoc = req.body;
 
                     // Find all grades whose field 'students'/'teachers'/'subjects' has an identical _id in newG's corresponding fields and pull that _id the respective field 
-                    gradeDb.updateMany(
-                        {
-                            $or: [
-                                {
+                    gradeDb.updateMany({
+                                $or: [{
+                                        students: {
+                                            $in: gradeDoc.students
+                                        }
+                                    },
+                                    {
+                                        teachers: {
+                                            $in: gradeDoc.teachers
+                                        }
+                                    },
+                                    {
+                                        subjects: {
+                                            $in: gradeDoc.subjects
+                                        }
+                                    },
+
+                                ]
+                            }, {
+                                $pull: {
                                     students: {
                                         $in: gradeDoc.students
-                                    }
-                                },
-                                {
+                                    },
                                     teachers: {
                                         $in: gradeDoc.teachers
-                                    }
-                                },
-                                {
+                                    },
                                     subjects: {
                                         $in: gradeDoc.subjects
                                     }
-                                },
-
-                            ]
-                        },
-                        {
-                            $pull: {
-                                students: {
-                                    $in: gradeDoc.students
-                                },
-                                teachers: {
-                                    $in: gradeDoc.teachers
-                                },
-                                subjects: {
-                                    $in: gradeDoc.subjects
                                 }
                             }
-                        }
 
-                    )
+                        )
                         .then(() => {
                             // Create class document 
                             gradeDb
@@ -183,46 +181,45 @@ module.exports = {
                     let gradeDoc = req.body;
 
                     // Find all grades whose field 'students'/'teachers'/'subjects' has an identical _id in newG's corresponding fields and pull that _id the respective field 
-                    gradeDb.updateMany(
-                        {
-                            $or: [
-                                {
+                    gradeDb.updateMany({
+                                $or: [{
+                                        students: {
+                                            $in: gradeDoc.students
+                                        }
+                                    },
+                                    {
+                                        teachers: {
+                                            $in: gradeDoc.teachers
+                                        }
+                                    },
+                                    {
+                                        subjects: {
+                                            $in: gradeDoc.subjects
+                                        }
+                                    },
+
+                                ]
+                            }, {
+                                $pull: {
                                     students: {
                                         $in: gradeDoc.students
-                                    }
-                                },
-                                {
+                                    },
                                     teachers: {
                                         $in: gradeDoc.teachers
-                                    }
-                                },
-                                {
+                                    },
                                     subjects: {
                                         $in: gradeDoc.subjects
                                     }
-                                },
-
-                            ]
-                        },
-                        {
-                            $pull: {
-                                students: {
-                                    $in: gradeDoc.students
-                                },
-                                teachers: {
-                                    $in: gradeDoc.teachers
-                                },
-                                subjects: {
-                                    $in: gradeDoc.subjects
                                 }
                             }
-                        }
 
-                    )
+                        )
                         .then(() => {
                             // Create class document 
                             gradeDb
-                                .findOneAndUpdate({ _id: gradeDoc._id }, gradeDoc)
+                                .findOneAndUpdate({
+                                    _id: gradeDoc._id
+                                }, gradeDoc)
                                 .then((newG) =>
                                     res.json(newG)
                                 )

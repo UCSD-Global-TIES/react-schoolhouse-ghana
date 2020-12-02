@@ -7,6 +7,7 @@ const API_PORT = process.env.PORT || 3001;
 const {
     verifyKey
 } = require("./verifyController");
+const { processAnnouncements } = require("./processAnnouncements");
 
 module.exports = {
     // SLOW ~ 2 seconds
@@ -21,24 +22,12 @@ module.exports = {
                     }
 
                     announcementDb
-                        .find(query)
-                        .populate('files')
-                        .then((announcements) => {
+                    .find(query)
+                    .populate('files')
+                    .then((announcements) => {
 
-                            for (let i = 0; i < announcements.length; i++) {
-                                const annFilesWithPaths = [];
-                                let currentAnnouncement = announcements[i];
-                                for (const file of currentAnnouncement.files) {
-                                    let newFile = { ...file }
-
-                                    newFile = newFile._doc
-                                    newFile.path = `http://${ip.address()}:${API_PORT}${file.path}`;
-                                    annFilesWithPaths.push(newFile);
-                                }
-                                currentAnnouncement.files = annFilesWithPaths;
-                            }
-
-                            res.json(announcements);
+                        res.json(
+                            processAnnouncements(announcements))
                         })
                         .catch(err => res.status(422).json(err));
                 } else {
