@@ -44,7 +44,7 @@ return (
                     <Tooltip title="Home page" interactive>
                         <Link to="/" className={classes.buttonLink} >
                             <Button border="white" color="white" disableElevation>
-                                <div className={classes.hoveringText}>Schoolhouse Ghana</div> &nbsp;                        
+                                <div className={classes.hoveringText}>Semanhyia American School</div> &nbsp;                        
                                 <FontAwesomeIcon className={classes.navIcon} icon={faSchool} />      
                             </Button> 
                         </Link>

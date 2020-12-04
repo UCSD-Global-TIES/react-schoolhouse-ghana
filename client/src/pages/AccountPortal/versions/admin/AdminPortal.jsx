@@ -39,6 +39,7 @@ const useStyles = makeStyles(theme => ({
     // },
     drawerPaper: {
         width: drawerWidth,
+        background: '#f7ee9a',
     },
     content: {
         flexGrow: 1,
