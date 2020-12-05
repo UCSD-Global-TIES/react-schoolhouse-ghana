@@ -148,7 +148,7 @@ function LoginPortal(props) {
             <FullScreenDialog
                 open={seedDialogOpen}
                 handleClose={handleCloseSeedDialog}
-                type={"Welcome to Schoolhouse Ghana!"}
+                type={"Welcome to Semanhyia American School!"}
                 action={handleSeedDatabase}
                 buttonText={seedLoading ? <FontAwesomeIcon icon={faSpinner} spin /> : "Seed"}
             >
@@ -250,9 +250,9 @@ function LoginPortal(props) {
                         <div style={{ display: "flex", width: "100%", margin: "10px 0" }}>
 
                             <div style={{ margin: "auto" }}>
-                                <Button style={{ backgroundColor: "rgb(0, 182, 112)", color: "white" }} aria-label="login" onClick={() => handleLogin(username, password)}>
+                                <Button style={{ backgroundColor: "#fe951d", color: "white" }} aria-label="login" onClick={() => handleLogin(username, password)}>
                                     <div> Sign in </div>
-                                    <FontAwesomeIcon className={classes.navIcon} icon={faSignInAlt} size="lg" />
+                                    <FontAwesomeIcon className={classes.navIcon} icon={faSignInAlt} size="lg" color="white"/>
                                 </Button>
 
                             </div>
