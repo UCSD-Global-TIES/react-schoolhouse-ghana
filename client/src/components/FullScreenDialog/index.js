@@ -37,7 +37,8 @@ export default function FullScreenDialog(props) {
         Open full-screen dialog
       </Button> */}
       <Dialog fullScreen open={props.open} onClose={props.handleClose} TransitionComponent={Transition}>
-        <AppBar className={classes.appBar} position="fixed">
+        {/* styles the form editor header bar */}
+        <AppBar className={classes.appBar} position="fixed" style={{ background: '#FE951D' }}>
           <Toolbar>
             <IconButton edge="start" color="inherit" onClick={props.handleClose} aria-label="close">
               <CloseIcon />

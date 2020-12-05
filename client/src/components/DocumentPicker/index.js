@@ -14,6 +14,7 @@ const useStyles = makeStyles(theme => ({
     root: {
         display: 'flex',
     },
+    // styles the list of files when editing or creating an announcement
     list: {
         width: '100%',
         backgroundColor: theme.palette.background.paper,
@@ -25,18 +26,20 @@ const useStyles = makeStyles(theme => ({
     actionButton: {
         margin: theme.spacing(1)
     },
+    // styles the search bar box for files when creating/editing an announcement 
     content: {
         width: "90%",
-        maxWidth: "700px"
+        maxWidth: "700px",
     },
     skeleton: {
         width: "100%",
         margin: "1rem 0rem",
-        height: "40px"
+        height: "40px",
     },
+    //styles the page number counter
     paginationContainer: {
         margin: "auto",
-        padding: "1rem"
+        padding: "1rem",
     },
     searchbar: {
         margin: "0.5rem 0rem",

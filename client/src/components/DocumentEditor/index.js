@@ -20,7 +20,7 @@ const useStyles = makeStyles(theme => ({
     },
     list: {
         width: '100%',
-        backgroundColor: theme.palette.background.paper,
+        backgroundColor: "#94DD9B",//theme.palette.background.paper,
     },
     buttonLink: {
         color: "inherit",
@@ -29,18 +29,20 @@ const useStyles = makeStyles(theme => ({
     actionButton: {
         margin: theme.spacing(1)
     },
+    // styles the header of the current view
     content: {
         width: "90%",
-        maxWidth: "700px"
+        maxWidth: "700px",
     },
     skeleton: {
         width: "100%",
         margin: "1rem 0rem",
-        height: "40px"
+        height: "40px",
     },
+    // styles page counter
     paginationContainer: {
         margin: "auto",
-        padding: "1rem"
+        padding: "1rem",
     },
     searchbar: {
         margin: "0.5rem 0rem",
