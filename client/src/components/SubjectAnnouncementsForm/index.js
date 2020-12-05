@@ -11,7 +11,7 @@ import { faFile } from "@fortawesome/free-solid-svg-icons";
 const useStyles = makeStyles(theme => ({
     root: {
         padding: "3rem 0rem",
-        display: "flex"
+        display: "flex",
     },
     field: {
         margin: "1rem 0px"

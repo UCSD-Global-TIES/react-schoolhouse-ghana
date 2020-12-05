@@ -27,7 +27,7 @@ const useStyles = makeStyles(theme => ({
     },
     content: {
         width: "90%",
-        maxWidth: "700px"
+        maxWidth: "700px",
     },
     skeleton: {
         width: "100%",
@@ -36,7 +36,7 @@ const useStyles = makeStyles(theme => ({
     },
     paginationContainer: {
         margin: "auto",
-        padding: "1rem"
+        padding: "1rem",
     },
     searchbar: {
         margin: "0.5rem 0rem",

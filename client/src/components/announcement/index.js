@@ -8,7 +8,7 @@ import Divider from "@material-ui/core/Divider";
 
 const useStyles = makeStyles({
   card: {
-    minWidth: 275
+    minWidth: 275,
   },
   bullet: {
     display: "inline-block",
