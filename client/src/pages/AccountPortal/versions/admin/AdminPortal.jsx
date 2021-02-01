@@ -23,6 +23,7 @@ import API from "../../../../utils/API";
 import SocketContext from "../../../../socket-context";
 import SocketIOFileUpload from "socketio-file-upload"
 import UploadQueue from "../../../../components/UploadQueue";
+import eduTies from './eduTies.png'
 
 const drawerWidth = 220;
 
@@ -116,6 +117,7 @@ function AdminPortal(props) {
             <div className={classes.toolbar} />
             {/* <Divider /> */}
             <List>
+                <img src={eduTies} alt="eduTies" height={125} width={200} />
                 {documentMenuItems.map((item, index) => (
                     <NavLink to={item.path} key={index} className={classes.buttonLink}>
                         <ListItem selected={props.location.pathname.includes(item.path)} button>

@@ -31,8 +31,8 @@ const useStyles = makeStyles(theme => ({
         height: 140,
     },
     textGlow: {
-        color: "white",
-        textShadow: "2px 2px 7px #787676"
+        color: "black",
+        // textShadow: "2px 2px 7px #787676"
     },
     boxShadow: {
         boxShadow: "10px 10px 5px #bebebe"
@@ -225,7 +225,7 @@ function UserPortal(props) {
             { renderDialogBox() }
 
             <Grid spacing={5} container style={{ padding: "2rem", width: "100%" }}>
-                <Grid item xs={12}><Typography style={{ padding: "2rem" }} align='center' className={clsx(classes.textGlow, "flow-text")} variant="h3">welcome back, {props.user.profile.first_name} 😄</Typography> </Grid>
+                <Grid item xs={12}><Typography style={{ padding: "2rem" }} align='center' className={clsx(classes.textGlow, "flow-text")} variant="h3">Welcome Back, {props.user.profile.first_name} 😄</Typography> </Grid>
                 {/* Announcements */}
                 <Grid item xs={12} md={5} lg={4} xl={3}>
                     <div className={classes.boxShadow} >
