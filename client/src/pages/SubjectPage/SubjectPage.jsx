@@ -22,7 +22,8 @@ import SubjectAnnouncementsForm from "../../components/SubjectAnnouncementsForm"
 import SubjectFilesForm from "../../components/SubjectFilesForm";
 import SocketContext from "../../socket-context"
 import clsx from "clsx"
-import eduTies from './eduTies.png'
+import eduTies from "../../logos/eduTIES_logo.png"
+import sas from "../../logos/sas_logo.png"  
 
 const drawerWidth = 220;
 
@@ -94,7 +95,8 @@ function SubjectPage(props) {
     >
       <div className={classes.toolbar} />
       <List>
-      <img src={eduTies} alt="eduTies" height={125} width={200} />
+      <div style={{textAlign: "center"}}> <img src={sas} alt="sas logo" height={150} width={150}/></div>
+      <div style={{marginTop: "10px"}}> </div>
         {documentMenuItems.map((item, index) => (
           <NavLink to={item.path} key={index} className={classes.buttonLink}>
             <ListItem selected={props.location.pathname.includes(item.path)} button>
@@ -104,6 +106,7 @@ function SubjectPage(props) {
           </NavLink>
         ))}
       </List>
+    <img src={eduTies} alt="eduTies_logo" height={200} width={200} style={{position: "absolute", top: 680}}/>
     </div>
   );
 
