@@ -111,6 +111,12 @@ function LoginPortal(props) {
         }
     }
 
+    const handleKeyPress = (event, username, password) => {
+        if(event.key === 'Enter') {
+            handleLogin(username, password);
+        } 
+    }
+
     const handleAlertClose = () => {
         setAlertOpen(false);
     }
@@ -242,6 +248,7 @@ function LoginPortal(props) {
 
                                     name='password'
                                     value={password}
+                                    onKeyPress={(e) => handleKeyPress(e, username,password)}
                                     onChange={handleChange}
 
                                 />
@@ -250,7 +257,7 @@ function LoginPortal(props) {
                         <div style={{ display: "flex", width: "100%", margin: "10px 0" }}>
 
                             <div style={{ margin: "auto" }}>
-                                <Button style={{ backgroundColor: "#fe951d", color: "white" }} aria-label="login" onClick={() => handleLogin(username, password)}>
+                                <Button style={{ backgroundColor: "#fe951d", color: "white" }} aria-label="login" onClick={() => handleLogin(username, password)} >
                                     <div> Sign in </div>
                                     <FontAwesomeIcon className={classes.navIcon} icon={faSignInAlt} size="lg" color="white"/>
                                 </Button>
