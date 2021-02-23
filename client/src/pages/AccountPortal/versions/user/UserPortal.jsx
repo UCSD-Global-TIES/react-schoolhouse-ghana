@@ -14,7 +14,7 @@ import AccessDenied from "../../../../components/AccessDenied";
 import PageSpinner from "../../../../components/PageSpinner";
 import AnnouncementViewer from "../../../../components/AnnouncementViewer";
 import SocketContext from "../../../../socket-context"
-
+import sas from "../../../../logos/sas_logo.png"  
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -26,13 +26,15 @@ const useStyles = makeStyles(theme => ({
     },
     card: {
         maxWidth: 345,
+        display: "block",
+        overflow: "hidden",
     },
     cardMedia: {
         height: 140,
     },
     textGlow: {
-        color: "white",
-        textShadow: "2px 2px 7px #787676"
+        color: "black",
+        // textShadow: "2px 2px 7px #787676"
     },
     boxShadow: {
         boxShadow: "10px 10px 5px #bebebe"
@@ -210,7 +212,7 @@ function UserPortal(props) {
     };
 
     return (
-        <div style={{ display: "flex", width: "100%", marginTop: "5rem" }}>
+        <div style={{ display: "flex", width: "100%", marginTop: "2.5rem" }}>
 
             {/* ALERTS FOR API ACTIONS */}
             <Snackbar
@@ -223,9 +225,11 @@ function UserPortal(props) {
             </Snackbar>
 
             { renderDialogBox() }
+            <Grid spacing={3} container style={{ padding: "2rem", width: "100%" }}>
 
-            <Grid spacing={5} container style={{ padding: "2rem", width: "100%" }}>
-                <Grid item xs={12}><Typography style={{ padding: "2rem" }} align='center' className={clsx(classes.textGlow, "flow-text")} variant="h3">welcome back, {props.user.profile.first_name} 😄</Typography> </Grid>
+                <Grid item xs={12}><Typography align='center' className={clsx(classes.textGlow, "flow-text")} variant="h3">Welcome Back, {props.user.profile.first_name} 😄</Typography> 
+                <div style={{textAlign: "center"}}> <img src={sas} alt="sas logo" height={115} width={120}/></div>
+                </Grid>
                 {/* Announcements */}
                 <Grid item xs={12} md={5} lg={4} xl={3}>
                     <div className={classes.boxShadow} >
@@ -253,7 +257,7 @@ function UserPortal(props) {
                 <Grid item xs={12} md={7} lg={8} xl={9}>
                     {
                         subjects.length ?
-                            <Grid spacing={1} align="center" container>
+                            <Grid spacing={3} align="center" container>
 
                                 {
                                     subjects.map((subjectDoc, idx) => (

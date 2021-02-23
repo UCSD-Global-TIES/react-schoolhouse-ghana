@@ -34,6 +34,8 @@ const useStyles = makeStyles(theme => ({
         width: "90%",
         maxWidth: "700px",
     },
+
+    // this is the general outline that is used by all the subject document containers
     skeleton: {
         width: "100%",
         margin: "1rem 0rem",
@@ -494,7 +496,7 @@ function DocumentEditor(props) {
                                                     const labelId = `${collection.toLowerCase()}-${idx}`;
 
                                                     return (
-                                                        <ListItem alignItems="flex-start" key={labelId} role={undefined} dense button onClick={() => handleSelect(document._id)}>
+                                                        <ListItem alignItems="flex-start" divider={true} key={labelId} role={undefined} dense button onClick={() => handleSelect(document._id)}>
                                                             <ListItemIcon>
                                                                 <Checkbox
                                                                     edge="start"
@@ -504,6 +506,7 @@ function DocumentEditor(props) {
                                                                     inputProps={{ 'aria-labelledby': labelId }}
                                                                 />
                                                             </ListItemIcon>
+
                                                             <ListItemText id={labelId} style={{ overflowWrap: "break-word" }} primary={primary(document)} secondary={`Created: ${document.createdAt ? parseTime(document.createdAt, true) : document.createdBy}`} />
                                                             <ListItemSecondaryAction>
                                                                 {
