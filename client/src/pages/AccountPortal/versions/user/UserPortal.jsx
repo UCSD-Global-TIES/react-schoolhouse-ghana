@@ -154,7 +154,7 @@ function UserPortal(props) {
 
                 // Set Student List
                 if (props.user.type === "Teacher") {
-                    setStudentList(promiseResults[0].data.students);
+                    setStudentList(promiseResults[0].data?.students || []);
                 }
 
                 // Set loading false, so the loading screen goes away
