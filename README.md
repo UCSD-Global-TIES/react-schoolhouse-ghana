@@ -6,7 +6,7 @@
 
 Commissioned by the GodFreds Foundation and the UCSD Global Ties program, Schoolhouse Ghana is striving to radically transform the education system at SAS (Semanhyiya American School) in Senase, Ghana. As internet usage is very expensive in this region, the school's access to online resources is greatly limited. In a school with hundreds of students and faculty, accessing online resources at school will quickly incur extensive internet charges.
 
-Schoolhouse Ghana presents the solution. A file-sharing platform designed specifically for schools, with many features including:
+EduTies presents the solution. A file-sharing platform designed specifically for schools, with many features including:
 - User authentication system with various account types & associated permissions (i.e. students, teachers, and administrative accounts)
 
 
@@ -24,10 +24,10 @@ Schoolhouse Ghana presents the solution. A file-sharing platform designed specif
 To get started and launch the server, follow the instructions below.
 
 ## Installation 
-### Prerequisites:
-1. An IDE of your choice. A good option to start with is [VSCode](https://code.visualstudio.com/download).
+### Prerequisite Downloads:
+1. An integrated development environment (IDE) of your choice. This a software program that allows you to edit, execute, and debug code all in the same place.  A good option to start with is [VSCode](https://code.visualstudio.com/download).
 
-2. [Git](https://git-scm.com/downloads), a version control management system for our code. Test your installation with the command: `git --version`. If this gives you an error, you may have to manually add git to your system's PATH environment variable. 
+2. [Git](https://git-scm.com/downloads), a version control management system for our code. To test your installation, open a terminal and type in the following  command: `git --version`. If this gives you an error, you may have to manually add git to your system's PATH environment variable. See a Windows guide [here](https://stackoverflow.com/questions/4492979/git-is-not-recognized-as-an-internal-or-external-command). 
 3. [Node.js](https://nodejs.org/en/download/), a JavaScript runtime environment. 
 
 3. [Robo 3T](https://robomongo.org/download), a GUI for MongoDB.
@@ -35,12 +35,12 @@ To get started and launch the server, follow the instructions below.
 ### Clone the repository
 1. Open up your IDE and open a terminal.
 2. Navigate to the folder where you want the project to reside. Use the command `cd DIRECTORY_NAME` to navigate your computer's file structure. The command `ls` shows you the files in your current directory (valid for macOS, and Windows PowerShell -- NOT Windows command prompt).
-3. Type in the following command:
+3. Create a Github account and ask someone to add you to the private repo (where all of our project's files reside). Type in the following command:
 ```
 git clone https://github.com/UCSD-Global-TIES/react-schoolhouse-ghana.git 
 ```
 ### Install the dependencies
-1. First, the package dependencies...
+1. First, resolve package dependencies with the following command:
 ```
 npm i 
 ```
@@ -51,13 +51,13 @@ npm i
 
 ### Select a storage folder and temporary folder (optional)
 *The storage folder will be automatically created if it does not exist already. Defaults to "../schoolhouse-storage"*
-1. Open the *nasConfig.js* file in your preferred editor
+1. Open the *nasConfig.js* file in your preferred editor (i.e. VSCode).
 
 
-2. Update the *path* field to the directory where you wish to store all resources 
+2. Update the *path* field to the directory where you wish to store all resources. 
 
 
-3. Update the *tmp* field to the directory where you wish to save resources temporarily (before the server automatically moves it to the directory specified by *path*)
+3. Update the *tmp* field to the directory where you wish to save resources temporarily (before the server automatically moves it to the directory specified by *path*).
 
 ### Start the server
 ```
@@ -70,7 +70,7 @@ npm start
 
 
 ### Making Changes
-To get the latest changes from the remote repo:
+To get the latest changes from the remote [repository](https://www.geeksforgeeks.org/what-is-a-git-repository/):
 ```
 git pull origin master
 ```
