@@ -28,9 +28,12 @@ To get started and launch the server, follow the instructions below.
 1. An integrated development environment (IDE) of your choice. This a software program that allows you to edit, execute, and debug code all in the same place.  A good option to start with is [VSCode](https://code.visualstudio.com/download).
 
 2. [Git](https://git-scm.com/downloads), a version control management system for our code. To test your installation, open a terminal and type in the following  command: `git --version`. If this gives you an error, you may have to manually add git to your system's PATH environment variable. See a Windows guide [here](https://stackoverflow.com/questions/4492979/git-is-not-recognized-as-an-internal-or-external-command). 
-3. [Node.js](https://nodejs.org/en/download/), a JavaScript runtime environment. 
 
-3. [Robo 3T](https://robomongo.org/download), a GUI for MongoDB.
+3. [Node.js](https://nodejs.org/en/download/), a JavaScript runtime environment. If you are a Mac User who would rather install node via command line type `brew install node`. If you are a Windows User using WSL, click [here](https://docs.microsoft.com/en-us/windows/dev-environment/javascript/nodejs-on-wsl) to get a step-by-step procedure on how to install Node via command line.
+
+4. [Robo 3T](https://robomongo.org/download), a GUI for MongoDB. If you are a Mac User who would rather install MongoDB via command line type `brew tap mongodb/brew` and then `brew install mongodb-community@4.4`.  If you are a Windows User using WSL, click [here](https://docs.microsoft.com/en-us/windows/wsl/tutorials/wsl-database) and look for a section titled "Install MongoDB" for instructions on how to install MongoDB via command line.
+
+If you are a Windows User who would rather do everything via command-line, it is recommended that you get the Windows Subsystem for Linux (WSL). This allows you to run all Linux commands without the need for virtual machines or dual-boot setups.  By getting the WSL, you can install the Ubuntu through the Microsoft Store for free. Once you install the Windows Subsystem for Ubuntu, you can run git basic Linux commands and Git now. For reference on how to install WSL, you can click [here] (https://docs.microsoft.com/en-us/windows/wsl/)  
 
 ### Clone the repository
 1. Open up your IDE and open a terminal.
@@ -47,6 +50,8 @@ npm i
 
 2. Then, the database server **MongoDB**
 > [Install MongoDB Community Server](https://www.mongodb.com/download-center/community)
+- If you are a Windows User with WSL already installed you can type `sudo service mongodb start` to start the database.  This step is really important before typing `npm start`.  
+- If you are a Mac User type `brew services start mongodb-community@4.4`. NOTE: You must follow Step 4 of Installation before typing this command.
 
 
 ### Select a storage folder and temporary folder (optional)
