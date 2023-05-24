@@ -6,6 +6,7 @@ const accountRoutes = require("./account");
 const fileRoutes = require("./file");
 const verifyRoutes = require("./verify");
 const assessmentRoutes = require("./assessment");
+const todoRountes = require('./todo');
 
 // Object routes
 router.use("/general", generalRoutes);
