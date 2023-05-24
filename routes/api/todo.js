@@ -9,7 +9,7 @@ router.route("/")
     .post(todoController.addTodo);
 
 // Matches with "/api/todo/:id"
-router.route("/:sid")
+router.route("/:id")
     // Retrieves a specific todo
     .get(todoController.getTodo)
     // Updates a specific todo
