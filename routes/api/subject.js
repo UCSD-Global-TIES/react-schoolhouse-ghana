@@ -39,4 +39,3 @@ router.route("/:sid/file/:fid")
   .delete(subjectController.removeFile)
 
 module.exports = router;
-
