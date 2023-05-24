@@ -6,5 +6,6 @@ module.exports = {
     Subject: require("./Subject"),
     Account: require("./Account"),
     File: require("./File"),
-    Grade: require("./Grade")
+    Grade: require("./Grade"),
+    Todo:require("./Todo")
 };
