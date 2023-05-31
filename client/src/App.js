@@ -38,7 +38,7 @@ import NavBar from "./components/NavBar";
 import { faSpinner } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import ToDoList from "./components/ToDoList";
+import ToDoList from "./components/TodoList/index";
 
 
 import AdminPortal from "./pages/AccountPortal/versions/admin/AdminPortal";
