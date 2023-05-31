@@ -12,6 +12,15 @@ import "./App.css";
 import API from "./utils/API";
 import 'typeface-roboto';
 
+//make a todo list for the app
+
+
+  
+
+
+
+
+
 // COMPONENTS
 // -----------------------------------------------------------
 // Component that ensures people are logged in and have proper permissions
@@ -28,6 +37,8 @@ import AssessmentPage from "./pages/AssessmentPage/index";
 import NavBar from "./components/NavBar";
 import { faSpinner } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+
+import ToDoList from "./components/ToDoList";
 
 
 import AdminPortal from "./pages/AccountPortal/versions/admin/AdminPortal";
@@ -64,6 +75,8 @@ function App() {
   }, []);
 
   return (
+  
+  
     <SocketContext.Provider value={socket}>
 
       <div className="App">
@@ -93,9 +106,17 @@ function App() {
             </Switch>
         }
       </div>
+      <div className="App">
+        <h1>To-Do List</h1>
+        <ToDoList />
+      </div>
+
 
     </SocketContext.Provider>
   );
+  
+
 }
+
 
 export default App;
