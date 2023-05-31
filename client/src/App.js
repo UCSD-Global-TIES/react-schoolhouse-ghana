@@ -105,11 +105,8 @@ function App() {
               <Route component={NoMatch} />
             </Switch>
         }
-      </div>
-      <div className="App">
-        <h1>To-Do List</h1>
-        <ToDoList />
-      </div>
+       
+      </div> 
 
 
     </SocketContext.Provider>
