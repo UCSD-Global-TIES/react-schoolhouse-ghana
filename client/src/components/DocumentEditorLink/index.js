@@ -92,7 +92,7 @@ function DocumentEditorLink(props) {
     // HANDLE QUERY CHANGE
     const handleQueryChange = (event) => {
         const { value } = event.target;
-        // Set search query
+        // Set query
         setSearchQuery(value);
 
         // Reset page 
@@ -244,7 +244,7 @@ function DocumentEditorLink(props) {
                         />
 
                         <FormControl className={classes.searchbar}>
-                            <InputLabel htmlFor="standard-adornment-amount">Search {collection.toLowerCase()}</InputLabel>
+                            <InputLabel htmlFor="standard-adornment-amount"> Search {collection.toLowerCase()}</InputLabel>
                             <Input
                                 value={searchQuery}
                                 onChange={handleQueryChange}

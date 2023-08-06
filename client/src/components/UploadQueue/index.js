@@ -61,7 +61,7 @@ function UploadQueue(props) {
     // HANDLE QUERY CHANGE
     const handleQueryChange = (event) => {
         const { value } = event.target;
-        // Set search query
+        // Set query
         setSearchQuery(value);
 
         // Reset page 
@@ -171,7 +171,7 @@ function UploadQueue(props) {
 
 
                         <FormControl className={classes.searchbar}>
-                            <InputLabel htmlFor="standard-adornment-amount">Search uploads</InputLabel>
+                            <InputLabel htmlFor="standard-adornment-amount">uploads</InputLabel>
                             <Input
                                 value={searchQuery}
                                 onChange={handleQueryChange}

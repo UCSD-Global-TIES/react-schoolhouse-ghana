@@ -51,7 +51,7 @@ function SimpleListView(props) {
     // HANDLE QUERY CHANGE
     const handleQueryChange = (event) => {
         const { value } = event.target;
-        // Set search query
+        // Set query
         setSearchQuery(value);
 
         // Reset page 
@@ -124,7 +124,7 @@ function SimpleListView(props) {
             {
                 PROPS.searchbar &&
                 <FormControl className={classes.searchbar}>
-                    <InputLabel htmlFor="standard-adornment-amount">Search {PROPS.title.toLowerCase()}</InputLabel>
+                    <InputLabel htmlFor="standard-adornment-amount"> Search {PROPS.title.toLowerCase()}</InputLabel>
                     <Input
                         value={searchQuery}
                         onChange={handleQueryChange}
