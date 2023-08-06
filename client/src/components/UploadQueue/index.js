@@ -61,7 +61,7 @@ function UploadQueue(props) {
     // HANDLE QUERY CHANGE
     const handleQueryChange = (event) => {
         const { value } = event.target;
-        // Set search query
+        // Set query
         setSearchQuery(value);
 
         // Reset page 

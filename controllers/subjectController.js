@@ -1,6 +1,8 @@
 const gradeDb = require("../models/Grade");
 const subjectDb = require("../models/Subject");
 const announcementDb = require("../models/Announcement");
+const studentDb = require("../models/Student");
+
 const ip = require("ip")
 const API_PORT = process.env.PORT || 3001;
 
@@ -10,6 +12,32 @@ const {
 const { processAnnouncements } = require("./processAnnouncements");
 
 module.exports = {
+    addMarksForStudent: function (req, res) {
+        verifyKey(req.header("Authorization"), "Teacher,Admin").then((isVerified) => {
+          if (isVerified) {
+            const studentId = req.params.studentId;
+            const marks = req.body.marks;
+    
+            // Assuming the studentId is valid, you can find the student and update their marks
+            studentDb
+              .findOneAndUpdate(
+                { _id: studentId },
+                { $push: { marks: { $each: marks } } }, // Add multiple marks to the array
+                { new: true } // Return the updated student object
+              )
+              .then((updatedStudent) => {
+                if (updatedStudent) {
+                  res.json(updatedStudent);
+                } else {
+                  res.status(404).json({ error: "Student not found." });
+                }
+              })
+              .catch((err) => res.status(422).json(err));
+          } else {
+            res.status(403).json(null);
+          }
+        })
+    },
     addAnnouncement: function (req, res) {
         verifyKey(req.header('Authorization'), 'Teacher,Admin')
             .then((isVerified) => {

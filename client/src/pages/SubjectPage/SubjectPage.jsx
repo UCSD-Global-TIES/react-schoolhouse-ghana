@@ -12,10 +12,13 @@ import API from "../../utils/API";
 import "./main.css";
 import NavBarAdmin from "../../components/NavBarAdmin";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBullhorn, faFile, faSpinner } from "@fortawesome/free-solid-svg-icons";
+import { faBullhorn, faCheck, faFile, faSpinner } from "@fortawesome/free-solid-svg-icons";
 import SimpleListView from "../../components/SimpleListView";
 import PageSpinner from "../../components/PageSpinner";
 import FileViewer from "../../components/FileViewer";
+import MarksViewer from "../../components/MarksViewer";
+import MarksForm from "../../components/MarksForm";
+
 import DocumentEditor from "../../components/DocumentEditor";
 import AnnouncementViewer from "../../components/AnnouncementViewer";
 import SubjectAnnouncementsForm from "../../components/SubjectAnnouncementsForm";
@@ -86,6 +89,11 @@ function SubjectPage(props) {
       label: "Resources",
       icon: faFile,
       path: `${props.match.url}/resources`
+    }, 
+    {
+      label: "Manage Student Grades",
+      icon: faCheck,
+      path: `${props.match.url}/studentGrades`
     }
   ];
 
@@ -188,6 +196,20 @@ function SubjectPage(props) {
           )
       ,
       path: `${props.match.path}/resources`
+    }, 
+    {
+      component:
+        props.user.type === "Student" ?
+          (props) => (
+            <MarksViewer />
+          )
+          :
+          (props) => (
+            <MarksForm />
+
+          )
+      ,
+      path: `${props.match.path}/studentGrades`
     }
   ]
 
