@@ -171,7 +171,7 @@ function UploadQueue(props) {
 
 
                         <FormControl className={classes.searchbar}>
-                            <InputLabel htmlFor="standard-adornment-amount">uploads</InputLabel>
+                            <InputLabel htmlFor="standard-adornment-amount">Search uploads</InputLabel>
                             <Input
                                 value={searchQuery}
                                 onChange={handleQueryChange}
