@@ -179,7 +179,7 @@ function SubjectPage(props) {
               title={"Resources"}
               items={subjectInfo.files || []}
               pageMax={5}
-              icon={faCheck}
+              icon={faFile}
               labelField={"nickname"}
               viewer={FileViewer}
               searchbar
