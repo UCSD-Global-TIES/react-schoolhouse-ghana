@@ -1,29 +1,11 @@
 const router = require("express").Router();
-const apiRoutes = require("./api");
-const Mark = require("../../controllers/markController"); 
+const markController = require("../../controllers/markController"); 
 
-
-router.use("/api", apiRoutes);
-router.post('/marks', markController.createMark);
-
-router.post('/marks', async (req, res) => {
-    try {
-      const { studentName, assignmentName, mark } = req.body;
-  
-    
-      const newMark = new Mark({
-        studentName,
-        assignmentName,
-        grade: mark,
-      });
-  
-      await newMark.save();
-  
-      res.status(201).json({ success: true, message: 'Mark saved successfully.' });
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ success: false, message: 'Error saving mark.' });
-    }
-});
+router.post('/', markController.createMark); 
+router.get('/', markController.getMarks); 
+router.get('/username/:username', markController.getMarksByUsername);  
+router.get('/:id', markController.getMark); 
+router.put('/:id', markController.updateMark); 
+router.delete('/:id', markController.deleteMark); 
 
 module.exports = router;

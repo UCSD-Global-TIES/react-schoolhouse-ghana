@@ -8,11 +8,14 @@ const siofu = require("socketio-file-upload")
 const fs = require("fs")
 const routes = require("./routes");
 const config = require("./nasConfig");
+const cors = require('cors');
+
 
 const app = express();
 var http = require('http').createServer(app);
 var io = require('socket.io')(http);
 const PORT = process.env.PORT || 3001;
+app.use(cors());
 
 // Define middleware here
 app.use(express.urlencoded({
