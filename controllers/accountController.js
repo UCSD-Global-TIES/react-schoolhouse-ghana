@@ -376,5 +376,25 @@ module.exports = {
                     res.status(403).json(null);
                 }
             })
+            
+    },
+    getAccountByProfileId: async (req, res) => {
+        console.log("Entering getAccountByProfileId with profileId:", req.params.profileId);
+    
+        try {
+            const account = await accountDb.findOne({ profile: req.params.profileId });
+            
+            console.log("Account fetched:", account);
+    
+            if (account) {
+                res.json(account);
+            } else {
+                console.log("Account not found for profileId:", req.params.profileId);
+                res.status(404).send("Account not found");
+            }
+        } catch (error) {
+            console.error("Error in getAccountByProfileId:", error);
+            res.status(500).send("Server error");
+        }
     }
 }

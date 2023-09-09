@@ -14,4 +14,7 @@ router.route("/:aid")
   // Updates a specific account
   .put(accountController.updateAccount)
 
+router.route("/profile/:profileId")
+  .get(accountController.getAccountByProfileId);
+
 module.exports = router;

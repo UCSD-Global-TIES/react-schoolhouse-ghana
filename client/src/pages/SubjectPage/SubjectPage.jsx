@@ -201,11 +201,11 @@ function SubjectPage(props) {
       component:
         props.user.type === "Student" ?
           (props) => (
-            <MarksViewer />
+            <MarksViewer {...props}/>
           )
           :
           (props) => (
-            <MarksForm />
+            <MarksForm subject_id={subject_id}/>
 
           )
       ,

@@ -1,25 +1,37 @@
 import React, { useState } from "react";
 import { TextField, Button, Typography, Paper } from "@material-ui/core";
-import API from "../../utils/API"; 
 
-function MarksInput({ onSave }) {
-  const [studentName, setStudentName] = useState("");
+function MarksInput({subject_id}) {
+  const [studentUsername, setStudentUsername] = useState("");
   const [assignmentName, setAssignmentName] = useState("");
   const [grade, setGrade] = useState("");
+  const subject = subject_id;
 
+  
   const handleSave = async () => {
-    if (studentName && assignmentName && grade !== '' && !isNaN(grade)) {
+    if (studentUsername && assignmentName && subject && grade !== '' && !isNaN(parseFloat(grade))) {
       try {
-        await API.post('/marks', {
-          studentName,
-          assignmentName,
-          grade: parseFloat(grade),
+        const response = await fetch('http://localhost:3001/api/mark', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            studentUsername,
+            assignmentName,
+            grade: parseFloat(grade),
+            subject 
+          }),
         });
 
-        onSave(); 
-        setStudentName('');
-        setAssignmentName('');
-        setGrade('');
+        if (response.ok) {
+          setStudentUsername('');
+          setAssignmentName('');
+          setGrade('');
+          console.log('Saved Grade');
+        } else {
+          console.log('Error saving grade:', response.status, response.statusText);
+        }
       } catch (error) {
         console.log('Error saving grade:', error);
       }
@@ -30,12 +42,12 @@ function MarksInput({ onSave }) {
     <Paper style={{ padding: "1rem" }}>
       <Typography variant="h6">Enter Assignment Grades</Typography>
       <TextField
-        label="Student Name"
+        label="Student Username"
         variant="outlined"
         fullWidth
         margin="normal"
-        value={studentName}
-        onChange={(e) => setStudentName(e.target.value)}
+        value={studentUsername}
+        onChange={(e) => setStudentUsername(e.target.value)}
       />
       <TextField
         label="Assignment Name"

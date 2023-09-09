@@ -4,6 +4,7 @@ const markSchema = new mongoose.Schema({
   studentUsername: { type: String, required: true },
   assignmentName: { type: String, required: true },
   grade: { type: Number, required: true },
+  subject: { type: String, required: true },
   createdAt: { type: Date, default: Date.now },
 });
 
