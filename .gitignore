@@ -66,3 +66,5 @@ client/public/storage/*
 
 # production build
 client/build/
+
+.vscode/
