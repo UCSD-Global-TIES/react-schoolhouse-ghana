@@ -8,7 +8,7 @@
     --accent-color-dg: #58CC02;
     --accent-color-g: #89E219;
     --accent-color-y: #FFC800;
-    --background-color: #F0F0F0;
+    --background-color: #FFF;
     --neutral-color: #4B4B4B;       /* Refer to Figma for transparency/alpha values */
 
     /* Font Variables */
@@ -21,12 +21,16 @@
 
 html {
     height: 100%;
-    background-image: radial-gradient( white,#9cdef2);
+
+    /* Original Background Below */
+    /* background-image: radial-gradient( white,#9cdef2); */
 }
 
 body {
     margin: 0;
-    background-color: transparent !important;
+
+    /* Original Background */
+    /* background-color: transparent !important; */
 }
 
 /* Fixes weird alignment for inline FA icons */
