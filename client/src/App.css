@@ -1,3 +1,21 @@
+@import url('https://fonts.googleapis.com/css2?family=Asap+Condensed:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,200;1,300;1,400;1,500;1,600;1,700;1,800&family=Nunito:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,200;1,300;1,400;1,500;1,600;1,700;1,800&display=swap');
+
+:root {
+    /* Color Variables */
+    --primary-color: #FF9600;
+    --secondary-color: #2584FF;     /* Refer to Figma for transparency/alpha values */
+    --accent-color-db: #005FD9;
+    --accent-color-dg: #58CC02;
+    --accent-color-g: #89E219;
+    --accent-color-y: #FFC800;
+    --background-color: #F0F0F0;
+    --neutral-color: #4B4B4B;       /* Refer to Figma for transparency/alpha values */
+
+    /* Font Variables */
+    --primary-font: 'Nunito', sans-serif;
+    --secondary-font: 'Asap Condensed', sans-serif;
+}
+
 .App{
 }
 
