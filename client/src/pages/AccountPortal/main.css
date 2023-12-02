@@ -1,0 +1,12 @@
+h1 {
+  font-size: 3rem;
+}
+
+h2 {
+  font-size: 1.75rem;
+  font-weight: normal;
+}
+
+#heading-text {
+  color: var(--primary-color);
+}
