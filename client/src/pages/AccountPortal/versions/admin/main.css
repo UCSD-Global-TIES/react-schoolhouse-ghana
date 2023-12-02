@@ -21,3 +21,17 @@
     transform: scale(1.1);
     transition: all 0ms;
 }
+
+/* End of Transition Group CSS */
+
+h1 {
+    font-size: 3rem;
+}
+
+h2 {
+    font-size: 1.75rem;
+}
+
+#heading-text {
+    color: var(--primary-color);
+}
