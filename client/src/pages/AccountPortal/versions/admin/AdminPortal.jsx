@@ -139,10 +139,11 @@ function AdminPortal(props) {
 
   const drawer = (
     <div onClick={isSmallDevice ? handleDrawerToggle : () => {}}>
-      <div className={classes.toolbar} />
-      {/* <Divider /> */}
       <List>
-        <div style={{ textAlign: "center" }}></div>
+        <div id="heading-text" style={{ textAlign: "center", margin: "0 auto" }}>
+          <h1>Semanhyia</h1>
+          <h2>American School</h2>
+        </div>
         <div style={{ marginTop: "10px" }}> </div>
         {documentMenuItems.map((item, index) => (
           <NavLink to={item.path} key={index} className={classes.buttonLink}>
