@@ -68,3 +68,5 @@ client/public/storage/*
 client/build/
 
 .vscode/
+
+.DS_Store
