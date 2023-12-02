@@ -1,49 +1,53 @@
-import React, {
-  useEffect,
-  useState
-} from "react";
+// React and Hooks
+import React, { useEffect, useState } from "react";
 
-import {
-  Route,
-  Switch
-} from "react-router-dom";
+// Router
+import { Route, Switch } from "react-router-dom";
 
-import "./App.css";
-import API from "./utils/API";
+// Material-UI Components and Styles
+import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles';
+import { CssBaseline } from "@material-ui/core";
+
+// Font and Icons
 import 'typeface-roboto';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSpinner } from "@fortawesome/free-solid-svg-icons";
 
-// COMPONENTS
+// Socket
+import * as io from 'socket.io-client';
+import SocketContext from './socket-context';
+
+// Utils
+import API from "./utils/API";
+
+// Style
+import "./App.css";
+
+// Components
 // -----------------------------------------------------------
 // Component that ensures people are logged in and have proper permissions
 // Using Redirect https://reacttraining.com/react-router/web/api/Redirect
 import ProtectedRoute from "./components/ProtectedRoute";
-// import Loading from "./components/Loading";
+// import Loading from "./components/Loading"; // Commented out but kept for future reference
+import NavBar from "./components/NavBar";
 
-// PAGES
+// Pages
 import NoMatch from "./pages/NoMatch/index";
 import LoginPortal from "./pages/LoginPortal/index";
 import AccountPortal from "./pages/AccountPortal/index";
 import SubjectPage from "./pages/SubjectPage/index";
 import AssessmentPage from "./pages/AssessmentPage/index";
-import NavBar from "./components/NavBar";
-import { faSpinner } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles';
-import { CssBaseline } from "@material-ui/core";
-
 import AdminPortal from "./pages/AccountPortal/versions/admin/AdminPortal";
-
-import SocketContext from './socket-context'
-import * as io from 'socket.io-client'
 
 const socket = io()
 
-// Create a theme instance.
+// Create a theme instance. 
+// Global Stylings should be changed/added here
 const appTheme = createMuiTheme({
   typography: {
     fontFamily: [
-      'Nunito',
       'Asap Condensed',
+      'Nunito',
       'sans-serif'
     ].join(','),
   },
@@ -55,9 +59,7 @@ const appTheme = createMuiTheme({
 });
 
 function App() {
-  // const testUser = null;
   const [userInfo, setUserInfo] = useState(null);
-
   const [loading, setLoading] = useState(true);
 
   const handleLogout = () => {
@@ -85,10 +87,6 @@ function App() {
       <SocketContext.Provider value={socket}>
 
         <div className="App">
-          <header>
-            <NavBar user={userInfo} logout={handleLogout} />
-          </header>
-
           {
             loading ?
               <div style={{ display: "flex", width: "100vw", height: "100vh" }}>
