@@ -16,7 +16,10 @@
     --secondary-font: 'Asap Condensed', sans-serif;
 }
 
-.App{
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
 html {
@@ -32,6 +35,12 @@ body {
     /* Original Background */
     /* background-color: transparent !important; */
 }
+
+.App{
+}
+
+
+
 
 /* Fixes weird alignment for inline FA icons */
 .svg-inline--fa {
