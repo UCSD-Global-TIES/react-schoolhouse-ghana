@@ -12,6 +12,7 @@ import { Drawer, Hidden, Divider, List, ListItem, ListItemIcon, ListItemText, Cs
 import { TransitionGroup, CSSTransition } from 'react-transition-group'
 import { useMediaQuery } from 'react-responsive';
 import "../../../../utils/flowHeaders.min.css";
+import "../../../../App.css"
 import "./main.css";
 import NavBarAdmin from "../../../../components/NavBarAdmin";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -41,7 +42,7 @@ const useStyles = makeStyles(theme => ({
     // },
     drawerPaper: {
         width: drawerWidth,
-        background: '#f7ee9a',
+        background: 'var(--background-color)',
     },
     content: {
         flexGrow: 1,
@@ -118,7 +119,7 @@ function AdminPortal(props) {
             <div className={classes.toolbar} />
             {/* <Divider /> */}
             <List>
-            <div style={{textAlign: "center"}}> <img src={sas} alt="sas logo" height={150} width={150}/></div>
+            <div style={{textAlign: "center"}}></div>
             <div style={{marginTop: "10px"}}> </div>
                 {documentMenuItems.map((item, index) => (
                     <NavLink to={item.path} key={index} className={classes.buttonLink}>
@@ -142,7 +143,7 @@ function AdminPortal(props) {
                 ))}
             </List>
             
-        <img src={eduTies} alt="eduTies" height={200} width={200} style={{position: "absolute", top: 680}}/>
+        {/* <img src={eduTies} alt="eduTies" height={200} width={200} style={{position: "absolute", top: 680}}/> */}
      
         </div>
     );

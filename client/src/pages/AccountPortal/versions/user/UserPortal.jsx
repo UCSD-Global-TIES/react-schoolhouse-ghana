@@ -8,6 +8,7 @@ import { Alert } from '@material-ui/lab';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faSchool, faPencilRuler, faChalkboardTeacher } from "@fortawesome/free-solid-svg-icons"
 import "../../../../utils/flowHeaders.min.css";
+import "../../../../App.css"
 import "./main.css";
 import clsx from "clsx"
 import AccessDenied from "../../../../components/AccessDenied";
@@ -19,7 +20,7 @@ import sas from "../../../../logos/sas_logo.png"
 const useStyles = makeStyles(theme => ({
     root: {
         width: '100%',
-        backgroundColor: theme.palette.background.paper,
+        backgroundColor: 'var(--background-color)',
     },
     inline: {
         display: 'inline',
