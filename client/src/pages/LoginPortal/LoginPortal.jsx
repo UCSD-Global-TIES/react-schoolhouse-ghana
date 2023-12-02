@@ -1,17 +1,27 @@
+// React and Hooks
 import React, { useState, useEffect, useContext } from "react";
-import "../../utils/flowHeaders.min.css";
-import "./main.css";
-import API from "../../utils/API"
-import { makeStyles } from '@material-ui/core/styles';
 import { Redirect } from "react-router-dom";
-import { Alert } from "@material-ui/lab";
+
+// Material-UI Components and Styles
+import { makeStyles } from '@material-ui/core/styles';
 import { Snackbar, FormControl, InputLabel, Input, InputAdornment, Fab, Typography, Button } from "@material-ui/core";
 import AccountCircle from "@material-ui/icons/AccountCircle";
 import Key from "@material-ui/icons/VpnKey";
+import { Alert } from "@material-ui/lab";
+
+// FontAwesome Icons
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSignInAlt, faChalkboardTeacher, faSpinner } from '@fortawesome/free-solid-svg-icons'
+import { faSignInAlt, faChalkboardTeacher, faSpinner } from '@fortawesome/free-solid-svg-icons';
+
+// Local Components and Utils
 import FullScreenDialog from "../../components/FullScreenDialog";
-import SocketContext from '../../socket-context'
+import SocketContext from '../../socket-context';
+import API from "../../utils/API";
+
+// Styles
+import "../../utils/flowHeaders.min.css";
+import "./main.css";
+
 
 
 const useStyles = makeStyles(theme => ({
