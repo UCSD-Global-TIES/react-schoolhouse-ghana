@@ -66,3 +66,7 @@ client/public/storage/*
 
 # production build
 client/build/
+
+.vscode/
+
+.DS_Store
