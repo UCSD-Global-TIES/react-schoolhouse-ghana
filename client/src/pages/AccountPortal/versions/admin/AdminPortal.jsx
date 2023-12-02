@@ -391,7 +391,6 @@ function AdminPortal(props) {
     return (
         <div className={classes.root}>
             <CssBaseline />
-            <NavBarAdmin logout={props.logout} handleDrawerToggle={handleDrawerToggle} />
             <nav className={classes.drawer}>
                 {/* The implementation can be swapped with js to avoid SEO duplication of links. */}
                 <Hidden smUp implementation="css">
