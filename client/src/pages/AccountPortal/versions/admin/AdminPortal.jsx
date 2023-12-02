@@ -51,6 +51,9 @@ import SocketIOFileUpload from "socketio-file-upload";
 import "../../../../utils/flowHeaders.min.css";
 import "../../../../App.css";
 import "./main.css";
+import { ReactComponent as BullhornIcon } from "../../../../assets/bullhorn.svg";
+import { ReactComponent as BookIcon } from "../../../../assets/books.svg";
+import { ReactComponent as AccountIcon } from "../../../../assets/account-icon.svg";
 import eduTies from "../../../../logos/eduTIES_logo.png";
 import sas from "../../../../logos/sas_logo.png";
 
@@ -79,6 +82,13 @@ const useStyles = makeStyles((theme) => ({
     color: "inherit",
     textDecoration: "none",
   },
+  navLink: {
+    '&&': {
+      marginBottom: theme.spacing(2), // Adjust the number for desired spacing
+    },
+    textDecoration: 'none',
+    color: 'inherit', // To keep the same color as the ListItemText
+  },
 }));
 
 function AdminPortal(props) {
@@ -99,60 +109,71 @@ function AdminPortal(props) {
   const documentMenuItems = [
     {
       label: "Announcements",
-      icon: faBullhorn,
+      Icon: BullhornIcon,
+      // icon: "../../../../assets/bullhorn.svg",
       path: `${props.match.url}/announcements`,
     },
     {
-      label: "Grades",
-      icon: faShapes,
+      label: "Class Manager",
+      Icon: BookIcon,
+      // icon: "../../../../assets/books.svg",
       path: `${props.match.url}/grades`,
     },
     {
-      label: "Subjects",
-      icon: faChalkboardTeacher,
-      path: `${props.match.url}/subjects`,
-    },
-  ];
-
-  const otherMenuItems = [
-    {
-      label: "Accounts",
-      icon: faUsers,
+      label: "Account Manager",
+      Icon: AccountIcon,
+      // icon: "../../../../assets/account-icon.svg",
       path: `${props.match.url}/accounts`,
     },
-    {
-      label: "Files",
-      icon: faFile,
-      path: `${props.match.url}/files`,
-    },
-    {
-      label: "Assessment",
-      icon: faCheckCircle,
-      path: `${props.match.url}/assessment`,
-    },
     // {
-    //     label: "Server",
-    //     icon: faServer,
-    //     path: `${props.match.url}/server`
+    //   label: "Subjects",
+    //   icon: faChalkboardTeacher,
+    //   path: `${props.match.url}/subjects`,
     // },
   ];
+
+  // const otherMenuItems = [
+  //   {
+  //     label: "Accounts",
+  //     icon: faUsers,
+  //     path: `${props.match.url}/accounts`,
+  //   },
+  //   {
+  //     label: "Files",
+  //     icon: faFile,
+  //     path: `${props.match.url}/files`,
+  //   },
+  //   {
+  //     label: "Assessment",
+  //     icon: faCheckCircle,
+  //     path: `${props.match.url}/assessment`,
+  //   },
+  //   {
+  //     label: "Accounts",
+  //     icon: faUsers,
+  //     path: `${props.match.url}/accounts`,
+  //   },
+  // ];
 
   const drawer = (
     <div onClick={isSmallDevice ? handleDrawerToggle : () => {}}>
       <List>
-        <div id="heading-text" style={{ textAlign: "center", margin: "0 auto" }}>
+        <div
+          id="heading-text"
+          style={{ textAlign: "center", margin: "0 auto" }}
+        >
           <h1>Semanhyia</h1>
           <h2>American School</h2>
         </div>
         <div style={{ marginTop: "10px" }}> </div>
         {documentMenuItems.map((item, index) => (
-          <NavLink to={item.path} key={index} className={classes.buttonLink}>
+          <NavLink to={item.path} key={index} className={`${classes.buttonLink} ${classes.navLink}`}>
             <ListItem
               selected={props.location.pathname.includes(item.path)}
               button
             >
               <ListItemIcon>
-                {<FontAwesomeIcon icon={item.icon} />}
+                <item.Icon />
               </ListItemIcon>
               <ListItemText
                 style={{ overflowWrap: "break-word" }}
@@ -163,7 +184,7 @@ function AdminPortal(props) {
         ))}
       </List>
       <Divider />
-      <List>
+      {/* <List>
         {otherMenuItems.map((item, index) => (
           <NavLink to={item.path} key={index} className={classes.buttonLink}>
             <ListItem
@@ -180,7 +201,7 @@ function AdminPortal(props) {
             </ListItem>
           </NavLink>
         ))}
-      </List>
+      </List> */}
 
       {/* <img src={eduTies} alt="eduTies" height={200} width={200} style={{position: "absolute", top: 680}}/> */}
     </div>
