@@ -51,9 +51,14 @@ import SocketIOFileUpload from "socketio-file-upload";
 import "../../../../utils/flowHeaders.min.css";
 import "../../../../App.css";
 import "./main.css";
-import { ReactComponent as BullhornIcon } from "../../../../assets/bullhorn.svg";
-import { ReactComponent as BookIcon } from "../../../../assets/books.svg";
-import { ReactComponent as AccountIcon } from "../../../../assets/account-icon.svg";
+// import { ReactComponent as BullhornIcon } from "../../../../assets/bullhorn.svg";
+// import { ReactComponent as BookIcon } from "../../../../assets/books.svg";
+// import { ReactComponent as AccountIcon } from "../../../../assets/account-icon.svg";
+
+import BullhornIcon  from "../../../../assets/bullhorn.svg";
+import BookIcon  from "../../../../assets/books.svg";
+import AccountIcon  from "../../../../assets/account-icon.svg";
+
 import eduTies from "../../../../logos/eduTIES_logo.png";
 import sas from "../../../../logos/sas_logo.png";
 
@@ -109,20 +114,22 @@ function AdminPortal(props) {
   const documentMenuItems = [
     {
       label: "Announcements",
-      Icon: BullhornIcon,
-      // icon: "../../../../assets/bullhorn.svg",
+    //   icon: BullhornIcon,
+      iconPath: BullhornIcon,
       path: `${props.match.url}/announcements`,
     },
     {
       label: "Class Manager",
-      Icon: BookIcon,
-      // icon: "../../../../assets/books.svg",
+    //   Icon: BookIcon,
+    //   icon: "../../../../assets/books.svg",
+    iconPath: BookIcon,
       path: `${props.match.url}/grades`,
     },
     {
       label: "Account Manager",
-      Icon: AccountIcon,
-      // icon: "../../../../assets/account-icon.svg",
+      iconPath: AccountIcon,
+    //   Icon: AccountIcon,
+      // icon: "../../../../assets/buaccount-icon.svg",
       path: `${props.match.url}/accounts`,
     },
     // {
@@ -172,9 +179,11 @@ function AdminPortal(props) {
               selected={props.location.pathname.includes(item.path)}
               button
             >
-              <ListItemIcon>
-                <item.Icon />
-              </ListItemIcon>
+            {/* <ListItemIcon src={item.iconPath}></ListItemIcon> */}
+            <ListItemIcon>
+  <img src={item.iconPath} alt={`${item.label} icon`} style={{ width: 24, height: 24 }} />
+</ListItemIcon>
+
               <ListItemText
                 style={{ overflowWrap: "break-word" }}
                 primary={item.label}
