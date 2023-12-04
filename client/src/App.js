@@ -58,7 +58,7 @@ const appTheme = createMuiTheme({
         backgroundColor: '#fff', // White background
         padding: '8px 16px', // Padding around the text
         textTransform: 'none', // Keeps the text's original casing
-        border: '1px solid #1976d2', // Blue border
+        border: '1px solid #f0f0f0', // Blue border
         boxShadow: '0px 3px 1px -2px rgba(0,0,0,0.2), 0px 2px 2px 0px rgba(0,0,0,0.14), 0px 1px 5px 0px rgba(0,0,0,0.12)', // Shadow for the 3D effect
         '&:hover': {
           backgroundColor: '#f0f0f0', // Light grey background on hover
