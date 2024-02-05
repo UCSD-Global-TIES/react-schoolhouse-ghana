@@ -41,8 +41,7 @@ import NavBarAdmin from "../../../../components/NavBarAdmin";
 import DocumentEditor from "../../../../components/DocumentEditor";
 import FilesForm from "../../../../components/FilesForm";
 import UploadQueue from "../../../../components/UploadQueue";
-import White from "../../../../components/Buttons/White";
-import Blue from "../../../../components/Buttons/Blue"
+import Button from "../../../../components/Button/Button";
 
 // Utils and Context
 import API from "../../../../utils/API";
@@ -521,8 +520,7 @@ function AdminPortal(props) {
         </Switch>
         {/* </CSSTransition>
                 </TransitionGroup> */}
-        {/* <White text="Admin"/>
-        <Blue text="Student"/> */}
+        <Button text="Student" icon="add" buttonColor="blue"/>
       </main>
     </div>
 
