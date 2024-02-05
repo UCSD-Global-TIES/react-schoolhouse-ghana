@@ -41,6 +41,7 @@ import NavBarAdmin from "../../../../components/NavBarAdmin";
 import DocumentEditor from "../../../../components/DocumentEditor";
 import FilesForm from "../../../../components/FilesForm";
 import UploadQueue from "../../../../components/UploadQueue";
+import NameCard from "../../../../components/NameCard/NameCard";
 
 // Utils and Context
 import API from "../../../../utils/API";
@@ -519,6 +520,10 @@ function AdminPortal(props) {
         </Switch>
         {/* </CSSTransition>
                 </TransitionGroup> */}
+        <NameCard name="Nick Campos" />
+        <NameCard name="Nick Campos" />
+        <NameCard name="Nick Campos" />
+        <NameCard name="Nick Campos" />
       </main>
     </div>
 
