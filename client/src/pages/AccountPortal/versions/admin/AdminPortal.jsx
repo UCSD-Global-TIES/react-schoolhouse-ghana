@@ -1,67 +1,60 @@
 // React and Hooks
-import React, { useEffect, useContext } from "react";
-import { NavLink, Switch, Redirect } from "react-router-dom";
-import { TransitionGroup, CSSTransition } from "react-transition-group";
+import React, { useContext, useEffect, useState } from "react";
 import { useMediaQuery } from "react-responsive";
+import { NavLink, Redirect, Switch } from "react-router-dom";
 
 // Material-UI Components and Styles
-import { makeStyles, useTheme } from "@material-ui/core/styles";
 import {
+  CssBaseline,
+  Divider,
   Drawer,
   Hidden,
-  Divider,
   List,
   ListItem,
   ListItemIcon,
-  ListItemText,
-  CssBaseline,
-  TextField,
+  ListItemText
 } from "@material-ui/core";
+import { makeStyles, useTheme } from "@material-ui/core/styles";
 
 // FontAwesome Icons
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faUsers,
   faBullhorn,
   faChalkboardTeacher,
-  faShapes,
   faCheckCircle,
   faFile,
+  faShapes,
+  faUsers,
 } from "@fortawesome/free-solid-svg-icons";
 
 // Local Components
-import AnnouncementsForm from "../../../../components/AnnouncementsForm";
-import GradesForm from "../../../../components/GradesForm";
-import SubjectsForm from "../../../../components/SubjectsForm";
 import AccountsForm from "../../../../components/AccountsForm";
+import AnnouncementsForm from "../../../../components/AnnouncementsForm";
 import AssessmentForm from "../../../../components/AssessmentForm";
-import ServerDash from "../../../../components/ServerDash";
-import ProtectedRoute from "../../../../components/ProtectedRoute";
-import NavBarAdmin from "../../../../components/NavBarAdmin";
 import DocumentEditor from "../../../../components/DocumentEditor";
 import FilesForm from "../../../../components/FilesForm";
-import UploadQueue from "../../../../components/UploadQueue";
+import GradesForm from "../../../../components/GradesForm";
 import NameCard from "../../../../components/NameCard/NameCard";
+import ProtectedRoute from "../../../../components/ProtectedRoute";
+import SubjectsForm from "../../../../components/SubjectsForm";
+import UploadQueue from "../../../../components/UploadQueue";
 
 // Utils and Context
-import API from "../../../../utils/API";
-import SocketContext from "../../../../socket-context";
 import SocketIOFileUpload from "socketio-file-upload";
+import SocketContext from "../../../../socket-context";
+import API from "../../../../utils/API";
 
 // Styles and Assets
-import "../../../../utils/flowHeaders.min.css";
 import "../../../../App.css";
+import "../../../../utils/flowHeaders.min.css";
 import "./main.css";
 // import { ReactComponent as BullhornIcon } from "../../../../assets/bullhorn.svg";
 // import { ReactComponent as BookIcon } from "../../../../assets/books.svg";
 // import { ReactComponent as AccountIcon } from "../../../../assets/account-icon.svg";
 
-import BullhornIcon  from "../../../../assets/bullhorn.svg";
-import BookIcon  from "../../../../assets/books.svg";
-import AccountIcon  from "../../../../assets/account-icon.svg";
+import AccountIcon from "../../../../assets/account-icon.svg";
+import BookIcon from "../../../../assets/books.svg";
+import BullhornIcon from "../../../../assets/bullhorn.svg";
 
-import eduTies from "../../../../logos/eduTIES_logo.png";
-import sas from "../../../../logos/sas_logo.png";
 
 const drawerWidth = 220;
 
@@ -99,6 +92,7 @@ const useStyles = makeStyles((theme) => ({
 
 function AdminPortal(props) {
   const classes = useStyles();
+
   const theme = useTheme();
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const isSmallDevice = useMediaQuery({
@@ -106,6 +100,32 @@ function AdminPortal(props) {
   });
   const socket = useContext(SocketContext);
   const siofu = new SocketIOFileUpload(socket);
+
+  // "Admin","Teachers", "Students" categories
+  const [admins, setAdmins] = useState([]);
+  const [teachers, setTeachers] = useState([]);
+  const [students, setStudents] = useState([]);
+
+  // function to handle adding new admin
+  const addAdmin = (adminName) => {
+    setAdmins(prevAdmin => [...prevAdmin, adminName]);
+  };
+  // function to handle adding new teacher
+  const addTeacher = (teacherName) => {
+    setTeachers(prevTeachers => [...prevTeachers, teacherName]);
+  };
+  // function to handle adding new student
+  const addStudent = (studentName) => {
+    setStudents(prevStudents => [...prevStudents, studentName]);
+  };
+
+  // Render the NameCards for each category
+  const renderNameCards = (list) => {
+    return list.map((name, index) => (
+      <NameCard key={index} name={name} />
+    ));
+  };
+
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
@@ -133,35 +153,7 @@ function AdminPortal(props) {
       // icon: "../../../../assets/buaccount-icon.svg",
       path: `${props.match.url}/accounts`,
     },
-    // {
-    //   label: "Subjects",
-    //   icon: faChalkboardTeacher,
-    //   path: `${props.match.url}/subjects`,
-    // },
   ];
-
-  // const otherMenuItems = [
-  //   {
-  //     label: "Accounts",
-  //     icon: faUsers,
-  //     path: `${props.match.url}/accounts`,
-  //   },
-  //   {
-  //     label: "Files",
-  //     icon: faFile,
-  //     path: `${props.match.url}/files`,
-  //   },
-  //   {
-  //     label: "Assessment",
-  //     icon: faCheckCircle,
-  //     path: `${props.match.url}/assessment`,
-  //   },
-  //   {
-  //     label: "Accounts",
-  //     icon: faUsers,
-  //     path: `${props.match.url}/accounts`,
-  //   },
-  // ];
 
   const drawer = (
     <div onClick={isSmallDevice ? handleDrawerToggle : () => {}}>
@@ -499,6 +491,24 @@ function AdminPortal(props) {
         style={{ marginLeft: !isSmallDevice ? drawerWidth : 0 }}
       >
         <div className={classes.toolbar} />
+        
+        <section>
+          <h2>Admin</h2>
+          <button onClick={() => addAdmin('New Admin')}>+ Admin</button>
+          {renderNameCards(admins)}
+        </section>
+
+        <section>
+          <h2>Teachers</h2>
+          <button onClick={() => addTeacher('New Teacher')}>+ Teacher</button>
+          {renderNameCards(teachers)}
+        </section>
+
+        <section>
+          <h2>Students</h2>
+          <button onClick={() => addStudent('New Student')}>+ Student</button>
+          {renderNameCards(students)}
+        </section>
 
         {/* <TransitionGroup>
                     <CSSTransition
@@ -520,13 +530,13 @@ function AdminPortal(props) {
         </Switch>
         {/* </CSSTransition>
                 </TransitionGroup> */}
+        {/* <NameCard name="Nick Campos" />
         <NameCard name="Nick Campos" />
         <NameCard name="Nick Campos" />
-        <NameCard name="Nick Campos" />
-        <NameCard name="Nick Campos" />
+        <NameCard name="Nick Campos" /> */}
       </main>
     </div>
-
+    
     // </div>
   );
 }
