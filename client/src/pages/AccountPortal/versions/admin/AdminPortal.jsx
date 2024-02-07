@@ -41,6 +41,7 @@ import NavBarAdmin from "../../../../components/NavBarAdmin";
 import DocumentEditor from "../../../../components/DocumentEditor";
 import FilesForm from "../../../../components/FilesForm";
 import UploadQueue from "../../../../components/UploadQueue";
+import SearchBar from "../../../../components/SearchBar/SearchBar.js";
 
 // Utils and Context
 import API from "../../../../utils/API";

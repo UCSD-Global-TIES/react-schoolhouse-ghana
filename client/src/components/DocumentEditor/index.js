@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { getQueries, parseTime } from "../../utils/misc";
 import clsx from "clsx";
 import { Alert, Skeleton, Pagination } from '@material-ui/lab'
-import { IconButton, FormControl, Input, InputLabel, InputAdornment, Snackbar, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Checkbox, Typography } from "@material-ui/core";
+import { IconButton, FormControl, Input, InputLabel, InputAdornment, Snackbar, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Checkbox, Typography, FilledInput } from "@material-ui/core";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSpinner, faExternalLinkAlt } from "@fortawesome/free-solid-svg-icons";
 
@@ -16,6 +16,7 @@ import { Dialog, DialogTitle, DialogContent, DialogActions, Button } from '@mate
 import ConfirmDialog from "../ConfirmDialog";
 import "../../utils/flowHeaders.min.css";
 import SocketContext from "../../socket-context"
+import SearchBar from "../SearchBar/SearchBar";
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -523,15 +524,8 @@ function DocumentEditor(props) {
                             handleUpdate={() => handleDocument(true, documents.find((doc) => doc._id === selected[0]))}
                             handleDelete={() => handleConfirm(true)}
                         />
-
-                        <FormControl className={classes.searchbar}>
-                            <InputLabel htmlFor="standard-adornment-amount">Search {collection.toLowerCase()}</InputLabel>
-                            <Input
-                                value={searchQuery}
-                                onChange={handleQueryChange}
-                                startAdornment={<InputAdornment position="start"><SearchIcon /></InputAdornment>}
-                            />
-                        </FormControl>
+                        
+                        <SearchBar placeholder={collection.toLowerCase()} function={handleQueryChange} value={searchQuery}/>
 
                         {
                             loading ?
