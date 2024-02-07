@@ -2,7 +2,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useMediaQuery } from "react-responsive";
 import { NavLink, Redirect, Switch } from "react-router-dom";
-import AccountManager from "../../../../components/AccountManager/AccountManager";
+// import AccountManager from "../../../../components/AccountManager/AccountManager";
 
 // Material-UI Components and Styles
 import {
@@ -131,24 +131,6 @@ function AdminPortal(props) {
     setMobileOpen(!mobileOpen);
   };
 
-
-  //Account Manage - Admin
-  const AdminPortal = (props) => {
-    // ... other logic
-  
-    return (
-      <div className={classes.root}>
-        <CssBaseline />
-        {/* Drawer and other components */}
-        
-        <main className={classes.content} style={{ marginLeft: !isSmallDevice ? drawerWidth : 0 }}>
-          <div className={classes.toolbar} />
-          <AccountManager />
-          {/* ... other components if any */}
-        </main>
-      </div>
-    );
-  };
 
   // menu items
   const documentMenuItems = [
@@ -538,24 +520,40 @@ function AdminPortal(props) {
         style={{ marginLeft: !isSmallDevice ? drawerWidth : 0 }}
       >
         <div className={classes.toolbar} />
-
         <section>
           <h2>Admin</h2>
-          <button onClick={() => addAdmin('New Admin')}>+ Admin</button>
+          <Button text="Admin" icon="add" onClick={() => addAdmin('New Admin')}>+ Admin</Button>
           {renderNameCards(admins)}
         </section>
 
         <section>
           <h2>Teachers</h2>
-          <button onClick={() => addTeacher('New Teacher')}>+ Teacher</button>
+          <Button text="Teacher" icon="add" onClick={() => addTeacher('New Teacher')}>+ Teacher</Button>
           {renderNameCards(teachers)}
         </section>
 
         <section>
           <h2>Students</h2>
-          <button onClick={() => addStudent('New Student')}>+ Student</button>
+          <Button text="Student" icon="add" onClick={() => addStudent('New Student')}>+ Student</Button>
           {renderNameCards(students)}
         </section>
+        {/* <section>
+          <h2>Admin</h2>
+          <Button text="Admin" icon="add" buttonColor="blue" onClick={addAdmin} />
+          {renderNameCards(admins)}
+        </section>
+
+        <section>
+          <h2>Teachers</h2>
+          <Button text="Teacher" icon="add" buttonColor="blue" onClick={() => addTeacher('New Teacher')} />
+          {renderNameCards(teachers)}
+        </section>
+
+        <section>
+          <h2>Students</h2>
+          <Button text="Student" icon="add" buttonColor="blue" onClick={() => addStudent('New Student')} />
+          {renderNameCards(students)}
+        </section> */}
 
         {/* <TransitionGroup>
                     <CSSTransition
@@ -577,7 +575,7 @@ function AdminPortal(props) {
         </Switch>
         {/* </CSSTransition>
                 </TransitionGroup> */}
-        <Button text="Student" icon="add" buttonColor="blue"/>
+        {/* <Button text="Student" icon="add" buttonColor="blue"/> */}
       </main>
     </div>
 
