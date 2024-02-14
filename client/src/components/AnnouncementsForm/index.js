@@ -73,6 +73,7 @@ function AnnouncementsForm(props) {
     const [options, setOptions] = useState([]);
     const [subjectValue, setSubjectValue] = useState(null);
     const [PROPS, setProps] = useState(props)
+    const [isEditing, setIsEditing] = useState(false);
 
     const handleSwitchToggle = name => e => {
         const event = {
@@ -109,6 +110,10 @@ function AnnouncementsForm(props) {
         }
         PROPS.handleChange(event)
     }
+
+    const toggleEdit = () => {
+        setIsEditing(!isEditing);
+    };
 
     useEffect(() => {
         const promises = [];
@@ -167,9 +172,12 @@ function AnnouncementsForm(props) {
 
     }, [props])
 
+    if (true) {
+
     return (
-        <div className={classes.root}>
+         <  div className={classes.root}>
             <div className={classes.vc}>
+
                 <div style={{ width: "100%" }}>
                     <Box className={classes.field} display="flex">
                         <Box flexGrow={1}>
@@ -256,9 +264,16 @@ function AnnouncementsForm(props) {
                     handleChange={(docs) => handlePickChange('files', docs)}
                 />
 
-            </div>
-        </div>
-    )
-};
+             </div>
+         </div>
+
+    );
+}
+return (
+    <div>
+
+    </div>
+);
+}
 
 export default AnnouncementsForm;

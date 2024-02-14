@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { getQueries, parseTime } from "../../utils/misc";
 import clsx from "clsx";
 import { Alert, Skeleton, Pagination } from '@material-ui/lab'
-import { IconButton, FormControl, Input, InputLabel, InputAdornment, Snackbar, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Checkbox, Typography } from "@material-ui/core";
+import { IconButton, FormControl, Input, InputLabel, InputAdornment, Snackbar, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Checkbox, Typography, Dialog } from "@material-ui/core";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSpinner, faExternalLinkAlt } from "@fortawesome/free-solid-svg-icons";
 
@@ -10,6 +10,7 @@ import SearchIcon from '@material-ui/icons/Search';
 import { makeStyles } from '@material-ui/core/styles';
 import EnhancedListToolbar from "../EnhancedListToolbar";
 import FullScreenDialog from "../FullScreenDialog";
+import newfullscreen from "../newfullscreen"
 import ConfirmDialog from "../ConfirmDialog";
 import "../../utils/flowHeaders.min.css";
 import SocketContext from "../../socket-context"
@@ -400,10 +401,10 @@ function DocumentEditor(props) {
         }
         
     }, []);
-
     return (
-        <>
-            {/* ALERTS FOR API ACTIONS */}
+        <div>
+        {!dialogOpen &&<div>
+
             <Snackbar
                 anchorOrigin={{ vertical: "top", horizontal: "right" }}
                 open={currentAlert.isOpen}
@@ -425,18 +426,20 @@ function DocumentEditor(props) {
                 </Alert>
             </Snackbar>
 
-
+        </div>
+    }
+    {dialogOpen &&<div>
             {/* UPDATE DOCUMENT DIALOG */}
-            <FullScreenDialog
-                open={dialogOpen}
-                handleClose={() => handleDocument(false)}
-                type={`${collection} Editor`}
-                buttonDisabled={JSON.stringify(initialDocument) == JSON.stringify(currentDocument)}
-                buttonText={actionPending ? <FontAwesomeIcon icon={faSpinner} spin /> : isCreate ? "Create" : "Update"}
-                action={isCreate ? () => handleCreate(currentDocument) : () => handleSave(currentDocument)}
-            >
-                <FormComponent error={errorDocument} history={props.history} match={props.match} isCreate={isCreate} document={currentDocument} handleRouteChange={handleRouteChange} handleChange={handleFormChange} />
-            </FullScreenDialog>
+            dialogOpen&&<newfullscreen
+    handleClose={() => handleDocument(false)}
+    type={`${collection} Editor`}
+    buttonDisabled={JSON.stringify(initialDocument) == JSON.stringify(currentDocument)}
+    buttonText={actionPending ? <FontAwesomeIcon icon={faSpinner} spin /> : isCreate ? "Create" : "Update"}
+    action={isCreate ? () => handleCreate(currentDocument) : () => handleSave(currentDocument)}
+>
+    <FormComponent error={errorDocument} history={props.history} match={props.match} isCreate={isCreate} document={currentDocument} handleRouteChange={handleRouteChange} handleChange={handleFormChange} />
+            </newfullscreen> 
+            
 
             {/* DELETE DOCUMENT(S) DIALOG */}
             <ConfirmDialog
@@ -446,7 +449,10 @@ function DocumentEditor(props) {
                 handleAction={handleDelete}>
                 Are you sure you would like to delete all selected {selected.length} {collection.toLowerCase()}(s)?
             </ConfirmDialog>
-
+            </div>
+    }
+            
+{(!dialogOpen)&&<div>
             {/* DOCUMENTS */}
             <div style={{ display: "flex", width: "100%" }}>
                 <div style={{ margin: "auto" }} className={classes.content}>
@@ -540,8 +546,38 @@ function DocumentEditor(props) {
                     </>
                 </div>
             </div>
-        </>
+            
+            </div>}
+        </div>
+    
+// }else{return(    <div
+//     handleClose={() => handleDocument(false)}
+//     type={`${collection} Editor`}
+//     buttonDisabled={JSON.stringify(initialDocument) == JSON.stringify(currentDocument)}
+//     buttonText={actionPending ? <FontAwesomeIcon icon={faSpinner} spin /> : isCreate ? "Create" : "Update"}
+//     action={isCreate ? () => handleCreate(currentDocument) : () => handleSave(currentDocument)}
+// >
+//     <FormComponent error={errorDocument} history={props.history} match={props.match} isCreate={isCreate} document={currentDocument} handleRouteChange={handleRouteChange} handleChange={handleFormChange} />
+
+
+//             {/* DELETE DOCUMENT(S) DIALOG */}
+//             <ConfirmDialog
+//                 open={confirmOpen}
+//                 buttonText={actionPending ? <FontAwesomeIcon icon={faSpinner} spin /> : "Confirm"}
+//                 handleClose={() => handleConfirm(false)}
+//                 handleAction={handleDelete}>
+//                 Are you sure you would like to delete all selected {selected.length} {collection.toLowerCase()}(s)?
+//             </ConfirmDialog>
+
+//             </div>)
+
+// };
+
     )
-};
+}
+
+
+
+
 
 export default DocumentEditor;
