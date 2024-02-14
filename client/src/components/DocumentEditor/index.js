@@ -427,8 +427,8 @@ function DocumentEditor(props) {
 
 
             {/* UPDATE DOCUMENT DIALOG */}
-            <FullScreenDialog
-                open={dialogOpen}
+            {dialogOpen && <div
+                
                 handleClose={() => handleDocument(false)}
                 type={`${collection} Editor`}
                 buttonDisabled={JSON.stringify(initialDocument) == JSON.stringify(currentDocument)}
@@ -436,7 +436,7 @@ function DocumentEditor(props) {
                 action={isCreate ? () => handleCreate(currentDocument) : () => handleSave(currentDocument)}
             >
                 <FormComponent error={errorDocument} history={props.history} match={props.match} isCreate={isCreate} document={currentDocument} handleRouteChange={handleRouteChange} handleChange={handleFormChange} />
-            </FullScreenDialog>
+            </div>}
 
             {/* DELETE DOCUMENT(S) DIALOG */}
             <ConfirmDialog
@@ -448,7 +448,7 @@ function DocumentEditor(props) {
             </ConfirmDialog>
 
             {/* DOCUMENTS */}
-            <div style={{ display: "flex", width: "100%" }}>
+            {!dialogOpen&&<div style={{ display: "flex", width: "100%" }}>
                 <div style={{ margin: "auto" }} className={classes.content}>
                     <>
                         <EnhancedListToolbar
@@ -539,7 +539,7 @@ function DocumentEditor(props) {
                         }
                     </>
                 </div>
-            </div>
+            </div>}
         </>
     )
 };
