@@ -2,7 +2,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useMediaQuery } from "react-responsive";
 import { NavLink, Redirect, Switch } from "react-router-dom";
-// import AccountManager from "../../../../components/AccountManager/AccountManager";
 
 // Material-UI Components and Styles
 import {
@@ -13,7 +12,7 @@ import {
   List,
   ListItem,
   ListItemIcon,
-  ListItemText
+  ListItemText,
 } from "@material-ui/core";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
 
@@ -39,6 +38,7 @@ import NameCard from "../../../../components/NameCard/NameCard";
 import ProtectedRoute from "../../../../components/ProtectedRoute";
 import SubjectsForm from "../../../../components/SubjectsForm";
 import UploadQueue from "../../../../components/UploadQueue";
+import UserList from "./../../../../components/UserList/UserList";
 
 // Utils and Context
 import SocketIOFileUpload from "socketio-file-upload";
@@ -49,14 +49,10 @@ import API from "../../../../utils/API";
 import "../../../../App.css";
 import "../../../../utils/flowHeaders.min.css";
 import "./main.css";
-// import { ReactComponent as BullhornIcon } from "../../../../assets/bullhorn.svg";
-// import { ReactComponent as BookIcon } from "../../../../assets/books.svg";
-// import { ReactComponent as AccountIcon } from "../../../../assets/account-icon.svg";
 
 import AccountIcon from "../../../../assets/account-icon.svg";
 import BookIcon from "../../../../assets/books.svg";
 import BullhornIcon from "../../../../assets/bullhorn.svg";
-
 
 const drawerWidth = 220;
 
@@ -84,18 +80,18 @@ const useStyles = makeStyles((theme) => ({
     textDecoration: "none",
   },
   navLink: {
-    '&&': {
+    "&&": {
       marginBottom: theme.spacing(2), // Adjust the number for desired spacing
     },
-    textDecoration: 'none',
-    color: 'inherit', // To keep the same color as the ListItemText
+    textDecoration: "none",
+    color: "inherit", // To keep the same color as the ListItemText
   },
 }));
 
 function AdminPortal(props) {
   const classes = useStyles();
   const theme = useTheme();
-  const [mobileOpen, setMobileOpen] = React.useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
   const isSmallDevice = useMediaQuery({
     query: "(max-width: 600px)",
   });
@@ -109,48 +105,45 @@ function AdminPortal(props) {
 
   // function to handle adding new admin
   const addAdmin = (adminName) => {
-    setAdmins(prevAdmin => [...prevAdmin, adminName]);
+    setAdmins((prevAdmin) => [...prevAdmin, adminName]);
   };
   // function to handle adding new teacher
   const addTeacher = (teacherName) => {
-    setTeachers(prevTeachers => [...prevTeachers, teacherName]);
+    setTeachers((prevTeachers) => [...prevTeachers, teacherName]);
   };
   // function to handle adding new student
   const addStudent = (studentName) => {
-    setStudents(prevStudents => [...prevStudents, studentName]);
+    setStudents((prevStudents) => [...prevStudents, studentName]);
   };
 
   // Render the NameCards for each category
   const renderNameCards = (list) => {
-    return list.map((name, index) => (
-      <NameCard key={index} name={name} />
-    ));
+    return list.map((name, index) => <NameCard key={index} name={name} />);
   };
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
   };
 
-
   // menu items
   const documentMenuItems = [
     {
       label: "Announcements",
-    //   icon: BullhornIcon,
+      //   icon: BullhornIcon,
       iconPath: BullhornIcon,
       path: `${props.match.url}/announcements`,
     },
     {
       label: "Class Manager",
-    //   Icon: BookIcon,
-    //   icon: "../../../../assets/books.svg",
-    iconPath: BookIcon,
+      //   Icon: BookIcon,
+      //   icon: "../../../../assets/books.svg",
+      iconPath: BookIcon,
       path: `${props.match.url}/grades`,
     },
     {
       label: "Account Manager",
       iconPath: AccountIcon,
-    //   Icon: AccountIcon,
+      //   Icon: AccountIcon,
       // icon: "../../../../assets/buaccount-icon.svg",
       path: `${props.match.url}/accounts`,
     },
@@ -196,15 +189,23 @@ function AdminPortal(props) {
         </div>
         <div style={{ marginTop: "10px" }}> </div>
         {documentMenuItems.map((item, index) => (
-          <NavLink to={item.path} key={index} className={`${classes.buttonLink} ${classes.navLink}`}>
+          <NavLink
+            to={item.path}
+            key={index}
+            className={`${classes.buttonLink} ${classes.navLink}`}
+          >
             <ListItem
               selected={props.location.pathname.includes(item.path)}
               button
             >
-            {/* <ListItemIcon src={item.iconPath}></ListItemIcon> */}
-            <ListItemIcon>
-  <img src={item.iconPath} alt={`${item.label} icon`} style={{ width: 24, height: 24 }} />
-</ListItemIcon>
+              {/* <ListItemIcon src={item.iconPath}></ListItemIcon> */}
+              <ListItemIcon>
+                <img
+                  src={item.iconPath}
+                  alt={`${item.label} icon`}
+                  style={{ width: 24, height: 24 }}
+                />
+              </ListItemIcon>
 
               <ListItemText
                 style={{ overflowWrap: "break-word" }}
@@ -480,8 +481,6 @@ function AdminPortal(props) {
   // SET DEFAULT MENU
   const defaultRoute = `${props.match.path}/announcements`;
 
-  useEffect(() => {}, []);
-
   return (
     <div className={classes.root}>
       <CssBaseline />
@@ -519,42 +518,6 @@ function AdminPortal(props) {
         className={classes.content}
         style={{ marginLeft: !isSmallDevice ? drawerWidth : 0 }}
       >
-        <div className={classes.toolbar} />
-        <section>
-          <h2>Admin</h2>
-          <Button text="Admin" icon="add" onClick={() => addAdmin('New Admin')}>+ Admin</Button>
-          {renderNameCards(admins)}
-        </section>
-
-        <section>
-          <h2>Teachers</h2>
-          <Button text="Teacher" icon="add" onClick={() => addTeacher('New Teacher')}>+ Teacher</Button>
-          {renderNameCards(teachers)}
-        </section>
-
-        <section>
-          <h2>Students</h2>
-          <Button text="Student" icon="add" onClick={() => addStudent('New Student')}>+ Student</Button>
-          {renderNameCards(students)}
-        </section>
-        {/* <section>
-          <h2>Admin</h2>
-          <Button text="Admin" icon="add" buttonColor="blue" onClick={addAdmin} />
-          {renderNameCards(admins)}
-        </section>
-
-        <section>
-          <h2>Teachers</h2>
-          <Button text="Teacher" icon="add" buttonColor="blue" onClick={() => addTeacher('New Teacher')} />
-          {renderNameCards(teachers)}
-        </section>
-
-        <section>
-          <h2>Students</h2>
-          <Button text="Student" icon="add" buttonColor="blue" onClick={() => addStudent('New Student')} />
-          {renderNameCards(students)}
-        </section> */}
-
         {/* <TransitionGroup>
                     <CSSTransition
                         key={props.location.key}
@@ -576,6 +539,15 @@ function AdminPortal(props) {
         {/* </CSSTransition>
                 </TransitionGroup> */}
         {/* <Button text="Student" icon="add" buttonColor="blue"/> */}
+        <div style={{padding: "3.5rem 4.38rem"}}>
+          <div style={{display: "flex", justifyContent: "space-between"}}>
+            <h1>Account Manager</h1>
+            <Button text="Account" icon="add" buttonColor="blue"/>
+          </div>
+          <UserList userCategory="ADMINS" users={admins} />
+          <UserList userCategory="TEACHERS" users={teachers} />
+          <UserList userCategory="STUDENTS" users={students} />
+        </div>
       </main>
     </div>
 
