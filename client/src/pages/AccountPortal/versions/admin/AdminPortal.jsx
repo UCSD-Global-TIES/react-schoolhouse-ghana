@@ -92,6 +92,7 @@ const useStyles = makeStyles((theme) => ({
     flexDirection: "column",
     alignItems: "flexStart",
     alignSelf: "stretch",
+    width: "100%"
   },
   navLink: { 
     // "&&": {
@@ -107,6 +108,14 @@ const useStyles = makeStyles((theme) => ({
     gap: "0.9375rem",
     alignSelf: "stretch",
   },
+  linkBox: {
+    display: "flex",
+    flexDirection: "column"
+  },
+  justifyIcon: {
+    display: "flex",
+    justifyContent: "center"
+  }
 }));
 
 function AdminPortal(props) {
@@ -222,8 +231,9 @@ function AdminPortal(props) {
               <ListItem
                 selected={props.location.pathname.includes(item.path)}
                 button
+                className={classes.linkBox}
               >
-                <ListItemIcon>
+                <ListItemIcon className={classes.justifyIcon}>
                   <img
                     src={item.iconPath}
                     alt={`${item.label} icon`}
@@ -524,7 +534,7 @@ function AdminPortal(props) {
         className={classes.content}
         style={{ marginLeft: !isSmallDevice ? drawerWidth : 0 }}
       >
-        <section>
+        {/* <section>
           <h2>Admin</h2>
           <Button
             text="Admin"
@@ -532,7 +542,7 @@ function AdminPortal(props) {
             onClick={() => addAdmin("New Admin")}
           ></Button>
           {renderNameCards(admins)}
-        </section>
+        </section> */}
 
         {/* <TransitionGroup>
                     <CSSTransition
