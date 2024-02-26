@@ -428,15 +428,28 @@ function DocumentEditor(props) {
 
 
             {/* UPDATE DOCUMENT DIALOG */}
-            {dialogOpen && <div
+            {dialogOpen && <>
+                <div
                 type={`${collection} Editor`}
                 buttonDisabled={JSON.stringify(initialDocument) == JSON.stringify(currentDocument)}
                 buttonText={actionPending ? <FontAwesomeIcon icon={faSpinner} spin /> : isCreate ? "Create" : "Update"}
-            >
-                <FormComponent error={errorDocument} history={props.history} match={props.match} isCreate={isCreate} document={currentDocument} handleRouteChange={handleRouteChange} handleChange={handleFormChange} />
-                <Button text="Close" icon="add" onClick={() => handleDocument(false)}>Close</Button>
-                <Button text="Save" icon="add" onClick={isCreate ? () => handleCreate(currentDocument) : () => handleSave(currentDocument)}>Save</Button>
-            </div>}
+                >
+                    <FormComponent error={errorDocument} history={props.history} match={props.match} isCreate={isCreate} document={currentDocument} handleRouteChange={handleRouteChange} handleChange={handleFormChange} />
+                    <Button text="Close" icon="add" onClick={() => handleDocument(false)}>Close</Button>
+                    <Button text="Save" icon="add" onClick={isCreate ? () => handleCreate(currentDocument) : () => handleSave(currentDocument)}>Save</Button>
+                </div>
+            
+                
+                {(collection == "Accounts") && <>
+                    {/*TODO: ADD ENROLLED CLASSES HERE -- need backend info */}
+                    <h1>ENROLLED CLASSES</h1>
+                    <SearchBar placeholder='classes' function={handleQueryChange} value={searchQuery}/>
+
+                </>
+                }
+            
+            </>
+            }
 
             {/* DELETE DOCUMENT(S) DIALOG */}
             <ConfirmDialog
