@@ -8,6 +8,8 @@ import VisibilityOff from '@material-ui/icons/VisibilityOff';
 
 import "../../utils/flowHeaders.min.css";
 import API from "../../utils/API"; 
+import ClassCard from "../ClassCard/ClassCard";
+import SearchBar from "../SearchBar/SearchBar";
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -22,6 +24,12 @@ const useStyles = makeStyles(theme => ({
         width: "90%",
         margin: "auto"
     },
+    classContainer: { 
+        display: "flex",
+        gap: "2rem",
+        overflowX: "auto",
+        whiteSpace: "nowrap",
+    }
 }));
 
 const disabledMsg = `This field will be populated after account creation.`
@@ -140,6 +148,7 @@ function AccountsForm(props) {
         if (!PROPS.isCreate && PROPS.document.type !== 'Admin') {
             promises.push(API.getUserGrade(PROPS.document.profile_id, PROPS.user.key))
         }
+        
 
         Promise.all(promises)
             .then((results) => {
@@ -150,7 +159,9 @@ function AccountsForm(props) {
                 // Set options and loading flag to false
                 setGradeOptions(options);
                 setLoading(false);
-
+                
+                
+              
                 // Set default autocomplete value
                 if (!PROPS.isCreate && PROPS.document.type !== 'Admin') {
                     const gradeObj = results[1].data
@@ -274,8 +285,25 @@ function AccountsForm(props) {
                         />
                     )})}
                     
-
+                    <div>
+                        <h1>ENROLLED CLASSES</h1>
+                        <SearchBar placeholder='classes' function='' value=''/>
+                    </div>
+                    
+                    <div className={classes.classContainer}>
+                    {
+                        // TO DO: update to subject options item.level for gradeOptions
+                        textFields.map((item) => {
+                            return(
+                                <ClassCard name={item.name} image=''/>
+                            )
+                        })
+                        
+                    }
+                    </div>
             </div>
+            
+            
         </div>
     )
 };
