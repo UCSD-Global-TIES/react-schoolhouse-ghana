@@ -240,6 +240,7 @@ function AdminPortal(props) {
   );
 
   const pagesInfo = [
+    // ANNOUNCEMENTS
     {
       collection: "Announcements",
       icon: faBullhorn,
@@ -269,6 +270,7 @@ function AdminPortal(props) {
         },
       },
     },
+    // GRADES
     {
       collection: "Grades",
       icon: faShapes,
@@ -298,6 +300,7 @@ function AdminPortal(props) {
         },
       },
     },
+    // SUBJECTS
     {
       collection: "Subjects",
       link: (doc) => `/subject/${doc._id}`,
@@ -331,8 +334,9 @@ function AdminPortal(props) {
         },
       },
     },
+    // ACCOUNT MANAGER
     {
-      collection: "Accounts",
+      collection: "Account Manager",
       icon: faUsers,
       FormComponent: (p) => <AccountsForm user={props.user} {...p} />,
       primary: (doc) => `${doc.first_name} ${doc.last_name} (${doc.type})`,
@@ -377,6 +381,7 @@ function AdminPortal(props) {
         },
       },
     },
+    // FILES
     {
       collection: "Files",
       link: (doc) => doc.path,
@@ -408,6 +413,7 @@ function AdminPortal(props) {
         },
       },
     },
+    // ASSESSMENT
     {
       collection: "Assessment",
       link: (doc) => `/assessment/yolo`, // TODO: Set specific quiz ID into the URL once backend is finished
@@ -538,11 +544,10 @@ function AdminPortal(props) {
         </Switch>
         {/* </CSSTransition>
                 </TransitionGroup> */}
-        {/* <Button text="Student" icon="add" buttonColor="blue"/> */}
-        <div style={{padding: "3.5rem 4.38rem"}}>
-          <div style={{display: "flex", justifyContent: "space-between"}}>
+        <div style={{ padding: "3.5rem 4.38rem" }}>
+          <div style={{ display: "flex", justifyContent: "space-between" }}>
             <h1>Account Manager</h1>
-            <Button text="Account" icon="add" buttonColor="blue"/>
+            <Button text="Account" icon="add" buttonColor="blue" />
           </div>
           <UserList userCategory="ADMINS" users={admins} />
           <UserList userCategory="TEACHERS" users={teachers} />
