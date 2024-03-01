@@ -1,5 +1,5 @@
 import { makeStyles } from "@material-ui/core";
-import Button from "@material-ui/core/Button";
+import MuiButton from "@material-ui/core/Button";
 import React from "react";
 import AddIcon from "@material-ui/icons/Add";
 import CloseIcon from "@material-ui/icons/Close";
@@ -31,7 +31,7 @@ const useStyles = makeStyles({
   }),
 });
 
-function Blue({ text, icon, buttonColor }) {
+function Button({ text, icon, buttonColor }) {
   const classes = useStyles({ buttonColor });
 
   function renderIcon(buttonIcon) {
@@ -43,11 +43,11 @@ function Blue({ text, icon, buttonColor }) {
   }
 
   return (
-    <Button className={classes.root}>
+    <MuiButton className={classes.root}>
       {renderIcon(icon)}
       {text}
-    </Button>
+    </MuiButton>
   );
 }
 
-export default Blue;
+export default Button;
