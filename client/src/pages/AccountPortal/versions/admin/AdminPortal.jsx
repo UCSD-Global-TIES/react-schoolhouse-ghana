@@ -2,7 +2,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useMediaQuery } from "react-responsive";
 import { NavLink, Redirect, Switch } from "react-router-dom";
-// import AccountManager from "../../../../components/AccountManager/AccountManager";
 
 // Material-UI Components and Styles
 import {
@@ -39,6 +38,7 @@ import NameCard from "../../../../components/NameCard/NameCard";
 import ProtectedRoute from "../../../../components/ProtectedRoute";
 import SubjectsForm from "../../../../components/SubjectsForm";
 import UploadQueue from "../../../../components/UploadQueue";
+import UserList from "./../../../../components/UserList/UserList";
 import SearchBar from "../../../../components/SearchBar/SearchBar.js";
 
 // Utils and Context
@@ -50,9 +50,6 @@ import API from "../../../../utils/API";
 import "../../../../App.css";
 import "../../../../utils/flowHeaders.min.css";
 import "./main.css";
-// import { ReactComponent as BullhornIcon } from "../../../../assets/bullhorn.svg";
-// import { ReactComponent as BookIcon } from "../../../../assets/books.svg";
-// import { ReactComponent as AccountIcon } from "../../../../assets/account-icon.svg";
 
 import AccountIcon from "../../../../assets/account-icon.svg";
 import BookIcon from "../../../../assets/books.svg";
@@ -93,9 +90,9 @@ const useStyles = makeStyles((theme) => ({
     flexDirection: "column",
     alignItems: "flexStart",
     alignSelf: "stretch",
-    width: "100%"
+    width: "100%",
   },
-  navLink: { 
+  navLink: {
     // "&&": {
     //   marginBottom: theme.spacing(2), // Adjust the number for desired spacing
     // },
@@ -111,18 +108,18 @@ const useStyles = makeStyles((theme) => ({
   },
   linkBox: {
     display: "flex",
-    flexDirection: "column"
+    flexDirection: "column",
   },
   justifyIcon: {
     display: "flex",
-    justifyContent: "center"
-  }
+    justifyContent: "center",
+  },
 }));
 
 function AdminPortal(props) {
   const classes = useStyles();
   const theme = useTheme();
-  const [mobileOpen, setMobileOpen] = React.useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
   const isSmallDevice = useMediaQuery({
     query: "(max-width: 600px)",
   });
@@ -255,6 +252,7 @@ function AdminPortal(props) {
   );
 
   const pagesInfo = [
+    // ANNOUNCEMENTS
     {
       collection: "Announcements",
       icon: faBullhorn,
@@ -284,6 +282,7 @@ function AdminPortal(props) {
         },
       },
     },
+    // GRADES
     {
       collection: "Grades",
       icon: faShapes,
@@ -313,6 +312,7 @@ function AdminPortal(props) {
         },
       },
     },
+    // SUBJECTS
     {
       collection: "Subjects",
       link: (doc) => `/subject/${doc._id}`,
@@ -346,8 +346,9 @@ function AdminPortal(props) {
         },
       },
     },
+    // ACCOUNT MANAGER
     {
-      collection: "Accounts",
+      collection: "Account Manager",
       icon: faUsers,
       FormComponent: (p) => <AccountsForm user={props.user} {...p} />,
       primary: (doc) => `${doc.first_name} ${doc.last_name} (${doc.type})`,
@@ -392,6 +393,7 @@ function AdminPortal(props) {
         },
       },
     },
+    // FILES
     {
       collection: "Files",
       link: (doc) => doc.path,
@@ -423,6 +425,7 @@ function AdminPortal(props) {
         },
       },
     },
+    // ASSESSMENT
     {
       collection: "Assessment",
       link: (doc) => `/assessment/yolo`, // TODO: Set specific quiz ID into the URL once backend is finished
@@ -496,8 +499,6 @@ function AdminPortal(props) {
   // SET DEFAULT MENU
   const defaultRoute = `${props.match.path}/announcements`;
 
-  useEffect(() => {}, []);
-
   return (
     <div className={classes.root}>
       <CssBaseline />
@@ -535,16 +536,6 @@ function AdminPortal(props) {
         className={classes.content}
         style={{ marginLeft: !isSmallDevice ? drawerWidth : 0 }}
       >
-        {/* <section>
-          <h2>Admin</h2>
-          <Button
-            text="Admin"
-            icon="add"
-            onClick={() => addAdmin("New Admin")}
-          ></Button>
-          {renderNameCards(admins)}
-        </section> */}
-
         {/* <TransitionGroup>
                     <CSSTransition
                         key={props.location.key}
@@ -565,6 +556,15 @@ function AdminPortal(props) {
         </Switch>
         {/* </CSSTransition>
                 </TransitionGroup> */}
+        <div style={{ padding: "3.5rem 4.38rem" }}>
+          <div style={{ display: "flex", justifyContent: "space-between" }}>
+            <h1>Account Manager</h1>
+            <Button text="Account" icon="add" buttonColor="blue" />
+          </div>
+          <UserList userCategory="ADMINS" users={admins} />
+          <UserList userCategory="TEACHERS" users={teachers} />
+          <UserList userCategory="STUDENTS" users={students} />
+        </div>
       </main>
     </div>
   );
