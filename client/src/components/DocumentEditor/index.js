@@ -16,6 +16,7 @@ import {
   ListItemText,
   Checkbox,
   Typography,
+  FilledInput,
 } from "@material-ui/core";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -30,6 +31,7 @@ import FullScreenDialog from "../FullScreenDialog";
 import ConfirmDialog from "../ConfirmDialog";
 import "../../utils/flowHeaders.min.css";
 import SocketContext from "../../socket-context";
+import SearchBar from "../SearchBar/SearchBar";
 
 import Button from "../Button/Button";
 import UserList from "../UserList/UserList";
@@ -456,38 +458,47 @@ function DocumentEditor(props) {
       </Snackbar>
 
       {/* UPDATE DOCUMENT DIALOG */}
-      <FullScreenDialog
-        open={dialogOpen}
-        handleClose={() => handleDocument(false)}
-        type={`${collection} Editor`}
-        buttonDisabled={
-          JSON.stringify(initialDocument) == JSON.stringify(currentDocument)
-        }
-        buttonText={
-          actionPending ? (
-            <FontAwesomeIcon icon={faSpinner} spin />
-          ) : isCreate ? (
-            "Create"
-          ) : (
-            "Update"
-          )
-        }
-        action={
-          isCreate
-            ? () => handleCreate(currentDocument)
-            : () => handleSave(currentDocument)
-        }
-      >
-        <FormComponent
-          error={errorDocument}
-          history={props.history}
-          match={props.match}
-          isCreate={isCreate}
-          document={currentDocument}
-          handleRouteChange={handleRouteChange}
-          handleChange={handleFormChange}
-        />
-      </FullScreenDialog>
+      {dialogOpen && (
+        <div
+          type={`${collection} Editor`}
+          buttonDisabled={
+            JSON.stringify(initialDocument) == JSON.stringify(currentDocument)
+          }
+          buttonText={
+            actionPending ? (
+              <FontAwesomeIcon icon={faSpinner} spin />
+            ) : isCreate ? (
+              "Create"
+            ) : (
+              "Update"
+            )
+          }
+        >
+          <FormComponent
+            error={errorDocument}
+            history={props.history}
+            match={props.match}
+            isCreate={isCreate}
+            document={currentDocument}
+            handleRouteChange={handleRouteChange}
+            handleChange={handleFormChange}
+          />
+          <Button text="Close" icon="add" onClick={() => handleDocument(false)}>
+            Close
+          </Button>
+          <Button
+            text="Save"
+            icon="add"
+            onClick={
+              isCreate
+                ? () => handleCreate(currentDocument)
+                : () => handleSave(currentDocument)
+            }
+          >
+            Save
+          </Button>
+        </div>
+      )}
 
       {/* DELETE DOCUMENT(S) DIALOG */}
       <ConfirmDialog
@@ -503,117 +514,110 @@ function DocumentEditor(props) {
       </ConfirmDialog>
 
       {/* DOCUMENTS */}
-      <div style={{ display: "flex", width: "100%" }}>
-        <div style={{ margin: "auto" }} className={classes.content}>
-          <EnhancedListToolbar
-            title={collection}
-            numSelected={selected.length}
-            handleCreate={() => handleDocument(true, {})}
-            handleUpdate={() =>
-              handleDocument(
-                true,
-                documents.find((doc) => doc._id === selected[0])
-              )
-            }
-            handleDelete={() => handleConfirm(true)}
-          />
-
-          <FormControl className={classes.searchbar}>
-            <InputLabel htmlFor="standard-adornment-amount">
-              Search {collection.toLowerCase()}
-            </InputLabel>
-            <Input
-              value={searchQuery}
-              onChange={handleQueryChange}
-              startAdornment={
-                <InputAdornment position="start">
-                  <SearchIcon />
-                </InputAdornment>
-              }
-            />
-          </FormControl>
-
-          {loading ? (
-            [0, 1, 2, 3, 4, 5].map((item, idx) => (
-              <Skeleton
-                key={`skeleton-document-${idx}`}
-                animation="wave"
-                variant="rect"
-                className={classes.skeleton}
-              />
-            )) // MAPPING ALL DOCUMENTS
-          ) : filteredDocuments.length ? (
+      {!dialogOpen && (
+        <div style={{ display: "flex", width: "100%" }}>
+          <div style={{ margin: "auto" }} className={classes.content}>
             <>
-              <div style={{ display: "flex" }}>
-                <div className={classes.paginationContainer}>
-                  <Pagination
-                    size="small"
-                    color={"primary"}
-                    count={Math.ceil(filteredDocuments.length / MAX_ITEMS)}
-                    page={page}
-                    onChange={handlePageChange}
-                  />
+              <EnhancedListToolbar
+                title={collection}
+                numSelected={selected.length}
+                handleCreate={() => handleDocument(true, {})}
+                handleUpdate={() =>
+                  handleDocument(
+                    true,
+                    documents.find((doc) => doc._id === selected[0])
+                  )
+                }
+                handleDelete={() => handleConfirm(true)}
+              />
+
+              <SearchBar
+                placeholder={collection.toLowerCase()}
+                function={handleQueryChange}
+                value={searchQuery}
+              />
+            </>
+
+            {loading ? (
+              [0, 1, 2, 3, 4, 5].map((item, idx) => (
+                <Skeleton
+                  key={`skeleton-document-${idx}`}
+                  animation="wave"
+                  variant="rect"
+                  className={classes.skeleton}
+                />
+              )) // MAPPING ALL DOCUMENTS
+            ) : filteredDocuments.length ? (
+              <>
+                <div style={{ display: "flex" }}>
+                  <div className={classes.paginationContainer}>
+                    <Pagination
+                      size="small"
+                      color={"primary"}
+                      count={Math.ceil(filteredDocuments.length / MAX_ITEMS)}
+                      page={page}
+                      onChange={handlePageChange}
+                    />
+                  </div>
                 </div>
-              </div>
-              {viewableDocuments.map((document, idx) => {
-                const labelId = `${collection.toLowerCase()}-${idx}`;
+                {viewableDocuments.map((document, idx) => {
+                  const labelId = `${collection.toLowerCase()}-${idx}`;
+                  return (
+                    <div>
+                      <List className={classes.list}>
+                        <ListItem
+                          alignItems="flex-start"
+                          divider={true}
+                          key={labelId}
+                          role={undefined}
+                          dense
+                          button
+                          onClick={() => handleSelect(document._id)}
+                        >
+                          <ListItemIcon>
+                            <Checkbox
+                              edge="start"
+                              checked={selected.indexOf(document._id) !== -1}
+                              tabIndex={-1}
+                              disableRipple
+                              inputProps={{ "aria-labelledby": labelId }}
+                            />
+                          </ListItemIcon>
 
-                return (
-                  <div>
-                    <List className={classes.list}>
-                      <ListItem
-                        alignItems="flex-start"
-                        divider={true}
-                        key={labelId}
-                        role={undefined}
-                        dense
-                        button
-                        onClick={() => handleSelect(document._id)}
-                      >
-                        <ListItemIcon>
-                          <Checkbox
-                            edge="start"
-                            checked={selected.indexOf(document._id) !== -1}
-                            tabIndex={-1}
-                            disableRipple
-                            inputProps={{ "aria-labelledby": labelId }}
+                          <ListItemText
+                            id={labelId}
+                            style={{ overflowWrap: "break-word" }}
+                            primary={primary(document)}
+                            secondary={`Created: ${
+                              document.createdAt
+                                ? parseTime(document.createdAt, true)
+                                : document.createdBy
+                            }`}
                           />
-                        </ListItemIcon>
-
-                        <ListItemText
-                          id={labelId}
-                          style={{ overflowWrap: "break-word" }}
-                          primary={primary(document)}
-                          secondary={`Created: ${
-                            document.createdAt
-                              ? parseTime(document.createdAt, true)
-                              : document.createdBy
-                          }`}
-                        />
-                        <ListItemSecondaryAction>
-                          {props.link ? (
-                            <a
-                              target="_blank"
-                              href={props.link(document)}
-                              style={{
-                                textDecoration: "none",
-                                fontSize: "1rem",
-                              }}
-                            >
-                              <IconButton aria-label="create">
-                                <FontAwesomeIcon
-                                  icon={faExternalLinkAlt}
-                                  size="xs"
-                                />
-                              </IconButton>
-                            </a>
-                          ) : (
-                            <FontAwesomeIcon icon={icon} />
-                          )}
-                        </ListItemSecondaryAction>
-                      </ListItem>
-                    </List>
-                    {/* {collection === "Account Manager" && (
+                          <ListItemSecondaryAction>
+                            {props.link ? (
+                              <a
+                                target="_blank"
+                                href={props.link(document)}
+                                style={{
+                                  textDecoration: "none",
+                                  fontSize: "1rem",
+                                }}
+                              >
+                                <IconButton aria-label="create">
+                                  <FontAwesomeIcon
+                                    icon={faExternalLinkAlt}
+                                    size="xs"
+                                  />
+                                </IconButton>
+                              </a>
+                            ) : (
+                              <FontAwesomeIcon icon={icon} />
+                            )}
+                          </ListItemSecondaryAction>
+                        </ListItem>
+                      </List>
+                      {/* {collection === "Account Manager" && (
                       <div style={{ padding: "3.5rem 4.38rem" }}>
                         <div
                           style={{
@@ -633,28 +637,29 @@ function DocumentEditor(props) {
                         <UserList userCategory="STUDENTS" users={students} />
                       </div>
                     )} */}
-                  </div>
-                );
-              })}
-            </>
-          ) : (
-            <div style={{ display: "flex", marginTop: "2rem" }}>
-              <div style={{ margin: "auto", padding: "3rem" }}>
-                <Typography
-                  className="flow-text"
-                  style={{ color: "grey" }}
-                  variant="h5"
-                >
-                  No {collection.toLowerCase()} were found.
-                </Typography>
-                <p style={{ textAlign: "center", color: "grey" }}>
-                  <FontAwesomeIcon icon={icon} size="5x" />
-                </p>
+                    </div>
+                  );
+                })}
+              </>
+            ) : (
+              <div style={{ display: "flex", marginTop: "2rem" }}>
+                <div style={{ margin: "auto", padding: "3rem" }}>
+                  <Typography
+                    className="flow-text"
+                    style={{ color: "grey" }}
+                    variant="h5"
+                  >
+                    No {collection.toLowerCase()} were found.
+                  </Typography>
+                  <p style={{ textAlign: "center", color: "grey" }}>
+                    <FontAwesomeIcon icon={icon} size="5x" />
+                  </p>
+                </div>
               </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
-      </div>
+      )}
     </>
   );
 }
