@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { getQueries, parseTime } from "../../utils/misc";
 import clsx from "clsx";
 import { Alert, Skeleton, Pagination } from '@material-ui/lab'
-import { IconButton, FormControl, Input, InputLabel, InputAdornment, Snackbar, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Checkbox, Typography } from "@material-ui/core";
+import { IconButton, FormControl, Input, InputLabel, InputAdornment, Snackbar, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Checkbox, Typography, Button, FilledInput } from "@material-ui/core";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSpinner, faExternalLinkAlt } from "@fortawesome/free-solid-svg-icons";
 
@@ -13,6 +13,7 @@ import FullScreenDialog from "../FullScreenDialog";
 import ConfirmDialog from "../ConfirmDialog";
 import "../../utils/flowHeaders.min.css";
 import SocketContext from "../../socket-context"
+import SearchBar from "../SearchBar/SearchBar";
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -427,16 +428,15 @@ function DocumentEditor(props) {
 
 
             {/* UPDATE DOCUMENT DIALOG */}
-            <FullScreenDialog
-                open={dialogOpen}
-                handleClose={() => handleDocument(false)}
+            {dialogOpen && <div
                 type={`${collection} Editor`}
                 buttonDisabled={JSON.stringify(initialDocument) == JSON.stringify(currentDocument)}
                 buttonText={actionPending ? <FontAwesomeIcon icon={faSpinner} spin /> : isCreate ? "Create" : "Update"}
-                action={isCreate ? () => handleCreate(currentDocument) : () => handleSave(currentDocument)}
             >
                 <FormComponent error={errorDocument} history={props.history} match={props.match} isCreate={isCreate} document={currentDocument} handleRouteChange={handleRouteChange} handleChange={handleFormChange} />
-            </FullScreenDialog>
+                <Button text="Close" icon="add" onClick={() => handleDocument(false)}>Close</Button>
+                <Button text="Save" icon="add" onClick={isCreate ? () => handleCreate(currentDocument) : () => handleSave(currentDocument)}>Save</Button>
+            </div>}
 
             {/* DELETE DOCUMENT(S) DIALOG */}
             <ConfirmDialog
@@ -448,7 +448,7 @@ function DocumentEditor(props) {
             </ConfirmDialog>
 
             {/* DOCUMENTS */}
-            <div style={{ display: "flex", width: "100%" }}>
+            {!dialogOpen&&<div style={{ display: "flex", width: "100%" }}>
                 <div style={{ margin: "auto" }} className={classes.content}>
                     <>
                         <EnhancedListToolbar
@@ -458,15 +458,8 @@ function DocumentEditor(props) {
                             handleUpdate={() => handleDocument(true, documents.find((doc) => doc._id === selected[0]))}
                             handleDelete={() => handleConfirm(true)}
                         />
-
-                        <FormControl className={classes.searchbar}>
-                            <InputLabel htmlFor="standard-adornment-amount">Search {collection.toLowerCase()}</InputLabel>
-                            <Input
-                                value={searchQuery}
-                                onChange={handleQueryChange}
-                                startAdornment={<InputAdornment position="start"><SearchIcon /></InputAdornment>}
-                            />
-                        </FormControl>
+                        
+                        <SearchBar placeholder={collection.toLowerCase()} function={handleQueryChange} value={searchQuery}/>
 
                         {
                             loading ?
@@ -539,7 +532,7 @@ function DocumentEditor(props) {
                         }
                     </>
                 </div>
-            </div>
+            </div>}
         </>
     )
 };

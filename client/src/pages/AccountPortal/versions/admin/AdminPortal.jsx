@@ -39,6 +39,7 @@ import NameCard from "../../../../components/NameCard/NameCard";
 import ProtectedRoute from "../../../../components/ProtectedRoute";
 import SubjectsForm from "../../../../components/SubjectsForm";
 import UploadQueue from "../../../../components/UploadQueue";
+import SearchBar from "../../../../components/SearchBar/SearchBar.js";
 
 // Utils and Context
 import SocketIOFileUpload from "socketio-file-upload";
