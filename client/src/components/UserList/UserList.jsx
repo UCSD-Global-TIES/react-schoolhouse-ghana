@@ -6,12 +6,12 @@ const UserList = ({userCategory, users}) => {
     <div>
       <h2>{userCategory}</h2>
       {users.map((user) => {
-        return <NameCard name="test"/>
+        return <NameCard name={user}/>
       })}
-      <NameCard name="SAS Admin"/>
+      {/* <NameCard name="SAS Admin"/>
       <NameCard name="admin1 lastName"/>
       <NameCard name="student1 lastName"/>
-      <NameCard name="teacher1 lastName"/>
+      <NameCard name="teacher1 lastName"/> */}
     </div>
   )
 }

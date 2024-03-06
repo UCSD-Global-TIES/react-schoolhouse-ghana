@@ -3,6 +3,7 @@ import { getQueries, parseTime } from "../../utils/misc";
 import clsx from "clsx";
 import { Alert, Skeleton, Pagination } from "@material-ui/lab";
 import {
+  Button,
   IconButton,
   FormControl,
   Input,
@@ -33,8 +34,9 @@ import "../../utils/flowHeaders.min.css";
 import SocketContext from "../../socket-context";
 import SearchBar from "../SearchBar/SearchBar";
 
-import Button from "../Button/Button";
+// import Button from "../Button/Button";
 import UserList from "../UserList/UserList";
+import NameCard from "../NameCard/NameCard";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -72,6 +74,30 @@ const useStyles = makeStyles((theme) => ({
     margin: "0.5rem 0rem",
     width: "100%",
   },
+  btn: (props) => ({
+    display: "flex",
+    height: "3.5rem",
+    padding: "0.5625rem 1.25rem",
+    alignItems: "center",
+    gap: "0.625rem",
+    flexShrink: "0",
+    fontSize: "1.75rem",
+    borderRadius: "1.5rem",
+    borderTop:
+      props.buttonColor === "blue" ? "1px solid #005FD9" : "1px solid #E5E5E5",
+    borderRight:
+      props.buttonColor === "blue" ? "1px solid #005FD9" : "1px solid #E5E5E5",
+    borderBottom:
+      props.buttonColor === "blue" ? "4px solid #005FD9" : "4px solid #E5E5E5",
+    borderLeft:
+      props.buttonColor === "blue" ? "1px solid #005FD9" : "1px solid #E5E5E5",
+    backgroundColor: props.buttonColor === "blue" ? "#2584FF" : "#FFF",
+    color: props.buttonColor === "blue" ? "#FFF" : "#2584FF",
+    "&:hover": {
+      backgroundColor: props.buttonColor === "blue" ? "#005FD9" : "#FFF",
+    },
+    fontFamily: "Nunito",
+  }),
 }));
 
 // Can be non-specific for all document editors
@@ -84,7 +110,7 @@ function DocumentEditor(props) {
   const socket = useContext(SocketContext);
   const MAX_ITEMS = 5;
 
-  const { FormComponent, icon, collection, primary, validation } = props;
+  const { FormComponent, icon, collection, primary, validation, type } = props;
   const classes = useStyles();
   // DOCUMENTS EDITOR
   const [selected, setSelected] = useState([]);
@@ -114,6 +140,10 @@ function DocumentEditor(props) {
 
   // COMPONENT STATUS
   const [loading, setLoading] = useState(true);
+
+  const admins = ['admin1', 'admin2', 'admin3'];
+  const students = ['stu1', 'stu2', 'stu3'];
+  const teachers = ['tc1', 'tc2', 'tc3'];
 
   const handleRefresh = () => {
     setRefreshing(true);
@@ -483,10 +513,11 @@ function DocumentEditor(props) {
             handleRouteChange={handleRouteChange}
             handleChange={handleFormChange}
           />
-          <Button text="Close" icon="add" onClick={() => handleDocument(false)}>
+          <Button className={classes.btn} text="Close" icon="add" onClick={() => handleDocument(false)}>
             Close
           </Button>
           <Button
+          className={classes.btn}
             text="Save"
             icon="add"
             onClick={
@@ -513,9 +544,8 @@ function DocumentEditor(props) {
         {collection.toLowerCase()}(s)?
       </ConfirmDialog>
 
-      {/* DOCUMENTS */}
-      {!dialogOpen && (
-        <div style={{ display: "flex", width: "100%" }}>
+      {!dialogOpen && collection != "Account Manager" && (
+         <div style={{ display: "flex", width: "100%" }}>
           <div style={{ margin: "auto" }} className={classes.content}>
             <>
               <EnhancedListToolbar
@@ -617,26 +647,11 @@ function DocumentEditor(props) {
                           </ListItemSecondaryAction>
                         </ListItem>
                       </List>
-                      {/* {collection === "Account Manager" && (
-                      <div style={{ padding: "3.5rem 4.38rem" }}>
-                        <div
-                          style={{
-                            display: "flex",
-                            justifyContent: "space-between",
-                          }}
-                        >
-                          <h1>Account Manager</h1>
-                          <Button
-                            text="Account"
-                            icon="add"
-                            buttonColor="blue"
-                          />
-                        </div>
-                        <UserList userCategory="ADMINS" users={admins} />
-                        <UserList userCategory="TEACHERS" users={teachers} />
-                        <UserList userCategory="STUDENTS" users={students} />
-                      </div>
-                    )} */}
+                      
+                    
+
+                    
+
                     </div>
                   );
                 })}
@@ -656,8 +671,58 @@ function DocumentEditor(props) {
                   </p>
                 </div>
               </div>
-            )}
+            )} 
           </div>
+        </div>
+      )}
+
+
+
+     
+      {(!dialogOpen && collection == "Account Manager")&& (
+          
+          <div style={{ padding: "3.5rem 4.38rem" }}>
+            
+          <div style={{ display: "flex", justifyContent: "space-between" }}>
+            <h1>Account Manager</h1>
+            <Button className={classes.btn} label="Account" icon="add" buttonColor="blue">+ Account</Button>
+          </div>
+          
+          <h2>Admins</h2>
+          {viewableDocuments.map((document, idx) => { 
+              return(
+                <>
+                  {(type(document) == "(Admin)") && (
+                    <NameCard isAdmin={false} name={primary(document)} />
+                  )}
+                </>
+              )
+          })}
+
+        
+
+          
+          <h2>Teachers</h2>
+          {viewableDocuments.map((document, idx) => { 
+              return(
+                <>
+                  {(type(document) == "(Teacher)") && (
+                    <NameCard isAdmin={false} name={primary(document)} />
+                  )}
+                </>
+              )
+          })}
+          <h2>Students</h2>
+          {viewableDocuments.map((document, idx) => { 
+              return(
+                <>
+                  {(type(document) == "(Student)") && (
+                    <NameCard isAdmin={false} name={primary(document)} />
+                  )}
+                </>
+              )
+          })}
+
         </div>
       )}
     </>

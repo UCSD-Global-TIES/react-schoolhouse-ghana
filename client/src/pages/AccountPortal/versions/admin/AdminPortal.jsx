@@ -30,7 +30,7 @@ import {
 import AccountsForm from "../../../../components/AccountsForm";
 import AnnouncementsForm from "../../../../components/AnnouncementsForm";
 import AssessmentForm from "../../../../components/AssessmentForm";
-import Button from "../../../../components/Button/Button";
+// import Button from "../../../../components/Button/Button";
 import DocumentEditor from "../../../../components/DocumentEditor";
 import FilesForm from "../../../../components/FilesForm";
 import GradesForm from "../../../../components/GradesForm";
@@ -351,7 +351,8 @@ function AdminPortal(props) {
       collection: "Account Manager",
       icon: faUsers,
       FormComponent: (p) => <AccountsForm user={props.user} {...p} />,
-      primary: (doc) => `${doc.first_name} ${doc.last_name} (${doc.type})`,
+      primary: (doc) => `${doc.first_name} ${doc.last_name} `,
+      type:(doc) => `(${doc.type})`,
       path: `${props.match.path}/accounts`,
       api: {
         get: API.getAccounts,
@@ -461,6 +462,7 @@ function AdminPortal(props) {
             put={page.api.put}
             delete={page.api.delete}
             validation={page.validation}
+            type={page.type}
             {...props}
           />
         ),
@@ -556,7 +558,7 @@ function AdminPortal(props) {
         </Switch>
         {/* </CSSTransition>
                 </TransitionGroup> */}
-        <div style={{ padding: "3.5rem 4.38rem" }}>
+        {/* <div style={{ padding: "3.5rem 4.38rem" }}>
           <div style={{ display: "flex", justifyContent: "space-between" }}>
             <h1>Account Manager</h1>
             <Button text="Account" icon="add" buttonColor="blue" />
@@ -564,7 +566,7 @@ function AdminPortal(props) {
           <UserList userCategory="ADMINS" users={admins} />
           <UserList userCategory="TEACHERS" users={teachers} />
           <UserList userCategory="STUDENTS" users={students} />
-        </div>
+        </div> */}
       </main>
     </div>
   );
