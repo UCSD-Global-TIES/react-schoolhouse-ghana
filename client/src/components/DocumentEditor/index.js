@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { getQueries, parseTime } from "../../utils/misc";
 import clsx from "clsx";
 import { Alert, Skeleton, Pagination } from '@material-ui/lab'
-import { IconButton, FormControl, Input, InputLabel, InputAdornment, Snackbar, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Checkbox, Typography } from "@material-ui/core";
+import { IconButton, FormControl, Input, InputLabel, InputAdornment, Snackbar, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Checkbox, Typography} from "@material-ui/core";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSpinner, faExternalLinkAlt } from "@fortawesome/free-solid-svg-icons";
 
@@ -23,7 +23,7 @@ const useStyles = makeStyles(theme => ({
     },
     list: {
         width: '100%',
-        backgroundColor: "#94DD9B",//theme.palette.background.paper,
+        // backgroundColor: "#94DD9B",//theme.palette.background.paper,
     },
     buttonLink: {
         color: "inherit",
@@ -35,7 +35,7 @@ const useStyles = makeStyles(theme => ({
     // styles the header of the current view
     content: {
         width: "90%",
-        maxWidth: "700px",
+        // maxWidth: "700px",
     },
 
     // this is the general outline that is used by all the subject document containers
@@ -341,7 +341,7 @@ function DocumentEditor(props) {
         tmp[name] = value;
 
         setCurrentDocument({ ...tmp });
-        if (errorDocument !== {}) setErrorDocument({})
+        // if (errorDocument !== {}) setErrorDocument({})
     }
 
     const handleRouteChange = (destination, _id) => {
@@ -523,15 +523,8 @@ function DocumentEditor(props) {
                             handleUpdate={() => handleDocument(true, documents.find((doc) => doc._id === selected[0]))}
                             handleDelete={() => handleConfirm(true)}
                         />
-
-                        <FormControl className={classes.searchbar}>
-                            <InputLabel htmlFor="standard-adornment-amount">Search {collection.toLowerCase()}</InputLabel>
-                            <Input
-                                value={searchQuery}
-                                onChange={handleQueryChange}
-                                startAdornment={<InputAdornment position="start"><SearchIcon /></InputAdornment>}
-                            />
-                        </FormControl>
+                        
+                        <SearchBar placeholder={collection.toLowerCase()} function={handleQueryChange} value={searchQuery}/>
 
                         {
                             loading ?
@@ -542,8 +535,8 @@ function DocumentEditor(props) {
                                 // MAPPING ALL DOCUMENTS
                                 filteredDocuments.length ?
                                     <>
-                                        <div style={{ display: "flex" }}>
-                                            <div className={classes.paginationContainer}>
+                                        <div style={{ display: "flex" ,margin : "auto"}}>
+                                            <div className={classes.paginationContainer} >
                                                 <Pagination
                                                     size="small"
                                                     color={"primary"}

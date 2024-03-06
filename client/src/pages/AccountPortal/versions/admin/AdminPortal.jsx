@@ -174,8 +174,8 @@ function AdminPortal(props) {
             >
             {/* <ListItemIcon src={item.iconPath}></ListItemIcon> */}
             <ListItemIcon>
-  <img src={item.iconPath} alt={`${item.label} icon`} style={{ width: 24, height: 24 }} />
-</ListItemIcon>
+            <img src={item.iconPath} alt={`${item.label} icon`} style={{ width: 24, height: 24 }} />
+              </ListItemIcon>
 
               <ListItemText
                 style={{ overflowWrap: "break-word" }}
@@ -491,16 +491,20 @@ function AdminPortal(props) {
         style={{ marginLeft: !isSmallDevice ? drawerWidth : 0 }}
       >
         <div className={classes.toolbar} />
+
         
         <section>
           <h2>Admin</h2>
           <button onClick={() => addAdmin('New Admin')}>+ Admin</button>
+
           {renderNameCards(admins)}
         </section>
 
         <section>
           <h2>Teachers</h2>
+
           <button onClick={() => addTeacher('New Teacher')}>+ Teacher</button>
+
           {renderNameCards(teachers)}
         </section>
 

@@ -29,7 +29,7 @@ const useStyles = makeStyles(theme => ({
     // styles the search bar box for files when creating/editing an announcement 
     content: {
         width: "90%",
-        maxWidth: "700px",
+        // maxWidth: "700px",
     },
     skeleton: {
         width: "100%",

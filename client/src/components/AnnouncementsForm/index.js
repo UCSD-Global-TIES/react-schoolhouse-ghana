@@ -18,9 +18,18 @@ const useStyles = makeStyles(theme => ({
         margin: "1rem 0px"
     },
     vc: {
-        maxWidth: "500px",
+        // maxWidth: "500px",
         width: "90%",
         margin: "auto"
+    },
+    customTextField: {
+        '& .MuiOutlinedInput-root': {
+            // Override styles for the Outlined Input root here
+        },
+        '& .MuiInputLabel-root': {
+            // Override styles for the Input Label here
+        },
+        // Add more overrides as needed
     },
 }));
 
@@ -170,6 +179,7 @@ function AnnouncementsForm(props) {
     return (
         <div className={classes.root}>
             <div className={classes.vc}>
+                <h1>Announcements Editor</h1>
                 <div style={{ width: "100%" }}>
                     <Box className={classes.field} display="flex">
                         <Box flexGrow={1}>
@@ -222,10 +232,12 @@ function AnnouncementsForm(props) {
                 {
                     textFields.map((item, idx) => (
                         <TextField
+                        
                             error={PROPS.error[item.name] ? PROPS.error[item.name].exists : null}
                             required={item.required}
                             key={`${item.name}-form-${idx}`}
-                            className={classes.field}
+                            // className={classes.field}
+                            className={classes.customTextField}
                             label={item.label}
                             name={item.name}
                             placeholder={(item.disabled || (item.updateOnly && PROPS.isCreate)) ? disabledMsg : ""}
