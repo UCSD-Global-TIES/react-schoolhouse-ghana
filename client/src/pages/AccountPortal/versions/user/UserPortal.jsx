@@ -215,6 +215,7 @@ function UserPortal(props) {
         onClose={handleCloseDocument}
         aria-labelledby="alert-dialog-slide-title"
         aria-describedby="alert-dialog-slide-description"
+        sty
       >
         <DialogTitle
           style={{ padding: "10px 24px" }}

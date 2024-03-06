@@ -27,7 +27,7 @@ const useStyles = makeStyles(theme => ({
     },
     content: {
         width: "90%",
-        maxWidth: "700px",
+        // maxWidth: "700px",
     },
     skeleton: {
         width: "100%",

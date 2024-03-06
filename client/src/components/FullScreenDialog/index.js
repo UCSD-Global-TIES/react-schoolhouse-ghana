@@ -12,15 +12,16 @@ import "../../utils/flowHeaders.min.css"
 import clsx from 'clsx';
 
 const useStyles = makeStyles(theme => ({
-  appBar: {
-  },
+  // appBar: {
+  // },
   title: {
     marginLeft: theme.spacing(2),
     flex: 1,
   },
   dialogContent: {
     marginTop: "4rem",
-    padding: "0.5rem"
+    padding: "0.5rem",
+    margin: "0",
   },
 }));
 
@@ -36,25 +37,42 @@ export default function FullScreenDialog(props) {
       {/* <Button variant="outlined" color="primary" onClick={handleClickOpen}>
         Open full-screen dialog
       </Button> */}
-      <Dialog fullScreen open={props.open} onClose={props.handleClose} TransitionComponent={Transition}>
-        {/* styles the form editor header bar */}
-        <AppBar className={classes.appBar} position="fixed" style={{ background: '#FE951D' }}>
-          <Toolbar>
-            <IconButton edge="start" color="inherit" onClick={props.handleClose} aria-label="close">
-              <CloseIcon />
-            </IconButton>
-            <Typography variant="h6" className={clsx(classes.title, "flow-text")}>
-              {props.type}
-            </Typography>
-            <Button disabled={props.buttonDisabled} autoFocus color="inherit" onClick={props.action}>
-              {props.buttonText}
-            </Button>
-          </Toolbar>
-        </AppBar>
-        <div className={classes.dialogContent}>
-          {props.children}
-        </div>
-      </Dialog>
+
+
+<Dialog
+  open={props.open}
+  onClose={props.handleClose}
+  TransitionComponent={Transition}
+  PaperProps={{
+    style: {
+      position: 'absolute',
+      right: 0,
+      margin: '0',
+      maxHeight: '100%',
+      width: '85vw', // Example: Set dialog width to 60% of the viewport width
+      maxWidth: 'none', // Override the default maxWidth to allow full specified width
+    }
+  }}
+>
+  <AppBar className={classes.appBar} style={{ background: '#FE951D', width: '100%' }}>
+    <Toolbar>
+      <IconButton edge="start" color="inherit" onClick={props.handleClose} aria-label="close">
+        <CloseIcon />
+      </IconButton>
+      <Typography variant="h6" className={clsx(classes.title, "flow-text")}>
+        {props.type}
+      </Typography>
+      <Button disabled={props.buttonDisabled} autoFocus color="inherit" onClick={props.action}>
+        {props.buttonText}
+      </Button>
+    </Toolbar>
+  </AppBar>
+  <div className={classes.dialogContent}>
+    {props.children}
+  </div>
+</Dialog>
+
+
     </div>
   );
 }

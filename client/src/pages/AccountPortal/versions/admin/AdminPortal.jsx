@@ -37,6 +37,7 @@ import NameCard from "../../../../components/NameCard/NameCard";
 import ProtectedRoute from "../../../../components/ProtectedRoute";
 import SubjectsForm from "../../../../components/SubjectsForm";
 import UploadQueue from "../../../../components/UploadQueue";
+import SearchBar from "../../../../components/SearchBar/SearchBar.js";
 
 // Utils and Context
 import SocketIOFileUpload from "socketio-file-upload";
@@ -126,10 +127,10 @@ function AdminPortal(props) {
     ));
   };
 
-
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
   };
+
 
   // menu items
   const documentMenuItems = [
@@ -174,8 +175,8 @@ function AdminPortal(props) {
             >
             {/* <ListItemIcon src={item.iconPath}></ListItemIcon> */}
             <ListItemIcon>
-  <img src={item.iconPath} alt={`${item.label} icon`} style={{ width: 24, height: 24 }} />
-</ListItemIcon>
+            <img src={item.iconPath} alt={`${item.label} icon`} style={{ width: 24, height: 24 }} />
+              </ListItemIcon>
 
               <ListItemText
                 style={{ overflowWrap: "break-word" }}
@@ -491,16 +492,20 @@ function AdminPortal(props) {
         style={{ marginLeft: !isSmallDevice ? drawerWidth : 0 }}
       >
         <div className={classes.toolbar} />
+
         
         <section>
           <h2>Admin</h2>
           <button onClick={() => addAdmin('New Admin')}>+ Admin</button>
+
           {renderNameCards(admins)}
         </section>
 
         <section>
           <h2>Teachers</h2>
+
           <button onClick={() => addTeacher('New Teacher')}>+ Teacher</button>
+
           {renderNameCards(teachers)}
         </section>
 
@@ -516,7 +521,7 @@ function AdminPortal(props) {
                         timeout={300}
                         classNames='fade'
                     > */}
-        <Switch location={props.location}>
+        <Switch location={props.location} >
           {pages.map((page, idx) => (
             <ProtectedRoute
               key={`page-${idx}`}
