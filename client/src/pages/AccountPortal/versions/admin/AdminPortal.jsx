@@ -37,7 +37,6 @@ import NameCard from "../../../../components/NameCard/NameCard";
 import ProtectedRoute from "../../../../components/ProtectedRoute";
 import SubjectsForm from "../../../../components/SubjectsForm";
 import UploadQueue from "../../../../components/UploadQueue";
-import SearchBar from "../../../../components/SearchBar/SearchBar.js";
 
 // Utils and Context
 import SocketIOFileUpload from "socketio-file-upload";
@@ -127,10 +126,10 @@ function AdminPortal(props) {
     ));
   };
 
+
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
   };
-
 
   // menu items
   const documentMenuItems = [
@@ -521,7 +520,7 @@ function AdminPortal(props) {
                         timeout={300}
                         classNames='fade'
                     > */}
-        <Switch location={props.location} >
+        <Switch location={props.location}>
           {pages.map((page, idx) => (
             <ProtectedRoute
               key={`page-${idx}`}

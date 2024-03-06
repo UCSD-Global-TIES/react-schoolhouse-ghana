@@ -22,11 +22,7 @@
   },
   "dependencies": {
     "@auth0/auth0-spa-js": "^1.13.6",
-    "@emotion/react": "^11.11.3",
-    "@emotion/styled": "^11.11.0",
     "@material-ui/lab": "^4.0.0-alpha.57",
-    "@mui/icons-material": "^5.15.8",
-    "@mui/material": "^5.15.7",
     "axios": "^0.21.1",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.19.0",

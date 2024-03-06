@@ -1,5 +1,5 @@
 import React from "react";
-import { Redirect, Route } from "react-router-dom";
+import { Route, Redirect } from "react-router-dom";
 
 const ProtectedRoute = ({ component: Component, path, user, ...rest }) => {
     if (!user) { return <Redirect to="/login" /> }

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { getQueries, parseTime } from "../../utils/misc";
 import clsx from "clsx";
 import { Alert, Skeleton, Pagination } from '@material-ui/lab'
-import { IconButton, FormControl, Input, InputLabel, InputAdornment, Snackbar, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Checkbox, Typography, Button, FilledInput } from "@material-ui/core";
+import { IconButton, FormControl, Input, InputLabel, InputAdornment, Snackbar, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Checkbox, Typography } from "@material-ui/core";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSpinner, faExternalLinkAlt } from "@fortawesome/free-solid-svg-icons";
 
@@ -10,18 +10,16 @@ import SearchIcon from '@material-ui/icons/Search';
 import { makeStyles } from '@material-ui/core/styles';
 import EnhancedListToolbar from "../EnhancedListToolbar";
 import FullScreenDialog from "../FullScreenDialog";
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button } from '@material-ui/core';
+
+
 import ConfirmDialog from "../ConfirmDialog";
 import "../../utils/flowHeaders.min.css";
 import SocketContext from "../../socket-context"
-import SearchBar from "../SearchBar/SearchBar";
-import ClassCard from "../ClassCard/ClassCard";
-import BooksIcon from "../../assets/books.svg";
 
 const useStyles = makeStyles(theme => ({
     root: {
         display: 'flex',
-        margin:"0px",
-        width: "100%",
     },
     list: {
         width: '100%',
@@ -77,6 +75,7 @@ function DocumentEditor(props) {
     const [page, setPage] = React.useState(1);
     const [searchQuery, setSearchQuery] = useState("");
 
+
     // ALERTS
     const [currentAlert, setCurrentAlert] = useState({ isOpen: false, severity: "", message: "" });
     const [confirmOpen, setConfirmOpen] = useState(false);
@@ -90,6 +89,9 @@ function DocumentEditor(props) {
     const [redirectOnExit, setRedirectOnExit] = useState(false);
     const [actionPending, setActionPending] = useState(false);
     const [refreshing, setRefreshing] = useState(false);
+
+    //new edit for pop up:
+    const [dialog2Open, setDialog2Open] = useState(false);
 
     // COMPONENT STATUS
     const [loading, setLoading] = useState(true);
@@ -184,6 +186,9 @@ function DocumentEditor(props) {
         } else {
             newSelected.splice(currentIndex, 1);
         }
+
+        setCurrentDocument(value);
+        setDialog2Open(true);
 
         setSelected(newSelected);
     };
@@ -358,6 +363,12 @@ function DocumentEditor(props) {
         props.history.push(`${destination}?_id=${_id}&redirect=true`);
     }
 
+    const handleAnnouncementClick = (document) => {
+        setCurrentDocument(document);
+        setDialogOpen(true);
+    };
+    
+
     useEffect(() => {
         if (!!props.get) {
             props.get(props.user.key)
@@ -431,18 +442,66 @@ function DocumentEditor(props) {
             </Snackbar>
 
 
-            {/* UPDATE DOCUMENT DIALOG */}
-            {dialogOpen &&
-                <div
+             {/* <Dialog
+                open={dialog2Open}
+                TransitionComponent={Transition}
+                keepMounted
+                onClose={handleCloseDocument}
+                aria-labelledby="alert-dialog-slide-title"
+                aria-describedby="alert-dialog-slide-description"
+                >
+                <DialogTitle style={{ padding: "10px 24px" }}
+                    align="center" id="alert-dialog-slide-title">{currentDocument[PROPS.labelField]}</DialogTitle>
+
+
+                <DialogContent style={{ width: "70vw", maxWidth: "500px", padding: "0px 24px" }}>
+
+                    <DocumentViewer document={currentDocument} />
+
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleCloseDocument} color="primary">
+                        Close
+                    </Button>
+
+                </DialogActions>
+            </Dialog> */}
+
+<Dialog
+    open={dialogOpen}
+    onClose={() => handleDocument(false)}
+    aria-labelledby="form-dialog-title"
+>
+    <DialogTitle id="form-dialog-title">{`${collection} Editor`}</DialogTitle>
+    <DialogContent>
+        <FormComponent error={errorDocument} history={props.history} match={props.match} isCreate={isCreate} document={currentDocument} handleRouteChange={handleFormChange} />
+    </DialogContent>
+    <DialogActions>
+        <Button onClick={() => handleDocument(false)} color="primary">
+            Cancel
+        </Button>
+        <Button 
+            onClick={isCreate ? () => handleCreate(currentDocument) : () => handleSave(currentDocument)} 
+            color="primary" 
+            disabled={JSON.stringify(initialDocument) == JSON.stringify(currentDocument)}
+        >
+            {actionPending ? <FontAwesomeIcon icon={faSpinner} spin /> : isCreate ? "Create" : "Update"}
+        </Button>
+    </DialogActions>
+</Dialog>
+
+
+
+            {/* <FullScreenDialog
+                open={dialogOpen}
+                handleClose={() => handleDocument(false)}
                 type={`${collection} Editor`}
                 buttonDisabled={JSON.stringify(initialDocument) == JSON.stringify(currentDocument)}
                 buttonText={actionPending ? <FontAwesomeIcon icon={faSpinner} spin /> : isCreate ? "Create" : "Update"}
-                >
-                    <FormComponent error={errorDocument} history={props.history} match={props.match} isCreate={isCreate} document={currentDocument} handleRouteChange={handleRouteChange} handleChange={handleFormChange} />
-                    <Button text="Close" icon="add" onClick={() => handleDocument(false)}>Close</Button>
-                    <Button text="Save" icon="add" onClick={isCreate ? () => handleCreate(currentDocument) : () => handleSave(currentDocument)}>Save</Button>
-                </div>
-            }
+                action={isCreate ? () => handleCreate(currentDocument) : () => handleSave(currentDocument)}
+            >
+                <FormComponent error={errorDocument} history={props.history} match={props.match} isCreate={isCreate} document={currentDocument} handleRouteChange={handleRouteChange} handleChange={handleFormChange} />
+            </FullScreenDialog> */}
 
             {/* DELETE DOCUMENT(S) DIALOG */}
             <ConfirmDialog
@@ -454,7 +513,7 @@ function DocumentEditor(props) {
             </ConfirmDialog>
 
             {/* DOCUMENTS */}
-            {!dialogOpen&&<div style={{ display: "flex", width: "100%" }}>
+            <div style={{ display: "flex", width: "100%" }}>
                 <div style={{ margin: "auto" }} className={classes.content}>
                     <>
                         <EnhancedListToolbar
@@ -464,8 +523,15 @@ function DocumentEditor(props) {
                             handleUpdate={() => handleDocument(true, documents.find((doc) => doc._id === selected[0]))}
                             handleDelete={() => handleConfirm(true)}
                         />
-                        
-                        <SearchBar placeholder={collection.toLowerCase()} function={handleQueryChange} value={searchQuery}/>
+
+                        <FormControl className={classes.searchbar}>
+                            <InputLabel htmlFor="standard-adornment-amount">Search {collection.toLowerCase()}</InputLabel>
+                            <Input
+                                value={searchQuery}
+                                onChange={handleQueryChange}
+                                startAdornment={<InputAdornment position="start"><SearchIcon /></InputAdornment>}
+                            />
+                        </FormControl>
 
                         {
                             loading ?
@@ -495,8 +561,9 @@ function DocumentEditor(props) {
                                                     const labelId = `${collection.toLowerCase()}-${idx}`;
 
                                                     return (
-                                                        <ListItem style={{ display: "flex" ,margin : "0"}} alignItems="flex-start" divider={true} key={labelId} role={undefined} dense button onClick={() => handleSelect(document._id)}>
-                                                            <ListItemIcon style={{ display: "flex" ,margin : "0"}} >
+                                                        // <ListItem alignItems="flex-start" divider={true} key={labelId} role={undefined} dense button onClick={() => handleSelect(document._id)}>
+                                                        <ListItem alignItems="flex-start" divider={true} key={labelId} role={undefined} dense button onClick={() => handleAnnouncementClick(document)}>
+                                                            <ListItemIcon>
                                                                 <Checkbox
                                                                     edge="start"
                                                                     checked={selected.indexOf(document._id) !== -1}
@@ -538,7 +605,7 @@ function DocumentEditor(props) {
                         }
                     </>
                 </div>
-            </div>}
+            </div>
         </>
     )
 };
