@@ -23,7 +23,7 @@ const useStyles = makeStyles(theme => ({
     },
     list: {
         width: '100%',
-        backgroundColor: "#94DD9B",//theme.palette.background.paper,
+        // backgroundColor: "#94DD9B",//theme.palette.background.paper,
     },
     buttonLink: {
         color: "inherit",
@@ -523,15 +523,8 @@ function DocumentEditor(props) {
                             handleUpdate={() => handleDocument(true, documents.find((doc) => doc._id === selected[0]))}
                             handleDelete={() => handleConfirm(true)}
                         />
-
-                        <FormControl className={classes.searchbar}>
-                            <InputLabel htmlFor="standard-adornment-amount">Search {collection.toLowerCase()}</InputLabel>
-                            <Input
-                                value={searchQuery}
-                                onChange={handleQueryChange}
-                                startAdornment={<InputAdornment position="start"><SearchIcon /></InputAdornment>}
-                            />
-                        </FormControl>
+                        
+                        <SearchBar placeholder={collection.toLowerCase()} function={handleQueryChange} value={searchQuery}/>
 
                         {
                             loading ?
