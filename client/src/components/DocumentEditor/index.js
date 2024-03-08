@@ -141,10 +141,6 @@ function DocumentEditor(props) {
   // COMPONENT STATUS
   const [loading, setLoading] = useState(true);
 
-  const admins = ['admin1', 'admin2', 'admin3'];
-  const students = ['stu1', 'stu2', 'stu3'];
-  const teachers = ['tc1', 'tc2', 'tc3'];
-
   const handleRefresh = () => {
     setRefreshing(true);
     setSelected([]);
@@ -691,7 +687,7 @@ function DocumentEditor(props) {
                 value={searchQuery}
               />
           <h2>Admins</h2>
-          {viewableDocuments.map((document, idx) => { 
+          {filteredDocuments.map((document) => { 
               return(
                 <>
                   {(type(document) == "(Admin)") && (
@@ -701,7 +697,7 @@ function DocumentEditor(props) {
               )
           })}
           <h2>Teachers</h2>
-          {viewableDocuments.map((document, idx) => { 
+          {filteredDocuments.map((document) => { 
               return(
                 <>
                   {(type(document) == "(Teacher)") && (
@@ -711,7 +707,7 @@ function DocumentEditor(props) {
               )
           })}
           <h2>Students</h2>
-          {viewableDocuments.map((document, idx) => { 
+          {filteredDocuments.map((document) => { 
               return(
                 <>
                   {(type(document) == "(Student)") && (
