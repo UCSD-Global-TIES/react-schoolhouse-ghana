@@ -545,7 +545,7 @@ function DocumentEditor(props) {
       </ConfirmDialog>
 
       {!dialogOpen && collection != "Account Manager" && (
-         <div style={{ display: "flex", width: "100%" }}>
+        <div style={{ display: "flex", width: "100%" }}>
           <div style={{ margin: "auto" }} className={classes.content}>
             <>
               <EnhancedListToolbar
@@ -680,14 +680,16 @@ function DocumentEditor(props) {
 
      
       {(!dialogOpen && collection == "Account Manager")&& (
-          
-          <div style={{ padding: "3.5rem 4.38rem" }}>
-            
+        <div style={{ padding: "3.5rem 4.38rem" }}>
           <div style={{ display: "flex", justifyContent: "space-between" }}>
             <h1>Account Manager</h1>
-            <Button className={classes.btn} label="Account" icon="add" buttonColor="blue">+ Account</Button>
+            <Button onClick={() => handleDocument(true, {})} className={classes.btn} label="Account" icon="add" buttonColor="blue">+ Account</Button>
           </div>
-          
+          <SearchBar
+                placeholder={collection.toLowerCase()}
+                function={handleQueryChange}
+                value={searchQuery}
+              />
           <h2>Admins</h2>
           {viewableDocuments.map((document, idx) => { 
               return(
@@ -698,10 +700,6 @@ function DocumentEditor(props) {
                 </>
               )
           })}
-
-        
-
-          
           <h2>Teachers</h2>
           {viewableDocuments.map((document, idx) => { 
               return(
@@ -722,7 +720,6 @@ function DocumentEditor(props) {
                 </>
               )
           })}
-
         </div>
       )}
     </>
