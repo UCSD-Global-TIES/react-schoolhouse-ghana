@@ -31,7 +31,7 @@ import AccountsForm from "../../../../components/AccountsForm";
 import AnnouncementsForm from "../../../../components/AnnouncementsForm";
 import AssessmentForm from "../../../../components/AssessmentForm";
 // import Button from "../../../../components/Button/Button";
-import DocumentEditor from "../../../../components/DocumentEditor";
+import DocumentEditor from "../../../../components/DocumentEditor/index.js";
 import FilesForm from "../../../../components/FilesForm";
 import GradesForm from "../../../../components/GradesForm";
 import NameCard from "../../../../components/NameCard/NameCard";
@@ -157,22 +157,17 @@ function AdminPortal(props) {
   const documentMenuItems = [
     {
       label: "Announcements",
-      //   icon: BullhornIcon,
       iconPath: BullhornIcon,
       path: `${props.match.url}/announcements`,
     },
     {
       label: "Class Manager",
-      //   Icon: BookIcon,
-      //   icon: "../../../../assets/books.svg",
       iconPath: BookIcon,
       path: `${props.match.url}/grades`,
     },
     {
       label: "Account Manager",
       iconPath: AccountIcon,
-      //   Icon: AccountIcon,
-      // icon: "../../../../assets/buaccount-icon.svg",
       path: `${props.match.url}/accounts`,
     },
     // {
@@ -352,7 +347,7 @@ function AdminPortal(props) {
       icon: faUsers,
       FormComponent: (p) => <AccountsForm user={props.user} {...p} />,
       primary: (doc) => `${doc.first_name} ${doc.last_name} `,
-      type:(doc) => `(${doc.type})`,
+      type: (doc) => `(${doc.type})`,
       path: `${props.match.path}/accounts`,
       api: {
         get: API.getAccounts,
@@ -539,11 +534,11 @@ function AdminPortal(props) {
         style={{ marginLeft: !isSmallDevice ? drawerWidth : 0 }}
       >
         {/* <TransitionGroup>
-                    <CSSTransition
-                        key={props.location.key}
-                        timeout={300}
-                        classNames='fade'
-                    > */}
+              <CSSTransition
+                key={props.location.key}
+                timeout={300}
+                classNames='fade'
+              > */}
         <Switch location={props.location}>
           {pages.map((page, idx) => (
             <ProtectedRoute
@@ -557,16 +552,7 @@ function AdminPortal(props) {
           <Redirect to={defaultRoute} />
         </Switch>
         {/* </CSSTransition>
-                </TransitionGroup> */}
-        {/* <div style={{ padding: "3.5rem 4.38rem" }}>
-          <div style={{ display: "flex", justifyContent: "space-between" }}>
-            <h1>Account Manager</h1>
-            <Button text="Account" icon="add" buttonColor="blue" />
-          </div>
-          <UserList userCategory="ADMINS" users={admins} />
-          <UserList userCategory="TEACHERS" users={teachers} />
-          <UserList userCategory="STUDENTS" users={students} />
-        </div> */}
+              </TransitionGroup> */}
       </main>
     </div>
   );

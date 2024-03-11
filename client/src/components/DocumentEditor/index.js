@@ -74,30 +74,33 @@ const useStyles = makeStyles((theme) => ({
     margin: "0.5rem 0rem",
     width: "100%",
   },
-  btn: (props) => ({
+  btn: {
     display: "flex",
-    height: "3.5rem",
-    padding: "0.5625rem 1.25rem",
-    alignItems: "center",
+    flexDirection: "column",
+    alignItems: "flex-start",
     gap: "0.625rem",
+    height: "3.75rem",
+    padding: "0.5625rem 1.25rem",
     flexShrink: "0",
     fontSize: "1.75rem",
     borderRadius: "1.5rem",
-    borderTop:
-      props.buttonColor === "blue" ? "1px solid #005FD9" : "1px solid #E5E5E5",
-    borderRight:
-      props.buttonColor === "blue" ? "1px solid #005FD9" : "1px solid #E5E5E5",
-    borderBottom:
-      props.buttonColor === "blue" ? "4px solid #005FD9" : "4px solid #E5E5E5",
-    borderLeft:
-      props.buttonColor === "blue" ? "1px solid #005FD9" : "1px solid #E5E5E5",
-    backgroundColor: props.buttonColor === "blue" ? "#2584FF" : "#FFF",
-    color: props.buttonColor === "blue" ? "#FFF" : "#2584FF",
-    "&:hover": {
-      backgroundColor: props.buttonColor === "blue" ? "#005FD9" : "#FFF",
-    },
     fontFamily: "Nunito",
-  }),
+    borderTop: "1px solid #005FD9",
+    borderRight: "1px solid #005FD9",
+    borderBottom: "4px solid #005FD9",
+    borderLeft: "1px solid #005FD9",
+    background: "#2584FF",
+    color: "#FFF",
+  },
+  acctManagerContainer: {
+    display: "flex",
+    width: "76rem",
+    padding: "3.5rem 4.375rem",
+    flexDirection: "column",
+    alignItems: "flex-start",
+    gap: "2.625rem",
+    flexShrink: "0",
+  },
 }));
 
 // Can be non-specific for all document editors
@@ -509,11 +512,16 @@ function DocumentEditor(props) {
             handleRouteChange={handleRouteChange}
             handleChange={handleFormChange}
           />
-          <Button className={classes.btn} text="Close" icon="add" onClick={() => handleDocument(false)}>
+          <Button
+            className={classes.btn}
+            text="Close"
+            icon="add"
+            onClick={() => handleDocument(false)}
+          >
             Close
           </Button>
           <Button
-          className={classes.btn}
+            className={classes.btn}
             text="Save"
             icon="add"
             onClick={
@@ -643,11 +651,6 @@ function DocumentEditor(props) {
                           </ListItemSecondaryAction>
                         </ListItem>
                       </List>
-                      
-                    
-
-                    
-
                     </div>
                   );
                 })}
@@ -667,55 +670,59 @@ function DocumentEditor(props) {
                   </p>
                 </div>
               </div>
-            )} 
+            )}
           </div>
         </div>
       )}
 
-
-
-     
-      {(!dialogOpen && collection == "Account Manager")&& (
-        <div style={{ padding: "3.5rem 4.38rem" }}>
-          <div style={{ display: "flex", justifyContent: "space-between" }}>
+      {!dialogOpen && collection == "Account Manager" && (
+        <div className={classes.acctManagerContainer}>
+          <div style={{ width: "100%", display: "flex", justifyContent: "space-between" }}>
             <h1>Account Manager</h1>
-            <Button onClick={() => handleDocument(true, {})} className={classes.btn} label="Account" icon="add" buttonColor="blue">+ Account</Button>
+            <Button
+              onClick={() => handleDocument(true, {})}
+              className={classes.btn}
+            >
+              + Account
+            </Button>
           </div>
           <SearchBar
-                placeholder={collection.toLowerCase()}
-                function={handleQueryChange}
-                value={searchQuery}
-              />
-          <h2>Admins</h2>
-          {filteredDocuments.map((document) => { 
-              return(
+            placeholder={collection.toLowerCase()}
+            function={handleQueryChange}
+            value={searchQuery}
+          />
+          <div style={{ width: "100%" }}>
+            <h2>Admins</h2>
+            {filteredDocuments.map((document) => {
+              return (
                 <>
-                  {(type(document) == "(Admin)") && (
+                  {type(document) == "(Admin)" && (
                     <NameCard isAdmin={false} name={primary(document)} />
                   )}
                 </>
-              )
-          })}
-          <h2>Teachers</h2>
-          {filteredDocuments.map((document) => { 
-              return(
+              );
+            })}
+            <h2>Teachers</h2>
+            {filteredDocuments.map((document) => {
+              return (
                 <>
-                  {(type(document) == "(Teacher)") && (
+                  {type(document) == "(Teacher)" && (
                     <NameCard isAdmin={false} name={primary(document)} />
                   )}
                 </>
-              )
-          })}
-          <h2>Students</h2>
-          {filteredDocuments.map((document) => { 
-              return(
+              );
+            })}
+            <h2>Students</h2>
+            {filteredDocuments.map((document) => {
+              return (
                 <>
-                  {(type(document) == "(Student)") && (
+                  {type(document) == "(Student)" && (
                     <NameCard isAdmin={false} name={primary(document)} />
                   )}
                 </>
-              )
-          })}
+              );
+            })}
+          </div>
         </div>
       )}
     </>
