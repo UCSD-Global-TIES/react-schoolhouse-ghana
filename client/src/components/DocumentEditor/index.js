@@ -44,7 +44,7 @@ const useStyles = makeStyles((theme) => ({
   },
   list: {
     width: "100%",
-    backgroundColor: "#94DD9B", //theme.palette.background.paper,
+    // backgroundColor: "#94DD9B", //theme.palette.background.paper,
   },
   buttonLink: {
     color: "inherit",
@@ -55,8 +55,8 @@ const useStyles = makeStyles((theme) => ({
   },
   // styles the header of the current view
   content: {
-    width: "90%",
-    maxWidth: "700px",
+    width: "100%",
+    // maxWidth: "700px",
   },
 
   // this is the general outline that is used by all the subject document containers
@@ -392,7 +392,7 @@ function DocumentEditor(props) {
     tmp[name] = value;
 
     setCurrentDocument({ ...tmp });
-    if (errorDocument !== {}) setErrorDocument({});
+    // if (errorDocument !== {}) setErrorDocument({});
   };
 
   const handleRouteChange = (destination, _id) => {
@@ -606,16 +606,17 @@ function DocumentEditor(props) {
                           role={undefined}
                           dense
                           button
-                          onClick={() => handleSelect(document._id)}
+                          // onClick={() => handleSelect(document._id)}
+                          onClick={() => handleDocument(true, document)}
                         >
                           <ListItemIcon>
-                            <Checkbox
+                            {/* <Checkbox
                               edge="start"
                               checked={selected.indexOf(document._id) !== -1}
                               tabIndex={-1}
                               disableRipple
                               inputProps={{ "aria-labelledby": labelId }}
-                            />
+                            /> */}
                           </ListItemIcon>
 
                           <ListItemText
@@ -628,7 +629,7 @@ function DocumentEditor(props) {
                                 : document.createdBy
                             }`}
                           />
-                          <ListItemSecondaryAction>
+                          {/* <ListItemSecondaryAction>
                             {props.link ? (
                               <a
                                 target="_blank"
@@ -645,10 +646,12 @@ function DocumentEditor(props) {
                                   />
                                 </IconButton>
                               </a>
-                            ) : (
+                            )
+                             : (
                               <FontAwesomeIcon icon={icon} />
-                            )}
-                          </ListItemSecondaryAction>
+                            )
+                            }
+                          </ListItemSecondaryAction> */}
                         </ListItem>
                       </List>
                     </div>
@@ -707,7 +710,7 @@ function DocumentEditor(props) {
               return (
                 <>
                   {type(document) == "(Teacher)" && (
-                    <NameCard isAdmin={false} name={primary(document)} />
+                    <NameCard isAdmin={false} name={primary(document)}/>
                   )}
                 </>
               );
