@@ -54,9 +54,19 @@ const useStyles = makeStyles({
 function NameCard(props) {
   const classes = useStyles();
 
+  //new code
+  const { name, handleDocument, document } = props; // Destructure the required props
+
+  const handleClick = () => {
+    if (handleDocument) {
+      handleDocument(true, document); // Call the handleDocument function with (true, document)
+    }
+  };
+
   return (
-    <div className={classes.container}>
-      <p className={classes.text}>{props.name}</p>
+    <div className={classes.container} onClick={handleClick}>
+      {/* <p className={classes.text}>{props.name}</p> */}
+      <p className={classes.text}>{name}</p>
       {/* {props.isAdmin && <div className={classes.adminLabel}>Admin</div>} */}
       <div className={classes.iconContainer}>
         {/* Add icons here */}

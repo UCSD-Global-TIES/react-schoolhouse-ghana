@@ -700,7 +700,16 @@ function DocumentEditor(props) {
               return (
                 <>
                   {type(document) == "(Admin)" && (
-                    <NameCard isAdmin={false} name={primary(document)} />
+                    // <NameCard 
+                    // onClick={() => handleDocument(true, document)}
+                    // isAdmin={false} name={primary(document)} 
+                    // />
+                    <NameCard
+                    handleDocument={handleDocument}
+                    document={document}
+                    name={primary(document)}
+                  />
+                    
                   )}
                 </>
               );
@@ -710,7 +719,13 @@ function DocumentEditor(props) {
               return (
                 <>
                   {type(document) == "(Teacher)" && (
-                    <NameCard isAdmin={false} name={primary(document)}/>
+                    // <NameCard isAdmin={false} name={primary(document)}/>
+
+                    <NameCard
+                    handleDocument={handleDocument}
+                    document={document}
+                    name={primary(document)}
+                  />
                   )}
                 </>
               );
@@ -720,7 +735,12 @@ function DocumentEditor(props) {
               return (
                 <>
                   {type(document) == "(Student)" && (
-                    <NameCard isAdmin={false} name={primary(document)} />
+                    // <NameCard isAdmin={false} name={primary(document)} />
+                    <NameCard
+                    handleDocument={handleDocument}
+                    document={document}
+                    name={primary(document)}
+                  />
                   )}
                 </>
               );
