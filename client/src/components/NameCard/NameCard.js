@@ -64,13 +64,13 @@ function NameCard(props) {
   };
 
   return (
-    <div className={classes.container} onClick={handleClick}>
+    <div className={classes.container}>
       {/* <p className={classes.text}>{props.name}</p> */}
       <p className={classes.text}>{name}</p>
       {/* {props.isAdmin && <div className={classes.adminLabel}>Admin</div>} */}
       <div className={classes.iconContainer}>
         {/* Add icons here */}
-        <div className={classes.icon}>
+        <div className={classes.icon} onClick={handleClick}>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="24"
