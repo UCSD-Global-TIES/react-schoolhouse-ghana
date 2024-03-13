@@ -143,7 +143,7 @@ function DocumentEditor(props) {
 
   // COMPONENT STATUS
   const [loading, setLoading] = useState(true);
-
+  
   const handleRefresh = () => {
     setRefreshing(true);
     setSelected([]);
@@ -693,35 +693,35 @@ function DocumentEditor(props) {
           />
           <div style={{ width: "100%" }}>
             <h2>Admins</h2>
-            {filteredDocuments.map((document) => {
-              return (
-                <>
-                  {type(document) == "(Admin)" && (
-                    <NameCard isAdmin={false} name={primary(document)} />
-                  )}
-                </>
-              );
-            })}
+            {filteredDocuments.filter(document => type(document) == "(Admin)").length > 0 ? (
+              filteredDocuments.map((document) => {
+                return type(document) == "(Admin)" && (
+                  <NameCard isAdmin={false} name={primary(document)} />
+                );
+              })
+            ) : (
+              <p>No admins were found.</p>
+            )}
             <h2>Teachers</h2>
-            {filteredDocuments.map((document) => {
-              return (
-                <>
-                  {type(document) == "(Teacher)" && (
-                    <NameCard isAdmin={false} name={primary(document)} />
-                  )}
-                </>
-              );
-            })}
+            {filteredDocuments.filter(document => type(document) == "(Teacher)").length > 0 ? (
+              filteredDocuments.map((document) => {
+                return type(document) == "(Teacher)" && (
+                  <NameCard isAdmin={false} name={primary(document)} />
+                );
+              })
+            ) : (
+              <p>No teachers were found.</p>
+            )}
             <h2>Students</h2>
-            {filteredDocuments.map((document) => {
-              return (
-                <>
-                  {type(document) == "(Student)" && (
-                    <NameCard isAdmin={false} name={primary(document)} />
-                  )}
-                </>
-              );
-            })}
+            {filteredDocuments.filter(document => type(document) == "(Student)").length > 0 ? (
+              filteredDocuments.map((document) => {
+                return type(document) == "(Student)" && (
+                  <NameCard isAdmin={false} name={primary(document)} />
+                );
+              })
+            ) : (
+              <p>No students were found.</p>
+            )}
           </div>
         </div>
       )}
