@@ -8,6 +8,7 @@ import VisibilityOff from '@material-ui/icons/VisibilityOff';
 
 import "../../utils/flowHeaders.min.css";
 import API from "../../utils/API"; 
+import EnrolledClasses from "../EnrolledClasses";
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -274,6 +275,7 @@ function AccountsForm(props) {
                         />
                     )})}
                     
+                    <EnrolledClasses></EnrolledClasses>
 
             </div>
         </div>
