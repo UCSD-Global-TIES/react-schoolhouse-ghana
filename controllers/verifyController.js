@@ -1,24 +1,26 @@
-const accountDb = require("../models/Account");
-const gradeDb = require("../models/Grade");
-const subjectDb = require("../models/Subject");
-const fileDb = require("../models/File");
-const announcementDb = require("../models/Announcement");
-const config = require("../nasConfig");
-const path = require("path");
-const fs = require("fs")
-const adminDb = require("../models/Admin");
-const loadtest = require('loadtest');
-const gradeSeeds = require('../seeds/grades')
-const subjectSeeds = require('../seeds/subjects');
-const fileSeeds = require('../seeds/files');
-const { announcements: announcementSeeds } = require('../seeds/announcements');
+// Import modules using ES6 import syntax
+import accountDb from "../models/Account";
+import gradeDb from "../models/Grade";
+import subjectDb from "../models/Subject";
+import fileDb from "../models/File";
+import announcementDb from "../models/Announcement";
+import config from "../nasConfig";
+import path from "path";
+import fs from "fs";
+import adminDb from "../models/Admin";
+import loadtest from 'loadtest'; // Assuming loadtest exports default, if not use: import * as loadtest from 'loadtest'
+import gradeSeeds from '../seeds/grades';
+import subjectSeeds from '../seeds/subjects';
+import fileSeeds from '../seeds/files';
+import { announcements as announcementSeeds } from '../seeds/announcements';
+import { encryptPassword, verifyPassword } from "../scripts/encrypt";
 
 const {
     encryptPassword,
     verifyPassword
 } = require("../scripts/encrypt");
 
-module.exports = {
+export const verifyController = {
     // https://stackoverflow.com/questions/44072750/how-to-send-basic-auth-with-axios
     verifyAccount: function (req, res) {
         // Find account document with matching username

@@ -1,13 +1,12 @@
-const {
-    address
-} = require("ip");
+
+import address from "ip";
 
 const API_PORT = process.env.PORT || 3001;
 
-module.exports.processAnnouncements = (announcements) => announcements
+export const processAnnouncements = (announcements) => announcements
     .map(({
         content,
-        private,
+        
         files,
         _id,
         authorName,
@@ -16,7 +15,7 @@ module.exports.processAnnouncements = (announcements) => announcements
         updatedAt
     }) => ({
         content,
-        private,
+        
         files: files.map(f => ({
             ...f,
             path: `http://${address()}:${API_PORT}${f.path}`

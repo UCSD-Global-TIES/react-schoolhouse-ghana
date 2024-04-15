@@ -38,5 +38,5 @@ router.route("/:sid/file/:fid")
   // Remove a file reference from the subject's 'files' array
   .delete(subjectController.removeFile)
 
-module.exports = router;
+exportrouter;
 

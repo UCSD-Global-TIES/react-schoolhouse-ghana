@@ -7,7 +7,7 @@ const {
     animals
 } = require('unique-names-generator');
 
-module.exports = {
+export{
 
     encryptPassword: function (password) {
         // const saltRounds = 10;

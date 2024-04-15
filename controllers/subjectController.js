@@ -11,7 +11,7 @@ const {
 } = require("./verifyController");
 const { processAnnouncements } = require("./processAnnouncements");
 
-module.exports = {
+export{
     addMarksForStudent: function (req, res) {
         verifyKey(req.header("Authorization"), "Teacher,Admin").then((isVerified) => {
           if (isVerified) {

@@ -42,4 +42,4 @@ router.route("/:uid/user")
 //   // Remove a subject from the grade
 //   .delete(gradeController.removeSubject)
 
-module.exports = router;
+exportrouter;

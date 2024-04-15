@@ -1,4 +1,4 @@
-module.exports = {
+export{
     Student: require("./Student"),
     Teacher: require("./Teacher"),
     Admin: require("./Admin"),

@@ -10,4 +10,4 @@ const markSchema = new mongoose.Schema({
 
 const Mark= mongoose.model('Mark', markSchema);
 
-module.exports = Mark;
+exportMark;

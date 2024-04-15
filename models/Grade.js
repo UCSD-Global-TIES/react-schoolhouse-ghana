@@ -22,4 +22,4 @@ const gradeSchema = new Schema({
 
 const Grade = mongoose.model("Grade", gradeSchema);
 
-module.exports = Grade;
+exportGrade;
