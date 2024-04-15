@@ -1,18 +1,22 @@
-const gradeDb = require("../models/Grade");
-const subjectDb = require("../models/Subject");
-const announcementDb = require("../models/Announcement");
-const studentDb = require("../models/Student");
+import gradeDb from ("../models/Grade");
 
-const ip = require("ip")
+import subjectDb from ("../models/Subject");
+import announcementDb from ("../models/Announcement");
+import studentDb from ("../models/Student");
+
+import ip from ("ip")
 const API_PORT = process.env.PORT || 3001;
 
-const {
+import {
     verifyKey
-} = require("./verifyController");
-const { processAnnouncements } = require("./processAnnouncements");
+} from "./verifyController";
 
-export{
-    addMarksForStudent: function (req, res) {
+import {
+    processAnnouncements
+} from "./processAnnouncements";
+
+export const
+    addMarksForStudent= function (req, res) {
         verifyKey(req.header("Authorization"), "Teacher,Admin").then((isVerified) => {
           if (isVerified) {
             const studentId = req.params.studentId;
@@ -37,8 +41,9 @@ export{
             res.status(403).json(null);
           }
         })
-    },
-    addAnnouncement: function (req, res) {
+    };
+    export const
+    addAnnouncement= function (req, res) {
         verifyKey(req.header('Authorization'), 'Teacher,Admin')
             .then((isVerified) => {
                 if (isVerified) {
@@ -67,8 +72,8 @@ export{
                 }
             })
 
-    },
-    deleteAnnouncement: function (req, res) {
+    };
+    export const deleteAnnouncement = function (req, res) {
         verifyKey(req.header('Authorization'), 'Teacher,Admin').then((isVerified) => {
             if (isVerified) {
                 const aid = req.params.aid;
@@ -101,8 +106,9 @@ export{
             }
         })
 
-    },
-    addFile: function (req, res) {
+    };
+    export const
+    addFile= function (req, res) {
         verifyKey(req.header('Authorization'), 'Teacher,Admin')
             .then((isVerified) => {
                 if (isVerified) {
@@ -123,8 +129,9 @@ export{
                     res.status(403).json(null);
                 }
             })
-    },
-    removeFile: function (req, res) {
+    };
+    export const
+    removeFile = function (req, res) {
         verifyKey(req.header('Authorization'), 'Teacher,Admin')
             .then((isVerified) => {
                 if (isVerified) {
@@ -145,8 +152,9 @@ export{
                     res.status(403).json(null);
                 }
             })
-    },
-    getSubjects: function (req, res) {
+    };
+    export const
+    getSubjects= function (req, res) {
         verifyKey(req.header('Authorization'), 'Admin')
             .then((isVerified) => {
                 if (isVerified) {
@@ -160,8 +168,9 @@ export{
                     res.status(403).json(null);
                 }
             })
-    },
-    getSubject: function (req, res) {
+    };
+    export const
+    getSubject= function (req, res) {
         verifyKey(req.header('Authorization'), 'Student,Teacher,Admin')
             .then((isVerified) => {
                 if (isVerified) {
@@ -201,8 +210,9 @@ export{
                     res.status(403).json(null);
                 }
             })
-    },
-    getAnnouncements: function (req, res) {
+    };
+    export const
+    getAnnouncements= function (req, res) {
         verifyKey(req.header('Authorization'), 'Teacher,Admin')
             .then((isVerified) => {
                 if (isVerified) {
@@ -215,8 +225,9 @@ export{
                     res.status(403).json(null);
                 }
             })
-    },
-    addSubject: function (req, res) {
+    };
+    export const 
+    addSubject= function (req, res) {
         verifyKey(req.header('Authorization'), 'Admin')
             .then((isVerified) => {
                 if (isVerified) {
@@ -250,8 +261,9 @@ export{
                     res.status(403).json(null);
                 }
             })
-    },
-    updateSubject: function (req, res) {
+    };
+    export const
+    updateSubject= function (req, res) {
         verifyKey(req.header('Authorization'), 'Teacher,Admin')
             .then((isVerified) => {
                 if (isVerified) {
@@ -310,8 +322,9 @@ export{
                     res.status(403).json(null);
                 }
             })
-    },
-    deleteSubject: function (req, res) {
+    };
+    export const
+    deleteSubject= function (req, res) {
         verifyKey(req.header('Authorization'), 'Admin')
             .then((isVerified) => {
                 if (isVerified) {
@@ -343,6 +356,4 @@ export{
                     res.status(403).json(null);
                 }
             })
-    },
-
-}
+    };

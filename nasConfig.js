@@ -1,8 +1,10 @@
-const path = require('path');
+import path from 'path';
 
-export{
-    // Changing the below path AFTER file creation will break ALL links 
-    path: path.join(__dirname, "../schoolhouse-storage"),
-    tmp: path.join(__dirname, "../schoolhouse-storage/tmp"),
+const storagePath = path.join(__dirname, "../schoolhouse-storage");
+const tmpPath = path.join(storagePath, "tmp"); // Use the previously defined storagePath for clarity
+
+export default {
+    storagePath,
+    tmpPath,
     publicPath: "/"
-}
+};
