@@ -1,9 +1,8 @@
-
-import accountDb from "../models/Account.js";
-import StudentDb from "../models/Student";
-import TeacherDb from "../models/Teacher";
-import AdminDb from "../models/Admin";
-import gradeDb from "../models/Grade";
+const accountDb = require("../models/Account");
+const StudentDb = require("../models/Student");
+const TeacherDb = require("../models/Teacher");
+const AdminDb = require("../models/Admin");
+const gradeDb = require("../models/Grade");
 
 const {
     verifyKey
@@ -65,7 +64,8 @@ const generateUniqueUsername = (first_name, last_name) => {
         });
 }
 
-export const addAccount = function (req, res) {
+module.exports = {
+    addAccount: function (req, res) {
         verifyKey(req.header('Authorization'), 'Admin')
             .then((isVerified) => {
                 if (isVerified) {
@@ -157,8 +157,8 @@ export const addAccount = function (req, res) {
                     res.status(403).json(null);
                 }
             })
-    };
-    export const updateAccount= function (req, res) {
+    },
+    updateAccount: function (req, res) {
         verifyKey(req.header('Authorization'), 'Admin')
             .then((isVerified) => {
                 if (isVerified) {
@@ -269,8 +269,8 @@ export const addAccount = function (req, res) {
                     res.status(403).json(null);
                 }
             })
-    };
-    export const deleteAccount = function (req, res) {
+    },
+    deleteAccount: function (req, res) {
         verifyKey(req.header('Authorization'), 'Admin')
             .then((isVerified) => {
                 if (isVerified) {
@@ -341,8 +341,8 @@ export const addAccount = function (req, res) {
                     res.status(403).json(null);
                 }
             })
-    };
-    export const getAccounts= function (req, res) {
+    },
+    getAccounts: function (req, res) {
         verifyKey(req.header('Authorization'), 'Admin')
             .then((isVerified) => {
                 if (isVerified) {
@@ -377,8 +377,8 @@ export const addAccount = function (req, res) {
                 }
             })
             
-    };
-    export const getAccountByProfileId = async (req, res) => {
+    },
+    getAccountByProfileId: async (req, res) => {
         console.log("Entering getAccountByProfileId with profileId:", req.params.profileId);
     
         try {
@@ -396,4 +396,5 @@ export const addAccount = function (req, res) {
             console.error("Error in getAccountByProfileId:", error);
             res.status(500).send("Server error");
         }
-    };
+    }
+}

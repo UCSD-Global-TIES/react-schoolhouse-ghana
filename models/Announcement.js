@@ -31,4 +31,4 @@ const announcementSchema = new Schema({
 
 const Announcement = mongoose.model("Announcement", announcementSchema);
 
-exportAnnouncement;
+module.exports = Announcement;

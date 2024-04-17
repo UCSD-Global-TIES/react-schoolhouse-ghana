@@ -8,7 +8,7 @@ const extract = require('extract-zip');
 const find = require("find");
 
 // import socket from server.js
-exportfunction (server, client, uploader) {
+module.exports = function (server, client, uploader) {
 
     // Track the number of connections to the server
     // let connections = 0;

@@ -29,4 +29,4 @@ const File = mongoose.model("File", fileSchema);
 
 // Populate nickname with filename if left blank
 
-exportFile;
+module.exports = File;

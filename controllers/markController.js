@@ -1,7 +1,7 @@
-import Mark from "../models/Marks";
+const Mark = require("../models/Marks"); 
 
 // Create a new mark
-export const createMark = async (req, res) => {
+exports.createMark = async (req, res) => {
   try {
     const { studentUsername, assignmentName, grade, subject } = req.body;
 
@@ -29,7 +29,7 @@ export const createMark = async (req, res) => {
 };
 
 // Get all marks
-export const getMarks = async (req, res) => {
+exports.getMarks = async (req, res) => {
   try {
     const marks = await Mark.find();
 
@@ -41,7 +41,7 @@ export const getMarks = async (req, res) => {
 };
 
 // Get a specific mark by ID
-export const getMark = async (req, res) => {
+exports.getMark = async (req, res) => {
   try {
     const mark = await Mark.findById(req.params.id);
 
@@ -57,7 +57,7 @@ export const getMark = async (req, res) => {
 };
 
 // Update a specific mark by ID
-export const updateMark = async (req, res) => {
+exports.updateMark = async (req, res) => {
   try {
     const updatedMark = await Mark.findByIdAndUpdate(
       req.params.id,
@@ -77,7 +77,7 @@ export const updateMark = async (req, res) => {
 };
 
 // Delete a specific mark by ID
-export const deleteMark = async (req, res) => {
+exports.deleteMark = async (req, res) => {
   try {
     const deletedMark = await Mark.findByIdAndRemove(req.params.id);
 
@@ -93,7 +93,7 @@ export const deleteMark = async (req, res) => {
   
 };
 
-export const getMarksByUsername= async (req, res) => {
+exports.getMarksByUsername= async (req, res) => {
   try {
       const marks = await Mark.find({ studentUsername: req.params.username });
       if (marks) {

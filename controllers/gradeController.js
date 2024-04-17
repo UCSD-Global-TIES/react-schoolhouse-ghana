@@ -1,14 +1,16 @@
+const gradeDb = require("../models/Grade");
+const studentDb = require("../models/Student");
+const accountDb = require("../models/Account");
+const API_PORT = process.env.PORT || 3001;
 
-import gradeDb from" ../models/Grade" ;
-
-import studentDb from "../models/Student";
-import accountDb from "../models/Account";
-import API_PORT from (process.env.PORT || 3001);
-
-import { verifyKey } from './verifyController.js';
-import { processAnnouncements } from './processAnnouncements.js';
-
-export const getGrades = function (req, res) {
+const {
+    verifyKey
+} = require("./verifyController");
+const {
+    processAnnouncements
+} = require("./processAnnouncements");
+module.exports = {
+    getGrades: function (req, res) {
         verifyKey(req.header('Authorization'), 'Admin')
             .then((isVerified) => {
                 if (isVerified) {
@@ -22,8 +24,8 @@ export const getGrades = function (req, res) {
                     res.status(403).json(null);
                 }
             })
-    };
-    export const getUserGrade = function (req, res) {
+    },
+    getUserGrade: function (req, res) {
         verifyKey(req.header('Authorization'), 'Student,Teacher,Admin')
             .then((isVerified) => {
                 if (isVerified) {
@@ -94,8 +96,8 @@ export const getGrades = function (req, res) {
                     res.status(403).json(null);
                 }
             })
-    };
-    export const getGrade = function (req, res) {
+    },
+    getGrade: function (req, res) {
         verifyKey(req.header('Authorization'), 'Admin')
             .then((isVerified) => {
                 if (isVerified) {
@@ -114,8 +116,8 @@ export const getGrades = function (req, res) {
                     res.status(403).json(null);
                 }
             })
-    };
-    export const addGrade = function (req, res) {
+    },
+    addGrade: function (req, res) {
         verifyKey(req.header('Authorization'), 'Admin')
             .then((isVerified) => {
                 if (isVerified) {
@@ -170,8 +172,8 @@ export const getGrades = function (req, res) {
                     res.status(403).json(null);
                 }
             })
-    };
-    export const updateGrade = function (req, res) {
+    },
+    updateGrade: function (req, res) {
         verifyKey(req.header('Authorization'), 'Admin')
             .then((isVerified) => {
                 if (isVerified) {
@@ -227,8 +229,8 @@ export const getGrades = function (req, res) {
                     res.status(403).json(null);
                 }
             })
-    };
-    export const deleteGrade = function (req, res) {
+    },
+    deleteGrade: function (req, res) {
         verifyKey(req.header('Authorization'), 'Admin')
             .then((isVerified) => {
                 if (isVerified) {
@@ -249,7 +251,7 @@ export const getGrades = function (req, res) {
                     res.status(403).json(null);
                 }
             })
-    };
+    },
 
     // addStudent: function (req, res) {
     //     verifyKey(req.header('Authorization'), 'Admin')
@@ -383,3 +385,4 @@ export const getGrades = function (req, res) {
     //             }
     //         })
     // },
+}

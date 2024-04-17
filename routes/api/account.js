@@ -17,4 +17,4 @@ router.route("/:aid")
 router.route("/profile/:profileId")
   .get(accountController.getAccountByProfileId);
 
-exportrouter;
+module.exports = router;

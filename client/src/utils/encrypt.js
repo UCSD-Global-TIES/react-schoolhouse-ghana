@@ -1,4 +1,4 @@
-import bcrypt from 'bcryptjs';
+const bcrypt = require('bcryptjs');
 
 export default {
     encryptPassword: (password) => {

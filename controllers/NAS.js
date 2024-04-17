@@ -1,10 +1,7 @@
-import fs from 'file-system';
-
-import checkDiskSpace from 'check-disk-space';
-
-import multer from 'multer';
-
-import config from '../nasConfig';
+const fs = require('file-system');
+const checkDiskSpace = require('check-disk-space');
+const multer = require('multer');
+const config = require('../nasConfig');
 
 let storage = multer.diskStorage({
     destination: function (req, file, callback) {
@@ -19,7 +16,7 @@ let upload = multer({
     storage: storage
 });
 
-export const 
+module.exports = {
     // // WRITE: Creating a directory
     // // ---------------------------------------------------------------
     // createDir: function (dir_path, dir_name) {
@@ -77,18 +74,17 @@ export const
     // },
     // WRITE: Renaming a file
     // ---------------------------------------------------------------
-    renameFile = function (old_filename, oldFilePath, new_filename, cb) {
+    renameFile: function (old_filename, oldFilePath, new_filename, cb) {
 
         const newFilePath = oldFilePath.replace(old_filename, new_filename);
         fs.rename(oldFilePath, newFilePath, function (err) {
             if (err) throw err;
             cb()
         });
-    };
+    },
     // WRITE: Deleting a file
     // ---------------------------------------------------------------
-    export const
-    deleteFile= function (path) {
+    deleteFile: function (path) {
         return new Promise((resolve, reject) => {
             const isDir = fs.lstatSync(path).isDirectory();
             if(isDir) {
@@ -103,7 +99,7 @@ export const
                 });
             }
         })
-    };
+    },
     // WRITE: Uploading a file to directory
     // ---------------------------------------------------------------
     // https://codeforgeek.com/multiple-file-upload-node-js/
@@ -111,7 +107,7 @@ export const
     // https://code.tutsplus.com/tutorials/file-upload-with-multer-in-node--cms-32088
     // https://medium.com/@bmshamsnahid/nodejs-file-upload-using-multer-3a904516f6d2
     // https://stackoverflow.com/questions/51566797/accessing-upload-data-in-react-from-multer-node-server
-    export const uploadFile= function (req, res) {
+    uploadFile: function (req, res) {
         new Promise((resolve, reject) => {
             const FOLDER_PATH = config.path;
             const createdAt = Date.now()
@@ -143,12 +139,13 @@ export const
                 });
             });
         })
-    };
+    },
     // TODO - NOT USED (SHOULD BE CALLED EVERYTIME UPLOADING TO NAS)
     // READ: Get disk space 
-    export const getDiskSpace= function (cb) {
+    getDiskSpace: function (cb) {
         return checkDiskSpace(config.path).then((diskSpace) => {
             cb(diskSpace);
         });
     }
 
+}

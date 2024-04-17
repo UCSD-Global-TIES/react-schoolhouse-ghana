@@ -17,4 +17,4 @@ router.route("/:fid")
     // Updates a 'File'
     .put(fileController.updateFile)
 
-exportrouter;
+module.exports = router;

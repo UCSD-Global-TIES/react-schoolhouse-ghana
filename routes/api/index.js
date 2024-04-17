@@ -18,4 +18,4 @@ router.use("/verify", verifyRoutes);
 router.use("/assessment", assessmentRoutes);
 router.use("/mark", markRoutes);
 
-exportrouter;
+module.exports = router;

@@ -6,4 +6,4 @@ router.route("/")
   // Creates a new assessment account
   .get(assessmentController.getAssessment);
 
-exportrouter;
+module.exports = router;

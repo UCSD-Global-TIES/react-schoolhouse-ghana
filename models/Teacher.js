@@ -14,4 +14,4 @@ const teacherSchema = new Schema({
 
 const Teacher = mongoose.model("Teacher", teacherSchema);
 
-exportTeacher;
+module.exports = Teacher;

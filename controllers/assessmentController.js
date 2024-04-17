@@ -1,8 +1,8 @@
 // TODO: Seed should be stored in the database as opposed to being loaded through the controller. Implement once database logic is finished.
+const seed = require("../seeds/assessment1.json");
 
-import seed from "../seeds/assessment1.json";
-
-
-export const getAssessment = (req, res) => {
-    res.json([seed]);
-};
+module.exports = {
+    getAssessment: (req, res) => {
+        res.json([seed]);
+    }
+}

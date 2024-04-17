@@ -19,4 +19,4 @@ router.route("/database")
 router.route("/load")
   .get(verifyController.verifyLatency)
 
-exportrouter;
+module.exports = router;

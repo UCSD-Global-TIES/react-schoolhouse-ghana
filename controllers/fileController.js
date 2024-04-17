@@ -12,7 +12,8 @@ const {
     verifyKey
 } = require("./verifyController");
 
-export const getFiles = (req, res) => {
+module.exports = {
+    getFiles: function (req, res) {
         verifyKey(req.header('Authorization'), 'Teacher,Admin')
             .then((isVerified) => {
                 if (isVerified) {
@@ -33,8 +34,8 @@ export const getFiles = (req, res) => {
                     res.status(403).json(null);
                 }
             })
-    };
-    export const createFile = (req, res) => {
+    },
+    createFile: function (req, res) {
         verifyKey(req.header('Authorization'), 'Admin')
             .then((isVerified) => {
                 if (isVerified) {
@@ -71,8 +72,8 @@ export const getFiles = (req, res) => {
                     res.status(403).json(null);
                 }
             })
-    };
-    export const getFile= function (req, res) {
+    },
+    getFile: function (req, res) {
         verifyKey(req.header('Authorization'), 'Student,Teacher,Admin')
             .then((isVerified) => {
                 if (isVerified) {
@@ -90,8 +91,8 @@ export const getFiles = (req, res) => {
                     res.status(403).json(null);
                 }
             })
-    };
-    export const deleteFile = function (req, res) {
+    },
+    deleteFile: function (req, res) {
         verifyKey(req.header('Authorization'), 'Admin')
             .then((isVerified) => {
                 if (isVerified) {
@@ -151,8 +152,8 @@ export const getFiles = (req, res) => {
                     res.status(403).json(null);
                 }
             })
-    };
-    export const updateFile = function (req, res) {
+    },
+    updateFile: function (req, res) {
         verifyKey(req.header('Authorization'), 'Admin')
             .then((isVerified) => {
                 if (isVerified) {
@@ -171,3 +172,4 @@ export const getFiles = (req, res) => {
                 }
             })
     }
+}

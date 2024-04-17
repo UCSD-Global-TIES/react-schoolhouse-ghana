@@ -15,4 +15,4 @@ router.route("/ann/:aid")
   // Updates a specific announcement
   .put(generalController.updateAnnouncement)
 
-exportrouter;
+module.exports = router;

@@ -1,6 +1,6 @@
-import moment from 'moment';
+const moment = require('moment');
 
-export{
+module.exports = {
     getQueries: (param_str) => {
         let tmp = param_str.split("?")[1];
         tmp = tmp.split("&");
