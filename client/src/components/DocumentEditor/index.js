@@ -44,7 +44,7 @@ const useStyles = makeStyles((theme) => ({
   },
   list: {
     width: "100%",
-    backgroundColor: "#94DD9B", //theme.palette.background.paper,
+    // backgroundColor: "#94DD9B", //theme.palette.background.paper,
   },
   buttonLink: {
     color: "inherit",
@@ -55,8 +55,8 @@ const useStyles = makeStyles((theme) => ({
   },
   // styles the header of the current view
   content: {
-    width: "90%",
-    maxWidth: "700px",
+    width: "100%",
+    // maxWidth: "700px",
   },
 
   // this is the general outline that is used by all the subject document containers
@@ -100,6 +100,23 @@ const useStyles = makeStyles((theme) => ({
     alignItems: "flex-start",
     gap: "2.625rem",
     flexShrink: "0",
+  },
+    AnnoucementContainer: {
+    display: "flex",
+    width: "76rem",
+    padding: "3.5rem 4.375rem",
+    flexDirection: "column",
+    alignItems: "flex-start",
+    gap: "2.625rem",
+    flexShrink: "0",
+  },
+  title: {
+    color: "#4B4B4B",
+    fontFamily: '"Asap Condensed", sans-serif',
+    fontSize: "60px",
+    fontStyle: "normal",
+    fontWeight: 700,
+    lineHeight: "normal",
   },
 }));
 
@@ -392,7 +409,7 @@ function DocumentEditor(props) {
     tmp[name] = value;
 
     setCurrentDocument({ ...tmp });
-    if (errorDocument !== {}) setErrorDocument({});
+    // if (errorDocument !== {}) setErrorDocument({});
   };
 
   const handleRouteChange = (destination, _id) => {
@@ -548,7 +565,176 @@ function DocumentEditor(props) {
         {collection.toLowerCase()}(s)?
       </ConfirmDialog>
 
+
+
+
+
+
+      {!dialogOpen && collection == "Account Manager" && (
+        <div className={classes.acctManagerContainer}>
+          <div style={{ width: "100%", display: "flex", justifyContent: "space-between" }}>
+            <h1>Account Manager</h1>
+            <Button
+              onClick={() => handleDocument(true, {})}
+              className={classes.btn}
+            >
+              + Account
+            </Button>
+          </div>
+          <SearchBar
+            placeholder={collection.toLowerCase()}
+            function={handleQueryChange}
+            value={searchQuery}
+          />
+          <div style={{ width: "100%" }}>
+            <h2>Admins</h2>
+            {filteredDocuments.map((document) => {
+              return (
+                <>
+                  {type(document) == "(Admin)" && (
+                    // <NameCard 
+                    // onClick={() => handleDocument(true, document)}
+                    // isAdmin={false} name={primary(document)} 
+                    // />
+                    <NameCard
+                    handleDocument={handleDocument}
+                    document={document}
+                    name={primary(document)}
+                  />
+                    
+                  )}
+                </>
+              );
+            })}
+            <h2>Teachers</h2>
+            {filteredDocuments.map((document) => {
+              return (
+                <>
+                  {type(document) == "(Teacher)" && (
+                    // <NameCard isAdmin={false} name={primary(document)}/>
+
+                    <NameCard
+                    handleDocument={handleDocument}
+                    document={document}
+                    name={primary(document)}
+                  />
+                  )}
+                </>
+              );
+            })}
+            <h2>Students</h2>
+            {filteredDocuments.map((document) => {
+              return (
+                <>
+                  {type(document) == "(Student)" && (
+                    // <NameCard isAdmin={false} name={primary(document)} />
+                    <NameCard
+                    handleDocument={handleDocument}
+                    document={document}
+                    name={primary(document)}
+                  />
+                  )}
+                </>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+{/* {!dialogOpen && collection == "Announcement" && (
+        <div className={classes.a}>
+          <div style={{ width: "100%", display: "flex", justifyContent: "space-between" }}>
+            <h1>Account Manager</h1>
+            <Button
+              onClick={() => handleDocument(true, {})}
+              className={classes.btn}
+            >
+              + Account
+            </Button>
+          </div>
+          <SearchBar
+            placeholder={collection.toLowerCase()}
+            function={handleQueryChange}
+            value={searchQuery}
+          />
+          <div style={{ width: "100%" }}>
+            <h2>Admins</h2>
+            {filteredDocuments.map((document) => {
+              return (
+                <>
+                  {type(document) == "(Admin)" && (
+                    // <NameCard 
+                    // onClick={() => handleDocument(true, document)}
+                    // isAdmin={false} name={primary(document)} 
+                    // />
+                    <NameCard
+                    handleDocument={handleDocument}
+                    document={document}
+                    name={primary(document)}
+                  />
+                    
+                  )}
+                </>
+              );
+            })}
+            <h2>Teachers</h2>
+            {filteredDocuments.map((document) => {
+              return (
+                <>
+                  {type(document) == "(Teacher)" && (
+                    // <NameCard isAdmin={false} name={primary(document)}/>
+
+                    <NameCard
+                    handleDocument={handleDocument}
+                    document={document}
+                    name={primary(document)}
+                  />
+                  )}
+                </>
+              );
+            })}
+            <h2>Students</h2>
+            {filteredDocuments.map((document) => {
+              return (
+                <>
+                  {type(document) == "(Student)" && (
+                    // <NameCard isAdmin={false} name={primary(document)} />
+                    <NameCard
+                    handleDocument={handleDocument}
+                    document={document}
+                    name={primary(document)}
+                  />
+                  )}
+                </>
+              );
+            })}
+          </div>
+        </div>
+      )} */}
+
+      {false && !dialogOpen && collection == "Announcement" && (
+        <div className={classes.AnnoucementContainer}> {/* Fix the class name */}
+          <div style={{ width: "100%", display: "flex", justifyContent: "space-between" }}>
+            <h1>Announcements</h1> {/* Adjust the header text */}
+            <Button
+              onClick={() => handleDocument(true, {})}
+              className={classes.btn}
+            >
+              + Announcement {/* Adjust the button text */}
+            </Button>
+          </div>
+          <SearchBar
+            placeholder={collection.toLowerCase()}
+            function={handleQueryChange}
+            value={searchQuery}
+          />
+          {/* Content to display announcements goes here, similar to the Account Manager section */}
+        </div>
+      )}
+
+
       {!dialogOpen && collection != "Account Manager" && (
+        
         <div style={{ display: "flex", width: "100%" }}>
           <div style={{ margin: "auto" }} className={classes.content}>
             <>
@@ -598,7 +784,15 @@ function DocumentEditor(props) {
                   const labelId = `${collection.toLowerCase()}-${idx}`;
                   return (
                     <div>
+                    {/* <div style={{ width: "100%", display: "flex", justifyContent: "space-between" }}> */}
+
                       <List className={classes.list}>
+                      <NameCard
+                        handleDocument={handleDocument}
+                        document={document}
+                        name={primary(document)}
+                      />
+                        {/*
                         <ListItem
                           alignItems="flex-start"
                           divider={true}
@@ -606,17 +800,20 @@ function DocumentEditor(props) {
                           role={undefined}
                           dense
                           button
-                          onClick={() => handleSelect(document._id)}
+                          // onClick={() => handleSelect(document._id)}
+                          onClick={() => handleDocument(true, document)}
                         >
+
                           <ListItemIcon>
-                            <Checkbox
+                             <Checkbox
                               edge="start"
                               checked={selected.indexOf(document._id) !== -1}
                               tabIndex={-1}
                               disableRipple
                               inputProps={{ "aria-labelledby": labelId }}
-                            />
+                            /> 
                           </ListItemIcon>
+
 
                           <ListItemText
                             id={labelId}
@@ -628,7 +825,7 @@ function DocumentEditor(props) {
                                 : document.createdBy
                             }`}
                           />
-                          <ListItemSecondaryAction>
+                          {/* <ListItemSecondaryAction>
                             {props.link ? (
                               <a
                                 target="_blank"
@@ -645,11 +842,13 @@ function DocumentEditor(props) {
                                   />
                                 </IconButton>
                               </a>
-                            ) : (
+                            )
+                             : (
                               <FontAwesomeIcon icon={icon} />
-                            )}
-                          </ListItemSecondaryAction>
-                        </ListItem>
+                            )
+                            }
+                          </ListItemSecondaryAction> 
+                        </ListItem>               */}
                       </List>
                     </div>
                   );
