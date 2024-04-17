@@ -1,26 +1,21 @@
-import express from "express";
+const express = require("express");
+const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
+const session = require('express-session');
+const morgan = require('morgan');
+const mongoose = require("mongoose");
+const siofu = require("socketio-file-upload")
+const fs = require("fs")
+const routes = require("./routes");
+const config = require("./nasConfig");
+const cors = require('cors');
 
-import bodyParser from 'body-parser';
-import cookieParser from 'cookie-parser';
-import session from 'express-session';
-import morgan from 'morgan';
-import mongoose from "mongoose";
-import siofu from "socketio-file-upload";
-import fs from "fs";
-import routes from "./routes/index.js";
-import config from "./nasConfig.js";
-import cors from 'cors';
-
-import http from 'http';
-import { Server as SocketIO } from 'socket.io';
 
 const app = express();
-const server = http.createServer(app);
-const io = new SocketIO(server);
+var http = require('http').createServer(app);
+var io = require('socket.io')(http);
 const PORT = process.env.PORT || 3001;
-
 app.use(cors());
-
 
 // Define middleware here
 app.use(express.urlencoded({

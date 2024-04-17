@@ -1,15 +1,14 @@
-import config from ("./nasConfig");
-import fileDb from("./models/File")
-import { deleteFile } from ("./controllers/NAS")
-import fs from("fs")
-import getSize from('get-folder-size');
+const config = require("./nasConfig");
+const fileDb = require("./models/File")
+const { deleteFile } = require("./controllers/NAS")
+const fs = require("fs")
+const getSize = require('get-folder-size');
 // const unzipper = require("unzipper");
-import extract  from('extract-zip');
-import find from("find");
+const extract = require('extract-zip');
+const find = require("find");
 
 // import socket from server.js
-
-export function setupCommunication(server, client, uploader) {
+exportfunction (server, client, uploader) {
 
     // Track the number of connections to the server
     // let connections = 0;

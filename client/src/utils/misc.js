@@ -1,7 +1,7 @@
 import moment from 'moment';
 
-export const
-    getQueries= (param_str) => {
+export{
+    getQueries: (param_str) => {
         let tmp = param_str.split("?")[1];
         tmp = tmp.split("&");
 
@@ -13,16 +13,14 @@ export const
         }
 
         return res;
-    };
-    export const
-    parseTime= (date, isShort) => {
+    },
+    parseTime: (date, isShort) => {
         if (!date) return;
 
         if (isShort) return moment(date).format("h:mm a on MM/DD/YY");
         return moment(date).format("dddd, MMMM Do YYYY, h:mm a");
-    };
-    export const
-    generatePassword= () => {
+    },
+    generatePassword: () => {
         // TODO: Make auth rules that require more conditions for the password (Ex. one lower case, one upper case, one symbol, etc)
         var length = 8,
             charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()",
@@ -32,3 +30,4 @@ export const
         }
         return retVal;
     }
+}
