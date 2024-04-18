@@ -18,9 +18,9 @@ const useStyles = makeStyles(theme => ({
         margin: "1rem 0px"
     },
     vc: {
-        maxWidth: "500px",
-        width: "90%",
-        margin: "auto"
+        // maxWidth: "500px",
+        // width: "90%",
+        // margin: "auto"
     },
 }));
 
