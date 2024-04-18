@@ -79,10 +79,10 @@ const useStyles = makeStyles((theme) => ({
     flexDirection: "column",
     alignItems: "flex-start",
     gap: "0.625rem",
-    height: "3.75rem",
+    height: "3.00rem",
     padding: "0.5625rem 1.25rem",
     flexShrink: "0",
-    fontSize: "1.75rem",
+    fontSize: "1.25rem",
     borderRadius: "1.5rem",
     fontFamily: "Nunito",
     borderTop: "1px solid #005FD9",
@@ -91,6 +91,15 @@ const useStyles = makeStyles((theme) => ({
     borderLeft: "1px solid #005FD9",
     background: "#2584FF",
     color: "#FFF",
+  },
+  cancelbtn: {
+    background: "#FFF",
+    color: "#2584FF",
+  },
+  buttonContainer: {
+    display: "flex",
+    justifyContent: "flex-end",
+    gap: "1.00rem",
   },
   acctManagerContainer: {
     display: "flex",
@@ -512,26 +521,28 @@ function DocumentEditor(props) {
             handleRouteChange={handleRouteChange}
             handleChange={handleFormChange}
           />
-          <Button
-            className={classes.btn}
-            text="Close"
-            icon="add"
-            onClick={() => handleDocument(false)}
-          >
-            Close
-          </Button>
-          <Button
-            className={classes.btn}
-            text="Save"
-            icon="add"
-            onClick={
-              isCreate
-                ? () => handleCreate(currentDocument)
-                : () => handleSave(currentDocument)
-            }
-          >
-            Save
-          </Button>
+          <div className={classes.buttonContainer}>
+            <Button
+              className={`${classes.btn} ${classes.cancelbtn}`}
+              text="Cancel"
+              icon="add"
+              onClick={() => handleDocument(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              className={classes.btn}
+              text="Save"
+              icon="add"
+              onClick={
+                isCreate
+                  ? () => handleCreate(currentDocument)
+                  : () => handleSave(currentDocument)
+              }
+            >
+              Finish
+            </Button>
+          </div>
         </div>
       )}
 

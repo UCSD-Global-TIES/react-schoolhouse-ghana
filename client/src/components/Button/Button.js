@@ -22,10 +22,10 @@ const useStyles = makeStyles({
       props.buttonColor === "blue" ? "4px solid #005FD9" : "4px solid #E5E5E5",
     borderLeft:
       props.buttonColor === "blue" ? "1px solid #005FD9" : "1px solid #E5E5E5",
-    backgroundColor: props.buttonColor === "blue" ? "#2584FF" : "#FFF",
-    color: props.buttonColor === "blue" ? "#FFF" : "#2584FF",
+    backgroundColor: props.buttonColor === "blue" ? "#2584FF" : (props.buttonColor === "white" ? "#FFF" : props.buttonColor), // Updated to handle custom colors
+    color: props.buttonColor === "blue" || props.buttonColor === "white" ? "#FFF" : "#2584FF", // Updated to handle custom colors
     "&:hover": {
-      backgroundColor: props.buttonColor === "blue" ? "#005FD9" : "#FFF",
+      backgroundColor: props.buttonColor === "blue" ? "#005FD9" : (props.buttonColor === "white" ? "#FFF" : props.buttonColor), // Updated to handle custom colors
     },
     fontFamily: "Nunito",
   }),
