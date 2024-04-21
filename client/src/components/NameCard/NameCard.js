@@ -66,9 +66,7 @@ function NameCard(props) {
 
   return (
     <div className={classes.container}>
-      {/* <p className={classes.text}>{props.name}</p> */}
       <p className={classes.text}>{name}</p>
-      {/* {props.isAdmin && <div className={classes.adminLabel}>Admin</div>} */}
       <div className={classes.iconContainer}>
         {/* Add icons here */}
         <div className={classes.icon} onClick={handleClick}>
