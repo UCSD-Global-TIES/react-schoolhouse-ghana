@@ -21,6 +21,7 @@ const useStyles = makeStyles(theme => ({
         border: '3px solid #E5E5E5',
         background: '#FFFFFF',
         alignItems: 'center',
+        marginBottom: '2rem',
       
     },
     placeholder: {
