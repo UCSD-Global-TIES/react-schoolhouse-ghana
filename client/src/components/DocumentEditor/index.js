@@ -101,18 +101,9 @@ const useStyles = makeStyles((theme) => ({
     justifyContent: "flex-end",
     gap: "1.00rem",
   },
-  acctManagerContainer: {
+  sectionContainer: {
     display: "flex",
-    width: "76rem",
-    padding: "3.5rem 4.375rem",
-    flexDirection: "column",
-    alignItems: "flex-start",
-    gap: "2.625rem",
-    flexShrink: "0",
-  },
-    AnnoucementContainer: {
-    display: "flex",
-    width: "76rem",
+    width: "100%",
     padding: "3.5rem 4.375rem",
     flexDirection: "column",
     alignItems: "flex-start",
@@ -576,177 +567,8 @@ function DocumentEditor(props) {
         {collection.toLowerCase()}(s)?
       </ConfirmDialog>
 
-
-
-
-
-
-      {!dialogOpen && collection == "Account Manager" && (
-        <div className={classes.acctManagerContainer}>
-          <div style={{ width: "100%", display: "flex", justifyContent: "space-between" }}>
-            <h1>Account Manager</h1>
-            <Button
-              onClick={() => handleDocument(true, {})}
-              className={classes.btn}
-            >
-              + Account
-            </Button>
-          </div>
-          <SearchBar
-            placeholder={collection.toLowerCase()}
-            function={handleQueryChange}
-            value={searchQuery}
-          />
-          <div style={{ width: "100%" }}>
-            <h2>Admins</h2>
-            {filteredDocuments.map((document) => {
-              return (
-                <>
-                  {type(document) == "(Admin)" && (
-                    // <NameCard 
-                    // onClick={() => handleDocument(true, document)}
-                    // isAdmin={false} name={primary(document)} 
-                    // />
-                    <NameCard
-                    handleDocument={handleDocument}
-                    document={document}
-                    name={primary(document)}
-                  />
-                    
-                  )}
-                </>
-              );
-            })}
-            <h2>Teachers</h2>
-            {filteredDocuments.map((document) => {
-              return (
-                <>
-                  {type(document) == "(Teacher)" && (
-                    // <NameCard isAdmin={false} name={primary(document)}/>
-
-                    <NameCard
-                    handleDocument={handleDocument}
-                    document={document}
-                    name={primary(document)}
-                  />
-                  )}
-                </>
-              );
-            })}
-            <h2>Students</h2>
-            {filteredDocuments.map((document) => {
-              return (
-                <>
-                  {type(document) == "(Student)" && (
-                    // <NameCard isAdmin={false} name={primary(document)} />
-                    <NameCard
-                    handleDocument={handleDocument}
-                    document={document}
-                    name={primary(document)}
-                  />
-                  )}
-                </>
-              );
-            })}
-          </div>
-        </div>
-      )}
-
-{/* {!dialogOpen && collection == "Announcement" && (
-        <div className={classes.a}>
-          <div style={{ width: "100%", display: "flex", justifyContent: "space-between" }}>
-            <h1>Account Manager</h1>
-            <Button
-              onClick={() => handleDocument(true, {})}
-              className={classes.btn}
-            >
-              + Account
-            </Button>
-          </div>
-          <SearchBar
-            placeholder={collection.toLowerCase()}
-            function={handleQueryChange}
-            value={searchQuery}
-          />
-          <div style={{ width: "100%" }}>
-            <h2>Admins</h2>
-            {filteredDocuments.map((document) => {
-              return (
-                <>
-                  {type(document) == "(Admin)" && (
-                    // <NameCard 
-                    // onClick={() => handleDocument(true, document)}
-                    // isAdmin={false} name={primary(document)} 
-                    // />
-                    <NameCard
-                    handleDocument={handleDocument}
-                    document={document}
-                    name={primary(document)}
-                  />
-                    
-                  )}
-                </>
-              );
-            })}
-            <h2>Teachers</h2>
-            {filteredDocuments.map((document) => {
-              return (
-                <>
-                  {type(document) == "(Teacher)" && (
-                    // <NameCard isAdmin={false} name={primary(document)}/>
-
-                    <NameCard
-                    handleDocument={handleDocument}
-                    document={document}
-                    name={primary(document)}
-                  />
-                  )}
-                </>
-              );
-            })}
-            <h2>Students</h2>
-            {filteredDocuments.map((document) => {
-              return (
-                <>
-                  {type(document) == "(Student)" && (
-                    // <NameCard isAdmin={false} name={primary(document)} />
-                    <NameCard
-                    handleDocument={handleDocument}
-                    document={document}
-                    name={primary(document)}
-                  />
-                  )}
-                </>
-              );
-            })}
-          </div>
-        </div>
-      )} */}
-
-      {false && !dialogOpen && collection == "Announcement" && (
-        <div className={classes.AnnoucementContainer}> {/* Fix the class name */}
-          <div style={{ width: "100%", display: "flex", justifyContent: "space-between" }}>
-            <h1>Announcements</h1> {/* Adjust the header text */}
-            <Button
-              onClick={() => handleDocument(true, {})}
-              className={classes.btn}
-            >
-              + Announcement {/* Adjust the button text */}
-            </Button>
-          </div>
-          <SearchBar
-            placeholder={collection.toLowerCase()}
-            function={handleQueryChange}
-            value={searchQuery}
-          />
-          {/* Content to display announcements goes here, similar to the Account Manager section */}
-        </div>
-      )}
-
-
-      {!dialogOpen && collection != "Account Manager" && (
-        
-        <div style={{ display: "flex", width: "100%" }}>
+      {!dialogOpen  && (
+        <div className={classes.sectionContainer}>
           <div style={{ margin: "auto" }} className={classes.content}>
             <>
               <EnhancedListToolbar
@@ -791,79 +613,44 @@ function DocumentEditor(props) {
                     />
                   </div>
                 </div>
-                {viewableDocuments.map((document, idx) => {
-                  const labelId = `${collection.toLowerCase()}-${idx}`;
-                  return (
-                    <div>
-                    {/* <div style={{ width: "100%", display: "flex", justifyContent: "space-between" }}> */}
 
-                      <List className={classes.list}>
-                      <NameCard
-                        handleDocument={handleDocument}
-                        document={document}
-                        name={primary(document)}
-                      />
-                        {/*
-                        <ListItem
-                          alignItems="flex-start"
-                          divider={true}
-                          key={labelId}
-                          role={undefined}
-                          dense
-                          button
-                          // onClick={() => handleSelect(document._id)}
-                          onClick={() => handleDocument(true, document)}
-                        >
-
-                          <ListItemIcon>
-                             <Checkbox
-                              edge="start"
-                              checked={selected.indexOf(document._id) !== -1}
-                              tabIndex={-1}
-                              disableRipple
-                              inputProps={{ "aria-labelledby": labelId }}
-                            /> 
-                          </ListItemIcon>
-
-
-                          <ListItemText
-                            id={labelId}
-                            style={{ overflowWrap: "break-word" }}
-                            primary={primary(document)}
-                            secondary={`Created: ${
-                              document.createdAt
-                                ? parseTime(document.createdAt, true)
-                                : document.createdBy
-                            }`}
+                {collection == "Account Manager" ? (
+                  <>
+                    {["Admin", "Teacher", "Student"].map((item) => (
+                      <>
+                        <Typography variant="h2">{item}s</Typography>
+                        {filteredDocuments.filter(document => type(document) == `(${item})`).length > 0 ? (
+                          filteredDocuments.map((document) => {
+                          return type(document) == `(${item})` && (
+                            <List className={classes.list}>
+                              <NameCard isAdmin={false} name={primary(document)} /> 
+                            </List>
+                            
+                          );
+                          })
+                        ) : (
+                          <p>No {item.toLowerCase()}s were found.</p>
+                        )}
+                      </>
+                    ))}
+                  </>
+                ) : (
+                  <>
+                    {viewableDocuments.map((document, idx) => {
+                      const labelId = `${collection.toLowerCase()}-${idx}`;
+                      return (
+                          <List className={classes.list}>
+                          <NameCard
+                            handleDocument={handleDocument}
+                            document={document}
+                            name={primary(document)}
                           />
-                          {/* <ListItemSecondaryAction>
-                            {props.link ? (
-                              <a
-                                target="_blank"
-                                href={props.link(document)}
-                                style={{
-                                  textDecoration: "none",
-                                  fontSize: "1rem",
-                                }}
-                              >
-                                <IconButton aria-label="create">
-                                  <FontAwesomeIcon
-                                    icon={faExternalLinkAlt}
-                                    size="xs"
-                                  />
-                                </IconButton>
-                              </a>
-                            )
-                             : (
-                              <FontAwesomeIcon icon={icon} />
-                            )
-                            }
-                          </ListItemSecondaryAction> 
-                        </ListItem>               */}
-                      </List>
-                    </div>
-                  );
-                })}
+                          </List>
+                      );
+                    })}
+                  </>
+                )
+              }
               </>
             ) : (
               <div style={{ display: "flex", marginTop: "2rem" }}>
@@ -881,41 +668,6 @@ function DocumentEditor(props) {
                 </div>
               </div>
             )}
-          </div>
-        </div>
-      )}
-
-      {!dialogOpen && collection == "Account Manager" && (
-        <div className={classes.acctManagerContainer}>
-          <div style={{ width: "100%", display: "flex", justifyContent: "space-between" }}>
-            <h1>Account Manager</h1>
-            <Button
-              onClick={() => handleDocument(true, {})}
-              className={classes.btn}
-            >
-              + Account
-            </Button>
-          </div>
-          <SearchBar
-            placeholder={collection.toLowerCase()}
-            function={handleQueryChange}
-            value={searchQuery}
-          />
-          <div style={{ width: "100%" }}>
-            {["Admin", "Teacher", "Student"].map((item) => (
-                <>
-                <h2>{item}s</h2>
-                {filteredDocuments.filter(document => type(document) == `(${item})`).length > 0 ? (
-                  filteredDocuments.map((document) => {
-                  return type(document) == `(${item})` && (
-                    <NameCard isAdmin={false} name={primary(document)} />
-                  );
-                  })
-                ) : (
-                  <p>No {item.toLowerCase()}s were found.</p>
-                )}
-                </>
-            ))}
           </div>
         </div>
       )}

@@ -44,6 +44,22 @@ const socket = io();
 const appTheme = createMuiTheme({
   typography: {
     fontFamily: ["Asap Condensed", "Nunito", "sans-serif"].join(","),
+    h1: {
+      fontFamily: "Asap Condensed",
+      fontSize: "3.75rem",
+      fontStyle: "normal",
+      fontWeight: "700",
+      lineHeight: "normal",
+      color: "#4B4B4B",
+    },
+    h2: {
+      fontFamily: "Asap Condensed",
+      fontSize: "2.5rem",
+      fontStyle: "normal",
+      fontWeight: "600",
+      lineHeight: "4rem",
+      color: "#4B4B4B",
+    }
   },
   palette: {
     background: {

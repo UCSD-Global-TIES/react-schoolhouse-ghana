@@ -4,18 +4,19 @@ import React from "react";
 const useStyles = makeStyles({
   container: {
     display: "flex",
+    height: "4.25rem",
     flex: "1 0 0",
     gap: "0.75rem",
     justifyContent: "space-between", // Added for spacing between name and icons
     padding: "1.25rem 1.875rem",
     alignItems: "center",
-    marginBottom: "1rem", // Add margin between cards
+    marginBottom: "0rem", // Add margin between cards
     borderRadius: "0.75rem", // Adjust border-radius as per the design
     // boxShadow: "0 2px 4px 0 rgba(0,0,0,0.1)", // Add shadow to match the design
     background: "#FFF",
     border: "3px solid #E5E5E5",
     "&:hover": {
-      border: "3px solid #005FD9",
+      borderColor: "#005FD9",
       background: "#f0f4fc",
     },
     "&:hover $iconContainer": {
