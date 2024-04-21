@@ -8,6 +8,7 @@ import SearchIcon from '@material-ui/icons/Search';
 import { lighten, makeStyles } from '@material-ui/core/styles';
 import "../../utils/flowHeaders.min.css";
 import { faExternalLinkAlt } from "@fortawesome/free-solid-svg-icons";
+import SearchBar from "../SearchBar/SearchBar";
 
 
 const useStyles = makeStyles(theme => ({
@@ -28,8 +29,7 @@ const useStyles = makeStyles(theme => ({
     },
     // styles the search bar box for files when creating/editing an announcement 
     content: {
-        width: "90%",
-        maxWidth: "700px",
+        width: "100%",
     },
     skeleton: {
         width: "100%",
@@ -170,7 +170,7 @@ function DocumentSelector(props) {
         <>
 
             {/* DOCUMENTS */}
-            <div style={{ display: "flex", width: "100%", height: "100%" }}>
+            <div style={{ width: "100%"}}>
                 <div style={{ margin: "auto" }} className={classes.content}>
                     <>
                         <Toolbar
@@ -203,14 +203,11 @@ function DocumentSelector(props) {
 
                         </Toolbar>
 
-                        <FormControl className={classes.searchbar}>
-                            <InputLabel htmlFor="standard-adornment-amount">Search {collection.toLowerCase()}</InputLabel>
-                            <Input
-                                value={searchQuery}
-                                onChange={handleQueryChange}
-                                startAdornment={<InputAdornment position="start"><SearchIcon /></InputAdornment>}
-                            />
-                        </FormControl>
+                        <SearchBar
+                            placeholder={`${collection.toLowerCase()}`}
+                            function={handleQueryChange}
+                            value={searchQuery}
+                        />
                         {/* </div> */}
 
                         {

@@ -11,7 +11,6 @@ import API from "../../utils/API";
 
 const useStyles = makeStyles(theme => ({
     root: {
-        padding: "3rem 0rem",
         display: "flex"
     },
     field: {
