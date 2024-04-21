@@ -11,7 +11,6 @@ import { faFile } from "@fortawesome/free-solid-svg-icons";
 
 const useStyles = makeStyles(theme => ({
     root: {
-        padding: "3rem 0rem",
         display: "flex"
     },
     field: {
@@ -244,7 +243,6 @@ function AnnouncementsForm(props) {
                             variant="outlined"
                         />
                     ))}
-
                 <DocumentPicker
                     title={"Attached Files"}
                     docs={fileOptions}

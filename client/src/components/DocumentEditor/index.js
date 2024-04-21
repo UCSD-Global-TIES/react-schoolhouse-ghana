@@ -107,8 +107,8 @@ const useStyles = makeStyles((theme) => ({
     padding: "3.5rem 4.375rem",
     flexDirection: "column",
     alignItems: "flex-start",
-    gap: "2.625rem",
     flexShrink: "0",
+    gap: "2.62rem"
   },
   title: {
     color: "#4B4B4B",
@@ -519,7 +519,9 @@ function DocumentEditor(props) {
               "Update"
             )
           }
+          className={classes.sectionContainer}
         >
+          <Typography variant="h1">{`${collection} Editor`}</Typography>
           <FormComponent
             error={errorDocument}
             history={props.history}
