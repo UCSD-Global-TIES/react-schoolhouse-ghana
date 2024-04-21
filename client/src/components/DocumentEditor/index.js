@@ -160,7 +160,7 @@ function DocumentEditor(props) {
 
   // COMPONENT STATUS
   const [loading, setLoading] = useState(true);
-  
+
   const handleRefresh = () => {
     setRefreshing(true);
     setSelected([]);
@@ -569,7 +569,7 @@ function DocumentEditor(props) {
         {collection.toLowerCase()}(s)?
       </ConfirmDialog>
 
-      {!dialogOpen  && (
+      {!dialogOpen && (
         <div className={classes.sectionContainer}>
           <div style={{ margin: "auto" }} className={classes.content}>
             <>
@@ -621,14 +621,22 @@ function DocumentEditor(props) {
                     {["Admin", "Teacher", "Student"].map((item) => (
                       <>
                         <Typography variant="h2">{item}s</Typography>
-                        {filteredDocuments.filter(document => type(document) == `(${item})`).length > 0 ? (
+                        {filteredDocuments.filter(
+                          (document) => type(document) == `(${item})`
+                        ).length > 0 ? (
                           filteredDocuments.map((document) => {
-                          return type(document) == `(${item})` && (
-                            <List className={classes.list}>
-                              <NameCard isAdmin={false} name={primary(document)} /> 
-                            </List>
-                            
-                          );
+                            return (
+                              type(document) == `(${item})` && (
+                                <List className={classes.list}>
+                                  <NameCard
+                                    handleDocument={handleDocument}
+                                    document={document}
+                                    isAdmin={false}
+                                    name={primary(document)}
+                                  />
+                                </List>
+                              )
+                            );
                           })
                         ) : (
                           <p>No {item.toLowerCase()}s were found.</p>
@@ -641,18 +649,17 @@ function DocumentEditor(props) {
                     {viewableDocuments.map((document, idx) => {
                       const labelId = `${collection.toLowerCase()}-${idx}`;
                       return (
-                          <List className={classes.list}>
+                        <List className={classes.list}>
                           <NameCard
                             handleDocument={handleDocument}
                             document={document}
                             name={primary(document)}
                           />
-                          </List>
+                        </List>
                       );
                     })}
                   </>
-                )
-              }
+                )}
               </>
             ) : (
               <div style={{ display: "flex", marginTop: "2rem" }}>
