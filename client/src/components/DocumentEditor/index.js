@@ -108,7 +108,7 @@ const useStyles = makeStyles((theme) => ({
     flexDirection: "column",
     alignItems: "flex-start",
     flexShrink: "0",
-    gap: "2.62rem"
+    gap: "2.62rem",
   },
   title: {
     color: "#4B4B4B",
@@ -630,6 +630,7 @@ function DocumentEditor(props) {
                                 <List className={classes.list}>
                                   <NameCard
                                     handleDocument={handleDocument}
+                                    handleSelect={handleSelect}
                                     document={document}
                                     isAdmin={false}
                                     name={primary(document)}
@@ -652,6 +653,7 @@ function DocumentEditor(props) {
                         <List className={classes.list}>
                           <NameCard
                             handleDocument={handleDocument}
+                            handleSelect={handleSelect}
                             document={document}
                             name={primary(document)}
                           />

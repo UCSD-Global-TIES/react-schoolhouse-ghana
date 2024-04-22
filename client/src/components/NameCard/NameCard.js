@@ -22,7 +22,7 @@ const useStyles = makeStyles({
     "&:hover $iconContainer": {
       display: "flex",
       justifyContent: "space-between",
-      width: "4rem"
+      width: "4rem",
     },
   },
   text: {
@@ -45,10 +45,10 @@ const useStyles = makeStyles({
     display: "none",
   },
   icon: {
-    '&:hover': {
-      cursor: "pointer"
-    }
-  }
+    "&:hover": {
+      cursor: "pointer",
+    },
+  },
   // Add more styles as needed for the design
 });
 
@@ -56,12 +56,16 @@ function NameCard(props) {
   const classes = useStyles();
 
   //new code
-  const { name, handleDocument, document } = props; // Destructure the required props
+  const { name, handleDocument, handleSelect, document } = props; // Destructure the required props
 
   const handleClick = () => {
     if (handleDocument) {
       handleDocument(true, document); // Call the handleDocument function with (true, document)
     }
+  };
+
+  const deleteDocument = () => {
+    handleSelect(document._id);
   };
 
   return (
@@ -83,7 +87,7 @@ function NameCard(props) {
             />
           </svg>
         </div>
-        <div className={classes.icon}>
+        <div className={classes.icon} onClick={deleteDocument}>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="24"
