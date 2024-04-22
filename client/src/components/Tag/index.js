@@ -29,11 +29,13 @@ function Tag(props) {
         'blue' : '#2584FF',
         'green' : '#58CC02',
         'grey' : '#E5E5E5',
+        'yellow' : '#FFC800'
     }
     const textColor = {
         'blue' : '#FFFFFF',
         'green' : '#FFFFFF',
         'grey' : '#4B4B4B',
+        'yellow' : '#4B4B4B',
     }
     return (
         <div className={classes.tag} style={{ backgroundColor: backgroundColor[props.color], color: textColor[props.color] }}>

@@ -625,7 +625,12 @@ function DocumentEditor(props) {
                           filteredDocuments.map((document) => {
                           return type(document) == `(${item})` && (
                             <List className={classes.list}>
-                              <NameCard isAdmin={false} name={primary(document)} /> 
+                              <NameCard
+                                isAdmin={false}
+                                handleDocument={handleDocument}
+                                document={document}
+                                name={primary(document)} 
+                              /> 
                             </List>
                             
                           );

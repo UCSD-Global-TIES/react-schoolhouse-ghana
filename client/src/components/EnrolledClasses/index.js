@@ -2,6 +2,7 @@ import React from 'react';
 import ClassCard from '../ClassCard';
 import SearchBar from '../SearchBar/SearchBar';
 import { makeStyles } from "@material-ui/core/styles";
+import { Typography } from '@material-ui/core';
 
 const useStyles = makeStyles(theme => ({
     classContainer: { 
@@ -12,40 +13,9 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-function EnrolledClasses() {
+function EnrolledClasses(props) {
     const classes = useStyles();
-    const dummyClasses = [
-        {
-            name: 'Class 1',
-            image: 'books',
-            tagLabel: '2023-2024',
-        },
-        {
-            name: 'Class 2',
-            image: 'books',
-            tagLabel: '2023-2024',
-        },
-        {
-            name: 'Class 3',
-            image: 'books',
-            tagLabel: 'archived',
-        },
-        {
-            name: 'Class 4',
-            image: 'books',
-            tagLabel: 'unpublished',
-        },
-        {
-            name: 'Class 5',
-            image: 'books',
-            tagLabel: 'archived',
-        },
-        {
-            name: 'Class 6',
-            image: 'books',
-            tagLabel: '2023-2024',
-        },
-    ];
+    const subjects = props.subjects;
     const tagMap = {
         'archived': 'grey',
         'unpublished': 'blue',
@@ -53,23 +23,24 @@ function EnrolledClasses() {
     }
     return (
         <>
-            <div>
-                <h1>ENROLLED CLASSES</h1>
-                <SearchBar placeholder='classes' function='' value=''/>
-                
-            </div>
-            
-            <div className={classes.classContainer}>
             {
-                // TO DO: update to subject options item.level for gradeOptions
-                dummyClasses.map((item) => {
-                    return(
-                        <ClassCard name={item.name} tagColor={tagMap[item.tagLabel]} tagLabel={item.tagLabel} image=''/>
-                    )
-                })
-                
-            }
-            </div>
+            subjects.length > 0 ? (
+                <>
+                    <div>
+                        <Typography variant="h2">ENROLLED CLASSES</Typography>
+                        <SearchBar placeholder='classes' function='' value=''/>
+                    </div>
+                    
+                    <div className={classes.classContainer}>
+                        {subjects.map((subject) => (
+                            <ClassCard name={subject.name} tagColor={'grey'} tagLabel={'archived'} image=''/>
+                        ))}
+                    </div>
+                </>
+            ) : (
+                <></>
+            ) }      
+            
         </>
     );
 };

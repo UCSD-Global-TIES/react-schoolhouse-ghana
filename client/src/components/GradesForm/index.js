@@ -218,7 +218,6 @@ function GradesForm(props) {
                     primary={(doc) => `${doc.first_name} ${doc.last_name}`}
                     handleChange={(docs) => handlePickChange('teachers', docs)}
                 />
-                <EnrolledClasses></EnrolledClasses>
             </div>
             
         </div>
