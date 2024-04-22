@@ -15,8 +15,9 @@ const useToolbarStyles = makeStyles(theme => ({
     highlight:
         theme.palette.type === 'light'
             ? {
+                
                 color: theme.palette.secondary.main,
-                backgroundColor: lighten(theme.palette.secondary.light, 0.85),
+                backgroundColor: lighten(theme.palette.secondary.light, 0.85), 
                 paddingLeft: theme.spacing(2),
 
             }
@@ -28,6 +29,7 @@ const useToolbarStyles = makeStyles(theme => ({
             },
     title: {
         flex: '1 1 100%',
+        marginBottom: '2.6rem',
     },
 }));
 
@@ -47,7 +49,7 @@ const EnhancedListToolbar = (props) => {
                     {numSelected} selected
               </Typography>
             ) : (
-                    <Typography className={classes.title} variant="h6" id="tableTitle">
+                    <Typography className={classes.title} variant="h1" id="tableTitle">
                         {props.title}
                     </Typography>
                 )}

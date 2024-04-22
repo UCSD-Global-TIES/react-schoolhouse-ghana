@@ -11,16 +11,16 @@ import { faChalkboardTeacher, faAppleAlt, faUserGraduate } from "@fortawesome/fr
 
 const useStyles = makeStyles(theme => ({
     root: {
-        padding: "3rem 0rem",
-        display: "flex"
+        
+        width: "100%",
     },
     field: {
         margin: "1rem 0px"
     },
     vc: {
-        maxWidth: "500px",
-        width: "90%",
-        margin: "auto"
+        // maxWidth: "500px",
+        // width: "90%",
+        // margin: "auto"
     },
 }));
 

@@ -12,16 +12,15 @@ import EnrolledClasses from "../EnrolledClasses";
 
 const useStyles = makeStyles(theme => ({
     root: {
-        padding: "3rem 0rem",
         display: "flex"
     },
     field: {
         margin: "1rem 0px"
     },
     vc: {
-        maxWidth: "500px",
-        width: "90%",
-        margin: "auto"
+        // maxWidth: "500px",
+        // width: "90%",
+        // margin: "auto"
     },
 }));
 

@@ -44,7 +44,7 @@ const useStyles = makeStyles((theme) => ({
   },
   list: {
     width: "100%",
-    backgroundColor: "#94DD9B", //theme.palette.background.paper,
+    // backgroundColor: "#94DD9B", //theme.palette.background.paper,
   },
   buttonLink: {
     color: "inherit",
@@ -55,8 +55,8 @@ const useStyles = makeStyles((theme) => ({
   },
   // styles the header of the current view
   content: {
-    width: "90%",
-    maxWidth: "700px",
+    width: "100%",
+    // maxWidth: "700px",
   },
 
   // this is the general outline that is used by all the subject document containers
@@ -79,10 +79,10 @@ const useStyles = makeStyles((theme) => ({
     flexDirection: "column",
     alignItems: "flex-start",
     gap: "0.625rem",
-    height: "3.75rem",
+    height: "3.00rem",
     padding: "0.5625rem 1.25rem",
     flexShrink: "0",
-    fontSize: "1.75rem",
+    fontSize: "1.25rem",
     borderRadius: "1.5rem",
     fontFamily: "Nunito",
     borderTop: "1px solid #005FD9",
@@ -92,14 +92,31 @@ const useStyles = makeStyles((theme) => ({
     background: "#2584FF",
     color: "#FFF",
   },
-  acctManagerContainer: {
+  cancelbtn: {
+    background: "#FFF",
+    color: "#2584FF",
+  },
+  buttonContainer: {
     display: "flex",
-    width: "76rem",
+    justifyContent: "flex-end",
+    gap: "1.00rem",
+  },
+  sectionContainer: {
+    display: "flex",
+    width: "100%",
     padding: "3.5rem 4.375rem",
     flexDirection: "column",
     alignItems: "flex-start",
-    gap: "2.625rem",
     flexShrink: "0",
+    gap: "2.62rem"
+  },
+  title: {
+    color: "#4B4B4B",
+    fontFamily: '"Asap Condensed", sans-serif',
+    fontSize: "60px",
+    fontStyle: "normal",
+    fontWeight: 700,
+    lineHeight: "normal",
   },
 }));
 
@@ -392,7 +409,7 @@ function DocumentEditor(props) {
     tmp[name] = value;
 
     setCurrentDocument({ ...tmp });
-    if (errorDocument !== {}) setErrorDocument({});
+    // if (errorDocument !== {}) setErrorDocument({});
   };
 
   const handleRouteChange = (destination, _id) => {
@@ -502,7 +519,9 @@ function DocumentEditor(props) {
               "Update"
             )
           }
+          className={classes.sectionContainer}
         >
+          <Typography variant="h1">{`${collection} Editor`}</Typography>
           <FormComponent
             error={errorDocument}
             history={props.history}
@@ -512,26 +531,28 @@ function DocumentEditor(props) {
             handleRouteChange={handleRouteChange}
             handleChange={handleFormChange}
           />
-          <Button
-            className={classes.btn}
-            text="Close"
-            icon="add"
-            onClick={() => handleDocument(false)}
-          >
-            Close
-          </Button>
-          <Button
-            className={classes.btn}
-            text="Save"
-            icon="add"
-            onClick={
-              isCreate
-                ? () => handleCreate(currentDocument)
-                : () => handleSave(currentDocument)
-            }
-          >
-            Save
-          </Button>
+          <div className={classes.buttonContainer}>
+            <Button
+              className={`${classes.btn} ${classes.cancelbtn}`}
+              text="Cancel"
+              icon="add"
+              onClick={() => handleDocument(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              className={classes.btn}
+              text="Save"
+              icon="add"
+              onClick={
+                isCreate
+                  ? () => handleCreate(currentDocument)
+                  : () => handleSave(currentDocument)
+              }
+            >
+              Finish
+            </Button>
+          </div>
         </div>
       )}
 
@@ -548,8 +569,8 @@ function DocumentEditor(props) {
         {collection.toLowerCase()}(s)?
       </ConfirmDialog>
 
-      {!dialogOpen && collection != "Account Manager" && (
-        <div style={{ display: "flex", width: "100%" }}>
+      {!dialogOpen  && (
+        <div className={classes.sectionContainer}>
           <div style={{ margin: "auto" }} className={classes.content}>
             <>
               <EnhancedListToolbar
@@ -594,66 +615,44 @@ function DocumentEditor(props) {
                     />
                   </div>
                 </div>
-                {viewableDocuments.map((document, idx) => {
-                  const labelId = `${collection.toLowerCase()}-${idx}`;
-                  return (
-                    <div>
-                      <List className={classes.list}>
-                        <ListItem
-                          alignItems="flex-start"
-                          divider={true}
-                          key={labelId}
-                          role={undefined}
-                          dense
-                          button
-                          onClick={() => handleSelect(document._id)}
-                        >
-                          <ListItemIcon>
-                            <Checkbox
-                              edge="start"
-                              checked={selected.indexOf(document._id) !== -1}
-                              tabIndex={-1}
-                              disableRipple
-                              inputProps={{ "aria-labelledby": labelId }}
-                            />
-                          </ListItemIcon>
 
-                          <ListItemText
-                            id={labelId}
-                            style={{ overflowWrap: "break-word" }}
-                            primary={primary(document)}
-                            secondary={`Created: ${
-                              document.createdAt
-                                ? parseTime(document.createdAt, true)
-                                : document.createdBy
-                            }`}
+                {collection == "Account Manager" ? (
+                  <>
+                    {["Admin", "Teacher", "Student"].map((item) => (
+                      <>
+                        <Typography variant="h2">{item}s</Typography>
+                        {filteredDocuments.filter(document => type(document) == `(${item})`).length > 0 ? (
+                          filteredDocuments.map((document) => {
+                          return type(document) == `(${item})` && (
+                            <List className={classes.list}>
+                              <NameCard isAdmin={false} name={primary(document)} /> 
+                            </List>
+                            
+                          );
+                          })
+                        ) : (
+                          <p>No {item.toLowerCase()}s were found.</p>
+                        )}
+                      </>
+                    ))}
+                  </>
+                ) : (
+                  <>
+                    {viewableDocuments.map((document, idx) => {
+                      const labelId = `${collection.toLowerCase()}-${idx}`;
+                      return (
+                          <List className={classes.list}>
+                          <NameCard
+                            handleDocument={handleDocument}
+                            document={document}
+                            name={primary(document)}
                           />
-                          <ListItemSecondaryAction>
-                            {props.link ? (
-                              <a
-                                target="_blank"
-                                href={props.link(document)}
-                                style={{
-                                  textDecoration: "none",
-                                  fontSize: "1rem",
-                                }}
-                              >
-                                <IconButton aria-label="create">
-                                  <FontAwesomeIcon
-                                    icon={faExternalLinkAlt}
-                                    size="xs"
-                                  />
-                                </IconButton>
-                              </a>
-                            ) : (
-                              <FontAwesomeIcon icon={icon} />
-                            )}
-                          </ListItemSecondaryAction>
-                        </ListItem>
-                      </List>
-                    </div>
-                  );
-                })}
+                          </List>
+                      );
+                    })}
+                  </>
+                )
+              }
               </>
             ) : (
               <div style={{ display: "flex", marginTop: "2rem" }}>
@@ -671,41 +670,6 @@ function DocumentEditor(props) {
                 </div>
               </div>
             )}
-          </div>
-        </div>
-      )}
-
-      {!dialogOpen && collection == "Account Manager" && (
-        <div className={classes.acctManagerContainer}>
-          <div style={{ width: "100%", display: "flex", justifyContent: "space-between" }}>
-            <h1>Account Manager</h1>
-            <Button
-              onClick={() => handleDocument(true, {})}
-              className={classes.btn}
-            >
-              + Account
-            </Button>
-          </div>
-          <SearchBar
-            placeholder={collection.toLowerCase()}
-            function={handleQueryChange}
-            value={searchQuery}
-          />
-          <div style={{ width: "100%" }}>
-            {["Admin", "Teacher", "Student"].map((item) => (
-                <>
-                <h2>{item}s</h2>
-                {filteredDocuments.filter(document => type(document) == `(${item})`).length > 0 ? (
-                  filteredDocuments.map((document) => {
-                  return type(document) == `(${item})` && (
-                    <NameCard isAdmin={false} name={primary(document)} />
-                  );
-                  })
-                ) : (
-                  <p>No {item.toLowerCase()}s were found.</p>
-                )}
-                </>
-            ))}
           </div>
         </div>
       )}
