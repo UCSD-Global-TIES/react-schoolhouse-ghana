@@ -93,9 +93,6 @@ const useStyles = makeStyles((theme) => ({
     width: "100%",
   },
   navLink: {
-    // "&&": {
-    //   marginBottom: theme.spacing(2), // Adjust the number for desired spacing
-    // },
     textDecoration: "none",
     color: "inherit", // To keep the same color as the ListItemText
     display: "flex",
@@ -533,12 +530,6 @@ function AdminPortal(props) {
         className={classes.content}
         style={{ marginLeft: !isSmallDevice ? drawerWidth : 0 }}
       >
-        {/* <TransitionGroup>
-              <CSSTransition
-                key={props.location.key}
-                timeout={300}
-                classNames='fade'
-              > */}
         <Switch location={props.location}>
           {pages.map((page, idx) => (
             <ProtectedRoute
@@ -551,8 +542,6 @@ function AdminPortal(props) {
           ))}
           <Redirect to={defaultRoute} />
         </Switch>
-        {/* </CSSTransition>
-              </TransitionGroup> */}
       </main>
     </div>
   );

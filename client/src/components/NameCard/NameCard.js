@@ -22,7 +22,7 @@ const useStyles = makeStyles({
     "&:hover $iconContainer": {
       display: "flex",
       justifyContent: "space-between",
-      width: "4rem"
+      width: "4rem",
     },
   },
   text: {
@@ -45,10 +45,10 @@ const useStyles = makeStyles({
     display: "none",
   },
   icon: {
-    '&:hover': {
-      cursor: "pointer"
-    }
-  }
+    "&:hover": {
+      cursor: "pointer",
+    },
+  },
   // Add more styles as needed for the design
 });
 
@@ -56,7 +56,7 @@ function NameCard(props) {
   const classes = useStyles();
 
   //new code
-  const { name, handleDocument, document } = props; // Destructure the required props
+  const { name, handleDocument, handleSelect, document } = props; // Destructure the required props
 
   const handleClick = () => {
     if (handleDocument) {
@@ -64,11 +64,13 @@ function NameCard(props) {
     }
   };
 
+  const deleteDocument = () => {
+    handleSelect(document._id);
+  };
+
   return (
     <div className={classes.container}>
-      {/* <p className={classes.text}>{props.name}</p> */}
       <p className={classes.text}>{name}</p>
-      {/* {props.isAdmin && <div className={classes.adminLabel}>Admin</div>} */}
       <div className={classes.iconContainer}>
         {/* Add icons here */}
         <div className={classes.icon} onClick={handleClick}>
@@ -85,7 +87,7 @@ function NameCard(props) {
             />
           </svg>
         </div>
-        <div className={classes.icon}>
+        <div className={classes.icon} onClick={deleteDocument}>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="24"
