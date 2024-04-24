@@ -3,6 +3,7 @@ import { TextField, Box, Switch, Typography, CircularProgress } from "@material-
 import { makeStyles } from '@material-ui/core/styles';
 import { parseTime } from '../../utils/misc';
 import DocumentPicker from "../DocumentPicker"
+import EnrolledClasses from "../EnrolledClasses";
 
 import "../../utils/flowHeaders.min.css";
 import API from "../../utils/API";
@@ -217,8 +218,8 @@ function GradesForm(props) {
                     primary={(doc) => `${doc.first_name} ${doc.last_name}`}
                     handleChange={(docs) => handlePickChange('teachers', docs)}
                 />
-
             </div>
+            
         </div>
     )
 };

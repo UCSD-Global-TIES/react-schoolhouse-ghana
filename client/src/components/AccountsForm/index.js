@@ -8,6 +8,7 @@ import VisibilityOff from '@material-ui/icons/VisibilityOff';
 
 import "../../utils/flowHeaders.min.css";
 import API from "../../utils/API"; 
+import EnrolledClasses from "../EnrolledClasses";
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -77,6 +78,9 @@ function AccountsForm(props) {
     const [gradeValue, setGradeValue] = useState({});
     const [showPassword, setShowPassword] = useState(false);
     const [PROPS, setProps] = useState(props);
+
+    const grade = gradeOptions.find(option => option._id == PROPS.document['grade']) || gradeValue || {};
+    const subjects = grade.subjects || [];
 
     const handleAutocompleteChange = (e, value, name) => {
         if (e && value && name) {
@@ -272,7 +276,8 @@ function AccountsForm(props) {
 
                         />
                     )})}
-                    
+                                
+                    <EnrolledClasses subjects={subjects}></EnrolledClasses>
 
             </div>
         </div>
