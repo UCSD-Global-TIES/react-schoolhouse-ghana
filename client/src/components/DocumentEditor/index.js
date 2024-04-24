@@ -579,9 +579,9 @@ function DocumentEditor(props) {
         <div className={classes.sectionContainer}>
           <div style={{ margin: "auto" }} className={classes.content}>
             <>
-              {/* <EnhancedListToolbar
+              <EnhancedListToolbar
                 title={collection}
-                numSelected={selected.length}
+                // numSelected={selected.length}
                 handleCreate={() => handleDocument(true, {})}
                 handleUpdate={() =>
                   handleDocument(
@@ -590,7 +590,7 @@ function DocumentEditor(props) {
                   )
                 }
                 handleDelete={() => handleConfirm(true)}
-              /> */}
+              />
 
               <SearchBar
                 placeholder={collection.toLowerCase()}
