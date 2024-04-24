@@ -133,7 +133,7 @@ function DocumentEditor(props) {
   const { FormComponent, icon, collection, primary, validation, type } = props;
   const classes = useStyles();
   // DOCUMENTS EDITOR
-  const [selected, setSelected] = useState([]);
+  const [selected, setSelected] = useState(null);
   const [documents, setDocuments] = useState([]);
   const [filteredDocuments, setFilteredDocuments] = useState([]);
   const [viewableDocuments, setViewableDocuments] = useState([]);
@@ -163,7 +163,7 @@ function DocumentEditor(props) {
 
   const handleRefresh = () => {
     setRefreshing(true);
-    setSelected([]);
+    setSelected(null);
 
     props.get(props.user.key).then((docData) => {
       const docList = docData.data;
@@ -244,16 +244,19 @@ function DocumentEditor(props) {
 
   // Handle checkbox selection
   const handleSelect = (value) => {
-    const currentIndex = selected.indexOf(value);
-    const newSelected = [...selected];
+    // const currentIndex = selected.indexOf(value);
+    // const newSelected = [...selected];
 
-    if (currentIndex === -1) {
-      newSelected.push(value);
-    } else {
-      newSelected.splice(currentIndex, 1);
-    }
+    // if (currentIndex === -1) {
+    //   newSelected.push(value);
+    // } else {
+    //   newSelected.splice(currentIndex, 1);
+    // }
 
-    setSelected(newSelected);
+    // setSelected(newSelected);
+
+    setSelected([value]);
+    setConfirmOpen(true);
   };
 
   // Handle deletion of document
@@ -272,7 +275,7 @@ function DocumentEditor(props) {
         setCurrentAlert({
           isOpen: true,
           severity: "success",
-          message: `The ${collection.toLowerCase()}(s) have been successfully deleted!`,
+          message: `The ${collection.toLowerCase()} has been successfully deleted!`,
         });
 
         notifyServer();
@@ -281,7 +284,7 @@ function DocumentEditor(props) {
         setCurrentAlert({
           isOpen: true,
           severity: "error",
-          message: `The ${collection.toLowerCase()}(s) failed to be deleted.`,
+          message: `The ${collection.toLowerCase()} failed to be deleted.`,
         });
       }
 
@@ -562,18 +565,21 @@ function DocumentEditor(props) {
         buttonText={
           actionPending ? <FontAwesomeIcon icon={faSpinner} spin /> : "Confirm"
         }
-        handleClose={() => handleConfirm(false)}
+        handleClose={() => {
+          handleConfirm(false)
+          setSelected(null)
+        }}
         handleAction={handleDelete}
       >
-        Are you sure you would like to delete all selected {selected.length}{" "}
-        {collection.toLowerCase()}(s)?
+        Are you sure you would like to delete the selected {" "}
+        {collection.toLowerCase()}?
       </ConfirmDialog>
 
       {!dialogOpen && (
         <div className={classes.sectionContainer}>
           <div style={{ margin: "auto" }} className={classes.content}>
             <>
-              <EnhancedListToolbar
+              {/* <EnhancedListToolbar
                 title={collection}
                 numSelected={selected.length}
                 handleCreate={() => handleDocument(true, {})}
@@ -584,7 +590,7 @@ function DocumentEditor(props) {
                   )
                 }
                 handleDelete={() => handleConfirm(true)}
-              />
+              /> */}
 
               <SearchBar
                 placeholder={collection.toLowerCase()}
