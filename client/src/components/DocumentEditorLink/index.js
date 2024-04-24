@@ -25,10 +25,10 @@ const useStyles = makeStyles(theme => ({
     actionButton: {
         margin: theme.spacing(1)
     },
-    content: {
-        width: "90%",
-        maxWidth: "700px",
-    },
+    // content: {
+    //     width: "90%",
+    //     maxWidth: "700px",
+    // },
     skeleton: {
         width: "100%",
         margin: "1rem 0rem",

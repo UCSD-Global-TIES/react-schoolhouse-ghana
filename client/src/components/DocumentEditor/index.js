@@ -63,7 +63,7 @@ const useStyles = makeStyles((theme) => ({
   skeleton: {
     width: "100%",
     margin: "1rem 0rem",
-    height: "40px",
+    height: "50px",
   },
   // styles page counter
   paginationContainer: {
@@ -102,7 +102,7 @@ const useStyles = makeStyles((theme) => ({
     gap: "1.00rem",
   },
   sectionContainer: {
-    display: "flex",
+    // display: "flex",
     width: "100%",
     padding: "3.5rem 4.375rem",
     flexDirection: "column",
@@ -118,6 +118,7 @@ const useStyles = makeStyles((theme) => ({
     fontWeight: 700,
     lineHeight: "normal",
   },
+  
 }));
 
 // Can be non-specific for all document editors

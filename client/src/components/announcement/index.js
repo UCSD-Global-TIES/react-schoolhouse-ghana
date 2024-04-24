@@ -41,13 +41,13 @@ export default function AnnouncementView(data) {
           <Typography variant="body2" component="p" gutterBottom>
             {announcement.author}
           </Typography>
-          <Typography
+          {/* <Typography
             className={classes.title}
             color="textSecondary"
             gutterBottom
           >
             {announcement.date}
-          </Typography>
+          </Typography> */}
         </div>
         <Divider />
         <Typography variant="body1" component="p">

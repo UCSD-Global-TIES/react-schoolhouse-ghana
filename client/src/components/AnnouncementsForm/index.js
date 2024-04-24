@@ -11,7 +11,7 @@ import { faFile } from "@fortawesome/free-solid-svg-icons";
 
 const useStyles = makeStyles(theme => ({
     root: {
-        display: "flex"
+        // display: "flex"
     },
     field: {
         margin: "1rem 0px"
@@ -28,37 +28,39 @@ const disabledMsg = `This field will be populated after announcement creation.`
 const textFields = [
     {
         name: "title",
-        label: "Title",
+        title: "Title",
         required: true,
-        helper: "This is an informative title of this announcement."
+        // helper: "This is an informative title of this announcement."
     },
     {
-        name: "content",
-        label: "Content",
+        name: "message",
+        // label: "Content",
+        title: "Message",
         multiline: true,
         required: true,
-        helper: "This is the main content of this announcement."
+        // helper: "This is the main content of this announcement."
     },
-    {
-        name: "authorName",
-        label: "Author Name",
-        disabled: true,
-        helper: "This is the name of the announcement's author."
-    },
+    // {
+    //     name: "authorName",
+    //     // label: "Author Name",
+    //     disabled: true,
+    //     helper: "This is the name of the announcement's author."
+    // },
     {
         name: "createdAt",
-        label: "Created On",
+        // label: "Created On",
+        title: "Created On",
         isDate: true,
         disabled: true,
-        helper: "This is the date this announcement was created."
+        // helper: "This is the date this announcement was created."
     },
-    {
-        name: "updatedAt",
-        label: "Last Updated",
-        isDate: true,
-        disabled: true,
-        helper: "This is the date this announcement was last updated."
-    },
+    // {
+    //     name: "updatedAt",
+    //     // label: "Last Updated",
+    //     isDate: true,
+    //     disabled: true,
+    //     helper: "This is the date this announcement was last updated."
+    // },
 
 ]
 
@@ -169,57 +171,13 @@ function AnnouncementsForm(props) {
     return (
         <div className={classes.root}>
             <div className={classes.vc}>
-                <div style={{ width: "100%" }}>
-                    <Box className={classes.field} display="flex">
-                        <Box flexGrow={1}>
-                            Subject-Specific <Typography display='inline' variant='caption' color='textSecondary'> Specifies if this announcement is viewable to the entire school.</Typography>
-                        </Box>
-                        <Box >
-                            <Switch
-                                disabled={!PROPS.isCreate}
-                                checked={PROPS.document['private'] || false}
-                                onChange={handleSwitchToggle('private')}
-                                color="primary"
-                                inputProps={{ 'aria-label': 'primary checkbox' }}
-                            />
-                        </Box>
-                    </Box>
-
-                    <Autocomplete
-                        onChange={(e, value) => handleAutocompleteChange(e, value, 'subject')}
-                        value={subjectValue}
-                        disabled={!PROPS.document['private'] || !PROPS.isCreate}
-                        className={classes.field}
-                        loading={loading}
-                        // Sort by category tag (sort by increasing grade)
-                        options={options.sort((a, b) => a.grade - b.grade)}
-                        // Option category tag (Sort by grade)
-                        groupBy={option => `Grade ${option.grade}`}
-                        // Option text
-                        getOptionLabel={option => option.name}
-                        renderInput={params => (
-                            <TextField
-                                {...params}
-                                label="Subject Name"
-                                helperText="This announcement will only be viewable to this subject's grade."
-                                fullWidth
-                                variant="outlined"
-                                InputProps={{
-                                    ...params.InputProps,
-                                    endAdornment: (
-                                        <React.Fragment>
-                                            {loading ? <CircularProgress color="inherit" size={20} /> : null}
-                                            {params.InputProps.endAdornment}
-                                        </React.Fragment>
-                                    ),
-                                }}
-                            />
-                        )}
-                    />
-
-                </div>
                 {
                     textFields.map((item, idx) => (
+                        <React.Fragment key={`${item.name}-form-${idx}`}>
+                        {/* Display title above the input field */}
+                        <Typography className={classes.title} variant="subtitle1">{item.title}</Typography>
+                        {/* Render TextField */}
+                        
                         <TextField
                             error={PROPS.error[item.name] ? PROPS.error[item.name].exists : null}
                             required={item.required}
@@ -235,13 +193,14 @@ function AnnouncementsForm(props) {
                             fullWidth
                             autoComplete={'off'}
                             margin="normal"
-                            InputLabelProps={{
-                                shrink: true,
-                            }}
+                            // InputLabelProps={{
+                            //     shrink: true,
+                            // }}
                             multiline={item.multiline}
                             rows={3}
                             variant="outlined"
                         />
+                        </React.Fragment>
                     ))}
                 <DocumentPicker
                     title={"Attached Files"}

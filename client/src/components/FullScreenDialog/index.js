@@ -38,7 +38,7 @@ export default function FullScreenDialog(props) {
       </Button> */}
 
 
-<Dialog
+{/* <Dialog
   open={props.open}
   onClose={props.handleClose}
   TransitionComponent={Transition}
@@ -69,7 +69,7 @@ export default function FullScreenDialog(props) {
   <div className={classes.dialogContent}>
     {props.children}
   </div>
-</Dialog>
+</Dialog> */}
 
 
     </div>
