@@ -82,7 +82,7 @@ const useStyles = makeStyles((theme) => ({
     height: "3.00rem",
     padding: "0.5625rem 1.25rem",
     flexShrink: "0",
-    fontSize: "1.25rem",
+    fontSize: "1.75rem",
     borderRadius: "1.5rem",
     fontFamily: "Nunito",
     borderTop: "1px solid #005FD9",
@@ -590,6 +590,7 @@ function DocumentEditor(props) {
                   )
                 }
                 handleDelete={() => handleConfirm(true)}
+                buttonClass={classes.btn}
               />
 
               <SearchBar
@@ -622,7 +623,7 @@ function DocumentEditor(props) {
                   </div>
                 </div>
 
-                {collection == "Account Manager" ? (
+                {collection == "Account" ? (
                   <>
                     {["Admin", "Teacher", "Student"].map((item) => (
                       <>

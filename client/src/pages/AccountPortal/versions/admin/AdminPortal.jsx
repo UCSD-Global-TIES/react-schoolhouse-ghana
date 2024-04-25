@@ -163,7 +163,7 @@ function AdminPortal(props) {
       path: `${props.match.url}/grades`,
     },
     {
-      label: "Account Manager",
+      label: "Accounts",
       iconPath: AccountIcon,
       path: `${props.match.url}/accounts`,
     },
@@ -246,7 +246,7 @@ function AdminPortal(props) {
   const pagesInfo = [
     // ANNOUNCEMENTS
     {
-      collection: "Announcements",
+      collection: "Announcement",
       icon: faBullhorn,
       FormComponent: (p) => <AnnouncementsForm user={props.user} {...p} />,
       primary: (doc) => doc.title,
@@ -276,7 +276,7 @@ function AdminPortal(props) {
     },
     // GRADES
     {
-      collection: "Grades",
+      collection: "Grade",
       icon: faShapes,
       FormComponent: (p) => <GradesForm user={props.user} {...p} />,
       primary: (doc) => `Grade ${doc.level}`,
@@ -340,7 +340,7 @@ function AdminPortal(props) {
     },
     // ACCOUNT MANAGER
     {
-      collection: "Account Manager",
+      collection: "Account",
       icon: faUsers,
       FormComponent: (p) => <AccountsForm user={props.user} {...p} />,
       primary: (doc) => `${doc.first_name} ${doc.last_name} `,
