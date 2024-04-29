@@ -9,6 +9,7 @@ const useStyles = makeStyles(theme => ({
         gap: "2rem",
         overflowX: "auto",
         whiteSpace: "nowrap",
+        marginTop:'.5rem',
     }
 }));
 
