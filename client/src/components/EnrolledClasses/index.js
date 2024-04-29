@@ -34,9 +34,14 @@ function EnrolledClasses(props) {
                     {subjects.map((subject) => {
                         const date = new Date(subject.createdAt);
                         const year = date.getFullYear();
-
+                        let label = '';
+                        if(props.status === 'active'){
+                            label = year + '-' + (year + 1);
+                        } else {
+                            label = props.status;
+                        }
                         return (
-                            <ClassCard name={subject.name} tagColor={'green'} tagLabel={`${year}-${year + 1}`} image=''/>
+                            <ClassCard name={subject.name} tagColor={tagMap[props.status]} tagLabel={label} image=''/>
                         );
                     })}
                     </div>

@@ -59,6 +59,7 @@ const appTheme = createMuiTheme({
       fontWeight: "600",
       lineHeight: "4rem",
       color: "#4B4B4B",
+      textTransform: "uppercase",
     }
   },
   palette: {

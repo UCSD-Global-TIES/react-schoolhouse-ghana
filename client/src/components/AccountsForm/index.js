@@ -81,6 +81,7 @@ function AccountsForm(props) {
 
     const grade = gradeOptions.find(option => option._id == PROPS.document['grade']) || gradeValue || {};
     const subjects = grade.subjects || [];
+    const status = grade.status || 'unpublished';
 
     const handleAutocompleteChange = (e, value, name) => {
         if (e && value && name) {
@@ -277,7 +278,7 @@ function AccountsForm(props) {
                         />
                     )})}
                                 
-                    <EnrolledClasses subjects={subjects}></EnrolledClasses>
+                    <EnrolledClasses subjects={subjects} status={status}></EnrolledClasses>
 
             </div>
         </div>

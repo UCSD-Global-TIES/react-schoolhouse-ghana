@@ -9,10 +9,14 @@ const useStyles = makeStyles({
     width: '10.5rem',
     height: 'fit-content',
     borderRadius:' 0.75rem',
-    border:' 1px solid #4B4B4B',
+    border:' 2px solid #4B4B4B',
     background:' #FFF',
     justifyContent: 'center',
     textAlign: 'left',
+    "&:hover": {
+      borderColor: "#005FD9",
+      background: "#f0f4fc",
+    },
   },
   text: {
     color: '#4B4B4B',
@@ -40,7 +44,7 @@ const useStyles = makeStyles({
   },
   imageContainer: {
     display: 'flex',
-    width: '10.3rem',
+    width: 'full',
     height: '7.5rem',
     justifyContent: 'center',
     alignItems: 'center',
@@ -49,10 +53,10 @@ const useStyles = makeStyles({
     borderTopLeftRadius: '0.75rem',
     borderBottomRightRadius: '0.5rem',
     borderBottomLeftRadius: '0.5rem',
-    borderBottom: '1px solid #4B4B4B',
+    borderBottom: '1.5px solid #4B4B4B',
     objectFit: 'contain',
     overflow: 'hidden',
-    backgroundImage: `url(${SubjectDefault})`
+    backgroundImage: `url(${SubjectDefault})`,
   },
   tagContainer: {
     display: 'flex',
@@ -65,9 +69,16 @@ const useStyles = makeStyles({
 
 function ClassCard(props) {
   const classes = useStyles();
+  const { name, handleDocument, document } = props;
 
+
+  const handleClick = () => {
+    if (handleDocument) {
+      handleDocument(true, document); // Call the handleDocument function with (true, document)
+    }
+  };
   return (
-    <div className={classes.container}>
+    <div className={classes.container} onClick={handleClick}>
       <div className={classes.imageContainer}></div>
       <p className={classes.text}>{props.name}</p>
       <div className={classes.tagContainer}>

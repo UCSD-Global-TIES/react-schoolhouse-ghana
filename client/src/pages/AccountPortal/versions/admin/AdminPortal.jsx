@@ -281,6 +281,7 @@ function AdminPortal(props) {
       FormComponent: (p) => <GradesForm user={props.user} {...p} />,
       primary: (doc) => `Grade ${doc.level}`,
       path: `${props.match.path}/grades`,
+      grStatus: (doc) => `(${doc.status})`,
       api: {
         get: API.getGrades,
         post: API.addGrade,
@@ -455,6 +456,7 @@ function AdminPortal(props) {
             delete={page.api.delete}
             validation={page.validation}
             type={page.type}
+            grStatus={page.grStatus}
             {...props}
           />
         ),

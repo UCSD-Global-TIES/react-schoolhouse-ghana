@@ -37,6 +37,11 @@ import SearchBar from "../SearchBar/SearchBar";
 // import Button from "../Button/Button";
 import UserList from "../UserList/UserList";
 import NameCard from "../NameCard/NameCard";
+import ClassCard from "../ClassCard";
+import EnrolledClasses from "../EnrolledClasses";
+
+import Divider from '@material-ui/core/Divider';
+
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -118,6 +123,13 @@ const useStyles = makeStyles((theme) => ({
     fontWeight: 700,
     lineHeight: "normal",
   },
+  classContainer: { 
+    display: "flex",
+    gap: "2rem",
+    overflowX: "auto",
+    whiteSpace: "nowrap",
+    marginBottom: "2.6rem",
+  }
 }));
 
 // Can be non-specific for all document editors
@@ -130,7 +142,7 @@ function DocumentEditor(props) {
   const socket = useContext(SocketContext);
   const MAX_ITEMS = 5;
 
-  const { FormComponent, icon, collection, primary, validation, type } = props;
+  const { FormComponent, icon, collection, primary, validation, type, grStatus } = props;
   const classes = useStyles();
   // DOCUMENTS EDITOR
   const [selected, setSelected] = useState(null);
@@ -160,6 +172,12 @@ function DocumentEditor(props) {
 
   // COMPONENT STATUS
   const [loading, setLoading] = useState(true);
+
+  const tagMap = {
+    'archived': 'grey',
+    'unpublished': 'blue',
+    'active': 'green',
+  }
 
   const handleRefresh = () => {
     setRefreshing(true);
@@ -648,6 +666,55 @@ function DocumentEditor(props) {
                           })
                         ) : (
                           <p>No {item.toLowerCase()}s were found.</p>
+                        )}
+                        {item !== "Student" && <Divider style={{marginBottom:'2rem', marginTop:'2rem', height: '0.1875rem'}}/>}
+                        
+                      </>
+                      
+                    ))}
+                  </>
+                ) : collection == "Grade" ? (
+                  <>
+                  
+                    {["active", "unpublished", "archived"].map((item) => (
+                      
+                      <>
+                        
+                        {filteredDocuments.filter(
+                          (document) => grStatus(document) == `(${item})`
+                        ).length > 0 ? (
+                          <>
+                          <Typography variant="h2">{item}</Typography>
+                          <div className={classes.classContainer}>
+                          
+                            {filteredDocuments.map((document) => {
+                                const date = new Date(document.createdAt);
+                                const year = date.getFullYear();
+                                let label = '';
+                                if(item === 'active'){
+                                    label = year + '-' + (year + 1);
+                                } else {
+                                    label = item;
+                                }
+                                return (
+                                  grStatus(document) == `(${item})` && (
+                                    <ClassCard
+                                      name={primary(document)}
+                                      tagColor={tagMap[item]}
+                                      tagLabel={label}
+                                      image=''
+                                      handleDocument={handleDocument}
+                                      document={document}
+                                    />
+                                  )
+                                );
+                            })}
+                          </div>
+                          {item !== "archived" && <Divider style={{marginBottom:'2rem', height: '0.1875rem'}}/>}
+                          
+                          </>
+                        ) : (
+                          <p>No {item.toLowerCase()} grades to display.</p>
                         )}
                       </>
                     ))}
