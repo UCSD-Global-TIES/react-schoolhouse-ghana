@@ -69,7 +69,7 @@ const useStyles = makeStyles({
 
 function ClassCard(props) {
   const classes = useStyles();
-  const { name, handleDocument, document } = props;
+  const { name, handleDocument, document, tagLabel, tagColor } = props;
 
 
   const handleClick = () => {
@@ -80,9 +80,9 @@ function ClassCard(props) {
   return (
     <div className={classes.container} onClick={handleClick}>
       <div className={classes.imageContainer}></div>
-      <p className={classes.text}>{props.name}</p>
+      <p className={classes.text}>{name}</p>
       <div className={classes.tagContainer}>
-        <Tag label={props.tagLabel} color={props.tagColor}></Tag>
+        <Tag label={tagLabel} color={tagColor}></Tag>
       </div>
       
     </div>

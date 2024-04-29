@@ -13,8 +13,9 @@ const useStyles = makeStyles(theme => ({
 }));
 
 function EnrolledClasses(props) {
+    const { subjects, status} = props;
     const classes = useStyles();
-    const subjects = props.subjects;
+    
     const tagMap = {
         'archived': 'grey',
         'unpublished': 'blue',
@@ -35,13 +36,13 @@ function EnrolledClasses(props) {
                         const date = new Date(subject.createdAt);
                         const year = date.getFullYear();
                         let label = '';
-                        if(props.status === 'active'){
+                        if(status === 'active'){
                             label = year + '-' + (year + 1);
                         } else {
-                            label = props.status;
+                            label = status;
                         }
                         return (
-                            <ClassCard name={subject.name} tagColor={tagMap[props.status]} tagLabel={label} image=''/>
+                            <ClassCard name={subject.name} tagColor={tagMap[status]} tagLabel={label} image=''/>
                         );
                     })}
                     </div>
