@@ -34,7 +34,6 @@ import "../../utils/flowHeaders.min.css";
 import SocketContext from "../../socket-context";
 import SearchBar from "../SearchBar/SearchBar";
 
-// import Button from "../Button/Button";
 import UserList from "../UserList/UserList";
 import NameCard from "../NameCard/NameCard";
 
@@ -75,20 +74,6 @@ const useStyles = makeStyles((theme) => ({
     width: "100%",
   },
   btn: {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "flex-start",
-    gap: "0.625rem",
-    height: "3.00rem",
-    padding: "0.5625rem 1.25rem",
-    flexShrink: "0",
-    fontSize: "1.75rem",
-    borderRadius: "1.5rem",
-    fontFamily: "Nunito",
-    borderTop: "1px solid #005FD9",
-    borderRight: "1px solid #005FD9",
-    borderBottom: "4px solid #005FD9",
-    borderLeft: "1px solid #005FD9",
     background: "#2584FF",
     color: "#FFF",
   },
@@ -537,16 +522,12 @@ function DocumentEditor(props) {
           <div className={classes.buttonContainer}>
             <Button
               className={`${classes.btn} ${classes.cancelbtn}`}
-              text="Cancel"
-              icon="add"
               onClick={() => handleDocument(false)}
             >
               Cancel
             </Button>
             <Button
               className={classes.btn}
-              text="Save"
-              icon="add"
               onClick={
                 isCreate
                   ? () => handleCreate(currentDocument)
@@ -563,16 +544,16 @@ function DocumentEditor(props) {
       <ConfirmDialog
         open={confirmOpen}
         buttonText={
-          actionPending ? <FontAwesomeIcon icon={faSpinner} spin /> : "Confirm"
+          actionPending ? <FontAwesomeIcon icon={faSpinner} spin /> : `Delete this ${collection}`
         }
         handleClose={() => {
-          handleConfirm(false)
-          setSelected(null)
+          handleConfirm(false);
+          setSelected(null);
         }}
         handleAction={handleDelete}
       >
-        Are you sure you would like to delete the selected {" "}
-        {collection.toLowerCase()}?
+        This will <Typography variant="body1" style={{display: "inline", fontWeight: "bold"}}>permanently delete</Typography> this {collection.toLowerCase()} and all
+        associated data. You cannot undo this action.
       </ConfirmDialog>
 
       {!dialogOpen && (
