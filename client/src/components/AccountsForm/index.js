@@ -150,6 +150,7 @@ function AccountsForm(props) {
                 // Retrieve grades and populate subjects
                 // For every grade...
                 let options = results[0].data;
+                console.log("OPTIONS ACC:"+ options)
 
                 // Set options and loading flag to false
                 setGradeOptions(options);

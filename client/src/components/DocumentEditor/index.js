@@ -41,6 +41,7 @@ import ClassCard from "../ClassCard";
 import EnrolledClasses from "../EnrolledClasses";
 
 import Divider from '@material-ui/core/Divider';
+import API from "../../utils/API"; 
 
 
 const useStyles = makeStyles((theme) => ({
@@ -152,6 +153,7 @@ function DocumentEditor(props) {
   const [viewableDocuments, setViewableDocuments] = useState([]);
   const [page, setPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
+  const [gradeOptions, setGradeOptions] = useState([]);
 
   // ALERTS
   const [currentAlert, setCurrentAlert] = useState({
@@ -451,6 +453,17 @@ function DocumentEditor(props) {
     // Travel to the new specified route with the redirect param as true
     props.history.push(`${destination}?_id=${_id}&redirect=true`);
   };
+  
+  useEffect(() => {
+    API.getGrades(props.user.key)
+      .then(response => {
+        setGradeOptions(response.data);
+      })
+      .catch(error => {
+        console.error('Error fetching grades:', error);
+      });
+  }, []);
+
 
   useEffect(() => {
     if (!!props.get) {
@@ -501,6 +514,7 @@ function DocumentEditor(props) {
         handleRefresh();
       });
     }
+    
   }, []);
 
   return (
@@ -718,6 +732,43 @@ function DocumentEditor(props) {
                         ) : (
                           <p>No {item.toLowerCase()} grades to display.</p>
                         )}
+                      </>
+                    ))}
+                  </>
+                ) : collection == "Subjects" ? (
+                  <>
+
+                    {["active", "unpublished", "archived"].map((item) => (
+                  
+                      <>
+                        <Typography variant="h2">{item}</Typography>
+                      
+                          <>
+                        
+                          <div className={classes.classContainer}>
+                          
+                            {filteredDocuments.map((document) => {
+                              const gradesWithSubject = gradeOptions.find(grade => grade.subjects.includes(document._id));  
+                            
+                                return (
+                                  
+                                    <ClassCard
+                                      name={primary(document)}
+                                      tagColor={'blue'}
+                                      tagLabel={'UGH'}
+                                      image=''
+                                      handleDocument={handleDocument}
+                                      handleSelect={handleSelect}
+                                      document={document}
+                                    />
+                                  
+                                );
+                            })}
+                          </div>
+                         
+                          
+                          </>
+                        
                       </>
                     ))}
                   </>
