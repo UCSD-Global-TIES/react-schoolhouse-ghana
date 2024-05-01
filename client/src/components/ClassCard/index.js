@@ -91,13 +91,17 @@ const useStyles = makeStyles({
 
 function ClassCard(props) {
   const classes = useStyles();
-  const { name, handleDocument, document, tagLabel, tagColor } = props;
+  const { name, handleDocument, document, tagLabel, tagColor, handleSelect } = props;
 
 
   const handleClick = () => {
     if (handleDocument) {
       handleDocument(true, document); // Call the handleDocument function with (true, document)
     }
+  };
+
+  const deleteDocument = () => {
+    handleSelect(document._id);
   };
   return (
     <div className={classes.container}>
@@ -118,7 +122,7 @@ function ClassCard(props) {
             />
           </svg>
         </div>
-        <div className={classes.icon} >
+        <div className={classes.icon} onClick={deleteDocument}>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="24"

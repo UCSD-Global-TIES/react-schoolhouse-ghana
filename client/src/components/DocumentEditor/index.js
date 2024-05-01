@@ -705,6 +705,7 @@ function DocumentEditor(props) {
                                       tagLabel={label}
                                       image=''
                                       handleDocument={handleDocument}
+                                      handleSelect={handleSelect}
                                       document={document}
                                     />
                                   )
