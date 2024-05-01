@@ -1,5 +1,5 @@
 import { makeStyles } from "@material-ui/core";
-import Button from "@material-ui/core/Button";
+import MuiButton from "@material-ui/core/Button";
 import React from "react";
 import AddIcon from "@material-ui/icons/Add";
 import CloseIcon from "@material-ui/icons/Close";
@@ -22,16 +22,16 @@ const useStyles = makeStyles({
       props.buttonColor === "blue" ? "4px solid #005FD9" : "4px solid #E5E5E5",
     borderLeft:
       props.buttonColor === "blue" ? "1px solid #005FD9" : "1px solid #E5E5E5",
-    backgroundColor: props.buttonColor === "blue" ? "#2584FF" : "#FFF",
-    color: props.buttonColor === "blue" ? "#FFF" : "#2584FF",
+    backgroundColor: props.buttonColor === "blue" ? "#2584FF" : (props.buttonColor === "white" ? "#FFF" : props.buttonColor), // Updated to handle custom colors
+    color: props.buttonColor === "blue" || props.buttonColor === "white" ? "#FFF" : "#2584FF", // Updated to handle custom colors
     "&:hover": {
-      backgroundColor: props.buttonColor === "blue" ? "#005FD9" : "#FFF",
+      backgroundColor: props.buttonColor === "blue" ? "#005FD9" : (props.buttonColor === "white" ? "#FFF" : props.buttonColor), // Updated to handle custom colors
     },
     fontFamily: "Nunito",
   }),
 });
 
-function Blue({ text, icon, buttonColor }) {
+function Button({ text, icon, buttonColor }) {
   const classes = useStyles({ buttonColor });
 
   function renderIcon(buttonIcon) {
@@ -43,11 +43,11 @@ function Blue({ text, icon, buttonColor }) {
   }
 
   return (
-    <Button className={classes.root}>
+    <MuiButton className={classes.root}>
       {renderIcon(icon)}
       {text}
-    </Button>
+    </MuiButton>
   );
 }
 
-export default Blue;
+export default Button;

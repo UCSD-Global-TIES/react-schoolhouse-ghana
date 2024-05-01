@@ -2,7 +2,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useMediaQuery } from "react-responsive";
 import { NavLink, Redirect, Switch } from "react-router-dom";
-// import AccountManager from "../../../../components/AccountManager/AccountManager";
 
 // Material-UI Components and Styles
 import {
@@ -13,7 +12,7 @@ import {
   List,
   ListItem,
   ListItemIcon,
-  ListItemText
+  ListItemText,
 } from "@material-ui/core";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
 
@@ -31,14 +30,15 @@ import {
 import AccountsForm from "../../../../components/AccountsForm";
 import AnnouncementsForm from "../../../../components/AnnouncementsForm";
 import AssessmentForm from "../../../../components/AssessmentForm";
-import Button from "../../../../components/Button/Button";
-import DocumentEditor from "../../../../components/DocumentEditor";
+import DocumentEditor from "../../../../components/DocumentEditor/index.js";
 import FilesForm from "../../../../components/FilesForm";
 import GradesForm from "../../../../components/GradesForm";
 import NameCard from "../../../../components/NameCard/NameCard";
 import ProtectedRoute from "../../../../components/ProtectedRoute";
 import SubjectsForm from "../../../../components/SubjectsForm";
 import UploadQueue from "../../../../components/UploadQueue";
+import UserList from "./../../../../components/UserList/UserList";
+import SearchBar from "../../../../components/SearchBar/SearchBar.js";
 
 // Utils and Context
 import SocketIOFileUpload from "socketio-file-upload";
@@ -49,31 +49,32 @@ import API from "../../../../utils/API";
 import "../../../../App.css";
 import "../../../../utils/flowHeaders.min.css";
 import "./main.css";
-// import { ReactComponent as BullhornIcon } from "../../../../assets/bullhorn.svg";
-// import { ReactComponent as BookIcon } from "../../../../assets/books.svg";
-// import { ReactComponent as AccountIcon } from "../../../../assets/account-icon.svg";
 
 import AccountIcon from "../../../../assets/account-icon.svg";
 import BookIcon from "../../../../assets/books.svg";
 import BullhornIcon from "../../../../assets/bullhorn.svg";
 
-
-const drawerWidth = 220;
+const drawerWidth = "9.375rem";
+const drawerPadding = "3.5rem 0";
 
 const useStyles = makeStyles((theme) => ({
   root: {
     display: "flex",
+    alignItems: "flex-start",
   },
   toolbar: theme.mixins.toolbar,
-  // drawer: {
-  //     [theme.breakpoints.up('sm')]: {
-  //         width: drawerWidth,
-  //         flexShrink: 0,
-  //     },
-  // },
+  sidebar: {
+    display: "flex",
+    width: "9.375rem",
+    padding: "3.5rem 0",
+    flexDirection: "column",
+    alignItems: "flex-start",
+    flexShrink: "0",
+    alignSelf: "stretch",
+  },
   drawerPaper: {
-    width: drawerWidth,
-    background: "var(--background-color)",
+    background: "var(--primary-color)",
+    color: "var(--background-color)",
   },
   content: {
     flexGrow: 1,
@@ -83,19 +84,38 @@ const useStyles = makeStyles((theme) => ({
     color: "inherit",
     textDecoration: "none",
   },
+  sidebarLinks: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "flexStart",
+    alignSelf: "stretch",
+    width: "100%",
+  },
   navLink: {
-    '&&': {
-      marginBottom: theme.spacing(2), // Adjust the number for desired spacing
-    },
-    textDecoration: 'none',
-    color: 'inherit', // To keep the same color as the ListItemText
+    textDecoration: "none",
+    color: "inherit", // To keep the same color as the ListItemText
+    display: "flex",
+    height: "5rem",
+    flexDirection: "column",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: "0.9375rem",
+    alignSelf: "stretch",
+  },
+  linkBox: {
+    display: "flex",
+    flexDirection: "column",
+  },
+  justifyIcon: {
+    display: "flex",
+    justifyContent: "center",
   },
 }));
 
 function AdminPortal(props) {
   const classes = useStyles();
   const theme = useTheme();
-  const [mobileOpen, setMobileOpen] = React.useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
   const isSmallDevice = useMediaQuery({
     query: "(max-width: 600px)",
   });
@@ -109,49 +129,41 @@ function AdminPortal(props) {
 
   // function to handle adding new admin
   const addAdmin = (adminName) => {
-    setAdmins(prevAdmin => [...prevAdmin, adminName]);
+    setAdmins((prevAdmin) => [...prevAdmin, adminName]);
   };
   // function to handle adding new teacher
   const addTeacher = (teacherName) => {
-    setTeachers(prevTeachers => [...prevTeachers, teacherName]);
+    setTeachers((prevTeachers) => [...prevTeachers, teacherName]);
   };
   // function to handle adding new student
   const addStudent = (studentName) => {
-    setStudents(prevStudents => [...prevStudents, studentName]);
+    setStudents((prevStudents) => [...prevStudents, studentName]);
   };
 
   // Render the NameCards for each category
   const renderNameCards = (list) => {
-    return list.map((name, index) => (
-      <NameCard key={index} name={name} />
-    ));
+    return list.map((name, index) => <NameCard key={index} name={name} />);
   };
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
   };
 
-
   // menu items
   const documentMenuItems = [
     {
       label: "Announcements",
-    //   icon: BullhornIcon,
       iconPath: BullhornIcon,
       path: `${props.match.url}/announcements`,
     },
     {
       label: "Class Manager",
-    //   Icon: BookIcon,
-    //   icon: "../../../../assets/books.svg",
-    iconPath: BookIcon,
+      iconPath: BookIcon,
       path: `${props.match.url}/grades`,
     },
     {
-      label: "Account Manager",
+      label: "Accounts",
       iconPath: AccountIcon,
-    //   Icon: AccountIcon,
-      // icon: "../../../../assets/buaccount-icon.svg",
       path: `${props.match.url}/accounts`,
     },
     // {
@@ -186,61 +198,54 @@ function AdminPortal(props) {
 
   const drawer = (
     <div onClick={isSmallDevice ? handleDrawerToggle : () => {}}>
-      <List>
+      <List className={classes.sidebar}>
         <div
-          id="heading-text"
-          style={{ textAlign: "center", margin: "0 auto" }}
+          style={{
+            textAlign: "center",
+            margin: "0 auto",
+            marginBottom: "10px",
+            color: "var(--background-color)",
+          }}
         >
-          <h1>Semanhyia</h1>
-          <h2>American School</h2>
+          <h1 style={{ fontSize: "1.75rem" }}>Semanhyia</h1>
+          <h2 style={{ fontSize: "1.125rem" }}>American School</h2>
         </div>
-        <div style={{ marginTop: "10px" }}> </div>
-        {documentMenuItems.map((item, index) => (
-          <NavLink to={item.path} key={index} className={`${classes.buttonLink} ${classes.navLink}`}>
-            <ListItem
-              selected={props.location.pathname.includes(item.path)}
-              button
+        <div className="sidebar-links">
+          {documentMenuItems.map((item, index) => (
+            <NavLink
+              to={item.path}
+              key={index}
+              className={`${classes.buttonLink} ${classes.navLink}`}
             >
-            {/* <ListItemIcon src={item.iconPath}></ListItemIcon> */}
-            <ListItemIcon>
-  <img src={item.iconPath} alt={`${item.label} icon`} style={{ width: 24, height: 24 }} />
-</ListItemIcon>
+              <ListItem
+                selected={props.location.pathname.includes(item.path)}
+                button
+                className={classes.linkBox}
+              >
+                <ListItemIcon className={classes.justifyIcon}>
+                  <img
+                    src={item.iconPath}
+                    alt={`${item.label} icon`}
+                    style={{ width: 24, height: 24 }}
+                  />
+                </ListItemIcon>
 
-              <ListItemText
-                style={{ overflowWrap: "break-word" }}
-                primary={item.label}
-              />
-            </ListItem>
-          </NavLink>
-        ))}
+                <ListItemText
+                  style={{ overflowWrap: "break-word" }}
+                  primary={item.label}
+                />
+              </ListItem>
+            </NavLink>
+          ))}
+        </div>
       </List>
-      <Divider />
-      {/* <List>
-        {otherMenuItems.map((item, index) => (
-          <NavLink to={item.path} key={index} className={classes.buttonLink}>
-            <ListItem
-              button
-              selected={props.location.pathname.includes(item.path)}
-            >
-              <ListItemIcon>
-                {<FontAwesomeIcon icon={item.icon} />}
-              </ListItemIcon>
-              <ListItemText
-                style={{ overflowWrap: "break-word" }}
-                primary={item.label}
-              />
-            </ListItem>
-          </NavLink>
-        ))}
-      </List> */}
-
-      {/* <img src={eduTies} alt="eduTies" height={200} width={200} style={{position: "absolute", top: 680}}/> */}
     </div>
   );
 
   const pagesInfo = [
+    // ANNOUNCEMENTS
     {
-      collection: "Announcements",
+      collection: "Announcement",
       icon: faBullhorn,
       FormComponent: (p) => <AnnouncementsForm user={props.user} {...p} />,
       primary: (doc) => doc.title,
@@ -268,8 +273,9 @@ function AdminPortal(props) {
         },
       },
     },
+    // GRADES
     {
-      collection: "Grades",
+      collection: "Grade",
       icon: faShapes,
       FormComponent: (p) => <GradesForm user={props.user} {...p} />,
       primary: (doc) => `Grade ${doc.level}`,
@@ -297,6 +303,7 @@ function AdminPortal(props) {
         },
       },
     },
+    // SUBJECTS
     {
       collection: "Subjects",
       link: (doc) => `/subject/${doc._id}`,
@@ -330,11 +337,13 @@ function AdminPortal(props) {
         },
       },
     },
+    // ACCOUNT MANAGER
     {
-      collection: "Accounts",
+      collection: "Account",
       icon: faUsers,
       FormComponent: (p) => <AccountsForm user={props.user} {...p} />,
-      primary: (doc) => `${doc.first_name} ${doc.last_name} (${doc.type})`,
+      primary: (doc) => `${doc.first_name} ${doc.last_name} `,
+      type: (doc) => `(${doc.type})`,
       path: `${props.match.path}/accounts`,
       api: {
         get: API.getAccounts,
@@ -376,6 +385,7 @@ function AdminPortal(props) {
         },
       },
     },
+    // FILES
     {
       collection: "Files",
       link: (doc) => doc.path,
@@ -407,6 +417,7 @@ function AdminPortal(props) {
         },
       },
     },
+    // ASSESSMENT
     {
       collection: "Assessment",
       link: (doc) => `/assessment/yolo`, // TODO: Set specific quiz ID into the URL once backend is finished
@@ -442,6 +453,7 @@ function AdminPortal(props) {
             put={page.api.put}
             delete={page.api.delete}
             validation={page.validation}
+            type={page.type}
             {...props}
           />
         ),
@@ -480,8 +492,6 @@ function AdminPortal(props) {
   // SET DEFAULT MENU
   const defaultRoute = `${props.match.path}/announcements`;
 
-  useEffect(() => {}, []);
-
   return (
     <div className={classes.root}>
       <CssBaseline />
@@ -519,48 +529,6 @@ function AdminPortal(props) {
         className={classes.content}
         style={{ marginLeft: !isSmallDevice ? drawerWidth : 0 }}
       >
-        <div className={classes.toolbar} />
-        <section>
-          <h2>Admin</h2>
-          <Button text="Admin" icon="add" onClick={() => addAdmin('New Admin')}>+ Admin</Button>
-          {renderNameCards(admins)}
-        </section>
-
-        <section>
-          <h2>Teachers</h2>
-          <Button text="Teacher" icon="add" onClick={() => addTeacher('New Teacher')}>+ Teacher</Button>
-          {renderNameCards(teachers)}
-        </section>
-
-        <section>
-          <h2>Students</h2>
-          <Button text="Student" icon="add" onClick={() => addStudent('New Student')}>+ Student</Button>
-          {renderNameCards(students)}
-        </section>
-        {/* <section>
-          <h2>Admin</h2>
-          <Button text="Admin" icon="add" buttonColor="blue" onClick={addAdmin} />
-          {renderNameCards(admins)}
-        </section>
-
-        <section>
-          <h2>Teachers</h2>
-          <Button text="Teacher" icon="add" buttonColor="blue" onClick={() => addTeacher('New Teacher')} />
-          {renderNameCards(teachers)}
-        </section>
-
-        <section>
-          <h2>Students</h2>
-          <Button text="Student" icon="add" buttonColor="blue" onClick={() => addStudent('New Student')} />
-          {renderNameCards(students)}
-        </section> */}
-
-        {/* <TransitionGroup>
-                    <CSSTransition
-                        key={props.location.key}
-                        timeout={300}
-                        classNames='fade'
-                    > */}
         <Switch location={props.location}>
           {pages.map((page, idx) => (
             <ProtectedRoute
@@ -573,13 +541,8 @@ function AdminPortal(props) {
           ))}
           <Redirect to={defaultRoute} />
         </Switch>
-        {/* </CSSTransition>
-                </TransitionGroup> */}
-        {/* <Button text="Student" icon="add" buttonColor="blue"/> */}
       </main>
     </div>
-
-    // </div>
   );
 }
 
