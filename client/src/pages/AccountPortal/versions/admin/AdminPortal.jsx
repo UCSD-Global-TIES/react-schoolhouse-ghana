@@ -455,6 +455,7 @@ function AdminPortal(props) {
             delete={page.api.delete}
             validation={page.validation}
             type={page.type}
+            displayLink={'Home/'+page.collection}
             {...props}
           />
         ),

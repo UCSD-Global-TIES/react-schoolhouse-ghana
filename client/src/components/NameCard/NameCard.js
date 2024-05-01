@@ -56,24 +56,21 @@ function NameCard(props) {
   const classes = useStyles();
 
   //new code
-  const { name, handleDocument, handleSelect, document } = props; // Destructure the required props
+  const { name, handleDocument, handleSelect, handleViewDocument } = props; // Destructure the required props
 
-  const handleClick = () => {
-    if (handleDocument) {
-      handleDocument(true, document); // Call the handleDocument function with (true, document)
-    }
-  };
+
+
 
   const deleteDocument = () => {
     handleSelect(document._id);
   };
 
   return (
-    <div className={classes.container}>
+    <div className={classes.container} onClick={() => handleViewDocument(true, document)}>
       <p className={classes.text}>{name}</p>
       <div className={classes.iconContainer}>
         {/* Add icons here */}
-        <div className={classes.icon} onClick={handleClick}>
+        <div className={classes.icon} onClick={() => handleDocument(true, document)}>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="24"

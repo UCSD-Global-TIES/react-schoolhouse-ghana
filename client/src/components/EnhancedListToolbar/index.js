@@ -35,46 +35,59 @@ const useToolbarStyles = makeStyles(theme => ({
 
 const EnhancedListToolbar = (props) => {
     const classes = useToolbarStyles();
-    const { numSelected, handleCreate, handleDelete, handleUpdate } = props;
+    const { numSelected, handleCreate, handleDelete, handleUpdate, onItemClick} = props;
+
+    //I want to return nothing
 
     return (
-        <Toolbar
-            className={clsx(classes.root, {
-                [classes.highlight]: numSelected > 0,
-            })}
-            disableGutters
-        >
-            {numSelected > 0 ? (
-                <Typography className={classes.title} color="inherit" variant="subtitle1">
-                    {numSelected} selected
-              </Typography>
-            ) : (
-                    <Typography className={classes.title} variant="h1" id="tableTitle">
-                        {props.title}
-                    </Typography>
-                )}
+        <div></div>
+        //return nothing
 
-            {numSelected === 1 ? (
-                <Tooltip title="Edit">
-                    <IconButton onClick={handleUpdate} aria-label="edit">
-                        <EditIcon />
-                    </IconButton>
-                </Tooltip>
-            ) : ""}
-            {numSelected > 0 ? (
-                <Tooltip title="Delete">
-                    <IconButton onClick={handleDelete} aria-label="delete">
-                        <DeleteIcon />
-                    </IconButton>
-                </Tooltip>
-            ) : ""}
-            <Tooltip title="Create">
-                <IconButton onClick={handleCreate} aria-label="create">
-                    <PostAddIcon />
-                </IconButton>
-            </Tooltip>
-        </Toolbar>
-    );
+        // <Toolbar
+        //     className={clsx(classes.root, {
+        //         [classes.highlight]: numSelected > 0,
+        //     })}
+        //     disableGutters
+        // >
+        //     {numSelected > 0 ? (
+        //         <Typography className={classes.title} color="inherit" variant="subtitle1">
+        //             {numSelected} selected
+        //       </Typography>
+        //     ) : (
+                    
+        //             <Typography className={classes.title} variant="h1" id="tableTitle">
+        //                 {props.title}
+        //             </Typography>
+        //         )}
+
+        //     {numSelected === 1 ? (
+        //         <Tooltip title="Edit">
+        //             <IconButton onClick={handleUpdate} aria-label="edit">
+        //                 <EditIcon />
+        //             </IconButton>
+        //         </Tooltip>
+        //     ) : ""}
+        //     {numSelected > 0 ? (
+        //         <Tooltip title="Delete">
+        //             <IconButton onClick={handleDelete} aria-label="delete">
+        //                 <DeleteIcon />
+        //             </IconButton>
+        //         </Tooltip>
+        //     ) : ""}
+        //     <Tooltip title="view" onClick={handleCreate} aria-label="create">
+        //         <IconButton onClick={handleCreate} aria-label="view">
+                    
+        //         </IconButton>
+        //     </Tooltip>
+        //     <Tooltip title="Create">
+        //         <IconButton onClick={handleCreate} aria-label="create">
+        //         <Typography className={classes.title} variant="h1" id="tableTitle">
+        //                 {props.title}
+        //             </Typography>
+        //         </IconButton>
+        //     </Tooltip>
+        // </Toolbar>
+   );
 };
 
 export default EnhancedListToolbar;

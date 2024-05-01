@@ -21,6 +21,17 @@ const useStyles = makeStyles(theme => ({
         // width: "90%",
         // margin: "auto"
     },
+    title: {
+        color: '#AFAFAF',
+        fontFamily: 'Nunito',
+        fontSize: '16px',
+        fontStyle: 'normal',
+        fontWeight: 700,
+        lineHeight: 'normal',
+    },
+    customTextField: {
+        borderRadius: '20px', // Adjust the value as needed
+    },
 }));
 
 const disabledMsg = `This field will be populated after announcement creation.`
@@ -28,14 +39,25 @@ const disabledMsg = `This field will be populated after announcement creation.`
 const textFields = [
     {
         name: "title",
-        title: "Title",
+        title: "TITLE",
         required: true,
         // helper: "This is an informative title of this announcement."
     },
+
+    {
+        name: "createdAt",
+        // label: "Created On",
+        title: "CREATED ON",
+        isDate: true,
+        disabled: true,
+        // helper: "This is the date this announcement was created."
+    },
+
+
     {
         name: "message",
         // label: "Content",
-        title: "Message",
+        title: "MESSAGE",
         multiline: true,
         required: true,
         // helper: "This is the main content of this announcement."
@@ -46,14 +68,7 @@ const textFields = [
     //     disabled: true,
     //     helper: "This is the name of the announcement's author."
     // },
-    {
-        name: "createdAt",
-        // label: "Created On",
-        title: "Created On",
-        isDate: true,
-        disabled: true,
-        // helper: "This is the date this announcement was created."
-    },
+
     // {
     //     name: "updatedAt",
     //     // label: "Last Updated",
@@ -61,6 +76,7 @@ const textFields = [
     //     disabled: true,
     //     helper: "This is the date this announcement was last updated."
     // },
+
 
 ]
 
@@ -169,16 +185,29 @@ function AnnouncementsForm(props) {
     }, [props])
 
     return (
+        <React.Fragment>
+        {/* <div style={{width: '100%', height: '100%', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 10, display: 'inline-flex'}}>
+        <div style={{color: '#4B4B4B', fontSize: 28, fontFamily: 'Asap Condensed', fontWeight: '400', textDecoration: 'underline', wordWrap: 'break-word'}}>Home</div>
+        <div style={{color: '#4B4B4B', fontSize: 28, fontFamily: 'Asap Condensed', fontWeight: '400', wordWrap: 'break-word'}}>/</div>
+        <div style={{color: '#4B4B4B', fontSize: 28, fontFamily: 'Asap Condensed', fontWeight: '700', textDecoration: 'underline', wordWrap: 'break-word'}}>Announcements Editor</div>
+        </div> */}
         <div className={classes.root}>
             <div className={classes.vc}>
+
                 {
+                    
                     textFields.map((item, idx) => (
                         <React.Fragment key={`${item.name}-form-${idx}`}>
+
                         {/* Display title above the input field */}
-                        <Typography className={classes.title} variant="subtitle1">{item.title}</Typography>
+                        <Typography className={classes.title} variant="subtitle1"
+                            >{item.title}</Typography>
                         {/* Render TextField */}
                         
                         <TextField
+                            InputProps={{
+                                style: { borderRadius: '12px' }, // Adjust the value as needed
+                            }}
                             error={PROPS.error[item.name] ? PROPS.error[item.name].exists : null}
                             required={item.required}
                             key={`${item.name}-form-${idx}`}
@@ -215,6 +244,7 @@ function AnnouncementsForm(props) {
 
             </div>
         </div>
+        </React.Fragment>
     )
 };
 

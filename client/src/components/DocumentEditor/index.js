@@ -19,6 +19,7 @@ import {
   Typography,
   FilledInput,
 } from "@material-ui/core";
+import Breadcrumb from '../Breadcrumb/Breadcrumb'; // for links
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faSpinner,
@@ -413,6 +414,15 @@ function DocumentEditor(props) {
     // if (errorDocument !== {}) setErrorDocument({});
   };
 
+  const [viewerOpen, setViewerOpen] = useState(false);
+
+  const handleViewDocument = (isOpen, document) => {
+    if (document) {
+      setCurrentDocument(document);
+    }
+    setViewerOpen(isOpen);
+  };
+
   const handleRouteChange = (destination, _id) => {
     // Replace the current history item as the current path with the open document
     // you are navigating away from
@@ -506,6 +516,8 @@ function DocumentEditor(props) {
 
       {/* UPDATE DOCUMENT DIALOG */}
       {dialogOpen && (
+                <React.Fragment>
+                <Breadcrumb link={props.displayLink} />
         <div
           type={`${collection} Editor`}
           buttonDisabled={
@@ -555,7 +567,40 @@ function DocumentEditor(props) {
             </Button>
           </div>
         </div>
+        </React.Fragment>
       )}
+
+    {viewerOpen && (
+      <React.Fragment>
+        <div style={{width: '100%', height: '100%', paddingLeft: 70, paddingRight: 70, paddingTop: 56, paddingBottom: 56, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 36, display: 'inline-flex'}}>
+          <div style={{justifyContent: 'flex-start', alignItems: 'flex-start', gap: 10, display: 'inline-flex'}}>
+            <div style={{color: '#4B4B4B', fontSize: 28, fontFamily: 'Asap Condensed', fontWeight: '400', textDecoration: 'underline', wordWrap: 'break-word'}}>Home</div>
+            <div style={{color: '#4B4B4B', fontSize: 28, fontFamily: 'Asap Condensed', fontWeight: '400', wordWrap: 'break-word'}}>/</div>
+            <div style={{color: '#4B4B4B', fontSize: 28, fontFamily: 'Asap Condensed', fontWeight: '700', textDecoration: 'underline', wordWrap: 'break-word'}}>{currentDocument.title}</div>
+          </div>
+          <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'center', gap: 24, display: 'inline-flex'}}>
+            <div style={{color: '#4B4B4B', fontSize: 60, fontFamily: 'Asap Condensed', fontWeight: '700', wordWrap: 'break-word'}}>{currentDocument.title}</div>
+            <div style={{padding: 12, borderRadius: 64, overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 10, display: 'flex'}}>
+              <div style={{width: 24, height: 24, position: 'relative'}}>
+                <div style={{width: 18, height: 18, left: 3, top: 3, position: 'absolute', background: '#4B4B4B'}}></div>
+              </div>
+            </div>
+            <div style={{width: 24, height: 24, position: 'relative'}}>
+              <div style={{width: 16, height: 18, left: 4, top: 3, position: 'absolute', background: '#4B4B4B'}}></div>
+            </div>
+          </div>
+          <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 12, display: 'inline-flex'}}>
+            <div style={{justifyContent: 'center', alignItems: 'flex-start', gap: 8, display: 'flex'}}>
+              <div style={{color: '#AFAFAF', fontSize: 18, fontFamily: 'Nunito', fontWeight: '700', wordWrap: 'break-word'}}>CREATED ON:</div>
+              <div style={{color: '#AFAFAF', fontSize: 18, fontFamily: 'Nunito', fontWeight: '700', wordWrap: 'break-word'}}>{currentDocument.createdDate}</div>
+            </div>
+          </div>
+          <div style={{alignSelf: 'stretch', height: 396, flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'flex-end', gap: 32, display: 'flex'}}>
+            <div style={{alignSelf: 'stretch'}} dangerouslySetInnerHTML={{__html: currentDocument.description}}></div>
+          </div>
+        </div>
+      </React.Fragment>
+    )}
 
       {/* DELETE DOCUMENT(S) DIALOG */}
       <ConfirmDialog
@@ -570,11 +615,13 @@ function DocumentEditor(props) {
         {collection.toLowerCase()}(s)?
       </ConfirmDialog>
 
-      {!dialogOpen && (
+      {!dialogOpen && !viewerOpen && (
+        <React.Fragment>
+        <Breadcrumb link={props.displayLink} />
         <div className={classes.sectionContainer}>
           <div style={{ margin: "auto" }} className={classes.content}>
             <>
-              <EnhancedListToolbar
+              {/* <EnhancedListToolbar
                 title={collection}
                 numSelected={selected.length}
                 handleCreate={() => handleDocument(true, {})}
@@ -585,7 +632,9 @@ function DocumentEditor(props) {
                   )
                 }
                 handleDelete={() => handleConfirm(true)}
-              />
+                //when click on the item handleDocument(true,{});
+                onItemClick={(item) => handleDocument(true, item)}
+              /> */}
 
               <SearchBar
                 placeholder={collection.toLowerCase()}
@@ -657,6 +706,7 @@ function DocumentEditor(props) {
                             handleSelect={handleSelect}
                             document={document}
                             name={primary(document)}
+                            handleViewDocument = {handleViewDocument}
                           />
                         </List>
                       );
@@ -682,6 +732,7 @@ function DocumentEditor(props) {
             )}
           </div>
         </div>
+        </React.Fragment>
       )}
     </>
   );
