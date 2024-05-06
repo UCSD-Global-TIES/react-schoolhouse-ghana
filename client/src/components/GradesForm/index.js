@@ -4,6 +4,8 @@ import { makeStyles } from '@material-ui/core/styles';
 import { parseTime } from '../../utils/misc';
 import DocumentPicker from "../DocumentPicker"
 import EnrolledClasses from "../EnrolledClasses";
+import { Select, MenuItem } from "@material-ui/core";
+
 
 import "../../utils/flowHeaders.min.css";
 import API from "../../utils/API";
@@ -25,6 +27,8 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const disabledMsg = `This field will be populated after grade creation.`
+
+
 
 const textFields = [
     {
@@ -160,30 +164,56 @@ function GradesForm(props) {
 
                 {
                     textFields.map((item, idx) => (
-                        <TextField
-                            // Just for Grade 'level' field
-                            error={PROPS.error[item.name] ? PROPS.error[item.name].exists : null}
-                            required={item.required}
-                            type={item.isNumber ? "number" : "text"}
-                            key={`${item.name}-form-${idx}`}
-                            className={classes.field}
-                            label={item.label}
-                            name={item.name}
-                            placeholder={(item.disabled || (item.updateOnly && PROPS.isCreate)) ? disabledMsg : ""}
-                            disabled={(item.disabled || (item.updateOnly && PROPS.isCreate) || (item.createOnly && !PROPS.isCreate))}
-                            value={(item.isDate ? parseTime(PROPS.document[item.name]) : null) || ((item.isNumber && !PROPS.document[item.name]) ? MIN_GRADE : null) || PROPS.document[item.name] || ""}
-                            helperText={PROPS.error[item.name] ? (PROPS.error[item.name].exists ? PROPS.error[item.name].message : item.helper) : item.helper}
-                            onChange={item.isNumber ? handleNumberChange : PROPS.handleChange}
-                            fullWidth
-                            autoComplete={'off'}
-                            margin="normal"
-                            InputLabelProps={{
-                                shrink: true,
-                            }}
-                            multiline={item.multiline}
-                            rows={3}
-                            variant="outlined"
-                        />
+                        item.name === "level" ? (
+                            <Select
+                                error={PROPS.error[item.name] ? PROPS.error[item.name].exists : null}
+                                required={item.required}
+                                key={`${item.name}-form-${idx}`}
+                                className={classes.field}
+                                label={item.label}
+                                name={item.name}
+                                disabled={(item.disabled || (item.updateOnly && PROPS.isCreate) || (item.createOnly && !PROPS.isCreate))}
+                                value={PROPS.document[item.name] || ""}
+                                
+                                // placeholder={(item.disabled || (item.updateOnly && PROPS.isCreate)) ? disabledMsg : ""}
+                                // helperText={PROPS.error[item.name] ? (PROPS.error[item.name].exists ? PROPS.error[item.name].message : item.helper) : item.helper}
+                                
+                                onChange={PROPS.handleChange}
+                                fullWidth
+                                autoComplete={'off'}
+                                variant="outlined"
+                            >
+                                {Array.from({ length: 6 }, (_, i) => (
+                                    <MenuItem key={i} value={i + 1}>
+                                        {i + 1}
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                        ) : (
+                            <TextField
+                                error={PROPS.error[item.name] ? PROPS.error[item.name].exists : null}
+                                required={item.required}
+                                type={item.isNumber ? "number" : "text"}
+                                key={`${item.name}-form-${idx}`}
+                                className={classes.field}
+                                label={item.label}
+                                name={item.name}
+                                placeholder={(item.disabled || (item.updateOnly && PROPS.isCreate)) ? disabledMsg : ""}
+                                disabled={(item.disabled || (item.updateOnly && PROPS.isCreate) || (item.createOnly && !PROPS.isCreate))}
+                                value={(item.isDate ? parseTime(PROPS.document[item.name]) : null) || ((item.isNumber && !PROPS.document[item.name]) ? MIN_GRADE : null) || PROPS.document[item.name] || ""}
+                                helperText={PROPS.error[item.name] ? (PROPS.error[item.name].exists ? PROPS.error[item.name].message : item.helper) : item.helper}
+                                onChange={item.isNumber ? handleNumberChange : PROPS.handleChange}
+                                fullWidth
+                                autoComplete={'off'}
+                                margin="normal"
+                                InputLabelProps={{
+                                    shrink: true,
+                                }}
+                                multiline={item.multiline}
+                                rows={3}
+                                variant="outlined"
+                            />
+                        )
                     ))}
 
                 <DocumentPicker
