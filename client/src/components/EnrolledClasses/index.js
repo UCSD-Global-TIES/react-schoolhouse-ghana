@@ -14,7 +14,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 function EnrolledClasses(props) {
-    const { subjects, status} = props;
+    const { subjects, status, title, editable} = props;
     const classes = useStyles();
     
     const tagMap = {
@@ -28,7 +28,7 @@ function EnrolledClasses(props) {
             subjects.length > 0 ? (
                 <>
                     <div style={{marginBottom: '1rem'}}>
-                        <Typography variant="h2">ENROLLED CLASSES</Typography>
+                        <Typography variant="h2">{title}</Typography>
                     </div>
                     
                     <div className={classes.classContainer}>
@@ -43,7 +43,7 @@ function EnrolledClasses(props) {
                             label = status;
                         }
                         return (
-                            <ClassCard name={subject.name} tagColor={tagMap[status]} tagLabel={label} image=''/>
+                            <ClassCard name={subject.name} tagColor={tagMap[status]} tagLabel={label} image='' editable={editable}/>
                         );
                     })}
                     </div>

@@ -707,6 +707,7 @@ function DocumentEditor(props) {
                                       handleDocument={handleDocument}
                                       handleSelect={handleSelect}
                                       document={document}
+                                      editable={true}
                                     />
                                   )
                                 );

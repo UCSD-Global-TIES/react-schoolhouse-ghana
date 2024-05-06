@@ -278,7 +278,7 @@ function AccountsForm(props) {
                         />
                     )})}
                                 
-                    <EnrolledClasses subjects={subjects} status={status}></EnrolledClasses>
+                    <EnrolledClasses subjects={subjects} status={status} title={'ENROLLED CLASSES'} editable={false}></EnrolledClasses>
 
             </div>
         </div>

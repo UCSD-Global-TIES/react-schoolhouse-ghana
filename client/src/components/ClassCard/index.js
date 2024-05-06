@@ -5,29 +5,33 @@ import SubjectDefault from "../../assets/subject_default.png";
 import Tag from "../Tag";
 
 const useStyles = makeStyles({
-  container: {
-    width: '10.5rem',
-    height: 'fit-content',
-    borderRadius:' 0.75rem',
-    border:' 2px solid #4B4B4B',
-    background:' #FFF',
-    justifyContent: 'center',
-    textAlign: 'left',
-    "&:hover": {
-      borderColor: "#005FD9",
-      background: "#f0f4fc",
-    },
-    "&:hover $iconContainer": {
-      display: 'flex',
-      justifyContent: "flex-end",
-      width: "fit-content",
-      margin: '0.5rem',
-      backgroundColor: '#ffffff',
+  
+    container: (props) => ({
+      width: '10.5rem',
       height: 'fit-content',
-      borderRadius: '0.25rem',
-      border: '1px solid #E5E5E5'
-    },
-  },
+      borderRadius:' 0.75rem',
+      border:' 2px solid #4B4B4B',
+      background:' #FFF',
+      justifyContent: 'center',
+      textAlign: 'left',
+      "&:hover": {
+        borderColor: props.editable ? "#005FD9" : "#4B4B4B" ,
+        background: props.editable ? "#f0f4fc" : "#FFF",
+      },
+      "&:hover $iconContainer": {
+        display: props.editable ? 'flex' : 'none',
+        justifyContent: "flex-end",
+        width: "fit-content",
+        margin: '0.5rem',
+        backgroundColor: '#ffffff',
+        height: 'fit-content',
+        borderRadius: '0.25rem',
+        border: '1px solid #E5E5E5'
+      },
+    }),
+  
+  
+  
   text: {
     color: '#4B4B4B',
     fontFamily: 'Nunito',
@@ -73,11 +77,11 @@ const useStyles = makeStyles({
     justifyContent: 'flex-end',
     // other styles...
   },
-  iconContainer: {
+  iconContainer:(props) =>({
     // Add styles for the icon container
     display: "none",
     
-  },
+  }),
   icon: {
     padding: '0.2rem 0.25rem 0rem 0.25rem',
     border: '1px solid #E5E5E5',
@@ -89,10 +93,10 @@ const useStyles = makeStyles({
   // Add more styles as needed for the design
 });
 
-function ClassCard(props) {
-  const classes = useStyles();
-  const { name, handleDocument, document, tagLabel, tagColor, handleSelect } = props;
-
+function ClassCard({ name, handleDocument, document, tagLabel, tagColor, handleSelect, editable }) {
+  
+  //const { name, handleDocument, document, tagLabel, tagColor, handleSelect, editable } = props;
+  const classes = useStyles({editable});
 
   const handleClick = () => {
     if (handleDocument) {

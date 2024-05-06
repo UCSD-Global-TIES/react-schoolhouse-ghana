@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { TextField, Box, Switch, Typography, CircularProgress } from "@material-ui/core";
+import { TextField, Box, Switch, Typography, CircularProgress, Divider } from "@material-ui/core";
 import { makeStyles } from '@material-ui/core/styles';
 import { parseTime } from '../../utils/misc';
 import DocumentPicker from "../DocumentPicker"
@@ -22,6 +22,9 @@ const useStyles = makeStyles(theme => ({
         // width: "90%",
         // margin: "auto"
     },
+    margin: {
+        marginBottom: "2rem"
+     }
 }));
 
 const disabledMsg = `This field will be populated after grade creation.`
@@ -63,6 +66,9 @@ function GradesForm(props) {
     const [teacherOptions, setTeacherOptions] = useState([]);
     const [selectedTeachers, setSelectedTeachers] = useState(props.document.teachers || []);
     const [PROPS, setProps] = useState(props)
+
+    const grStatus = props.document.status || 'UNPUBLISHED';
+
 
     const handleNumberChange = (e) => {
         const { value, name } = e.target;
@@ -185,7 +191,10 @@ function GradesForm(props) {
                             variant="outlined"
                         />
                     ))}
-
+                <div className={classes.margin}>
+                    <EnrolledClasses subjects={props.document.subjects} status={grStatus} title={'CURRENT SUBJECTS'} editable={false}></EnrolledClasses>
+                </div>
+                
                 <DocumentPicker
                     title={"Grade Subjects"}
                     docs={subjectOptions}
@@ -219,7 +228,7 @@ function GradesForm(props) {
                     handleChange={(docs) => handlePickChange('teachers', docs)}
                 />
             </div>
-            
+
         </div>
     )
 };
