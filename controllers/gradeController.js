@@ -252,7 +252,21 @@ module.exports = {
                 }
             })
     },
-
+    // updateGradeStatus: function (req, res) {
+    //     verifyKey(req.header('Authorization'), 'Admin')
+    //         .then((isVerified) => {
+    //             if (isVerified) {
+    //                 const { gid, status } = req.params;
+    
+    //                 gradeDb
+    //                     .findOneAndUpdate({ _id: gid }, { status: status })
+    //                     .then(updatedGrade => res.json(updatedGrade))
+    //                     .catch(err => res.status(422).json(err));
+    //             } else {
+    //                 res.status(403).json(null);
+    //             }
+    //         })
+    // }
     // addStudent: function (req, res) {
     //     verifyKey(req.header('Authorization'), 'Admin')
     //         .then((isVerified) => {

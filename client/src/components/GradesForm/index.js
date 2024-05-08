@@ -5,6 +5,9 @@ import { parseTime } from '../../utils/misc';
 import DocumentPicker from "../DocumentPicker"
 import EnrolledClasses from "../EnrolledClasses";
 
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import Checkbox from '@material-ui/core/Checkbox';
+
 import "../../utils/flowHeaders.min.css";
 import API from "../../utils/API";
 import { faChalkboardTeacher, faAppleAlt, faUserGraduate } from "@fortawesome/free-solid-svg-icons";
@@ -65,9 +68,10 @@ function GradesForm(props) {
     const [selectedStudents, setSelectedStudents] = useState(props.document.students || []);
     const [teacherOptions, setTeacherOptions] = useState([]);
     const [selectedTeachers, setSelectedTeachers] = useState(props.document.teachers || []);
+    const [gradeStatus, setGradeStatus] = useState(props.document.status || 'unpublished');
     const [PROPS, setProps] = useState(props)
-
-    const grStatus = props.document.status || 'UNPUBLISHED';
+    //const grStatus = props.document.status || 'unpublished';
+    const [checked, setChecked] = useState(gradeStatus === 'active' ? true : false)
 
 
     const handleNumberChange = (e) => {
@@ -87,6 +91,15 @@ function GradesForm(props) {
         props.handleChange(tmp);
     }
 
+    const changeStatus = (e) => {
+        setChecked(e.target.checked);
+        let status = e.target.checked ? 'active' : 'unpublished';
+        setGradeStatus(status);
+
+        let newEvent = { ...e, target: { ...e.target, name: 'status', value: status } };
+
+        PROPS.handleChange(newEvent);
+    }
 
     const handlePickChange = (name, selectedDocs) => {
         switch (name) {
@@ -191,8 +204,11 @@ function GradesForm(props) {
                             variant="outlined"
                         />
                     ))}
+                
+                <FormControlLabel control={<Checkbox checked={checked} onChange={changeStatus}/>} label="Publish Grade" />
+
                 <div className={classes.margin}>
-                    <EnrolledClasses subjects={props.document.subjects} status={grStatus} title={'CURRENT SUBJECTS'} editable={false}></EnrolledClasses>
+                    <EnrolledClasses subjects={props.document.subjects} status={gradeStatus} title={'CURRENT SUBJECTS'} editable={false}></EnrolledClasses>
                 </div>
                 
                 <DocumentPicker
