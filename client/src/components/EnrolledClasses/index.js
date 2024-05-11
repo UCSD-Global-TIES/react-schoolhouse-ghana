@@ -25,7 +25,7 @@ function EnrolledClasses(props) {
     return (
         <>
             {
-            subjects.length > 0 ? (
+            subjects && subjects.length > 0 ? (
                 <>
                     <div style={{marginBottom: '1rem'}}>
                         <Typography variant="h2">{title}</Typography>
