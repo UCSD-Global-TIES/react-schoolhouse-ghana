@@ -59,8 +59,10 @@ const textFields = [
         disabled: true,
         helper: "This is the date this announcement was last updated."
     },
-
 ]
+
+// Filter out the fields you don't want to display
+const filteredTextFields = textFields.filter(field => field.name !== "authorName" && field.name !== "updatedAt");
 
 // Private field is special use case
 
@@ -113,7 +115,6 @@ function AnnouncementsForm(props) {
         const promises = [];
         promises.push(API.getGrades(PROPS.user.key));
         promises.push(API.getFiles(PROPS.user.key));
-
 
         Promise.all(promises)
             .then((results) => {
@@ -219,7 +220,7 @@ function AnnouncementsForm(props) {
 
                 </div>
                 {
-                    textFields.map((item, idx) => (
+                    filteredTextFields.map((item, idx) => (
                         <TextField
                             error={PROPS.error[item.name] ? PROPS.error[item.name].exists : null}
                             required={item.required}
