@@ -43,7 +43,7 @@ function EnrolledClasses(props) {
                             label = status;
                         }
                         return (
-                            <ClassCard name={subject.name} tagColor={tagMap[status]} tagLabel={label} image='' editable={editable}/>
+                            <ClassCard name={subject.name} tagColor={tagMap[status]} tagLabel={label} image='' editable={editable} />
                         );
                     })}
                     </div>

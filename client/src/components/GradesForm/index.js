@@ -70,7 +70,6 @@ function GradesForm(props) {
     const [selectedTeachers, setSelectedTeachers] = useState(props.document.teachers || []);
     const [gradeStatus, setGradeStatus] = useState(props.document.status || 'unpublished');
     const [PROPS, setProps] = useState(props)
-    //const grStatus = props.document.status || 'unpublished';
     const [checked, setChecked] = useState(gradeStatus === 'active' ? true : false)
 
 

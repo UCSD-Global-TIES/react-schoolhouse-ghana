@@ -130,6 +130,8 @@ const useStyles = makeStyles((theme) => ({
     whiteSpace: "nowrap",
     marginBottom: "2.6rem",
     marginTop:".5rem",
+    width: "full",
+    flexWrap: "nowrap",
   }
 }));
 
@@ -697,6 +699,7 @@ function DocumentEditor(props) {
                                 } else {
                                     label = item;
                                 }
+ 
                                 return (
                                   grStatus(document) == `(${item})` && (
                                     <ClassCard
@@ -705,7 +708,6 @@ function DocumentEditor(props) {
                                       tagLabel={label}
                                       image=''
                                       handleDocument={handleDocument}
-                                      handleSelect={handleSelect}
                                       document={document}
                                       editable={true}
                                     />
