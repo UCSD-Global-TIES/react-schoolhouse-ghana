@@ -8,7 +8,7 @@ import DocumentEditorLink from '../DocumentEditorLink'
 
 import "../../utils/flowHeaders.min.css";
 import API from "../../utils/API";
-import { faFile, faBullhorn } from "@fortawesome/free-solid-svg-icons";
+import { faFile, faBullhorn, faHome } from "@fortawesome/free-solid-svg-icons";
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -209,7 +209,8 @@ function SubjectsForm(props) {
                     <DocumentEditorLink
                         link={'/edit/announcements'}
                         docs={PROPS.document.announcements || []}
-                        icon={faBullhorn}
+                        // icon={faBullhorn}
+                        icon={faHome}
                         collection={"Subject Announcements"}
                         primary={"title"}
                         match={PROPS.match}

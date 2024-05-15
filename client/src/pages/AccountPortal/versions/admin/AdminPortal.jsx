@@ -19,6 +19,7 @@ import { makeStyles, useTheme } from "@material-ui/core/styles";
 // FontAwesome Icons
 import {
   faBullhorn,
+  faHome,
   faChalkboardTeacher,
   faCheckCircle,
   faFile,
@@ -53,6 +54,7 @@ import "./main.css";
 import AccountIcon from "../../../../assets/account-icon.svg";
 import BookIcon from "../../../../assets/books.svg";
 import BullhornIcon from "../../../../assets/bullhorn.svg";
+import HomeIcon from "../../../../assets/home.svg";
 
 const drawerWidth = "9.375rem";
 const drawerPadding = "3.5rem 0";
@@ -152,8 +154,9 @@ function AdminPortal(props) {
   // menu items
   const documentMenuItems = [
     {
-      label: "Announcements",
-      iconPath: BullhornIcon,
+      label: "Home",
+      // iconPath: BullhornIcon,
+      iconPath: HomeIcon,
       path: `${props.match.url}/announcements`,
     },
     {
@@ -246,7 +249,8 @@ function AdminPortal(props) {
     // ANNOUNCEMENTS
     {
       collection: "Announcement",
-      icon: faBullhorn,
+      // icon: faBullhorn,
+      icon: faHome,
       FormComponent: (p) => <AnnouncementsForm user={props.user} {...p} />,
       primary: (doc) => doc.title,
       path: `${props.match.path}/announcements`,

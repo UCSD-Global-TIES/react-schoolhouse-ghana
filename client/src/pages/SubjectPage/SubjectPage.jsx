@@ -12,7 +12,7 @@ import API from "../../utils/API";
 import "./main.css";
 import NavBarAdmin from "../../components/NavBarAdmin";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBullhorn, faCheck, faFile, faSpinner } from "@fortawesome/free-solid-svg-icons";
+import { faBullhorn, faCheck, faFile, faSpinner, faHome } from "@fortawesome/free-solid-svg-icons";
 import SimpleListView from "../../components/SimpleListView";
 import PageSpinner from "../../components/PageSpinner";
 import FileViewer from "../../components/FileViewer";
