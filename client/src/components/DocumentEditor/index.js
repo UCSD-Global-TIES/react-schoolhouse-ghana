@@ -145,7 +145,7 @@ function DocumentEditor(props) {
   const socket = useContext(SocketContext);
   const MAX_ITEMS = 5;
 
-  const { FormComponent, icon, collection, primary, validation, type, grStatus } = props;
+  const { FormComponent, icon, collection, primary, validation, type, grStatus, teacherName } = props;
   const classes = useStyles();
   // DOCUMENTS EDITOR
   const [selected, setSelected] = useState(null);
