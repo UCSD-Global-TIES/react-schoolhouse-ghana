@@ -14,7 +14,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 function EnrolledClasses(props) {
-    const { subjects, status, title, editable} = props;
+    const { subjects, status, title, editable, gradeLabel} = props;
     const classes = useStyles();
     
     const tagMap = {
@@ -36,6 +36,9 @@ function EnrolledClasses(props) {
                     {subjects.map((subject) => {
                         const date = new Date(subject.createdAt);
                         const year = date.getFullYear();
+
+                        const yearLabel = 'YR' + String(year).slice(-2) + '-' + (String(year+1).slice(-2));
+
                         let label = '';
                         if(status === 'active'){
                             label = year + '-' + (year + 1);
@@ -43,7 +46,7 @@ function EnrolledClasses(props) {
                             label = status;
                         }
                         return (
-                            <ClassCard name={subject.name} tagColor={tagMap[status]} tagLabel={label} image='' editable={editable} />
+                            <ClassCard name = {`${subject.name} ${gradeLabel}`} secondLine = {yearLabel} tagColor={tagMap[status]} tagLabel={label} image='' editable={editable} />
                         );
                     })}
                     </div>

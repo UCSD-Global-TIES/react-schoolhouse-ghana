@@ -13,7 +13,7 @@ const useStyles = makeStyles({
       border:' 2px solid #4B4B4B',
       background:' #FFF',
       justifyContent: 'center',
-      textAlign: 'left',
+      textAlign: 'center',
       "&:hover": {
         borderColor: props.editable ? "#005FD9" : "#4B4B4B" ,
         background: props.editable ? "#f0f4fc" : "#FFF",
@@ -38,13 +38,13 @@ const useStyles = makeStyles({
     fontSize: '1.125rem',
     fontStyle: 'normal',
     fontWeight: 700,
-    lineHeight: 'normal',
+    // lineHeight: 'normal',
     textTransform: 'uppercase',
-    marginBottom: '0.75rem',
+    // marginBottom: '0.75rem',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
     whiteSpace: 'nowrap',
-    padding: '0.5rem',
+    padding: '0rem 0.5rem',
     
   },
   // Add styles for other elements like the icon, admin label, etc.
@@ -70,6 +70,7 @@ const useStyles = makeStyles({
     borderBottom: '1.5px solid #4B4B4B',
     objectFit: 'contain',
     overflow: 'hidden',
+    marginBottom: '0.5rem',
     backgroundImage: `url(${SubjectDefault})`,
   },
   tagContainer: {
@@ -93,7 +94,7 @@ const useStyles = makeStyles({
   // Add more styles as needed for the design
 });
 
-function ClassCard({ name, handleDocument, document, tagLabel, tagColor, handleSelect, editable }) {
+function ClassCard({ name, handleDocument, document, tagLabel, tagColor, handleSelect, editable, secondLine }) {
   
   //const { name, handleDocument, document, tagLabel, tagColor, handleSelect, editable } = props;
   const classes = useStyles({editable});
@@ -143,6 +144,7 @@ function ClassCard({ name, handleDocument, document, tagLabel, tagColor, handleS
       </div>
       </div>
       <p className={classes.text}>{name}</p>
+      <p className={classes.text}>{secondLine}</p>
       <div className={classes.tagContainer}>
         <Tag label={tagLabel} color={tagColor}></Tag>
       </div>

@@ -279,10 +279,10 @@ function AdminPortal(props) {
       collection: "Grade",
       icon: faShapes,
       FormComponent: (p) => <GradesForm user={props.user} {...p} />,
-      // primary: (doc) => `Grade ${doc.level}`,
+      primary: (doc) => `Grade ${doc.level}`,
+      secondary: (doc) => `G${doc.level}`,
       path: `${props.match.path}/grades`,
       grStatus: (doc) => `(${doc.status})`,
-      primary: (doc) => `${doc.teachers[0]}`,
       api: {
         get: API.getGrades,
         post: API.addGrade,
@@ -458,6 +458,7 @@ function AdminPortal(props) {
             validation={page.validation}
             type={page.type}
             grStatus={page.grStatus}
+            secondary={page.secondary}
             {...props}
           />
         ),

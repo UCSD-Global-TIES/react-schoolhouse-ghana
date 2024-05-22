@@ -206,9 +206,10 @@ function GradesForm(props) {
                 
                 <FormControlLabel control={<Checkbox checked={checked} onChange={changeStatus}/>} label="Publish Grade" />
 
-                <div className={classes.margin}>
+                //TODO: This has issues when editing subjects for a grade, also with 'gradeLabel' prop
+                {/* <div className={classes.margin}>
                     <EnrolledClasses subjects={props.document.subjects} status={gradeStatus} title={'CURRENT SUBJECTS'} editable={false}></EnrolledClasses>
-                </div>
+                </div> */}
                 
                 <DocumentPicker
                     title={"Grade Subjects"}

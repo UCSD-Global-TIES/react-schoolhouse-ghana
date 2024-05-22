@@ -42,6 +42,8 @@ import EnrolledClasses from "../EnrolledClasses";
 
 import Divider from '@material-ui/core/Divider';
 
+import API from "../../utils/API";
+
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -145,7 +147,7 @@ function DocumentEditor(props) {
   const socket = useContext(SocketContext);
   const MAX_ITEMS = 5;
 
-  const { FormComponent, icon, collection, primary, validation, type, grStatus, teacherName } = props;
+  const { FormComponent, icon, collection, primary, validation, type, grStatus, secondary } = props;
   const classes = useStyles();
   // DOCUMENTS EDITOR
   const [selected, setSelected] = useState(null);
@@ -155,6 +157,7 @@ function DocumentEditor(props) {
   const [page, setPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
 
+  const [teacherOptions, setTeacherOptions] = useState([]);
   // ALERTS
   const [currentAlert, setCurrentAlert] = useState({
     isOpen: false,
@@ -454,6 +457,33 @@ function DocumentEditor(props) {
     props.history.push(`${destination}?_id=${_id}&redirect=true`);
   };
 
+
+  useEffect(() => {
+    const promises = [];
+    promises.push(API.getUsers(props.user.key));
+
+    Promise.all(promises)
+        .then((results) => {
+            const teachers = [];
+            for (const account of results[0].data) {
+                const { first_name, last_name, profile_id: _id, profile_createdAt: createdAt, profile_updatedAt: updatedAt } = account;
+                const profileObj = {
+                    first_name,
+                    last_name,
+                    _id,
+                    createdAt,
+                    updatedAt
+                }
+
+                if (account.type === "Teacher") teachers.push(profileObj)
+            }
+
+            setTeacherOptions([...teachers]);
+
+        })
+}, []);
+
+
   useEffect(() => {
     if (!!props.get) {
       props.get(props.user.key).then((docData) => {
@@ -693,17 +723,27 @@ function DocumentEditor(props) {
                             {filteredDocuments.map((document) => {
                                 const date = new Date(document.createdAt);
                                 const year = date.getFullYear();
+                                
+                                const yearLabel = 'YR' + String(year).slice(-2) + '-' + (String(year+1).slice(-2));
+
                                 let label = '';
                                 if(item === 'active'){
                                     label = year + '-' + (year + 1);
                                 } else {
                                     label = item;
                                 }
+
+                                const teacherId = document.teachers[0];
+                                const teacher = teacherOptions.find(teacher => teacher._id === teacherId);
+                                const teacherName = teacher ? `${teacher.last_name}` : '';
+
+                                const gradeLabel = teacher ? secondary(document) : primary(document);
  
                                 return (
                                   grStatus(document) == `(${item})` && (
                                     <ClassCard
-                                      name={primary(document)}
+                                      name = {`${teacherName} ${gradeLabel}`}
+                                      secondLine = {yearLabel}
                                       tagColor={tagMap[item]}
                                       tagLabel={label}
                                       image=''

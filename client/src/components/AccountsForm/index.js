@@ -82,6 +82,7 @@ function AccountsForm(props) {
     const grade = gradeOptions.find(option => option._id == PROPS.document['grade']) || gradeValue || {};
     const subjects = grade.subjects || [];
     const status = grade.status || 'unpublished';
+    const gradeLabel = grade.level ? `G${grade.level}` : '';
 
     const handleAutocompleteChange = (e, value, name) => {
         if (e && value && name) {
@@ -278,7 +279,7 @@ function AccountsForm(props) {
                         />
                     )})}
                                 
-                    <EnrolledClasses subjects={subjects} status={status} title={'ENROLLED CLASSES'} editable={false}></EnrolledClasses>
+                    <EnrolledClasses subjects={subjects} status={status} title={'ENROLLED CLASSES'} editable={false} gradeLabel={gradeLabel}></EnrolledClasses>
 
             </div>
         </div>
