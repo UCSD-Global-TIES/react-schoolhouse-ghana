@@ -9,6 +9,7 @@ import EditIcon from "@material-ui/icons/Edit";
 import clsx from "clsx";
 import { Button } from "@material-ui/core";
 import { lighten, makeStyles } from "@material-ui/core/styles";
+import banner from "../../assets/banner.png";
 
 const useToolbarStyles = makeStyles((theme) => ({
   root: {
@@ -37,6 +38,21 @@ const useToolbarStyles = makeStyles((theme) => ({
   },
   padding: {
     padding: "0.56rem 1.25rem"
+  },
+  imageContainer: {
+    position: 'relative',
+    top: 0,
+    right: 0,
+    width: '115%', 
+    height: '110%', 
+    marginTop: '-7%', 
+    marginLeft: '-8%',
+    marginBottom: '5rem'
+  },
+  image: {
+    width: '100%',
+    height: '100%',
+    objectFit: 'cover',
   }
 }));
 
@@ -46,6 +62,12 @@ const EnhancedListToolbar = (props) => {
     props;
 
   return (
+    <div>
+      {title === "Announcement" && (
+        <div className={classes.imageContainer}>
+          <img src={banner} alt="Description" className={classes.image} />
+      </div>
+    )}
     <Toolbar
       className={clsx(classes.root, {
         [classes.highlight]: numSelected > 0,
@@ -84,10 +106,11 @@ const EnhancedListToolbar = (props) => {
       ) : (
         ""
       )}
-      <Button onClick={handleCreate} className={buttonClass + " " + classes.createBtn} classes={{text: classes.padding}}>
+      <Button onClick={handleCreate} className={buttonClass + " " + classes.createBtn} classes={{ text: classes.padding }}>
         + {title}
       </Button>
     </Toolbar>
+  </div>
   );
 };
 
