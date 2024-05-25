@@ -134,7 +134,7 @@ const useStyles = makeStyles((theme) => ({
     marginTop:".5rem",
     maxWidth: "100%",
     flexWrap: "nowrap",
-  }
+}
 }));
 
 // Can be non-specific for all document editors

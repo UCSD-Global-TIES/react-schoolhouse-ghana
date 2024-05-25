@@ -8,6 +8,7 @@ const useStyles = makeStyles({
   
     container: (props) => ({
       minWidth: '10.5rem',
+      maxWidth: '10.5rem',
       flexShrink: 0,
       height: 'fit-content',
       borderRadius:' 0.75rem',

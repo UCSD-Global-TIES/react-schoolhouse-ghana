@@ -12,7 +12,8 @@ import EnrolledClasses from "../EnrolledClasses";
 
 const useStyles = makeStyles(theme => ({
     root: {
-        display: "flex"
+        // display: "flex"
+        width: "100%",
     },
     field: {
         margin: "1rem 0px"
@@ -22,6 +23,13 @@ const useStyles = makeStyles(theme => ({
         // width: "90%",
         // margin: "auto"
     },
+    cardContainer: {
+        
+        overflowX: "auto",
+        whiteSpace: "nowrap",
+        maxWidth: "100%",
+        flexWrap: "nowrap",
+    }
 }));
 
 const disabledMsg = `This field will be populated after account creation.`
@@ -278,8 +286,11 @@ function AccountsForm(props) {
 
                         />
                     )})}
-                                
+
+                    <div className={classes.cardContainer}>
                     <EnrolledClasses subjects={subjects} status={status} title={'ENROLLED CLASSES'} editable={false} gradeLabel={gradeLabel}></EnrolledClasses>
+
+                    </div>            
 
             </div>
         </div>

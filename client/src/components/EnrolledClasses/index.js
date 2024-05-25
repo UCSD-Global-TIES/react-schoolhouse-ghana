@@ -10,6 +10,7 @@ const useStyles = makeStyles(theme => ({
         overflowX: "auto",
         whiteSpace: "nowrap",
         marginTop:'.5rem',
+        width: '100%',
     }
 }));
 
