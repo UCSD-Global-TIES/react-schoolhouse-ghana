@@ -309,7 +309,7 @@ function GradesForm(props) {
                 variant="body1"
                 style={{ display: "inline", fontWeight: "bold" }}
                 >
-                archived and read only.
+                archived.
                 </Typography>{" "}
                 You can undo this action within grade page settings.
             </ConfirmDialog>
