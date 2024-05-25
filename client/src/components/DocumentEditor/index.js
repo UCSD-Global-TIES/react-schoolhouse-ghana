@@ -1,41 +1,24 @@
 import React, { useEffect, useState, useContext } from "react";
-import { getQueries, parseTime } from "../../utils/misc";
-import clsx from "clsx";
-import { Alert, Skeleton, Pagination } from "@material-ui/lab";
-import {
-  Button,
-  IconButton,
-  FormControl,
-  Input,
-  InputLabel,
-  InputAdornment,
-  Snackbar,
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemSecondaryAction,
-  ListItemText,
-  Checkbox,
-  Typography,
-  FilledInput,
-} from "@material-ui/core";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faSpinner,
-  faExternalLinkAlt,
-} from "@fortawesome/free-solid-svg-icons";
-
-import SearchIcon from "@material-ui/icons/Search";
+import { Button, Snackbar, List, Typography, Box } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
+import { Alert, Skeleton, Pagination } from "@material-ui/lab";
+import { getQueries } from "../../utils/misc";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSpinner } from "@fortawesome/free-solid-svg-icons";
 import EnhancedListToolbar from "../EnhancedListToolbar";
-import FullScreenDialog from "../FullScreenDialog";
 import ConfirmDialog from "../ConfirmDialog";
 import "../../utils/flowHeaders.min.css";
 import SocketContext from "../../socket-context";
 import SearchBar from "../SearchBar/SearchBar";
-
-import UserList from "../UserList/UserList";
 import NameCard from "../NameCard/NameCard";
+import ClassCard from "../ClassCard";
+import EnrolledClasses from "../EnrolledClasses";
+
+import Divider from '@material-ui/core/Divider';
+
+import API from "../../utils/API";
+
+import transitions from "@material-ui/core/styles/transitions";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -103,6 +86,26 @@ const useStyles = makeStyles((theme) => ({
     fontWeight: 700,
     lineHeight: "normal",
   },
+  classContainer: { 
+    display: "flex",
+    gap: "2rem",
+    overflowX: "auto",
+    whiteSpace: "nowrap",
+    marginBottom: "2.6rem",
+    marginTop:".5rem",
+    maxWidth: "100%",
+    flexWrap: "nowrap",
+},
+  tabs: {
+    border: "none",
+    borderTop: "none",
+    borderBottom: "none",
+    borderLeft: "none",
+    borderRight: "none",
+    boxShadow: "none",
+    transition: "none",
+    borderRadius: "none",
+  },
 }));
 
 // Can be non-specific for all document editors
@@ -115,7 +118,7 @@ function DocumentEditor(props) {
   const socket = useContext(SocketContext);
   const MAX_ITEMS = 5;
 
-  const { FormComponent, icon, collection, primary, validation, type } = props;
+  const { FormComponent, icon, collection, primary, validation, type, grStatus, secondary } = props;
   const classes = useStyles();
   // DOCUMENTS EDITOR
   const [selected, setSelected] = useState(null);
@@ -125,6 +128,7 @@ function DocumentEditor(props) {
   const [page, setPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
 
+  const [teacherOptions, setTeacherOptions] = useState([]);
   // ALERTS
   const [currentAlert, setCurrentAlert] = useState({
     isOpen: false,
@@ -132,6 +136,8 @@ function DocumentEditor(props) {
     message: "",
   });
   const [confirmOpen, setConfirmOpen] = useState(false);
+
+  const [confirmArchive, setConfirmArchive] = useState(false);
 
   // DOCUMENT DIALOG
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -145,6 +151,15 @@ function DocumentEditor(props) {
 
   // COMPONENT STATUS
   const [loading, setLoading] = useState(true);
+
+  // State for Account Interface
+  const [accountsToDisplay, setAccountsToDisplay] = useState("Admin");
+
+  const tagMap = {
+    'archived': 'grey',
+    'unpublished': 'blue',
+    'active': 'green',
+  }
 
   const handleRefresh = () => {
     setRefreshing(true);
@@ -229,17 +244,6 @@ function DocumentEditor(props) {
 
   // Handle checkbox selection
   const handleSelect = (value) => {
-    // const currentIndex = selected.indexOf(value);
-    // const newSelected = [...selected];
-
-    // if (currentIndex === -1) {
-    //   newSelected.push(value);
-    // } else {
-    //   newSelected.splice(currentIndex, 1);
-    // }
-
-    // setSelected(newSelected);
-
     setSelected([value]);
     setConfirmOpen(true);
   };
@@ -418,6 +422,33 @@ function DocumentEditor(props) {
     props.history.push(`${destination}?_id=${_id}&redirect=true`);
   };
 
+
+  useEffect(() => {
+    const promises = [];
+    promises.push(API.getUsers(props.user.key));
+
+    Promise.all(promises)
+        .then((results) => {
+            const teachers = [];
+            for (const account of results[0].data) {
+                const { first_name, last_name, profile_id: _id, profile_createdAt: createdAt, profile_updatedAt: updatedAt } = account;
+                const profileObj = {
+                    first_name,
+                    last_name,
+                    _id,
+                    createdAt,
+                    updatedAt
+                }
+
+                if (account.type === "Teacher") teachers.push(profileObj)
+            }
+
+            setTeacherOptions([...teachers]);
+
+        })
+}, []);
+
+
   useEffect(() => {
     if (!!props.get) {
       props.get(props.user.key).then((docData) => {
@@ -544,7 +575,11 @@ function DocumentEditor(props) {
       <ConfirmDialog
         open={confirmOpen}
         buttonText={
-          actionPending ? <FontAwesomeIcon icon={faSpinner} spin /> : `Delete this ${collection}`
+          actionPending ? (
+            <FontAwesomeIcon icon={faSpinner} spin />
+          ) : (
+            `Delete this ${collection}`
+          )
         }
         handleClose={() => {
           handleConfirm(false);
@@ -552,8 +587,15 @@ function DocumentEditor(props) {
         }}
         handleAction={handleDelete}
       >
-        This will <Typography variant="body1" style={{display: "inline", fontWeight: "bold"}}>permanently delete</Typography> this {collection.toLowerCase()} and all
-        associated data. You cannot undo this action.
+        This will{" "}
+        <Typography
+          variant="body1"
+          style={{ display: "inline", fontWeight: "bold" }}
+        >
+          permanently delete
+        </Typography>{" "}
+        this {collection.toLowerCase()} and all associated data. You cannot undo
+        this action.
       </ConfirmDialog>
 
       {!dialogOpen && (
@@ -592,29 +634,36 @@ function DocumentEditor(props) {
               )) // MAPPING ALL DOCUMENTS
             ) : filteredDocuments.length ? (
               <>
-                <div style={{ display: "flex" }}>
-                  <div className={classes.paginationContainer}>
-                    <Pagination
-                      size="small"
-                      color={"primary"}
-                      count={Math.ceil(filteredDocuments.length / MAX_ITEMS)}
-                      page={page}
-                      onChange={handlePageChange}
-                    />
-                  </div>
-                </div>
-
+                {/* Logic for Handling Account Interface vs Other data */}
                 {collection == "Account" ? (
                   <>
-                    {["Admin", "Teacher", "Student"].map((item) => (
-                      <>
-                        <Typography variant="h2">{item}s</Typography>
-                        {filteredDocuments.filter(
-                          (document) => type(document) == `(${item})`
-                        ).length > 0 ? (
-                          filteredDocuments.map((document) => {
+                    <Box style={{ display: "flex", gap: 50 }}>
+                      {["Admin", "Teacher", "Student"].map((item) => (
+                        <Button
+                          onClick={() => setAccountsToDisplay(item)}
+                          disableRipple={true}
+                          className={classes.tabs}
+                        >
+                          <Typography
+                            variant="h2"
+                            style={
+                              accountsToDisplay === item
+                                ? { textDecoration: "underline" }
+                                : null
+                            }
+                          >
+                            {item}s
+                          </Typography>
+                        </Button>
+                      ))}
+                    </Box>
+                    <Box>
+                      {filteredDocuments.filter(
+                        (document) => type(document) == `(${accountsToDisplay})`
+                      ).length > 0
+                        ? filteredDocuments.map((document) => {
                             return (
-                              type(document) == `(${item})` && (
+                              type(document) == `(${accountsToDisplay})` && (
                                 <List className={classes.list}>
                                   <NameCard
                                     handleDocument={handleDocument}
@@ -627,12 +676,82 @@ function DocumentEditor(props) {
                               )
                             );
                           })
+                        : null}
+                    </Box>
+                    {/* Pagination Feature - navigate pages of users */}
+                    <div style={{ display: "flex" }}>
+                      <div className={classes.paginationContainer}>
+                        <Pagination
+                          size="small"
+                          color={"primary"}
+                          count={Math.ceil(
+                            filteredDocuments.length / MAX_ITEMS
+                          )}
+                          page={page}
+                          onChange={handlePageChange}
+                        />
+                      </div>
+                    </div>
+                  </>
+                ) : collection == "Grade" ? (
+                  <div>
+                  
+                    {["active", "unpublished", "archived"].map((item) => (
+                      
+                      <>
+                        
+                        {filteredDocuments.filter(
+                          (document) => grStatus(document) == `(${item})`
+                        ).length > 0 ? (
+                          <>
+                          <Typography variant="h2">{item}</Typography>
+                          <div className={classes.classContainer}>
+                          
+                            {filteredDocuments.map((document) => {
+                                const date = new Date(document.createdAt);
+                                const year = date.getFullYear();
+                                
+                                const yearLabel = 'YR' + String(year).slice(-2) + '-' + (String(year+1).slice(-2));
+
+                                let label = '';
+                                if(item === 'active'){
+                                    label = year + '-' + (year + 1);
+                                } else {
+                                    label = item;
+                                }
+
+                                const teacherId = document.teachers[0];
+                                const teacher = teacherOptions.find(teacher => teacher._id === teacherId);
+                                const teacherName = teacher ? `${teacher.last_name}` : '';
+
+                                const gradeLabel = teacher ? secondary(document) : primary(document);
+ 
+                                return (
+                                  grStatus(document) == `(${item})` && (
+                                    <ClassCard
+                                      name = {`${teacherName} ${gradeLabel}`}
+                                      secondLine = {yearLabel}
+                                      tagColor={tagMap[item]}
+                                      tagLabel={label}
+                                      image=''
+                                      handleDocument={handleDocument}
+                                      handleSelect={handleSelect}
+                                      document={document}
+                                      editable={true}
+                                    />
+                                  )
+                                );
+                            })}
+                          </div>
+                          {item !== "archived" && <Divider style={{marginBottom:'2rem', height: '0.1875rem'}}/>}
+                          
+                          </>
                         ) : (
-                          <p>No {item.toLowerCase()}s were found.</p>
+                          <p>No {item.toLowerCase()} grades to display.</p>
                         )}
                       </>
                     ))}
-                  </>
+                  </div>
                 ) : (
                   <>
                     {viewableDocuments.map((document, idx) => {

@@ -12,7 +12,8 @@ import EnrolledClasses from "../EnrolledClasses";
 
 const useStyles = makeStyles(theme => ({
     root: {
-        display: "flex"
+        // display: "flex"
+        width: "100%",
     },
     field: {
         margin: "1rem 0px"
@@ -22,6 +23,13 @@ const useStyles = makeStyles(theme => ({
         // width: "90%",
         // margin: "auto"
     },
+    cardContainer: {
+        
+        overflowX: "auto",
+        whiteSpace: "nowrap",
+        maxWidth: "100%",
+        flexWrap: "nowrap",
+    }
 }));
 
 const disabledMsg = `This field will be populated after account creation.`
@@ -81,6 +89,8 @@ function AccountsForm(props) {
 
     const grade = gradeOptions.find(option => option._id == PROPS.document['grade']) || gradeValue || {};
     const subjects = grade.subjects || [];
+    const status = grade.status || 'unpublished';
+    const gradeLabel = grade.level ? `G${grade.level}` : '';
 
     const handleAutocompleteChange = (e, value, name) => {
         if (e && value && name) {
@@ -276,8 +286,11 @@ function AccountsForm(props) {
 
                         />
                     )})}
-                                
-                    <EnrolledClasses subjects={subjects}></EnrolledClasses>
+
+                    <div className={classes.cardContainer}>
+                    <EnrolledClasses subjects={subjects} status={status} title={'ENROLLED CLASSES'} editable={false} gradeLabel={gradeLabel}></EnrolledClasses>
+
+                    </div>            
 
             </div>
         </div>
