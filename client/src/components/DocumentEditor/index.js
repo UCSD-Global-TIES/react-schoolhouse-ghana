@@ -1,41 +1,15 @@
 import React, { useEffect, useState, useContext } from "react";
-import { getQueries, parseTime } from "../../utils/misc";
-import clsx from "clsx";
-import { Alert, Skeleton, Pagination } from "@material-ui/lab";
-import {
-  Button,
-  IconButton,
-  FormControl,
-  Input,
-  InputLabel,
-  InputAdornment,
-  Snackbar,
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemSecondaryAction,
-  ListItemText,
-  Checkbox,
-  Typography,
-  FilledInput,
-} from "@material-ui/core";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faSpinner,
-  faExternalLinkAlt,
-} from "@fortawesome/free-solid-svg-icons";
-
-import SearchIcon from "@material-ui/icons/Search";
+import { Button, Snackbar, List, Typography, Box } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
+import { Alert, Skeleton, Pagination } from "@material-ui/lab";
+import { getQueries } from "../../utils/misc";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSpinner } from "@fortawesome/free-solid-svg-icons";
 import EnhancedListToolbar from "../EnhancedListToolbar";
-import FullScreenDialog from "../FullScreenDialog";
 import ConfirmDialog from "../ConfirmDialog";
 import "../../utils/flowHeaders.min.css";
 import SocketContext from "../../socket-context";
 import SearchBar from "../SearchBar/SearchBar";
-
-// import Button from "../Button/Button";
-import UserList from "../UserList/UserList";
 import NameCard from "../NameCard/NameCard";
 import ClassCard from "../ClassCard";
 import EnrolledClasses from "../EnrolledClasses";
@@ -44,6 +18,7 @@ import Divider from '@material-ui/core/Divider';
 
 import API from "../../utils/API";
 
+import transitions from "@material-ui/core/styles/transitions";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -82,20 +57,6 @@ const useStyles = makeStyles((theme) => ({
     width: "100%",
   },
   btn: {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "flex-start",
-    gap: "0.625rem",
-    height: "3.00rem",
-    padding: "0.5625rem 1.25rem",
-    flexShrink: "0",
-    fontSize: "1.75rem",
-    borderRadius: "1.5rem",
-    fontFamily: "Nunito",
-    borderTop: "1px solid #005FD9",
-    borderRight: "1px solid #005FD9",
-    borderBottom: "4px solid #005FD9",
-    borderLeft: "1px solid #005FD9",
     background: "#2584FF",
     color: "#FFF",
   },
@@ -135,6 +96,16 @@ const useStyles = makeStyles((theme) => ({
     maxWidth: "100%",
     flexWrap: "nowrap",
 }
+  tabs: {
+    border: "none",
+    borderTop: "none",
+    borderBottom: "none",
+    borderLeft: "none",
+    borderRight: "none",
+    boxShadow: "none",
+    transition: "none",
+    borderRadius: "none",
+  },
 }));
 
 // Can be non-specific for all document editors
@@ -178,6 +149,9 @@ function DocumentEditor(props) {
 
   // COMPONENT STATUS
   const [loading, setLoading] = useState(true);
+
+  // State for Account Interface
+  const [accountsToDisplay, setAccountsToDisplay] = useState("Admin");
 
   const tagMap = {
     'archived': 'grey',
@@ -268,17 +242,6 @@ function DocumentEditor(props) {
 
   // Handle checkbox selection
   const handleSelect = (value) => {
-    // const currentIndex = selected.indexOf(value);
-    // const newSelected = [...selected];
-
-    // if (currentIndex === -1) {
-    //   newSelected.push(value);
-    // } else {
-    //   newSelected.splice(currentIndex, 1);
-    // }
-
-    // setSelected(newSelected);
-
     setSelected([value]);
     setConfirmOpen(true);
   };
@@ -588,16 +551,12 @@ function DocumentEditor(props) {
           <div className={classes.buttonContainer}>
             <Button
               className={`${classes.btn} ${classes.cancelbtn}`}
-              text="Cancel"
-              icon="add"
               onClick={() => handleDocument(false)}
             >
               Cancel
             </Button>
             <Button
               className={classes.btn}
-              text="Save"
-              icon="add"
               onClick={
                 isCreate
                   ? () => handleCreate(currentDocument)
@@ -614,16 +573,27 @@ function DocumentEditor(props) {
       <ConfirmDialog
         open={confirmOpen}
         buttonText={
-          actionPending ? <FontAwesomeIcon icon={faSpinner} spin /> : "Confirm"
+          actionPending ? (
+            <FontAwesomeIcon icon={faSpinner} spin />
+          ) : (
+            `Delete this ${collection}`
+          )
         }
         handleClose={() => {
-          handleConfirm(false)
-          setSelected(null)
+          handleConfirm(false);
+          setSelected(null);
         }}
         handleAction={handleDelete}
       >
-        Are you sure you would like to delete the selected {" "}
-        {collection.toLowerCase()}?
+        This will{" "}
+        <Typography
+          variant="body1"
+          style={{ display: "inline", fontWeight: "bold" }}
+        >
+          permanently delete
+        </Typography>{" "}
+        this {collection.toLowerCase()} and all associated data. You cannot undo
+        this action.
       </ConfirmDialog>
 
       {!dialogOpen && (
@@ -662,29 +632,36 @@ function DocumentEditor(props) {
               )) // MAPPING ALL DOCUMENTS
             ) : filteredDocuments.length ? (
               <>
-                <div style={{ display: "flex" }}>
-                  <div className={classes.paginationContainer}>
-                    <Pagination
-                      size="small"
-                      color={"primary"}
-                      count={Math.ceil(filteredDocuments.length / MAX_ITEMS)}
-                      page={page}
-                      onChange={handlePageChange}
-                    />
-                  </div>
-                </div>
-
+                {/* Logic for Handling Account Interface vs Other data */}
                 {collection == "Account" ? (
                   <>
-                    {["Admin", "Teacher", "Student"].map((item) => (
-                      <>
-                        <Typography variant="h2">{item}s</Typography>
-                        {filteredDocuments.filter(
-                          (document) => type(document) == `(${item})`
-                        ).length > 0 ? (
-                          filteredDocuments.map((document) => {
+                    <Box style={{ display: "flex", gap: 50 }}>
+                      {["Admin", "Teacher", "Student"].map((item) => (
+                        <Button
+                          onClick={() => setAccountsToDisplay(item)}
+                          disableRipple={true}
+                          className={classes.tabs}
+                        >
+                          <Typography
+                            variant="h2"
+                            style={
+                              accountsToDisplay === item
+                                ? { textDecoration: "underline" }
+                                : null
+                            }
+                          >
+                            {item}s
+                          </Typography>
+                        </Button>
+                      ))}
+                    </Box>
+                    <Box>
+                      {filteredDocuments.filter(
+                        (document) => type(document) == `(${accountsToDisplay})`
+                      ).length > 0
+                        ? filteredDocuments.map((document) => {
                             return (
-                              type(document) == `(${item})` && (
+                              type(document) == `(${accountsToDisplay})` && (
                                 <List className={classes.list}>
                                   <NameCard
                                     handleDocument={handleDocument}
@@ -697,14 +674,22 @@ function DocumentEditor(props) {
                               )
                             );
                           })
-                        ) : (
-                          <p>No {item.toLowerCase()}s were found.</p>
-                        )}
-                        {item !== "Student" && <Divider style={{marginBottom:'2rem', marginTop:'2rem', height: '0.1875rem'}}/>}
-                        
-                      </>
-                      
-                    ))}
+                        : null}
+                    </Box>
+                    {/* Pagination Feature - navigate pages of users */}
+                    <div style={{ display: "flex" }}>
+                      <div className={classes.paginationContainer}>
+                        <Pagination
+                          size="small"
+                          color={"primary"}
+                          count={Math.ceil(
+                            filteredDocuments.length / MAX_ITEMS
+                          )}
+                          page={page}
+                          onChange={handlePageChange}
+                        />
+                      </div>
+                    </div>
                   </>
                 ) : collection == "Grade" ? (
                   <div>

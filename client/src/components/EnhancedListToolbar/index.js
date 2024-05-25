@@ -35,6 +35,9 @@ const useToolbarStyles = makeStyles((theme) => ({
     minWidth: "11.3rem",
     height: "3.5rem",
   },
+  padding: {
+    padding: "0.56rem 1.25rem"
+  }
 }));
 
 const EnhancedListToolbar = (props) => {
@@ -81,7 +84,7 @@ const EnhancedListToolbar = (props) => {
       ) : (
         ""
       )}
-      <Button onClick={handleCreate} className={buttonClass + " " + classes.createBtn}>
+      <Button onClick={handleCreate} className={buttonClass + " " + classes.createBtn} classes={{text: classes.padding}}>
         + {title}
       </Button>
     </Toolbar>

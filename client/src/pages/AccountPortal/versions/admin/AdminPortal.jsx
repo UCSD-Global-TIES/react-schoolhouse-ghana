@@ -30,7 +30,6 @@ import {
 import AccountsForm from "../../../../components/AccountsForm";
 import AnnouncementsForm from "../../../../components/AnnouncementsForm";
 import AssessmentForm from "../../../../components/AssessmentForm";
-// import Button from "../../../../components/Button/Button";
 import DocumentEditor from "../../../../components/DocumentEditor/index.js";
 import FilesForm from "../../../../components/FilesForm";
 import GradesForm from "../../../../components/GradesForm";
