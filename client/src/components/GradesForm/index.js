@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { TextField, Box, Switch, Typography, CircularProgress, Divider } from "@material-ui/core";
+import { TextField, Box, Switch, Typography, CircularProgress, Divider, Button } from "@material-ui/core";
 import { makeStyles } from '@material-ui/core/styles';
 import { parseTime } from '../../utils/misc';
 import DocumentPicker from "../DocumentPicker"
@@ -27,7 +27,26 @@ const useStyles = makeStyles(theme => ({
     },
     margin: {
         marginBottom: "2rem"
-     }
+     },
+     btn: {
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "flex-start",
+        gap: "0.625rem",
+        height: "3.00rem",
+        padding: "0.5625rem 1.25rem",
+        flexShrink: "0",
+        fontSize: "1.75rem",
+        borderRadius: "1.5rem",
+        fontFamily: "Nunito",
+        borderTop: "1px solid #005FD9",
+        borderRight: "1px solid #005FD9",
+        borderBottom: "4px solid #005FD9",
+        borderLeft: "1px solid #005FD9",
+        background: "#2584FF",
+        color: "#FFF",
+        margin: "1rem",
+      },
 }));
 
 const disabledMsg = `This field will be populated after grade creation.`
@@ -122,6 +141,13 @@ function GradesForm(props) {
         PROPS.handleChange(event)
     }
 
+    const rerouteSubjects = () => {
+        props.history.push({
+            pathname: `/edit/subjects`,
+        })
+    
+    }
+
     useEffect(() => {
         const promises = [];
         promises.push(API.getSubjects(props.user.key));
@@ -206,7 +232,7 @@ function GradesForm(props) {
                 
                 <FormControlLabel control={<Checkbox checked={checked} onChange={changeStatus}/>} label="Publish Grade" />
 
-                //TODO: This has issues when editing subjects for a grade, also with 'gradeLabel' prop
+                {/* TODO: This has issues when editing subjects for a grade, also with 'gradeLabel' prop */}
                 {/* <div className={classes.margin}>
                     <EnrolledClasses subjects={props.document.subjects} status={gradeStatus} title={'CURRENT SUBJECTS'} editable={false}></EnrolledClasses>
                 </div> */}
@@ -221,6 +247,8 @@ function GradesForm(props) {
                     primary={(doc) => doc.name}
                     handleChange={(docs) => handlePickChange('subjects', docs)}
                 />
+
+                <Button className={classes.btn} onClick={rerouteSubjects}>Edit Subjects</Button>
 
                 <DocumentPicker
                     title={"Students"}
