@@ -95,7 +95,7 @@ const useStyles = makeStyles((theme) => ({
     marginTop:".5rem",
     maxWidth: "100%",
     flexWrap: "nowrap",
-}
+},
   tabs: {
     border: "none",
     borderTop: "none",
