@@ -7,7 +7,8 @@ import Tag from "../Tag";
 const useStyles = makeStyles({
   
     container: (props) => ({
-      width: '10.5rem',
+      minWidth: '10.5rem',
+      flexShrink: 0,
       height: 'fit-content',
       borderRadius:' 0.75rem',
       border:' 2px solid #4B4B4B',

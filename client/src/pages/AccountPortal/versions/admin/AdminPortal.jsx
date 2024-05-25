@@ -60,7 +60,7 @@ const drawerPadding = "3.5rem 0";
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    display: "flex",
+    // display: "flex",
     alignItems: "flex-start",
   },
   toolbar: theme.mixins.toolbar,

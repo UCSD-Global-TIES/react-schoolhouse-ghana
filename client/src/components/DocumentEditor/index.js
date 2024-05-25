@@ -132,7 +132,7 @@ const useStyles = makeStyles((theme) => ({
     whiteSpace: "nowrap",
     marginBottom: "2.6rem",
     marginTop:".5rem",
-    width: "full",
+    maxWidth: "100%",
     flexWrap: "nowrap",
   }
 }));
@@ -707,7 +707,7 @@ function DocumentEditor(props) {
                     ))}
                   </>
                 ) : collection == "Grade" ? (
-                  <>
+                  <div>
                   
                     {["active", "unpublished", "archived"].map((item) => (
                       
@@ -748,6 +748,7 @@ function DocumentEditor(props) {
                                       tagLabel={label}
                                       image=''
                                       handleDocument={handleDocument}
+                                      handleSelect={handleSelect}
                                       document={document}
                                       editable={true}
                                     />
@@ -763,7 +764,7 @@ function DocumentEditor(props) {
                         )}
                       </>
                     ))}
-                  </>
+                  </div>
                 ) : (
                   <>
                     {viewableDocuments.map((document, idx) => {
