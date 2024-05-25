@@ -4,6 +4,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import { parseTime } from '../../utils/misc';
 import DocumentPicker from "../DocumentPicker"
 import EnrolledClasses from "../EnrolledClasses";
+import ConfirmDialog from "../ConfirmDialog";
 
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
@@ -32,7 +33,7 @@ const useStyles = makeStyles(theme => ({
         display: "flex",
         flexDirection: "column",
         alignItems: "flex-start",
-        gap: "0.625rem",
+        // gap: "0.625rem",
         height: "3.00rem",
         padding: "0.5625rem 1.25rem",
         flexShrink: "0",
@@ -45,7 +46,7 @@ const useStyles = makeStyles(theme => ({
         borderLeft: "1px solid #005FD9",
         background: "#2584FF",
         color: "#FFF",
-        margin: "1rem",
+        // margin: "1rem",
       },
 }));
 
@@ -90,6 +91,7 @@ function GradesForm(props) {
     const [gradeStatus, setGradeStatus] = useState(props.document.status || 'unpublished');
     const [PROPS, setProps] = useState(props)
     const [checked, setChecked] = useState(gradeStatus === 'active' ? true : false)
+    const [confirmOpen, setConfirmOpen] = useState(false);
 
 
     const handleNumberChange = (e) => {
@@ -148,6 +150,25 @@ function GradesForm(props) {
     
     }
 
+    const archiveGrade = () => {
+        setConfirmOpen(true);
+    }
+
+    const handleConfirm = (isOpen) => {
+        setConfirmOpen(isOpen);
+      };
+      
+    const handleArchive = (e) => {
+        setChecked(false);
+        let status = 'archived';
+        setGradeStatus(status);
+
+        let newEvent = { ...e, target: { ...e.target, name: 'status', value: status } };
+
+        PROPS.handleChange(newEvent);
+        setConfirmOpen(false);
+    }
+
     useEffect(() => {
         const promises = [];
         promises.push(API.getSubjects(props.user.key));
@@ -200,6 +221,7 @@ function GradesForm(props) {
 
     return (
         <div className={classes.root}>
+
             <div className={classes.vc}>
 
                 {
@@ -272,6 +294,27 @@ function GradesForm(props) {
                     handleChange={(docs) => handlePickChange('teachers', docs)}
                 />
             </div>
+            
+            <ConfirmDialog
+                open={confirmOpen}
+                buttonText={'Archive this Grade'}
+                handleClose={() => {
+                handleConfirm(false);
+                
+                }}
+                handleAction={handleArchive}
+            >
+                This will mark this grade as{" "}
+                <Typography
+                variant="body1"
+                style={{ display: "inline", fontWeight: "bold" }}
+                >
+                archived and read only.
+                </Typography>{" "}
+                You can undo this action within grade page settings.
+            </ConfirmDialog>
+            
+            <Button className={classes.btn} onClick={archiveGrade} disabled={gradeStatus === 'archived'}>Archive Grade</Button>
 
         </div>
     )

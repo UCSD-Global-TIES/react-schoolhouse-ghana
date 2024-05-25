@@ -137,6 +137,8 @@ function DocumentEditor(props) {
   });
   const [confirmOpen, setConfirmOpen] = useState(false);
 
+  const [confirmArchive, setConfirmArchive] = useState(false);
+
   // DOCUMENT DIALOG
   const [dialogOpen, setDialogOpen] = useState(false);
   const [isCreate, setCreateFlag] = useState(true);
