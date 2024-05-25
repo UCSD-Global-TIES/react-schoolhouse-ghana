@@ -307,7 +307,7 @@ function AdminPortal(props) {
     },
     // SUBJECTS
     {
-      collection: "Subjects",
+      collection: "Subject",
       link: (doc) => `/subject/${doc._id}`,
       icon: faChalkboardTeacher,
       FormComponent: (p) => <SubjectsForm user={props.user} {...p} />,
