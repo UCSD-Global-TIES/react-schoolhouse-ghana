@@ -106,7 +106,7 @@ function SimpleListView(props) {
                         align="center" id="alert-dialog-slide-title">{currentDocument[PROPS.labelField]}</DialogTitle>
 
 
-                    <DialogContent style={{ width: "70vw", maxWidth: "500px", padding: "0px 24px" }}>
+                    <DialogContent style={{  padding: "0px 24px" }}>
 
                         <DocumentViewer document={currentDocument} />
 

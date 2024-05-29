@@ -11,13 +11,13 @@ import { faFile } from "@fortawesome/free-solid-svg-icons";
 
 const useStyles = makeStyles(theme => ({
     root: {
-        display: "flex"
+        width: "100%",
     },
     field: {
         margin: "1rem 0px"
     },
     vc: {
-        // maxWidth: "500px",
+        // //maxWidth: "500px",
         // width: "90%",
         // margin: "auto"
     },
