@@ -168,60 +168,24 @@ function AnnouncementsForm(props) {
     }, [props])
 
     return (
+        <React.Fragment>
         <div className={classes.root}>
             <div className={classes.vc}>
-                <div style={{ width: "100%" }}>
-                    <Box className={classes.field} display="flex">
-                        <Box flexGrow={1}>
-                            Subject-Specific <Typography display='inline' variant='caption' color='textSecondary'> Specifies if this announcement is viewable to the entire school.</Typography>
-                        </Box>
-                        <Box >
-                            <Switch
-                                disabled={!PROPS.isCreate}
-                                checked={PROPS.document['private'] || false}
-                                onChange={handleSwitchToggle('private')}
-                                color="primary"
-                                inputProps={{ 'aria-label': 'primary checkbox' }}
-                            />
-                        </Box>
-                    </Box>
 
-                    <Autocomplete
-                        onChange={(e, value) => handleAutocompleteChange(e, value, 'subject')}
-                        value={subjectValue}
-                        disabled={!PROPS.document['private'] || !PROPS.isCreate}
-                        className={classes.field}
-                        loading={loading}
-                        // Sort by category tag (sort by increasing grade)
-                        options={options.sort((a, b) => a.grade - b.grade)}
-                        // Option category tag (Sort by grade)
-                        groupBy={option => `Grade ${option.grade}`}
-                        // Option text
-                        getOptionLabel={option => option.name}
-                        renderInput={params => (
-                            <TextField
-                                {...params}
-                                label="Subject Name"
-                                helperText="This announcement will only be viewable to this subject's grade."
-                                fullWidth
-                                variant="outlined"
-                                InputProps={{
-                                    ...params.InputProps,
-                                    endAdornment: (
-                                        <React.Fragment>
-                                            {loading ? <CircularProgress color="inherit" size={20} /> : null}
-                                            {params.InputProps.endAdornment}
-                                        </React.Fragment>
-                                    ),
-                                }}
-                            />
-                        )}
-                    />
-
-                </div>
                 {
-                    filteredTextFields.map((item, idx) => (
+                    
+                    textFields.map((item, idx) => (
+                        <React.Fragment key={`${item.name}-form-${idx}`}>
+
+                        {/* Display title above the input field */}
+                        <Typography className={classes.title} variant="subtitle1"
+                            >{item.title}</Typography>
+                        {/* Render TextField */}
+                        
                         <TextField
+                            InputProps={{
+                                style: { borderRadius: '12px' }, // Adjust the value as needed
+                            }}
                             error={PROPS.error[item.name] ? PROPS.error[item.name].exists : null}
                             required={item.required}
                             key={`${item.name}-form-${idx}`}
@@ -236,13 +200,14 @@ function AnnouncementsForm(props) {
                             fullWidth
                             autoComplete={'off'}
                             margin="normal"
-                            InputLabelProps={{
-                                shrink: true,
-                            }}
+                            // InputLabelProps={{
+                            //     shrink: true,
+                            // }}
                             multiline={item.multiline}
                             rows={3}
                             variant="outlined"
                         />
+                        </React.Fragment>
                     ))}
                 <DocumentPicker
                     title={"Attached Files"}
@@ -257,7 +222,8 @@ function AnnouncementsForm(props) {
 
             </div>
         </div>
-    )
+        </React.Fragment>
+        )
 };
 
 export default AnnouncementsForm;
