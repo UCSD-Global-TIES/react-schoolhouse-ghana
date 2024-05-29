@@ -84,7 +84,8 @@ const EnhancedListToolbar = (props) => {
         </Typography>
       ) : (
         <Typography variant="h1" id="tableTitle">
-          {props.title}s Manager
+          {/* {props.title}s Manager */}
+          Schoolwide Announcements
         </Typography>
       )}
 
