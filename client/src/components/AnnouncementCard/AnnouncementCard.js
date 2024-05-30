@@ -1,28 +1,37 @@
 import { makeStyles } from "@material-ui/core/styles";
+import moment from "moment";
 import React from "react";
 
 const useStyles = makeStyles({
   container: {
     display: "flex",
+    height: "4.25rem",
     flex: "1 0 0",
     gap: "0.75rem",
     justifyContent: "space-between", // Added for spacing between name and icons
     padding: "1.25rem 1.875rem",
     alignItems: "center",
-    marginBottom: "1rem", // Add margin between cards
+    marginBottom: "0rem", // Add margin between cards
     borderRadius: "0.75rem", // Adjust border-radius as per the design
     // boxShadow: "0 2px 4px 0 rgba(0,0,0,0.1)", // Add shadow to match the design
     background: "#FFF",
     border: "3px solid #E5E5E5",
     "&:hover": {
-      border: "3px solid #005FD9",
+      borderColor: "#005FD9",
       background: "#f0f4fc",
     },
     "&:hover $iconContainer": {
       display: "flex",
       justifyContent: "space-between",
-      width: "4rem"
+      width: "4rem",
     },
+  },
+  textContainer: {
+    display: "flex",
+    flexDirection: "column",
+    fontSize: "0.75rem",
+    fontFamily: "var(--primary-font)",
+    color: "#AFAFAF",
   },
   text: {
     color: "#4B4B4B",
@@ -44,18 +53,18 @@ const useStyles = makeStyles({
     display: "none",
   },
   icon: {
-    '&:hover': {
-      cursor: "pointer"
-    }
-  }
+    "&:hover": {
+      cursor: "pointer",
+    },
+  },
   // Add more styles as needed for the design
 });
 
-function NameCard(props) {
+function AnnouncementCard(props) {
   const classes = useStyles();
 
   //new code
-  const { name, handleDocument, document } = props; // Destructure the required props
+  const { name, createdAt, handleDocument, handleSelect, document } = props; // Destructure the required props
 
   const handleClick = () => {
     if (handleDocument) {
@@ -63,13 +72,17 @@ function NameCard(props) {
     }
   };
 
+  const deleteDocument = () => {
+    handleSelect(document._id);
+  };
+
   return (
     <div className={classes.container}>
-      {/* <p className={classes.text}>{props.name}</p> */}
-      <p className={classes.text}>{name}</p>
-      {/* {props.isAdmin && <div className={classes.adminLabel}>Admin</div>} */}
+      <div className={classes.textContainer}>
+        <p className={classes.text}>{name}</p>
+        <p className={classes.dateText}>CREATED ON: {moment(createdAt).format('MM/DD/YYYY')}</p>
+      </div>
       <div className={classes.iconContainer}>
-        {/* Add icons here */}
         <div className={classes.icon} onClick={handleClick}>
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -84,7 +97,7 @@ function NameCard(props) {
             />
           </svg>
         </div>
-        <div className={classes.icon}>
+        <div className={classes.icon} onClick={deleteDocument}>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="24"
@@ -103,4 +116,4 @@ function NameCard(props) {
   );
 }
 
-export default NameCard;
+export default AnnouncementCard;

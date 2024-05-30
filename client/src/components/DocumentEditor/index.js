@@ -36,6 +36,8 @@ import SearchBar from "../SearchBar/SearchBar";
 
 import UserList from "../UserList/UserList";
 import NameCard from "../NameCard/NameCard";
+import AnnouncementCard from "../AnnouncementCard/AnnouncementCard";
+
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -639,7 +641,7 @@ function DocumentEditor(props) {
                       const labelId = `${collection.toLowerCase()}-${idx}`;
                       return (
                         <List className={classes.list}>
-                          <NameCard
+                          <AnnouncementCard
                             handleDocument={handleDocument}
                             handleSelect={handleSelect}
                             document={document}
