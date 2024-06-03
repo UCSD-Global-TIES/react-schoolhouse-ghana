@@ -11,6 +11,7 @@ import "../../utils/flowHeaders.min.css";
 import SocketContext from "../../socket-context";
 import SearchBar from "../SearchBar/SearchBar";
 import NameCard from "../NameCard/NameCard";
+import AccountFilter from "../AccountFilter/index";
 import transitions from "@material-ui/core/styles/transitions";
 
 const useStyles = makeStyles((theme) => ({
@@ -103,6 +104,7 @@ function DocumentEditor(props) {
 
   const { FormComponent, icon, collection, primary, validation, type } = props;
   const classes = useStyles();
+
   // DOCUMENTS EDITOR
   const [selected, setSelected] = useState(null);
   const [documents, setDocuments] = useState([]);
@@ -132,9 +134,6 @@ function DocumentEditor(props) {
   // COMPONENT STATUS
   const [loading, setLoading] = useState(true);
 
-  // State for Account Interface
-  const [accountsToDisplay, setAccountsToDisplay] = useState("Admin");
-
   const handleRefresh = () => {
     setRefreshing(true);
     setSelected(null);
@@ -145,7 +144,7 @@ function DocumentEditor(props) {
       // Initialize documents
       setDocuments(docList);
 
-      setPage(0);
+      setPage(page);
 
       if (searchQuery.length) {
         const filteredDocuments = docList.filter((document) =>
@@ -187,7 +186,7 @@ function DocumentEditor(props) {
     setSearchQuery(value);
 
     // Reset page
-    setPage(0);
+    setPage(1);
 
     // Filter documents
     if (value.length) {
@@ -402,6 +401,7 @@ function DocumentEditor(props) {
         const docList = docData.data;
 
         // Initialize documents
+        setPage(page);
         setDocuments(docList);
         setFilteredDocuments(docList);
         setViewableDocuments(docList.slice(0, MAX_ITEMS));
@@ -581,65 +581,18 @@ function DocumentEditor(props) {
               )) // MAPPING ALL DOCUMENTS
             ) : filteredDocuments.length ? (
               <>
-                {/* Logic for Handling Account Interface vs Other data */}
+                {/* Logic for Handling Account Interface*/}
                 {collection == "Account" ? (
-                  <>
-                    <Box style={{ display: "flex", gap: 50 }}>
-                      {["Admin", "Teacher", "Student"].map((item) => (
-                        <Button
-                          onClick={() => setAccountsToDisplay(item)}
-                          disableRipple={true}
-                          className={classes.tabs}
-                        >
-                          <Typography
-                            variant="h2"
-                            style={
-                              accountsToDisplay === item
-                                ? { textDecoration: "underline" }
-                                : null
-                            }
-                          >
-                            {item}s
-                          </Typography>
-                        </Button>
-                      ))}
-                    </Box>
-                    <Box>
-                      {filteredDocuments.filter(
-                        (document) => type(document) == `(${accountsToDisplay})`
-                      ).length > 0
-                        ? filteredDocuments.map((document) => {
-                            return (
-                              type(document) == `(${accountsToDisplay})` && (
-                                <List className={classes.list}>
-                                  <NameCard
-                                    handleDocument={handleDocument}
-                                    handleSelect={handleSelect}
-                                    document={document}
-                                    isAdmin={false}
-                                    name={primary(document)}
-                                  />
-                                </List>
-                              )
-                            );
-                          })
-                        : null}
-                    </Box>
-                    {/* Pagination Feature - navigate pages of users */}
-                    <div style={{ display: "flex" }}>
-                      <div className={classes.paginationContainer}>
-                        <Pagination
-                          size="small"
-                          color={"primary"}
-                          count={Math.ceil(
-                            filteredDocuments.length / MAX_ITEMS
-                          )}
-                          page={page}
-                          onChange={handlePageChange}
-                        />
-                      </div>
-                    </div>
-                  </>
+                  <AccountFilter
+                    filteredDocuments={filteredDocuments}
+                    type={type}
+                    handleDocument={handleDocument}
+                    handleSelect={handleSelect}
+                    primary={primary}
+                    page={page}
+                    setPage={setPage}
+                    icon={icon}
+                  />
                 ) : (
                   <>
                     {viewableDocuments.map((document, idx) => {
