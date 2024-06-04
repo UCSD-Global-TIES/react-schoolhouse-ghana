@@ -12,7 +12,7 @@ import SocketContext from "../../socket-context"
 
 const useStyles = makeStyles(theme => ({
     root: {
-        maxWidth: "700px",
+        //maxWidth: "700px",
         width: '100%',
         backgroundColor: theme.palette.background.paper,
     },
@@ -25,7 +25,7 @@ const useStyles = makeStyles(theme => ({
         margin: "1rem 0px"
     },
     vc: {
-        maxWidth: "700px",
+        //maxWidth: "700px",
         width: "90%",
         margin: "auto"
     },
@@ -35,7 +35,7 @@ const useStyles = makeStyles(theme => ({
     },
     content: {
         width: "90%",
-        maxWidth: "700px"
+        //maxWidth: "700px"
     },
 }));
 
@@ -167,11 +167,11 @@ function UploadQueue(props) {
 
                 <Dialog onClose={handleClose} aria-labelledby="simple-dialog-title" open={modalShow} >
                     <DialogTitle id="simple-dialog-title">Uploads ({uploads.filter((item) => item.status === "Pending").length} pending)</DialogTitle>
-                    <div style={{ padding: "2rem", width: "85vw", maxWidth: "500px" }}>
+                    <div style={{ padding: "2rem", width: "85vw"}}>
 
 
                         <FormControl className={classes.searchbar}>
-                            <InputLabel htmlFor="standard-adornment-amount">Search uploads</InputLabel>
+                            
                             <Input
                                 value={searchQuery}
                                 onChange={handleQueryChange}

@@ -225,7 +225,7 @@ function UserPortal(props) {
         </DialogTitle>
 
         <DialogContent
-          style={{ width: "70vw", maxWidth: "500px", padding: "0px 24px" }}
+          style={{ width: "70vw", padding: "0px 24px" }}
         >
           <div className="row">
             {" "}
