@@ -9,12 +9,15 @@ const useStyles = makeStyles(theme => ({
         gap: "2rem",
         overflowX: "auto",
         whiteSpace: "nowrap",
+        marginTop:'.5rem',
+        width: '100%',
     }
 }));
 
 function EnrolledClasses(props) {
+    const { subjects, status, title, editable, gradeLabel} = props;
     const classes = useStyles();
-    const subjects = props.subjects;
+    
     const tagMap = {
         'archived': 'grey',
         'unpublished': 'blue',
@@ -23,10 +26,10 @@ function EnrolledClasses(props) {
     return (
         <>
             {
-            subjects.length > 0 ? (
+            subjects && subjects.length > 0 ? (
                 <>
                     <div style={{marginBottom: '1rem'}}>
-                        <Typography variant="h2">ENROLLED CLASSES</Typography>
+                        <Typography variant="h2">{title}</Typography>
                     </div>
                     
                     <div className={classes.classContainer}>
@@ -35,8 +38,16 @@ function EnrolledClasses(props) {
                         const date = new Date(subject.createdAt);
                         const year = date.getFullYear();
 
+                        const yearLabel = 'YR' + String(year).slice(-2) + '-' + (String(year+1).slice(-2));
+
+                        let label = '';
+                        if(status === 'active'){
+                            label = year + '-' + (year + 1);
+                        } else {
+                            label = status;
+                        }
                         return (
-                            <ClassCard name={subject.name} tagColor={'green'} tagLabel={`${year}-${year + 1}`} image=''/>
+                            <ClassCard name = {`${subject.name} ${gradeLabel}`} secondLine = {yearLabel} tagColor={tagMap[status]} tagLabel={label} image='' editable={editable} />
                         );
                     })}
                     </div>

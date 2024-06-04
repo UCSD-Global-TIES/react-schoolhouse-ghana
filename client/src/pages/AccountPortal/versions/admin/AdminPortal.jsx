@@ -59,7 +59,7 @@ const drawerPadding = "3.5rem 0";
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    display: "flex",
+    // display: "flex",
     alignItems: "flex-start",
   },
   toolbar: theme.mixins.toolbar,
@@ -279,7 +279,9 @@ function AdminPortal(props) {
       icon: faShapes,
       FormComponent: (p) => <GradesForm user={props.user} {...p} />,
       primary: (doc) => `Grade ${doc.level}`,
+      secondary: (doc) => `G${doc.level}`,
       path: `${props.match.path}/grades`,
+      grStatus: (doc) => `(${doc.status})`,
       api: {
         get: API.getGrades,
         post: API.addGrade,
@@ -305,7 +307,7 @@ function AdminPortal(props) {
     },
     // SUBJECTS
     {
-      collection: "Subjects",
+      collection: "Subject",
       link: (doc) => `/subject/${doc._id}`,
       icon: faChalkboardTeacher,
       FormComponent: (p) => <SubjectsForm user={props.user} {...p} />,
@@ -454,6 +456,8 @@ function AdminPortal(props) {
             delete={page.api.delete}
             validation={page.validation}
             type={page.type}
+            grStatus={page.grStatus}
+            secondary={page.secondary}
             {...props}
           />
         ),
