@@ -236,6 +236,7 @@ function AnnouncementsForm(props) {
                 handleChange={(docs) => handlePickChange('files', docs)}
             />
         </div>
+        </React.Fragment>
     );
 }
 
