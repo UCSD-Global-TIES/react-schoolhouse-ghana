@@ -11,6 +11,8 @@ import "../../utils/flowHeaders.min.css";
 import SocketContext from "../../socket-context";
 import SearchBar from "../SearchBar/SearchBar";
 import NameCard from "../NameCard/NameCard";
+import AnnouncementCard from "../AnnouncementCard/AnnouncementCard";
+
 import ClassCard from "../ClassCard";
 import EnrolledClasses from "../EnrolledClasses";
 
@@ -714,7 +716,7 @@ function DocumentEditor(props) {
                       const labelId = `${collection.toLowerCase()}-${idx}`;
                       return (
                         <List className={classes.list}>
-                          <NameCard
+                          <AnnouncementCard
                             handleDocument={handleDocument}
                             handleSelect={handleSelect}
                             document={document}
