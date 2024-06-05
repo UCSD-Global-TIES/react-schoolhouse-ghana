@@ -17,7 +17,13 @@ const gradeSchema = new Schema({
   students: [{
     type: Schema.Types.ObjectId,
     ref: 'Student'
-  }]
+  }],
+  status: {
+    type: String,
+    required: true,
+    enum: ['active', 'unpublished', 'archived'],  
+    default: 'active' 
+  }
 }, { timestamps: true });
 
 const Grade = mongoose.model("Grade", gradeSchema);

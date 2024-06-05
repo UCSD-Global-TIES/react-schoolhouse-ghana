@@ -160,6 +160,7 @@ function AnnouncementsForm(props) {
     }, [props]);
 
     return (
+        <React.Fragment>
         <div className={classes.root}>
             <Box className={classes.switchContainer}>
                 <Box className={classes.switchLabel}>
