@@ -1,5 +1,6 @@
 // React and Hooks
 import React, { useEffect, useState } from "react";
+import Cookies from 'js-cookie';
 
 // Router
 import { Route, Switch } from "react-router-dom";
@@ -114,6 +115,7 @@ function App() {
       setUserInfo(nullUser.data);
       window.location.href = "/login";
     });
+    Cookies.remove('user_sid');
   };
 
   const setUser = (user) => {
