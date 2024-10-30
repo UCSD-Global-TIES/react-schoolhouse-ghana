@@ -112,6 +112,7 @@ function App() {
   const handleLogout = () => {
     API.destroySession().then((nullUser) => {
       setUserInfo(nullUser.data);
+      window.location.href = "/login";
     });
   };
 

@@ -170,7 +170,7 @@ function LoginPortal(props) {
           {alertMessage}
         </Alert>
       </Snackbar>
-      <FullScreenDialog
+      {/* <FullScreenDialog
         open={seedDialogOpen}
         handleClose={handleCloseSeedDialog}
         type={"Welcome to Semanhyia American School!"}
@@ -236,7 +236,7 @@ function LoginPortal(props) {
             </div>
           </div>
         </div>
-      </FullScreenDialog>
+      </FullScreenDialog> */}
       <div style={{ display: "flex", width: "100%", height: "100vh" }}>
         <div style={{ margin: "auto" }}>
           <div className={classes.portal}>

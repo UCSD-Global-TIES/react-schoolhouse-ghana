@@ -24,6 +24,7 @@ import {
   faFile,
   faShapes,
   faUsers,
+  faRightFromBracket,
 } from "@fortawesome/free-solid-svg-icons";
 
 // Local Components
@@ -53,6 +54,7 @@ import "./main.css";
 import AccountIcon from "../../../../assets/account-icon.svg";
 import BookIcon from "../../../../assets/books.svg";
 import BullhornIcon from "../../../../assets/bullhorn.svg";
+import LogoutIcon from "../../../../assets/LogoutIcon.svg";
 
 const drawerWidth = "9.375rem";
 const drawerPadding = "3.5rem 0";
@@ -113,6 +115,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function AdminPortal(props) {
+  
   const classes = useStyles();
   const theme = useTheme();
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -165,6 +168,11 @@ function AdminPortal(props) {
       label: "Accounts",
       iconPath: AccountIcon,
       path: `${props.match.url}/accounts`,
+    },
+    {
+      label: "Log Out",
+      iconPath: LogoutIcon,
+      path: `${props.match.url}/login`,
     },
     // {
     //   label: "Subjects",
