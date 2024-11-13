@@ -149,6 +149,8 @@ function AdminPortal(props) {
     setMobileOpen(!mobileOpen);
   };
 
+  const { logout } = props
+
   // menu items
   const documentMenuItems = [
     {
@@ -166,35 +168,13 @@ function AdminPortal(props) {
       iconPath: AccountIcon,
       path: `${props.match.url}/accounts`,
     },
-    // {
-    //   label: "Subjects",
-    //   icon: faChalkboardTeacher,
-    //   path: `${props.match.url}/subjects`,
-    // },
+    {
+      label: "Log Out",
+      iconPath: BookIcon,
+      clickHandler: logout,
+      // path: `${props.match.url}/login`,
+    },
   ];
-
-  // const otherMenuItems = [
-  //   {
-  //     label: "Accounts",
-  //     icon: faUsers,
-  //     path: `${props.match.url}/accounts`,
-  //   },
-  //   {
-  //     label: "Files",
-  //     icon: faFile,
-  //     path: `${props.match.url}/files`,
-  //   },
-  //   {
-  //     label: "Assessment",
-  //     icon: faCheckCircle,
-  //     path: `${props.match.url}/assessment`,
-  //   },
-  //   {
-  //     label: "Accounts",
-  //     icon: faUsers,
-  //     path: `${props.match.url}/accounts`,
-  //   },
-  // ];
 
   const drawer = (
     <div onClick={isSmallDevice ? handleDrawerToggle : () => {}}>
@@ -212,14 +192,11 @@ function AdminPortal(props) {
         </div>
         <div className="sidebar-links">
           {documentMenuItems.map((item, index) => (
-            <NavLink
-              to={item.path}
-              key={index}
-              className={`${classes.buttonLink} ${classes.navLink}`}
-            >
+            item.clickHandler ? (
               <ListItem
-                selected={props.location.pathname.includes(item.path)}
+                key={index}
                 button
+                onClick={item.clickHandler}
                 className={classes.linkBox}
               >
                 <ListItemIcon className={classes.justifyIcon}>
@@ -229,19 +206,42 @@ function AdminPortal(props) {
                     style={{ width: 24, height: 24 }}
                   />
                 </ListItemIcon>
-
                 <ListItemText
                   style={{ overflowWrap: "break-word" }}
                   primary={item.label}
                 />
               </ListItem>
-            </NavLink>
+            ) : (
+              <NavLink
+                to={item.path}
+                key={index}
+                className={`${classes.buttonLink} ${classes.navLink}`}
+              >
+                <ListItem
+                  selected={props.location.pathname.includes(item.path)}
+                  button
+                  className={classes.linkBox}
+                >
+                  <ListItemIcon className={classes.justifyIcon}>
+                    <img
+                      src={item.iconPath}
+                      alt={`${item.label} icon`}
+                      style={{ width: 24, height: 24 }}
+                    />
+                  </ListItemIcon>
+                  <ListItemText
+                    style={{ overflowWrap: "break-word" }}
+                    primary={item.label}
+                  />
+                </ListItem>
+              </NavLink>
+            )
           ))}
         </div>
       </List>
     </div>
   );
-
+  
   const pagesInfo = [
     // ANNOUNCEMENTS
     {

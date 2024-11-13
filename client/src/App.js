@@ -22,6 +22,8 @@ import API from "./utils/API";
 // Style
 import "./App.css";
 
+import Cookies from 'js-cookie';
+
 // Components
 // -----------------------------------------------------------
 // Component that ensures people are logged in and have proper permissions
@@ -110,8 +112,10 @@ function App() {
   const [loading, setLoading] = useState(true);
 
   const handleLogout = () => {
-    API.destroySession().then((nullUser) => {
-      setUserInfo(nullUser.data);
+    API.destroySession().then(() => {
+      setUserInfo(null); // Clear user info
+      Cookies.remove('user_sid'); // Remove session cookie
+      window.location.href = "/login"; // Redirect to login page
     });
   };
 
