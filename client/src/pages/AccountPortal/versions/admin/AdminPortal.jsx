@@ -25,6 +25,7 @@ import {
   faShapes,
   faUsers,
 } from "@fortawesome/free-solid-svg-icons";
+import LogoutIcon from "../../../../assets/LogoutIcon.svg";
 
 // Local Components
 import AccountsForm from "../../../../components/AccountsForm";
@@ -170,7 +171,7 @@ function AdminPortal(props) {
     },
     {
       label: "Log Out",
-      iconPath: BookIcon,
+      iconPath: LogoutIcon,
       clickHandler: logout,
       // path: `${props.match.url}/login`,
     },
