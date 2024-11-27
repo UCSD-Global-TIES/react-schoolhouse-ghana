@@ -38,7 +38,7 @@ import AssessmentPage from "./pages/AssessmentPage/index";
 import LoginPortal from "./pages/LoginPortal/index";
 import NoMatch from "./pages/NoMatch/index";
 import SubjectPage from "./pages/SubjectPage/index";
-import UserPortal from "./pages/AccountPortal/versions/user/UserPortal.jsx"; 
+import TeacherPortal from "./pages/AccountPortal/versions/teacher/TeacherPortal.jsx"; 
 
 const socket = io();
 
@@ -151,8 +151,8 @@ function App() {
                 user={userInfo}
               />
               <ProtectedRoute
-                path="/user"
-                component={UserPortal}
+                path="/teacher"
+                component={TeacherPortal}
                 logout={handleLogout}
                 user={userInfo}
               />

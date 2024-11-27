@@ -1,552 +1,386 @@
 // React and Hooks
-import React, { useContext, useEffect, useState } from "react";
-import { useMediaQuery } from "react-responsive";
-import { NavLink, Redirect, Switch } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 
 // Material-UI Components and Styles
+import { makeStyles } from "@material-ui/core/styles";
 import {
-  CssBaseline,
-  Divider,
-  Drawer,
-  Hidden,
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
+  Snackbar,
+  Grid,
+  Typography,
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  Slide,
+  DialogActions,
+  CardActionArea,
+  CardContent,
+  CardMedia,
+  Card,
+  Button,
 } from "@material-ui/core";
-import { makeStyles, useTheme } from "@material-ui/core/styles";
+import { Alert } from "@material-ui/lab";
 
 // FontAwesome Icons
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faBullhorn,
+  faSchool,
+  faPencilRuler,
   faChalkboardTeacher,
-  faCheckCircle,
-  faFile,
-  faShapes,
-  faUsers,
 } from "@fortawesome/free-solid-svg-icons";
-import LogoutIcon from "../../../../assets/LogoutIcon.svg";
 
 // Local Components
-import AccountsForm from "../../../../components/AccountsForm";
-import AnnouncementsForm from "../../../../components/AnnouncementsForm";
-import AssessmentForm from "../../../../components/AssessmentForm";
-import DocumentEditor from "../../../../components/DocumentEditor/index.js";
-import FilesForm from "../../../../components/FilesForm";
-import GradesForm from "../../../../components/GradesForm";
-import NameCard from "../../../../components/NameCard/NameCard";
-import ProtectedRoute from "../../../../components/ProtectedRoute";
-import SubjectsForm from "../../../../components/SubjectsForm";
-import UploadQueue from "../../../../components/UploadQueue";
-import UserList from "./../../../../components/UserList/UserList";
-import SearchBar from "../../../../components/SearchBar/SearchBar.js";
+import SimpleListView from "../../../../components/SimpleListView";
+import AccessDenied from "../../../../components/AccessDenied";
+import PageSpinner from "../../../../components/PageSpinner";
+import AnnouncementViewer from "../../../../components/AnnouncementViewer";
 
 // Utils and Context
-import SocketIOFileUpload from "socketio-file-upload";
-import SocketContext from "../../../../socket-context";
 import API from "../../../../utils/API";
+import SocketContext from "../../../../socket-context";
 
 // Styles and Assets
-import "../../../../App.css";
 import "../../../../utils/flowHeaders.min.css";
+import "../../../../App.css";
 import "./main.css";
-
-import AccountIcon from "../../../../assets/account-icon.svg";
-import BookIcon from "../../../../assets/books.svg";
-import BullhornIcon from "../../../../assets/bullhorn.svg";
-
-const drawerWidth = "9.375rem";
-const drawerPadding = "3.5rem 0";
+import clsx from "clsx";
+import sas from "../../../../logos/sas_logo.png";
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    // display: "flex",
-    alignItems: "flex-start",
-  },
-  toolbar: theme.mixins.toolbar,
-  sidebar: {
-    display: "flex",
-    width: "9.375rem",
-    padding: "3.5rem 0",
-    flexDirection: "column",
-    alignItems: "flex-start",
-    flexShrink: "0",
-    alignSelf: "stretch",
-  },
-  drawerPaper: {
-    background: "var(--primary-color)",
-    color: "var(--background-color)",
-  },
-  content: {
-    flexGrow: 1,
-    padding: theme.spacing(1),
-  },
-  buttonLink: {
-    color: "inherit",
-    textDecoration: "none",
-  },
-  sidebarLinks: {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "flexStart",
-    alignSelf: "stretch",
     width: "100%",
+    backgroundColor: "var(--background-color)",
   },
-  navLink: {
-    textDecoration: "none",
-    color: "inherit", // To keep the same color as the ListItemText
-    display: "flex",
-    height: "5rem",
-    flexDirection: "column",
-    justifyContent: "center",
-    alignItems: "center",
-    gap: "0.9375rem",
-    alignSelf: "stretch",
+  inline: {
+    display: "inline",
   },
-  linkBox: {
-    display: "flex",
-    flexDirection: "column",
+  card: {
+    maxWidth: 345,
+    display: "block",
+    overflow: "hidden",
   },
-  justifyIcon: {
-    display: "flex",
-    justifyContent: "center",
+  cardMedia: {
+    height: 140,
+  },
+  textGlow: {
+    color: "black",
+    // textShadow: "2px 2px 7px #787676"
+  },
+  boxShadow: {
+    boxShadow: "10px 10px 5px #bebebe",
   },
 }));
 
+const Transition = React.forwardRef(function Transition(props, ref) {
+  return <Slide direction="up" ref={ref} {...props} />;
+});
+
 function UserPortal(props) {
+  const socket = React.useContext(SocketContext);
+
   const classes = useStyles();
-  const theme = useTheme();
-  const [mobileOpen, setMobileOpen] = useState(false);
-  const isSmallDevice = useMediaQuery({
-    query: "(max-width: 600px)",
-  });
-  const socket = useContext(SocketContext);
-  const siofu = new SocketIOFileUpload(socket);
+  const MAX_ANN = 3;
 
-  // "Admin","Teachers", "Students" categories
-  const [admins, setAdmins] = useState([]);
-  const [teachers, setTeachers] = useState([]);
-  const [students, setStudents] = useState([]);
+  // HOOKS
+  // Stores this grade's information
+  const [subjects, setSubjects] = useState({});
 
-  // function to handle adding new admin
-//   const addAdmin = (adminName) => {
-//     setAdmins((prevAdmin) => [...prevAdmin, adminName]);
-//   };
-  // function to handle adding new teacher
-//   const addTeacher = (teacherName) => {
-//     setTeachers((prevTeachers) => [...prevTeachers, teacherName]);
-//   };
-  // function to handle adding new student
-//   const addStudent = (studentName) => {
-//     setStudents((prevStudents) => [...prevStudents, studentName]);
-//   };
+  // Stores current grade announcements
+  const [gradeAnnouncements, setGradeAnnouncements] = useState([]);
+  // Stores current school announcements
+  const [schoolAnnouncements, setSchoolAnnouncements] = useState([]);
 
-  // Render the NameCards for each category
-  const renderNameCards = (list) => {
-    return list.map((name, index) => <NameCard key={index} name={name} />);
+  // If loading, show loading screen
+  const [loading, setLoading] = useState(true);
+
+  const [refreshing, setRefreshing] = useState(false);
+
+  const [studentDialog, setStudentDialog] = useState(false);
+
+  const [studentList, setStudentList] = useState([]);
+
+  // Route user to clicked subject page
+  const handleOpenSubject = (subject_id) => {
+    props.history.push(`/subject/${subject_id}`);
   };
 
-  const handleDrawerToggle = () => {
-    setMobileOpen(!mobileOpen);
+  const handleRefresh = () => {
+    setRefreshing(true);
+
+    const promises = [];
+
+    // Get 'Grade' associated with user account, populating subjects and their announcements
+    promises.push(API.getUserGrade(props.user.profile._id, props.user.key));
+
+    // Get school announcements
+    promises.push(API.getSchoolAnnouncements(props.user.key));
+
+    Promise.all(promises).then((promiseResults) => {
+      // Get & set grade's subjects info
+      setSubjects(
+        promiseResults[0].data ? promiseResults[0].data.subjects : []
+      );
+
+      // Get & Set school announcements
+      setSchoolAnnouncements([...promiseResults[1].data]);
+
+      let subjectAnnList = [];
+      if (promiseResults[0].data) {
+        for (const subjectDoc of promiseResults[0].data.subjects) {
+          subjectAnnList = subjectAnnList.concat(subjectDoc.announcements);
+        }
+      }
+
+      // Get & Set Subject announcements
+      setGradeAnnouncements([...subjectAnnList]);
+
+      // Set loading false, so the loading screen goes away
+      setRefreshing(false);
+    });
   };
 
-  const { logout } = props
+  const handleCloseDocument = () => {
+    setStudentDialog(false);
+  };
+  const showPassword = (username, password) => {
+    var x = document.getElementsByClassName("myInput");
+    for (var i = 0; i < x.length; i++) {
+      if (
+        x.item(i).type === "password" &&
+        x.item(i).name === `${username}` &&
+        x.item(i).value === `${password}`
+      ) {
+        x.item(i).type = "text";
+      } else {
+        x.item(i).type = "password";
+      }
+    }
+  };
 
-  // menu items
-  const documentMenuItems = [
-    {
-      label: "Home",
-      iconPath: BullhornIcon,
-      path: `${props.match.url}/announcements`,
-    },
-    {
-      label: "Classes",
-      iconPath: BookIcon,
-      path: `${props.match.url}/grades`,
-    },
-    // {
-    //   label: "Accounts",
-    //   iconPath: AccountIcon,
-    //   path: `${props.match.url}/accounts`,
-    // },
-    {
-      label: "Log Out",
-      iconPath: LogoutIcon,
-      clickHandler: logout,
-      // path: `${props.match.url}/login`,
-    },
-  ];
+  useEffect(() => {
+    const promises = [];
 
-  const drawer = (
-    <div onClick={isSmallDevice ? handleDrawerToggle : () => {}}>
-      <List className={classes.sidebar}>
-        <div
-          style={{
-            textAlign: "center",
-            margin: "0 auto",
-            marginBottom: "10px",
-            color: "var(--background-color)",
-          }}
+    // Get 'Grade' associated with user account, populating subjects and their announcements
+    promises.push(API.getUserGrade(props.user.profile._id, props.user.key));
+
+    // Get school announcements
+    promises.push(API.getSchoolAnnouncements(props.user.key));
+
+    Promise.all(promises).then((promiseResults) => {
+      // Get & set grade's subjects info
+      setSubjects(
+        promiseResults[0].data ? promiseResults[0].data.subjects : []
+      );
+
+      // Get & Set school announcements
+      setSchoolAnnouncements(promiseResults[1].data);
+
+      let subjectAnnList = [];
+      if (promiseResults[0].data) {
+        for (const subjectDoc of promiseResults[0].data.subjects) {
+          subjectAnnList = subjectAnnList.concat(subjectDoc.announcements);
+        }
+      }
+
+      // Get & Set Subject announcements
+      setGradeAnnouncements(subjectAnnList);
+
+      // Set Student List
+      if (props.user.type === "Teacher") {
+        setStudentList(promiseResults[0].data?.students || []);
+      }
+
+      // Set loading false, so the loading screen goes away
+      setLoading(false);
+    });
+
+    const collections = ["announcements"];
+    for (const collection of collections) {
+      socket.on(`refresh-${collection}`, function () {
+        handleRefresh();
+      });
+    }
+  }, []);
+
+  if (loading) {
+    return <PageSpinner />;
+  }
+
+  const renderDialogBox = () => {
+    return (
+      <Dialog
+        open={studentDialog}
+        TransitionComponent={Transition}
+        keepMounted
+        onClose={handleCloseDocument}
+        aria-labelledby="alert-dialog-slide-title"
+        aria-describedby="alert-dialog-slide-description"
+      >
+        <DialogTitle
+          style={{ padding: "10px 24px" }}
+          align="center"
+          id="student-list"
         >
-          <h1 style={{ fontSize: "1.75rem" }}>Semanhyia</h1>
-          <h2 style={{ fontSize: "1.125rem" }}>American School</h2>
-        </div>
-        <div className="sidebar-links">
-          {documentMenuItems.map((item, index) => (
-            item.clickHandler ? (
-              <ListItem
-                key={index}
-                button
-                onClick={item.clickHandler}
-                className={classes.linkBox}
-              >
-                <ListItemIcon className={classes.justifyIcon}>
-                  <img
-                    src={item.iconPath}
-                    alt={`${item.label} icon`}
-                    style={{ width: 24, height: 24 }}
-                  />
-                </ListItemIcon>
-                <ListItemText
-                  style={{ overflowWrap: "break-word" }}
-                  primary={item.label}
-                />
-              </ListItem>
-            ) : (
-              <NavLink
-                to={item.path}
-                key={index}
-                className={`${classes.buttonLink} ${classes.navLink}`}
-              >
-                <ListItem
-                  selected={props.location.pathname.includes(item.path)}
-                  button
-                  className={classes.linkBox}
+          Student List
+        </DialogTitle>
+
+        <DialogContent
+          style={{ width: "70vw", padding: "0px 24px" }}
+        >
+          <div className="row">
+            {" "}
+            <p>
+              {" "}
+              <b>Student Name</b>
+            </p>{" "}
+            <p>
+              <b>Username</b>{" "}
+            </p>{" "}
+            <p>
+              <b>Password</b>
+            </p>{" "}
+          </div>
+          {studentList.map((val, idx) => (
+            <div className="row">
+              <p key={"student-name" + idx}>
+                {val.firstName} {val.lastName}
+              </p>
+              <p key={"student-user" + idx}>{val.username}</p>
+              <p key={"student-pw" + idx}>
+                <input
+                  type="password"
+                  name={val.username}
+                  value={val.password}
+                  class="myInput"
+                ></input>
+                <Button
+                  size="medium"
+                  onClick={() => showPassword(val.username, val.password)}
                 >
-                  <ListItemIcon className={classes.justifyIcon}>
-                    <img
-                      src={item.iconPath}
-                      alt={`${item.label} icon`}
-                      style={{ width: 24, height: 24 }}
-                    />
-                  </ListItemIcon>
-                  <ListItemText
-                    style={{ overflowWrap: "break-word" }}
-                    primary={item.label}
-                  />
-                </ListItem>
-              </NavLink>
-            )
+                  Show/Hide
+                </Button>
+              </p>
+            </div>
           ))}
-        </div>
-      </List>
-    </div>
-  );
-  
-  const pagesInfo = [
-    // ANNOUNCEMENTS
-    {
-      collection: "Announcement",
-      icon: faBullhorn,
-      FormComponent: (p) => <AnnouncementsForm user={props.user} {...p} />,
-      primary: (doc) => doc.title,
-      path: `${props.match.path}/announcements`,
-      api: {
-        get: API.getAnnouncements,
-        post: API.addAnnouncement,
-        put: API.updateAnnouncement,
-        delete: API.deleteAnnouncements,
-      },
-      validation: {
-        title: {
-          validate: (value) =>
-            new Promise((resolve, reject) => {
-              resolve(value);
-            }),
-          message: "You must enter an announcement title.",
-        },
-        content: {
-          validate: (value) =>
-            new Promise((resolve, reject) => {
-              resolve(value);
-            }),
-          message: "You must enter some announcement content.",
-        },
-      },
-    },
-    // GRADES
-    {
-      collection: "Grade",
-      icon: faShapes,
-      FormComponent: (p) => <GradesForm user={props.user} {...p} />,
-      primary: (doc) => `Grade ${doc.level}`,
-      secondary: (doc) => `G${doc.level}`,
-      path: `${props.match.path}/grades`,
-      grStatus: (doc) => `(${doc.status})`,
-      api: {
-        get: API.getGrades,
-        post: API.addGrade,
-        put: API.updateGrade,
-        delete: API.deleteGrades,
-      },
-      validation: {
-        level: {
-          validate: (value) =>
-            new Promise((resolve, reject) => {
-              API.getGrades(props.user.key).then((result) => {
-                const grades = result.data;
-
-                for (const grade of grades) {
-                  if (grade.level === parseInt(value)) resolve(false);
-                }
-                resolve(true);
-              });
-            }),
-          message: "You must enter a grade level that does not yet exist.",
-        },
-      },
-    },
-    // SUBJECTS
-    {
-      collection: "Subject",
-      link: (doc) => `/subject/${doc._id}`,
-      icon: faChalkboardTeacher,
-      FormComponent: (p) => <SubjectsForm user={props.user} {...p} />,
-      primary: (doc) => doc.name,
-      path: `${props.match.path}/subjects`,
-      api: {
-        get: API.getSubjects,
-        post: API.addSubject,
-        put: API.updateSubject,
-        delete: API.deleteSubjects,
-      },
-      validation: {
-        name: {
-          validate: (value) =>
-            new Promise((resolve, reject) => {
-              if (!value) resolve(false);
-
-              API.getSubjects(props.user.key).then((result) => {
-                const subjects = result.data;
-
-                for (const subject of subjects) {
-                  if (subject.name === value) resolve(false);
-                }
-                resolve(true);
-              });
-            }),
-          message:
-            "You must enter a subject name, one that does not already exist",
-        },
-      },
-    },
-    // ACCOUNT MANAGER
-    {
-      collection: "Account",
-      icon: faUsers,
-      FormComponent: (p) => <AccountsForm user={props.user} {...p} />,
-      primary: (doc) => `${doc.first_name} ${doc.last_name} `,
-      type: (doc) => `(${doc.type})`,
-      path: `${props.match.path}/accounts`,
-      api: {
-        get: API.getAccounts,
-        post: API.addAccount,
-        put: API.updateAccount,
-        delete: API.deleteAccounts,
-      },
-      validation: {
-        first_name: {
-          validate: (value) =>
-            new Promise((resolve, reject) => {
-              resolve(value);
-            }),
-          message: "You must enter the user's first name.",
-        },
-        last_name: {
-          validate: (value) =>
-            new Promise((resolve, reject) => {
-              resolve(value);
-            }),
-          message: "You must enter the user's last name.",
-        },
-        type: {
-          validate: (value) =>
-            new Promise((resolve, reject) => {
-              resolve(value);
-            }),
-          message: "You must select the user's account type.",
-        },
-        password: {
-          validate: (value) =>
-            new Promise((resolve, reject) => {
-              if (!value) resolve(false);
-
-              if (value.length >= 5) resolve(true);
-              else resolve(false);
-            }),
-          message: "You must enter a password longer than five characters.",
-        },
-      },
-    },
-    // FILES
-    {
-      collection: "Files",
-      link: (doc) => doc.path,
-      icon: faFile,
-      FormComponent: FilesForm,
-      primary: (doc) => doc.nickname,
-      path: `${props.match.path}/files`,
-      api: {
-        get: API.getFiles,
-        put: API.updateFile,
-        delete: API.deleteFiles,
-        post: (doc) => {
-          return new Promise((resolve, reject) => {
-            siofu.submitFiles(doc.files);
-            resolve({
-              data: {},
-            });
-          });
-        },
-      },
-      validation: {
-        nickname: {
-          updateOnly: true,
-          validate: (value) =>
-            new Promise((resolve, reject) => {
-              resolve(value);
-            }),
-          message: "You must enter an informative file nickname",
-        },
-      },
-    },
-    // ASSESSMENT
-    {
-      collection: "Assessment",
-      link: (doc) => `/assessment/yolo`, // TODO: Set specific quiz ID into the URL once backend is finished
-      icon: faCheckCircle,
-      FormComponent: (p) => <AssessmentForm user={props.user} {...p} />,
-      primary: (doc) => doc.title,
-      path: `${props.match.path}/assessment`,
-      api: {
-        get: API.getAssessments,
-        // TODO: Other API requests once we start implementing ability to create tests
-      },
-      validation: {},
-    },
-  ];
-
-  let pages = [];
-
-  pagesInfo
-    .filter((obj) => obj.collection != "Files")
-    .map((page, idx) => {
-      console.log(page.path);
-      pages.push({
-        path: page.path,
-        component: (props) => (
-          <DocumentEditor
-            link={page.link}
-            primary={page.primary}
-            collection={page.collection}
-            icon={page.icon}
-            FormComponent={page.FormComponent}
-            get={page.api.get}
-            post={page.api.post}
-            put={page.api.put}
-            delete={page.api.delete}
-            validation={page.validation}
-            type={page.type}
-            grStatus={page.grStatus}
-            secondary={page.secondary}
-            {...props}
-          />
-        ),
-      });
-    });
-
-  pagesInfo
-    .filter((obj) => obj.collection == "Files")
-    .map((page, idx) => {
-      pages.push({
-        path: page.path,
-        component: (props) => (
-          <>
-            <DocumentEditor
-              link={page.link}
-              primary={page.primary}
-              collection={page.collection}
-              icon={page.icon}
-              FormComponent={page.FormComponent}
-              get={page.api.get}
-              post={page.api.post}
-              put={page.api.put}
-              delete={page.api.delete}
-              validation={page.validation}
-              {...props}
-            />
-            <UploadQueue />
-          </>
-        ),
-      });
-    });
-
-  // ADD SERVER MANAGEMENT PAGE
-  // pages.push({ path: `${props.match.path}/server`, component: ServerDash })
-
-  // SET DEFAULT MENU
-  const defaultRoute = `${props.match.path}/announcements`;
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDocument} color="primary">
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
+    );
+  };
 
   return (
-    <div className={classes.root}>
-      <CssBaseline />
-      <nav className={classes.drawer}>
-        {/* The implementation can be swapped with js to avoid SEO duplication of links. */}
-        <Hidden smUp implementation="css">
-          <Drawer
-            variant="temporary"
-            anchor={theme.direction === "rtl" ? "right" : "left"}
-            open={mobileOpen}
-            onClose={handleDrawerToggle}
-            classes={{
-              paper: classes.drawerPaper,
-            }}
-            ModalProps={{
-              keepMounted: true, // Better open performance on mobile.
-            }}
-          >
-            {drawer}
-          </Drawer>
-        </Hidden>
-        <Hidden xsDown implementation="css">
-          <Drawer
-            classes={{
-              paper: classes.drawerPaper,
-            }}
-            variant="permanent"
-            open
-          >
-            {drawer}
-          </Drawer>
-        </Hidden>
-      </nav>
-      <main
-        className={classes.content}
-        style={{ marginLeft: !isSmallDevice ? drawerWidth : 0 }}
+    <div style={{ display: "flex", width: "100%", marginTop: "2.5rem" }}>
+      {/* ALERTS FOR API ACTIONS */}
+      <Snackbar
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        open={refreshing}
       >
-        <Switch location={props.location}>
-          {pages.map((page, idx) => (
-            <ProtectedRoute
-              key={`page-${idx}`}
-              exact
-              path={page.path}
-              component={page.component}
-              user={props.user}
+        <Alert severity={"info"}>Refreshing...</Alert>
+      </Snackbar>
+
+      {renderDialogBox()}
+      <Grid spacing={3} container style={{ padding: "2rem", width: "100%" }}>
+        <Grid item xs={12}>
+          <Typography
+            align="center"
+            className={clsx(classes.textGlow, "flow-text")}
+            variant="h3"
+          >
+            Welcome Back, {props.user.profile.first_name} 😄
+          </Typography>
+          <div style={{ textAlign: "center" }}>
+            {" "}
+            <img src={sas} alt="sas logo" height={115} width={120} />
+          </div>
+        </Grid>
+        {/* Announcements */}
+        <Grid item xs={12} md={5} lg={4} xl={3}>
+          <div className={classes.boxShadow}>
+            <SimpleListView
+              title={"School Announcements"}
+              items={schoolAnnouncements}
+              pageMax={MAX_ANN}
+              icon={faSchool}
+              labelField={"title"}
+              viewer={AnnouncementViewer}
             />
-          ))}
-          <Redirect to={defaultRoute} />
-        </Switch>
-      </main>
+            <SimpleListView
+              title={"Grade Announcements"}
+              items={gradeAnnouncements}
+              pageMax={MAX_ANN}
+              icon={faPencilRuler}
+              labelField={"title"}
+              viewer={AnnouncementViewer}
+            />
+          </div>
+        </Grid>
+
+        {/* Subjects */}
+        <Grid item xs={12} md={7} lg={8} xl={9}>
+          {subjects.length ? (
+            <Grid spacing={3} align="center" container>
+              {subjects.map((subjectDoc, idx) => (
+                <Grid
+                  onClick={() => handleOpenSubject(subjectDoc._id)}
+                  key={`subject-card-${idx}`}
+                  item
+                  xs={12}
+                  sm={6}
+                  md={4}
+                  lg={3}
+                >
+                  <Card raised className={classes.card}>
+                    <CardActionArea>
+                      <CardMedia
+                        className={classes.cardMedia}
+                        image="https://builtin.com/sites/default/files/styles/og/public/2019-04/big-data-education.png"
+                        title="Blank"
+                      />
+                      <CardContent>
+                        <Typography gutterBottom variant="h5" component="h2">
+                          {subjectDoc.name}
+                        </Typography>
+                      </CardContent>
+                    </CardActionArea>
+                  </Card>
+                </Grid>
+              ))}
+            </Grid>
+          ) : (
+            <div style={{ display: "flex", width: "100%", height: "100%" }}>
+              <div style={{ margin: "auto" }}>
+                <Typography
+                  className="flow-text"
+                  style={{ color: "grey" }}
+                  variant="h5"
+                >
+                  No subjects were found.
+                </Typography>
+                <p style={{ textAlign: "center", color: "grey" }}>
+                  <FontAwesomeIcon icon={faChalkboardTeacher} size="5x" />
+                </p>
+              </div>
+            </div>
+          )}
+        </Grid>
+
+        <Grid>
+          {props.user.type === "Teacher" ? (
+            <div className={classes.boxShadow} style={{ marginLeft: "20px" }}>
+              <Button
+                style={{ backgroundColor: "white" }}
+                onClick={() => setStudentDialog(true)}
+              >
+                Student List
+              </Button>
+            </div>
+          ) : null}
+        </Grid>
+      </Grid>
     </div>
   );
 }

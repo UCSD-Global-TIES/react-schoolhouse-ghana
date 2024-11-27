@@ -6,11 +6,11 @@ import UserPortal from "./versions/user/UserPortal.jsx";
 import { Redirect } from "react-router-dom";
 
 const AdminRedirect = () => <Redirect to="/edit" />;
-const UserRedirect = () => <Redirect to="/user"/>
+const TeacherRedirect = () => <Redirect to="/teacher"/>
 
 const accountComponents = {
     Student: UserPortal,
-    Teacher: UserRedirect,
+    Teacher: TeacherRedirect,
     Admin: AdminRedirect
 }
 
