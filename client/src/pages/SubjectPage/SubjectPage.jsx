@@ -33,6 +33,7 @@ import BullhornIcon from "../../assets/bullhorn.svg";
 import HelpIcon from "../../assets/help.svg";
 
 import BookIcon from "../../assets/books.svg";
+import SubjectHome from "../../components/SubjectHome";
 const drawerWidth = "9.375rem";
 
 const useStyles = makeStyles(theme => ({
@@ -243,11 +244,49 @@ function SubjectPage(props) {
           )
           :
           (props) => (
-            <SubjectFilesForm
-              document={subjectInfo}
-              {...props}
-            />
-
+            <>
+              <DocumentEditor
+                primary={doc => doc.title}
+                collection={"Subject Announcement"}
+                icon={faBullhorn}
+                FormComponent={(props) =>
+                  <SubjectAnnouncementsForm user={props.user} {...props} />}
+                get={(key) => API.getAnnouncements(key, subject_id)}
+                post={(doc, key, user) => {
+                  let newA = doc;
+                  newA.subject = subject_id;
+                  newA.private = true;
+                  return API.addAnnouncement(newA, key, user)
+                }}
+                put={API.updateAnnouncement}
+                delete={API.deleteAnnouncements}
+                validation={{
+                  title: {
+                    validate: value => new Promise((resolve, reject) => {
+                      resolve(value)
+                    }),
+                    message: "You must enter an announcement title."
+                  },
+                  content: {
+                    validate: value => new Promise((resolve, reject) => {
+                      resolve(value)
+                    }),
+                    message: "You must enter some announcement content."
+                  },
+                }}
+                {...props}
+              />
+              <h1>Resources</h1>
+              <SubjectFilesForm
+                document={subjectInfo}
+                {...props}
+              />
+            </>
+            
+            //PUT COMPONENTS FOR SUBJECT PAGE HERE
+            // <SubjectHome
+            // document={subjectInfo}
+            // {...props}/>
           )
       ,
       path: `${props.match.path}/resources`
