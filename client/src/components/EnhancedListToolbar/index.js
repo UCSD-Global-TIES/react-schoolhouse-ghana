@@ -58,7 +58,7 @@ const useToolbarStyles = makeStyles((theme) => ({
 
 const EnhancedListToolbar = (props) => {
   const classes = useToolbarStyles();
-  const { numSelected, handleCreate, handleDelete, handleUpdate, buttonClass, title } =
+  const { user, numSelected, handleCreate, handleDelete, handleUpdate, buttonClass, title } =
     props;
 
   return (
@@ -107,9 +107,15 @@ const EnhancedListToolbar = (props) => {
       ) : (
         ""
       )}
-      <Button onClick={handleCreate} className={buttonClass + " " + classes.createBtn} classes={{ text: classes.padding }}>
-        + {title}
-      </Button>
+      {user.type === 'Admin' && ( 
+        <Button
+          onClick={handleCreate}
+          className={buttonClass + " " + classes.createBtn}
+          classes={{ text: classes.padding }}
+        >
+          + {title}
+        </Button>
+      )}
     </Toolbar>
   </div>
   );

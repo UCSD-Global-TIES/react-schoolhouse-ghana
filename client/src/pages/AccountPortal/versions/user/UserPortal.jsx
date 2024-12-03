@@ -442,6 +442,7 @@ function UserPortal(props) {
             type={page.type}
             grStatus={page.grStatus}
             secondary={page.secondary}
+            user={props.user}
             {...props}
           />
         ),
