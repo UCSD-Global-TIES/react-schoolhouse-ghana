@@ -4,17 +4,16 @@ import Typography from "@material-ui/core/Typography";
 import IconButton from "@material-ui/core/IconButton";
 import Tooltip from "@material-ui/core/Tooltip";
 import DeleteIcon from "@material-ui/icons/Delete";
-import PostAddIcon from "@material-ui/icons/PostAdd";
 import EditIcon from "@material-ui/icons/Edit";
-import clsx from "clsx";
 import { Button } from "@material-ui/core";
+import clsx from "clsx";
 import { lighten, makeStyles } from "@material-ui/core/styles";
 import banner from "../../assets/banner.png";
 
 const useToolbarStyles = makeStyles((theme) => ({
   root: {
     marginBottom: "2.6rem",
-    justifyContent: "space-between"
+    justifyContent: "space-between",
   },
   highlight:
     theme.palette.type === "light"
@@ -37,87 +36,80 @@ const useToolbarStyles = makeStyles((theme) => ({
     height: "3.5rem",
   },
   padding: {
-    padding: "0.56rem 1.25rem"
+    padding: "0.56rem 1.25rem",
   },
   imageContainer: {
-    position: 'relative',
+    position: "relative",
     top: 0,
     right: 0,
-    width: '115%', 
-    height: '110%', 
-    marginTop: '-7%', 
-    marginLeft: '-8%',
-    marginBottom: '5rem'
+    width: "115%",
+    height: "110%",
+    marginTop: "-7%",
+    marginLeft: "-8%",
+    marginBottom: "5rem",
   },
   image: {
-    width: '100%',
-    height: '100%',
-    objectFit: 'cover',
-  }
+    width: "100%",
+    height: "100%",
+    objectFit: "cover",
+  },
 }));
 
 const EnhancedListToolbar = (props) => {
   const classes = useToolbarStyles();
   const { user, numSelected, handleCreate, handleDelete, handleUpdate, buttonClass, title } =
     props;
+    console.log("User in EnhancedListToolbar:", user);
 
   return (
     <div>
       {title === "Announcement" && (
         <div className={classes.imageContainer}>
           <img src={banner} alt="Description" className={classes.image} />
-      </div>
-    )}
-    <Toolbar
-      className={clsx(classes.root, {
-        [classes.highlight]: numSelected > 0,
-      })}
-      disableGutters
-    >
-      {numSelected > 0 ? (
-        <Typography
-          className={classes.title}
-          color="inherit"
-          variant="subtitle1"
-        >
-          {numSelected} selected
-        </Typography>
-      ) : (
-        <Typography variant="h1" id="tableTitle">
-          {/* {props.title}s Manager */}
-          Schoolwide Announcements
-        </Typography>
+        </div>
       )}
+      <Toolbar
+        className={clsx(classes.root, {
+          [classes.highlight]: numSelected > 0,
+        })}
+        disableGutters
+      >
+        {numSelected > 0 ? (
+          <Typography className={classes.title} color="inherit" variant="subtitle1">
+            {numSelected} selected
+          </Typography>
+        ) : (
+          <Typography variant="h1" id="tableTitle">
+            Schoolwide Announcements
+          </Typography>
+        )}
+        {user.type === "Admin" && numSelected === 1 && (
+          <Tooltip title="Edit">
+            <IconButton onClick={handleUpdate} aria-label="edit">
+              <EditIcon />
+            </IconButton>
+          </Tooltip>
+        )}
 
-      {numSelected === 1 ? (
-        <Tooltip title="Edit">
-          <IconButton onClick={handleUpdate} aria-label="edit">
-            <EditIcon />
-          </IconButton>
-        </Tooltip>
-      ) : (
-        ""
-      )}
-      {numSelected > 0 ? (
-        <Tooltip title="Delete">
-          <IconButton onClick={handleDelete} aria-label="delete">
-            <DeleteIcon />
-          </IconButton>
-        </Tooltip>
-      ) : (
-        ""
-      )}
-      {user.type === 'Admin' && ( 
-        <Button
-          onClick={handleCreate}
-          className={buttonClass + " " + classes.createBtn}
-          classes={{ text: classes.padding }}
-        >
-          + {title}
-        </Button>
-      )}
-    </Toolbar>
-  </div>
+        {user.type === "Admin" && numSelected > 0 && (
+          <Tooltip title="Delete">
+            <IconButton onClick={handleDelete} aria-label="delete">
+              <DeleteIcon />
+            </IconButton>
+          </Tooltip>
+        )}
+
+        {user.type === "Admin" && (
+          <Button
+            onClick={handleCreate}
+            className={buttonClass + " " + classes.createBtn}
+            classes={{ text: classes.padding }}
+          >
+            + {title}
+          </Button>
+        )}
+      </Toolbar>
+    </div>
   );
 };
 

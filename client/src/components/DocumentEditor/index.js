@@ -122,6 +122,7 @@ function DocumentEditor(props) {
   const MAX_ITEMS = 5;
 
   const { user, FormComponent, icon, collection, primary, validation, type, grStatus, secondary } = props;
+  console.log(user)
   const classes = useStyles();
 
   // DOCUMENTS EDITOR
@@ -722,6 +723,7 @@ function DocumentEditor(props) {
                             handleSelect={handleSelect}
                             document={document}
                             name={primary(document)}
+                            user={props.user} 
                           />
                         </List>
                       );
