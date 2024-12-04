@@ -100,6 +100,7 @@ function SubjectFilesForm(props) {
     return (
         <div className={classes.root}>
             {/* ALERTS FOR API ACTIONS */}
+            
             <Snackbar
                 anchorOrigin={{ vertical: "top", horizontal: "right" }}
                 open={currentAlert.isOpen}
@@ -112,6 +113,7 @@ function SubjectFilesForm(props) {
             </Snackbar>
             <div className={classes.vc}>
                 <div style={{ marginBottom: "2rem", display: "flex", justifyContent: "flex-end" }}>
+                    
                     <Button
                         variant="contained"
                         color="primary"
@@ -124,6 +126,7 @@ function SubjectFilesForm(props) {
                         </Button>
 
                 </div>
+                
                 <DocumentPicker
                     link={(doc) => doc.path}
                     title={"Attached Files"}

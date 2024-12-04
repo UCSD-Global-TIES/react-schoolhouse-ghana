@@ -243,14 +243,14 @@ function SubjectPage(props) {
             />
           )
           :
-          (props) => (
+          (p) => (
             <>
               <DocumentEditor
                 primary={doc => doc.title}
                 collection={"Subject Announcement"}
                 icon={faBullhorn}
-                FormComponent={(props) =>
-                  <SubjectAnnouncementsForm user={props.user} {...props} />}
+                FormComponent={(p) =>
+                  <SubjectAnnouncementsForm user={props.user} {...p} />}
                 get={(key) => API.getAnnouncements(key, subject_id)}
                 post={(doc, key, user) => {
                   let newA = doc;
@@ -274,19 +274,17 @@ function SubjectPage(props) {
                     message: "You must enter some announcement content."
                   },
                 }}
-                {...props}
+                {...p}
               />
+              <h1>Tasks</h1>
               <h1>Resources</h1>
               <SubjectFilesForm
                 document={subjectInfo}
-                {...props}
+                {...p}
               />
             </>
             
-            //PUT COMPONENTS FOR SUBJECT PAGE HERE
-            // <SubjectHome
-            // document={subjectInfo}
-            // {...props}/>
+           
           )
       ,
       path: `${props.match.path}/resources`
