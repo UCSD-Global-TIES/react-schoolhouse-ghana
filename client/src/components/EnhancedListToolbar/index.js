@@ -58,7 +58,7 @@ const useToolbarStyles = makeStyles((theme) => ({
 
 const EnhancedListToolbar = (props) => {
   const classes = useToolbarStyles();
-  const { numSelected, handleCreate, handleDelete, handleUpdate, buttonClass, title } =
+  const { numSelected, handleCreate, handleDelete, handleUpdate, buttonClass, title, useSubHeader } =
     props;
 
   return (
@@ -82,12 +82,19 @@ const EnhancedListToolbar = (props) => {
         >
           {numSelected} selected
         </Typography>
+      ) : useSubHeader === "true" ? (
+        <Typography variant="h2" id="tableTitle">
+          {props.title}
+          {/* Schoolwide Announcements */}
+        </Typography>
       ) : (
         <Typography variant="h1" id="tableTitle">
-          {props.title}s Manager
+          {props.title}
           {/* Schoolwide Announcements */}
         </Typography>
       )}
+      
+
 
       {numSelected === 1 ? (
         <Tooltip title="Edit">

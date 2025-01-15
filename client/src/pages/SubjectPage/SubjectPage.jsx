@@ -34,6 +34,7 @@ import HelpIcon from "../../assets/help.svg";
 
 import BookIcon from "../../assets/books.svg";
 import SubjectHome from "../../components/SubjectHome";
+import AnnouncementCard from "../../components/AnnouncementCard/AnnouncementCard";
 const drawerWidth = "9.375rem";
 
 const useStyles = makeStyles(theme => ({
@@ -89,6 +90,25 @@ const useStyles = makeStyles(theme => ({
     display: "flex",
     justifyContent: "center",
   },
+  header: {
+    padding: "2.5rem 4.375rem 0 4.375rem",
+  },
+  subjectTitle: {
+    fontFamily: "Asap Condensed",
+    fontSize: "3rem",
+    fontStyle: "normal",
+    fontWeight: "700",
+    lineHeight: "2.5rem",
+    color: "#005FD9;",
+    textTransform: "uppercase",
+  },
+  sectionContainer: {
+    padding: "2.5rem 4.375rem",
+    display: "flex",
+    flexDirection: "column",
+    gap: "0.63rem",
+  },
+
 }));
 
 function SubjectPage(props) {
@@ -247,7 +267,8 @@ function SubjectPage(props) {
             <>
               <DocumentEditor
                 primary={doc => doc.title}
-                collection={"Subject Announcement"}
+                isSubComponent={"true"}
+                collection={"Announcements"}
                 icon={faBullhorn}
                 FormComponent={(p) =>
                   <SubjectAnnouncementsForm user={props.user} {...p} />}
@@ -276,8 +297,19 @@ function SubjectPage(props) {
                 }}
                 {...p}
               />
-              <h1>Tasks</h1>
-              <h1>Resources</h1>
+              
+              <Typography variant="h2" className={classes.header}>Upcoming Tasks</Typography>
+              <div className={classes.sectionContainer}>
+                <AnnouncementCard></AnnouncementCard>
+                <AnnouncementCard></AnnouncementCard>
+                <AnnouncementCard></AnnouncementCard>
+              </div>
+              
+
+              
+              <Typography variant="h2" className={classes.header}>Resources</Typography>
+              
+              
               <SubjectFilesForm
                 document={subjectInfo}
                 {...p}
@@ -393,8 +425,9 @@ function SubjectPage(props) {
       <main className={classes.content} style={{ marginLeft: !isSmallDevice ? drawerWidth : 0, }}>
         {/* <div className={classes.toolbar} /> */}
 
-        <Typography style={{ padding: "1rem" }} align='center' className={clsx(classes.textGlow, "flow-text")} variant="h3"> {subjectInfo.name} </Typography>
-
+        {/* <Typography style={{ padding: "1rem" }} align='center' className={clsx(classes.textGlow, "flow-text")} variant="h3"> {subjectInfo.name} </Typography> */}
+        <Typography variant="h1" className={classes.header}>{props.user.type}'s Class</Typography>
+        <Typography className={clsx(classes.header,classes.subjectTitle)}>{subjectInfo.name}</Typography>
 
         {/* <TransitionGroup>
           <CSSTransition

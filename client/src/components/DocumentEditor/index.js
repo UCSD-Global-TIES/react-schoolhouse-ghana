@@ -121,7 +121,7 @@ function DocumentEditor(props) {
   const socket = useContext(SocketContext);
   const MAX_ITEMS = 5;
 
-  const { FormComponent, icon, collection, primary, validation, type, grStatus, secondary } = props;
+  const { FormComponent, icon, collection, primary, validation, type, grStatus, secondary, isSubComponent } = props;
   const classes = useStyles();
 
   // DOCUMENTS EDITOR
@@ -619,6 +619,7 @@ function DocumentEditor(props) {
                 }
                 handleDelete={() => handleConfirm(true)}
                 buttonClass={classes.btn}
+                useSubHeader={isSubComponent}
               />
 
               <SearchBar
