@@ -121,7 +121,7 @@ function DocumentEditor(props) {
   const socket = useContext(SocketContext);
   const MAX_ITEMS = 5;
 
-  const { user, FormComponent, icon, collection, primary, validation, type, grStatus, secondary } = props;
+  const { user, FormComponent, icon, collection, primary, validation, type, grStatus, secondary, isSubComponent } = props;
   console.log(user)
   const classes = useStyles();
 
@@ -620,6 +620,7 @@ function DocumentEditor(props) {
                 }
                 handleDelete={() => handleConfirm(true)}
                 buttonClass={classes.btn}
+                useSubHeader={isSubComponent}
                 user = {user}
               />
 

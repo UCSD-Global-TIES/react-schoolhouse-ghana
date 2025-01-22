@@ -57,7 +57,7 @@ const useToolbarStyles = makeStyles((theme) => ({
 
 const EnhancedListToolbar = (props) => {
   const classes = useToolbarStyles();
-  const { user, numSelected, handleCreate, handleDelete, handleUpdate, buttonClass, title } =
+  const { user, numSelected, handleCreate, handleDelete, handleUpdate, buttonClass, title, useSubHeader } =
     props;
     console.log("User in EnhancedListToolbar:", user);
 
@@ -66,50 +66,59 @@ const EnhancedListToolbar = (props) => {
       {title === "Announcement" && (
         <div className={classes.imageContainer}>
           <img src={banner} alt="Description" className={classes.image} />
-        </div>
+      </div>
+    )}
+    <Toolbar
+      className={clsx(classes.root, {
+        [classes.highlight]: numSelected > 0,
+      })}
+      disableGutters
+    >
+      {numSelected > 0 ? (
+        <Typography
+          className={classes.title}
+          color="inherit"
+          variant="subtitle1"
+        >
+          {numSelected} selected
+        </Typography>
+      ) : useSubHeader === "true" ? (
+        <Typography variant="h2" id="tableTitle">
+          {props.title}
+          {/* Schoolwide Announcements */}
+        </Typography>
+      ) : (
+        <Typography variant="h1" id="tableTitle">
+          {props.title}
+          {/* Schoolwide Announcements */}
+        </Typography>
       )}
-      <Toolbar
-        className={clsx(classes.root, {
-          [classes.highlight]: numSelected > 0,
-        })}
-        disableGutters
-      >
-        {numSelected > 0 ? (
-          <Typography className={classes.title} color="inherit" variant="subtitle1">
-            {numSelected} selected
-          </Typography>
-        ) : (
-          <Typography variant="h1" id="tableTitle">
-            Schoolwide Announcements
-          </Typography>
-        )}
-        {user.type === "Admin" && numSelected === 1 && (
-          <Tooltip title="Edit">
-            <IconButton onClick={handleUpdate} aria-label="edit">
-              <EditIcon />
-            </IconButton>
-          </Tooltip>
-        )}
+      
 
-        {user.type === "Admin" && numSelected > 0 && (
-          <Tooltip title="Delete">
-            <IconButton onClick={handleDelete} aria-label="delete">
-              <DeleteIcon />
-            </IconButton>
-          </Tooltip>
-        )}
 
-        {user.type === "Admin" && (
-          <Button
-            onClick={handleCreate}
-            className={buttonClass + " " + classes.createBtn}
-            classes={{ text: classes.padding }}
-          >
-            + {title}
-          </Button>
-        )}
-      </Toolbar>
-    </div>
+      {numSelected === 1 ? (
+        <Tooltip title="Edit">
+          <IconButton onClick={handleUpdate} aria-label="edit">
+            <EditIcon />
+          </IconButton>
+        </Tooltip>
+      ) : (
+        ""
+      )}
+      {numSelected > 0 ? (
+        <Tooltip title="Delete">
+          <IconButton onClick={handleDelete} aria-label="delete">
+            <DeleteIcon />
+          </IconButton>
+        </Tooltip>
+      ) : (
+        ""
+      )}
+      <Button onClick={handleCreate} className={buttonClass + " " + classes.createBtn} classes={{ text: classes.padding }}>
+        + {title}
+      </Button>
+    </Toolbar>
+  </div>
   );
 };
 

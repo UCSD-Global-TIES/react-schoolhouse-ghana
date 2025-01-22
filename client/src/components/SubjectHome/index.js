@@ -29,7 +29,7 @@ const useStyles = makeStyles(theme => ({
 
 // Private field is special use case
 
-function SubjectFilesForm(props) {
+function SubjectHome(props) {
     const socket = React.useContext(SocketContext)
     const classes = useStyles();
     const [fileOptions, setFileOptions] = useState([]);
@@ -99,52 +99,12 @@ function SubjectFilesForm(props) {
 
     return (
         <div className={classes.root}>
-            {/* ALERTS FOR API ACTIONS */}
-            
-            <Snackbar
-                anchorOrigin={{ vertical: "top", horizontal: "right" }}
-                open={currentAlert.isOpen}
-                autoHideDuration={6000}
-                onClose={handleAlertClose}
-            >
-                <Alert onClose={handleAlertClose} severity={currentAlert.severity}>
-                    {currentAlert.message}
-                </Alert>
-            </Snackbar>
-            <div className={classes.vc}>
-                <div style={{ marginBottom: "2rem", display: "flex", justifyContent: "flex-end" }}>
-                    
-                    <Button
-                        variant="contained"
-                        color="primary"
-                        size="large"
-                        startIcon={<SaveIcon />}
-                        onClick={handleSave}
-                        disabled={JSON.stringify(selectedFiles) === JSON.stringify(props.document.files.map((file) => file._id))}
-                    >
-                        Save
-                        </Button>
-
-                </div>
-                
-                <DocumentPicker
-                    link={(doc) => doc.path}
-                    title={"Attached Files"}
-                    docs={fileOptions}
-                    pageMax={5}
-                    selected={selectedFiles}
-                    icon={faFile}
-                    collection={"Files"}
-                    primary={doc => doc.nickname}
-                    handleChange={(docs) => handlePickChange(docs)}
-                />
+            <h1>hello</h1>
 
 
-
-
-            </div>
+          
         </div>
     )
 };
 
-export default SubjectFilesForm;
+export default SubjectHome;
