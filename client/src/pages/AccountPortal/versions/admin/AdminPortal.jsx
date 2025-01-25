@@ -191,7 +191,7 @@ function AdminPortal(props) {
           <h1 style={{ fontSize: "1.75rem" }}>Semanhyia</h1>
           <h2 style={{ fontSize: "1.125rem" }}>American School</h2>
         </div>
-        <div className="sidebar-links">
+        <div className={classes.sidebarLinks}>
           {documentMenuItems.map((item, index) => (
             item.clickHandler ? (
               <ListItem
