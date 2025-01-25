@@ -4,17 +4,16 @@ import Typography from "@material-ui/core/Typography";
 import IconButton from "@material-ui/core/IconButton";
 import Tooltip from "@material-ui/core/Tooltip";
 import DeleteIcon from "@material-ui/icons/Delete";
-import PostAddIcon from "@material-ui/icons/PostAdd";
 import EditIcon from "@material-ui/icons/Edit";
-import clsx from "clsx";
 import { Button } from "@material-ui/core";
+import clsx from "clsx";
 import { lighten, makeStyles } from "@material-ui/core/styles";
 import banner from "../../assets/banner.png";
 
 const useToolbarStyles = makeStyles((theme) => ({
   root: {
     marginBottom: "2.6rem",
-    justifyContent: "space-between"
+    justifyContent: "space-between",
   },
   highlight:
     theme.palette.type === "light"
@@ -37,29 +36,30 @@ const useToolbarStyles = makeStyles((theme) => ({
     height: "3.5rem",
   },
   padding: {
-    padding: "0.56rem 1.25rem"
+    padding: "0.56rem 1.25rem",
   },
   imageContainer: {
-    position: 'relative',
+    position: "relative",
     top: 0,
     right: 0,
-    width: '115%', 
-    height: '110%', 
-    marginTop: '-7%', 
-    marginLeft: '-8%',
-    marginBottom: '5rem'
+    width: "115%",
+    height: "110%",
+    marginTop: "-7%",
+    marginLeft: "-8%",
+    marginBottom: "5rem",
   },
   image: {
-    width: '100%',
-    height: '100%',
-    objectFit: 'cover',
-  }
+    width: "100%",
+    height: "100%",
+    objectFit: "cover",
+  },
 }));
 
 const EnhancedListToolbar = (props) => {
   const classes = useToolbarStyles();
-  const { numSelected, handleCreate, handleDelete, handleUpdate, buttonClass, title } =
+  const { user, numSelected, handleCreate, handleDelete, handleUpdate, buttonClass, title, useSubHeader } =
     props;
+    console.log("User in EnhancedListToolbar:", user);
 
   return (
     <div>
@@ -82,12 +82,19 @@ const EnhancedListToolbar = (props) => {
         >
           {numSelected} selected
         </Typography>
+      ) : useSubHeader === "true" ? (
+        <Typography variant="h2" id="tableTitle">
+          {props.title}
+          {/* Schoolwide Announcements */}
+        </Typography>
       ) : (
         <Typography variant="h1" id="tableTitle">
-          {/* {props.title}s Manager */}
-          Schoolwide Announcements
+          {props.title}
+          {/* Schoolwide Announcements */}
         </Typography>
       )}
+      
+
 
       {numSelected === 1 ? (
         <Tooltip title="Edit">

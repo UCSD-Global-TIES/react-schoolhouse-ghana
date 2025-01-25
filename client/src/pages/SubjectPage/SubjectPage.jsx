@@ -12,7 +12,7 @@ import API from "../../utils/API";
 import "./main.css";
 import NavBarAdmin from "../../components/NavBarAdmin";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBullhorn, faCheck, faFile, faSpinner } from "@fortawesome/free-solid-svg-icons";
+import { faBullhorn, faCheck, faFile, faSpinner, faUsers, } from "@fortawesome/free-solid-svg-icons";
 import SimpleListView from "../../components/SimpleListView";
 import PageSpinner from "../../components/PageSpinner";
 import FileViewer from "../../components/FileViewer";
@@ -27,37 +27,88 @@ import SocketContext from "../../socket-context"
 import clsx from "clsx"
 import eduTies from "../../logos/eduTIES_logo.png"
 import sas from "../../logos/sas_logo.png"  
+// import AccountIcon from "../../../../assets/account-icon.svg";
+// import BookIcon from "../../../../assets/books.svg";
+import BullhornIcon from "../../assets/bullhorn.svg";
+import HelpIcon from "../../assets/help.svg";
 
-const drawerWidth = 220;
+import BookIcon from "../../assets/books.svg";
+import SubjectHome from "../../components/SubjectHome";
+import AnnouncementCard from "../../components/AnnouncementCard/AnnouncementCard";
+const drawerWidth = "9.375rem";
 
 const useStyles = makeStyles(theme => ({
   root: {
-    display: 'flex',
+    // display: "flex",
+    alignItems: "flex-start",
   },
   toolbar: theme.mixins.toolbar,
-  // drawer: {
-  //     [theme.breakpoints.up('sm')]: {
-  //         width: drawerWidth,
-  //         flexShrink: 0,
-  //     },
-  // },
+  sidebar: {
+    display: "flex",
+    width: "9.375rem",
+    padding: "3.5rem 0",
+    flexDirection: "column",
+    alignItems: "flex-start",
+    flexShrink: "0",
+    alignSelf: "stretch",
+  },
   drawerPaper: {
-    width: drawerWidth,
-    backgroundColor: "#f7ee9a",
+    background: "var(--primary-color)",
+    color: "var(--background-color)",
   },
   content: {
     flexGrow: 1,
-    marginTop: "4rem",
-    padding: theme.spacing(2),
+    padding: theme.spacing(1),
   },
   buttonLink: {
     color: "inherit",
-    textDecoration: "none"
+    textDecoration: "none",
   },
-  textGlow: {
-    color: "black",
-    // textShadow: "2px 2px 7px #787676"
+  sidebarLinks: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "flexStart",
+    alignSelf: "stretch",
+    width: "100%",
   },
+  navLink: {
+    textDecoration: "none",
+    color: "inherit", // To keep the same color as the ListItemText
+    display: "flex",
+    height: "5rem",
+    flexDirection: "column",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: "0.9375rem",
+    alignSelf: "stretch",
+  },
+  linkBox: {
+    display: "flex",
+    flexDirection: "column",
+  },
+  justifyIcon: {
+    display: "flex",
+    justifyContent: "center",
+  },
+  header: {
+    padding: "2.5rem 4.375rem 0 4.375rem",
+  },
+  subjectTitle: {
+    fontFamily: "Asap Condensed",
+    fontSize: "3rem",
+    fontStyle: "normal",
+    fontWeight: "700",
+    lineHeight: "2.5rem",
+    color: "#005FD9;",
+    textTransform: "uppercase",
+  },
+  sectionContainer: {
+    padding: "2.5rem 4.375rem",
+    display: "flex",
+    flexDirection: "column",
+    gap: "0.63rem",
+  },
+
 }));
 
 function SubjectPage(props) {
@@ -82,39 +133,64 @@ function SubjectPage(props) {
   const documentMenuItems = [
     {
       label: "Announcements",
-      icon: faBullhorn,
-      path: `${props.match.url}/announcements`
+      iconPath: BullhornIcon,
+      path: `${props.match.url}/announcements`,
     },
     {
-      label: "Resources",
-      icon: faFile,
-      path: `${props.match.url}/resources`
+      label: "Classes",
+      iconPath: BookIcon,
+      path: `${props.match.url}/resources`,
     }, 
     {
-      label: "Manage Student Grades",
-      icon: faCheck,
+      label: "Help",
+      iconPath: HelpIcon,
       path: `${props.match.url}/studentGrades`
     }
   ];
 
   const drawer = (
-    <div
-      onClick={isSmallDevice ? handleDrawerToggle : () => { }}
-    >
-      <div className={classes.toolbar} />
-      <List>
-      <div style={{textAlign: "center"}}> <img src={sas} alt="sas logo" height={150} width={150}/></div>
-      <div style={{marginTop: "10px"}}> </div>
-        {documentMenuItems.map((item, index) => (
-          <NavLink to={item.path} key={index} className={classes.buttonLink}>
-            <ListItem selected={props.location.pathname.includes(item.path)} button>
-              <ListItemIcon>{<FontAwesomeIcon icon={item.icon} />}</ListItemIcon>
-              <ListItemText style={{ overflowWrap: "break-word" }} primary={item.label} />
-            </ListItem>
-          </NavLink>
-        ))}
+    <div onClick={isSmallDevice ? handleDrawerToggle : () => {}}>
+      <List className={classes.sidebar}>
+        <div
+          style={{
+            textAlign: "center",
+            margin: "0 auto",
+            marginBottom: "10px",
+            color: "var(--background-color)",
+          }}
+        >
+          <h1 style={{ fontSize: "1.75rem" }}>Semanhyia</h1>
+          <h2 style={{ fontSize: "1.125rem" }}>American School</h2>
+        </div>
+        <div className={classes.sidebarLinks}>
+          {documentMenuItems.map((item, index) => (
+            <NavLink
+              to={item.path}
+              key={index}
+              className={`${classes.buttonLink} ${classes.navLink}`}
+            >
+              <ListItem
+                selected={props.location.pathname.includes(item.path)}
+                button
+                className={classes.linkBox}
+              >
+                <ListItemIcon className={classes.justifyIcon}>
+                  <img
+                    src={item.iconPath}
+                    alt={`${item.label} icon`}
+                    style={{ width: 24, height: 24 }}
+                  />
+                </ListItemIcon>
+
+                <ListItemText
+                  style={{ overflowWrap: "break-word" }}
+                  primary={item.label}
+                />
+              </ListItem>
+            </NavLink>
+          ))}
+        </div>
       </List>
-    <img src={eduTies} alt="eduTies_logo" height={200} width={200} style={{position: "absolute", top: 680}}/>
     </div>
   );
 
@@ -187,12 +263,60 @@ function SubjectPage(props) {
             />
           )
           :
-          (props) => (
-            <SubjectFilesForm
-              document={subjectInfo}
-              {...props}
-            />
+          (p) => (
+            <>
+              <DocumentEditor
+                primary={doc => doc.title}
+                isSubComponent={"true"}
+                collection={"Announcements"}
+                icon={faBullhorn}
+                FormComponent={(p) =>
+                  <SubjectAnnouncementsForm user={props.user} {...p} />}
+                get={(key) => API.getAnnouncements(key, subject_id)}
+                post={(doc, key, user) => {
+                  let newA = doc;
+                  newA.subject = subject_id;
+                  newA.private = true;
+                  return API.addAnnouncement(newA, key, user)
+                }}
+                put={API.updateAnnouncement}
+                delete={API.deleteAnnouncements}
+                validation={{
+                  title: {
+                    validate: value => new Promise((resolve, reject) => {
+                      resolve(value)
+                    }),
+                    message: "You must enter an announcement title."
+                  },
+                  content: {
+                    validate: value => new Promise((resolve, reject) => {
+                      resolve(value)
+                    }),
+                    message: "You must enter some announcement content."
+                  },
+                }}
+                {...p}
+              />
+              
+              <Typography variant="h2" className={classes.header}>Upcoming Tasks</Typography>
+              <div className={classes.sectionContainer}>
+                <AnnouncementCard></AnnouncementCard>
+                <AnnouncementCard></AnnouncementCard>
+                <AnnouncementCard></AnnouncementCard>
+              </div>
+              
 
+              
+              <Typography variant="h2" className={classes.header}>Resources</Typography>
+              
+              
+              <SubjectFilesForm
+                document={subjectInfo}
+                {...p}
+              />
+            </>
+            
+           
           )
       ,
       path: `${props.match.path}/resources`
@@ -301,8 +425,9 @@ function SubjectPage(props) {
       <main className={classes.content} style={{ marginLeft: !isSmallDevice ? drawerWidth : 0, }}>
         {/* <div className={classes.toolbar} /> */}
 
-        <Typography style={{ padding: "1rem" }} align='center' className={clsx(classes.textGlow, "flow-text")} variant="h3"> {subjectInfo.name} </Typography>
-
+        {/* <Typography style={{ padding: "1rem" }} align='center' className={clsx(classes.textGlow, "flow-text")} variant="h3"> {subjectInfo.name} </Typography> */}
+        <Typography variant="h1" className={classes.header}>{props.user.type}'s Class</Typography>
+        <Typography className={clsx(classes.header,classes.subjectTitle)}>{subjectInfo.name}</Typography>
 
         {/* <TransitionGroup>
           <CSSTransition

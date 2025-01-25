@@ -22,6 +22,8 @@ import API from "./utils/API";
 // Style
 import "./App.css";
 
+import Cookies from 'js-cookie';
+
 // Components
 // -----------------------------------------------------------
 // Component that ensures people are logged in and have proper permissions
@@ -36,6 +38,7 @@ import AssessmentPage from "./pages/AssessmentPage/index";
 import LoginPortal from "./pages/LoginPortal/index";
 import NoMatch from "./pages/NoMatch/index";
 import SubjectPage from "./pages/SubjectPage/index";
+import UserPortal from "./pages/AccountPortal/versions/user/UserPortal.jsx"; 
 
 const socket = io();
 
@@ -110,8 +113,10 @@ function App() {
   const [loading, setLoading] = useState(true);
 
   const handleLogout = () => {
-    API.destroySession().then((nullUser) => {
-      setUserInfo(nullUser.data);
+    API.destroySession().then(() => {
+      setUserInfo(null); // Clear user info
+      Cookies.remove('user_sid'); // Remove session cookie
+      window.location.href = "/login"; // Redirect to login page
     });
   };
 
@@ -143,6 +148,12 @@ function App() {
                 exact
                 path="/"
                 component={AccountPortal}
+                user={userInfo}
+              />
+              <ProtectedRoute
+                path="/user"
+                component={UserPortal}
+                logout={handleLogout}
                 user={userInfo}
               />
               {/* Class component should check account type and render the correct component */}

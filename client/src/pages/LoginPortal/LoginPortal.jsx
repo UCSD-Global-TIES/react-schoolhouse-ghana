@@ -170,130 +170,131 @@ function LoginPortal(props) {
           {alertMessage}
         </Alert>
       </Snackbar>
-      <FullScreenDialog
-        open={seedDialogOpen}
-        handleClose={handleCloseSeedDialog}
-        type={"Welcome to Semanhyia American School!"}
-        action={handleSeedDatabase}
-        buttonText={
-          seedLoading ? <FontAwesomeIcon icon={faSpinner} spin /> : "Seed"
-        }
-      >
-        <div style={{ height: "100%", width: "100%", display: "flex" }}>
-          <div style={{ margin: "auto", maxWidth: "400px", width: "70%" }}>
-            <Typography
-              align="center"
-              variant="h2"
-              color="textSecondary"
-              className={"flow-text"}
-              gutterBottom
-            >
-              welcome 🥳
-            </Typography>
-            <Typography
-              align="center"
-              variant="subtitle2"
-              color="textSecondary"
-              gutterBottom
-            >
-              Below are the credentials for the server's master account. Feel
-              free to initialize the database with some example documents just
-              to get going by clicking 'Seed'.
-            </Typography>
-            <div className={classes.formContainer}>
-              <FormControl className={classes.formInput}>
-                <InputLabel htmlFor="input-with-icon-adornment">
-                  Username
-                </InputLabel>
-                <Input
-                  startAdornment={
-                    <InputAdornment position="start">
-                      <AccountCircle />
-                    </InputAdornment>
-                  }
-                  name="username"
-                  defaultValue={createdUser.username}
-                  readOnly
-                />
-              </FormControl>
-            </div>
-            <div className={classes.formContainer}>
-              <FormControl className={classes.formInput}>
-                <InputLabel htmlFor="input-with-icon-adornment">
-                  Password
-                </InputLabel>
-                <Input
-                  startAdornment={
-                    <InputAdornment position="start">
-                      <Key />
-                    </InputAdornment>
-                  }
-                  name="password"
-                  defaultValue={createdUser.password}
-                  readOnly
-                />
-              </FormControl>
-            </div>
-          </div>
-        </div>
-      </FullScreenDialog>
+  
+      {/* MAIN CONTAINER */}
       <div style={{ display: "flex", width: "100%", height: "100vh" }}>
-        <div style={{ margin: "auto" }}>
-          <div className={classes.portal}>
-            <Typography align="center" variant="h4" className={classes.title}>
-              login <FontAwesomeIcon icon={faChalkboardTeacher} size="lg" />
+        {/* LEFT SECTION: IMAGE */}
+        <div
+          style={{
+            width: "50%",
+            backgroundImage: `url(${require("../../assets/LogIn.png")})`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+          }}
+        ></div>
+  
+        {/* RIGHT SECTION: LOGIN FORM */}
+        <div
+          style={{
+            width: "60%",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: "center",
+            backgroundColor: "white",
+            padding: "40px",
+            boxSizing: "border-box",
+          }}
+        >
+          <div
+            className={classes.portal}
+            style={{
+              width: "100%", 
+              maxWidth: "500px",
+            }}
+          >
+            {/* TITLE */}
+            <Typography
+              align="center"
+              variant="h3" 
+              className={classes.title}
+              style={{
+                fontSize: "36px",
+                marginBottom: "30px",
+              }}
+            >
+              Login
             </Typography>
 
-            <div className={classes.formContainer}>
-              <FormControl className={classes.formInput}>
-                <InputLabel htmlFor="input-with-icon-adornment">
-                  Username
-                </InputLabel>
+            {/* USERNAME FIELD */}
+            <div className={classes.formContainer} style={{ marginBottom: "20px" }}>
+              <FormControl
+                className={classes.formInput}
+                style={{
+                  width: "100%", border: "2px solid black", borderRadius: "30px",padding: "10px 15px",boxSizing: "border-box",}}
+              >
                 <Input
+                  placeholder="Enter your username"
+                  disableUnderline
                   startAdornment={
                     <InputAdornment position="start">
-                      <AccountCircle />
+                      <AccountCircle style={{ fontSize: "30px" }} />
                     </InputAdornment>
                   }
                   name="username"
                   value={username}
                   onChange={handleChange}
+                  style={{
+                    fontSize: "25px",
+                    color: "black",
+                  }}
+                  inputProps={{
+                    style: {
+                      color: "gray", 
+                    },
+                  }}
                 />
               </FormControl>
             </div>
-            <div className={classes.formContainer}>
-              <FormControl className={classes.formInput}>
-                <InputLabel htmlFor="input-with-icon-adornment">
-                  Password
-                </InputLabel>
+
+            {/* PASSWORD FIELD */}
+            <div className={classes.formContainer} style={{ marginBottom: "20px" }}>
+              <FormControl
+                className={classes.formInput}
+                style={{width: "100%", border: "2px solid black", borderRadius: "30px", padding: "10px 15px", boxSizing: "border-box",}}
+              >
                 <Input
                   type="password"
+                  placeholder="Enter your password"
+                  disableUnderline
                   startAdornment={
                     <InputAdornment position="start">
-                      <Key />
+                      <Key style={{ fontSize: "30px" }} />
                     </InputAdornment>
                   }
                   name="password"
                   value={password}
                   onKeyPress={(e) => handleKeyPress(e, username, password)}
                   onChange={handleChange}
+                  style={{
+                    fontSize: "25px",
+                    color: "black",
+                  }}
+                  inputProps={{
+                    style: {
+                      color: "gray", 
+                    },
+                  }}
                 />
               </FormControl>
             </div>
-            <div style={{ display: "flex", width: "100%", margin: "10px 0" }}>
-              <div style={{ margin: "auto" }}>
+
+            {/* SIGN-IN BUTTON */}
+            <div style={{ display: "flex", width: "100%", margin: "20px 0" }}>
+              <div style={{ margin: "auto", width: "100%" }}>
                 <Button
-                  style={{ backgroundColor: "#fe951d", color: "white" }}
+                  style={{
+                    backgroundColor: "#2584FF",
+                    color: "white",
+                    width: "100%",
+                    padding: "15px 0", 
+                    fontSize: "25px",
+                    borderRadius: "30px",
+                  }}
                   aria-label="login"
                   onClick={() => handleLogin(username, password)}
                 >
-                  <div> Sign in </div>
-                  <FontAwesomeIcon
-                    className={classes.navIcon}
-                    icon={faSignInAlt}
-                    size="lg"
-                    color="white"
-                  />
+                  <div>Log In</div>
                 </Button>
               </div>
             </div>

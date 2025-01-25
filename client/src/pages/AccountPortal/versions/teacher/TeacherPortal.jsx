@@ -113,7 +113,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function UserPortal(props) {
+function TeacherPortal(props) {
   const classes = useStyles();
   const theme = useTheme();
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -123,6 +123,23 @@ function UserPortal(props) {
   const socket = useContext(SocketContext);
   const siofu = new SocketIOFileUpload(socket);
 
+  // "Admin","Teachers", "Students" categories
+  const [admins, setAdmins] = useState([]);
+  const [teachers, setTeachers] = useState([]);
+  const [students, setStudents] = useState([]);
+
+  // function to handle adding new admin
+//   const addAdmin = (adminName) => {
+//     setAdmins((prevAdmin) => [...prevAdmin, adminName]);
+//   };
+  // function to handle adding new teacher
+//   const addTeacher = (teacherName) => {
+//     setTeachers((prevTeachers) => [...prevTeachers, teacherName]);
+//   };
+  // function to handle adding new student
+//   const addStudent = (studentName) => {
+//     setStudents((prevStudents) => [...prevStudents, studentName]);
+//   };
 
   // Render the NameCards for each category
   const renderNameCards = (list) => {
@@ -404,19 +421,19 @@ function UserPortal(props) {
       },
     },
     // ASSESSMENT
-    // {
-    //   collection: "Assessment",
-    //   link: (doc) => `/assessment/yolo`, // TODO: Set specific quiz ID into the URL once backend is finished
-    //   icon: faCheckCircle,
-    //   FormComponent: (p) => <AssessmentForm user={props.user} {...p} />,
-    //   primary: (doc) => doc.title,
-    //   path: `${props.match.path}/assessment`,
-    //   api: {
-    //     get: API.getAssessments,
-    //     // TODO: Other API requests once we start implementing ability to create tests
-    //   },
-    //   validation: {},
-    // },
+    {
+      collection: "Assessment",
+      link: (doc) => `/assessment/yolo`, // TODO: Set specific quiz ID into the URL once backend is finished
+      icon: faCheckCircle,
+      FormComponent: (p) => <AssessmentForm user={props.user} {...p} />,
+      primary: (doc) => doc.title,
+      path: `${props.match.path}/assessment`,
+      api: {
+        get: API.getAssessments,
+        // TODO: Other API requests once we start implementing ability to create tests
+      },
+      validation: {},
+    },
   ];
 
   let pages = [];
@@ -442,7 +459,6 @@ function UserPortal(props) {
             type={page.type}
             grStatus={page.grStatus}
             secondary={page.secondary}
-            user={props.user}
             {...props}
           />
         ),
@@ -535,4 +551,4 @@ function UserPortal(props) {
   );
 }
 
-export default UserPortal;
+export default TeacherPortal;
