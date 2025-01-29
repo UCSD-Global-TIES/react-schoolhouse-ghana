@@ -42,6 +42,20 @@ const useStyles = makeStyles(theme => ({
     switchLabel: {
         flexGrow: 1,
     },
+        vc: {
+        // maxWidth: "500px",
+        // width: "90%",
+        // margin: "auto"
+        display: "flex",
+        flexDirection: "column",
+        width: "100%",
+    },
+    toggleContainer: {
+        display: "flex",
+        justifyContent: "flex-end",
+        width: "100%",
+        padding: "0.5rem 0",
+    }
 }));
 
 const disabledMsg = `Today's Date`;
@@ -79,6 +93,7 @@ function AnnouncementsForm(props) {
     const [options, setOptions] = useState([]);
     const [subjectValue, setSubjectValue] = useState(null);
     const [PROPS, setProps] = useState(props);
+    const [viewMode, setViewMode] = useState(!props.isCreate);
 
     const handleSwitchToggle = name => e => {
         const event = {
@@ -135,7 +150,6 @@ function AnnouncementsForm(props) {
                     }
                 }
                 setSelectedFiles(selected);
-
                 setOptions(subjectOptions);
                 setFileOptions([...results[1].data]);
                 setLoading(false);
@@ -159,84 +173,125 @@ function AnnouncementsForm(props) {
         setProps(props);
     }, [props]);
 
-    return (
-        <React.Fragment>
-        <div className={classes.root}>
-            <Box className={classes.switchContainer}>
-                <Box className={classes.switchLabel}>
-                    Subject-Specific <Typography display='inline' variant='caption' color='textSecondary'>Specifies if this announcement is viewable to the entire school.</Typography>
-                </Box>
-                <Switch
-                    disabled={!PROPS.isCreate}
-                    checked={PROPS.document['private'] || false}
-                    onChange={handleSwitchToggle('private')}
-                    color="primary"
-                    inputProps={{ 'aria-label': 'primary checkbox' }}
-                />
-            </Box>
+    const toggleViewMode = () => {
+        setViewMode(!viewMode);
+    }
 
-            <Autocomplete
-                onChange={(e, value) => handleAutocompleteChange(e, value, 'subject')}
-                value={subjectValue}
-                disabled={!PROPS.document['private'] || !PROPS.isCreate}
-                className={classes.field}
-                loading={loading}
-                options={options.sort((a, b) => a.grade - b.grade)}
-                groupBy={option => `Grade ${option.grade}`}
-                getOptionLabel={option => option.name}
-                renderInput={params => (
-                    <TextField
-                        {...params}
-                        label="Subject Name"
-                        helperText="This announcement will only be viewable to this subject's grade."
-                        fullWidth
-                        variant="outlined"
-                        InputProps={{
-                            ...params.InputProps,
-                            endAdornment: (
-                                <React.Fragment>
-                                    {loading ? <CircularProgress color="inherit" size={20} /> : null}
-                                    {params.InputProps.endAdornment}
-                                </React.Fragment>
-                            ),
-                        }}
+    return (
+        // <React.Fragment>
+        <div className={classes.root}>
+        <div className={classes.toggleContainer}>
+                <Switch
+                    checked={viewMode}
+                    onChange={toggleViewMode}
+                    name="viewModeToggle"
+                    color="primary"
+                />
+                <Typography>{viewMode ? "Viewer Mode" : "Edit Mode"}</Typography>
+            </div>
+            <div className={classes.vc}>
+            {!viewMode && (
+                <div style={{ width: "100%" }}>
+                    <Box className={classes.field} display="flex">
+                        <Box flexGrow={1}>
+                            Subject-Specific <Typography display='inline' variant='caption' color='textSecondary'>Specifies if this announcement is viewable to the entire school.</Typography>
+                        </Box>
+                        <Box>
+                            <Switch
+                                disabled={!PROPS.isCreate}
+                                checked={PROPS.document['private'] || false}
+                                onChange={handleSwitchToggle('private')}
+                                color="primary"
+                                inputProps={{ 'aria-label': 'primary checkbox' }}
+                            />
+                        </Box>
+                    </Box>
+                    <Autocomplete
+                            onChange={(e, value) => handleAutocompleteChange(e, value, 'subject')}
+                            value={subjectValue}
+                            disabled={!PROPS.document['private'] || !PROPS.isCreate}
+                            className={classes.field}
+                            loading={loading}
+                            options={options.sort((a, b) => a.grade - b.grade)}
+                            groupBy={option => `Grade ${option.grade}`}
+                            getOptionLabel={option => option.name}
+                            renderInput={params => (
+                                <TextField
+                                    {...params}
+                                    label="Subject Name"
+                                    helperText="This announcement will only be viewable to this subject's grade."
+                                    fullWidth
+                                    variant="outlined"
+                                    InputProps={{
+                                        ...params.InputProps,
+                                        endAdornment: (
+                                            <React.Fragment>
+                                                {loading ? <CircularProgress color="inherit" size={20} /> : null}
+                                                {params.InputProps.endAdornment}
+                                            </React.Fragment>
+                                        ),
+                                    }}
+                                />
+                            )}
+                        />
+                    </div>
+                )}
+                {viewMode ? (
+                    <div style={{ width: '100%', height: '100%', paddingLeft: 70, paddingRight: 70, paddingTop: 56, paddingBottom: 56, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 36, display: 'inline-flex' }}>
+                        <div style={{ alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'center', gap: 12, display: 'inline-flex' }}>
+                            <div style={{ color: '#4B4B4B', fontSize: 60, fontFamily: 'Asap Condensed', fontWeight: '700', wordWrap: 'break-word' }}>{PROPS.document.title}</div>
+                        </div>
+                        <div style={{ alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'inline-flex' }}>
+                            <div style={{ justifyContent: 'center', alignItems: 'flex-start', gap: 8, display: 'flex' }}>
+                                <div style={{ color: '#AFAFAF', fontSize: 18, fontFamily: 'Nunito', fontWeight: '700', wordWrap: 'break-word' }}>CREATED ON:</div>
+                                <div style={{ color: '#AFAFAF', fontSize: 18, fontFamily: 'Nunito', fontWeight: '700', wordWrap: 'break-word' }}>{parseTime(PROPS.document.createdAt)}</div>
+                            </div>
+                        </div>
+                        <div style={{ alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'flex-end', gap: 32, display: 'flex' }}>
+                            <div style={{ alignSelf: 'stretch' }}><span style={{ color: '#4B4B4B', fontSize: 24, fontFamily: 'Nunito', fontWeight: '400', wordWrap: 'break-word' }}>{PROPS.document.content}</span></div>
+                        </div>
+                    </div>
+                ) : (
+                    textFields.map((item, idx) => (
+                        <TextField
+                            error={PROPS.error[item.name] ? PROPS.error[item.name].exists : null}
+                            required={item.required}
+                            key={`${item.name}-form-${idx}`}
+                            className={classes.field}
+                            label={item.label}
+                            name={item.name}
+                            placeholder={(item.disabled || (item.updateOnly && PROPS.isCreate)) ? disabledMsg : ""}
+                            disabled={(item.disabled || (item.updateOnly && PROPS.isCreate))}
+                            value={(item.isDate ? parseTime(PROPS.document[item.name]) : null) || PROPS.document[item.name] || ""}
+                            helperText={PROPS.error[item.name] ? (PROPS.error[item.name].exists ? PROPS.error[item.name].message : item.helper) : item.helper}
+                            onChange={PROPS.handleChange}
+                            fullWidth
+                            autoComplete={'off'}
+                            margin="normal"
+                            InputLabelProps={{
+                                shrink: true,
+                            }}
+                            multiline={item.multiline}
+                            rows={3}
+                            variant="outlined"
+                        />
+                    ))
+                )}
+                {!viewMode && (
+                    <DocumentPicker
+                        title={"Attached Files"}
+                        docs={fileOptions}
+                        pageMax={5}
+                        selected={selectedFiles}
+                        icon={faFile}
+                        collection={"Files"}
+                        primary={(doc) => doc.nickname}
+                        handleChange={(docs) => handlePickChange('files', docs)}
                     />
                 )}
-            />
-
-            {filteredTextFields.map((item, idx) => (
-                <TextField
-                    key={`${item.name}-form-${idx}`}
-                    className={classes.field}
-                    label={item.label}
-                    name={item.name}
-                    placeholder={(item.disabled || (item.updateOnly && PROPS.isCreate)) ? disabledMsg : ""}
-                    disabled={(item.disabled || (item.updateOnly && PROPS.isCreate))}
-                    value={(item.isDate ? parseTime(PROPS.document[item.name]) : null) || PROPS.document[item.name] || ""}
-                    helperText={PROPS.error[item.name] ? (PROPS.error[item.name].exists ? PROPS.error[item.name].message : item.helper) : item.helper}
-                    onChange={PROPS.handleChange}
-                    fullWidth
-                    autoComplete="off"
-                    margin="normal"
-                    InputLabelProps={{ shrink: true }}
-                    multiline={item.multiline}
-                    rows={item.multiline ? 3 : 1}
-                    variant="outlined"
-                />
-            ))}
-
-            <DocumentPicker
-                title="Attached Files"
-                docs={fileOptions}
-                pageMax={5}
-                selected={selectedFiles}
-                icon={faFile}
-                collection="Files"
-                primary={(doc) => doc.nickname}
-                handleChange={(docs) => handlePickChange('files', docs)}
-            />
+            </div>
         </div>
-        </React.Fragment>
+
     );
 }
 
