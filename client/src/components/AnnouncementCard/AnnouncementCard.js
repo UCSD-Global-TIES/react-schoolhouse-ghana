@@ -1,6 +1,6 @@
 import { makeStyles } from "@material-ui/core/styles";
+import React, {useState } from "react";
 import moment from "moment";
-import React from "react";
 
 const useStyles = makeStyles({
   container: {
@@ -62,6 +62,7 @@ const useStyles = makeStyles({
 
 function AnnouncementCard(props) {
   const classes = useStyles();
+  const [PROPS, setProps] = useState(props);
 
   const { 
     name, 
@@ -86,7 +87,7 @@ function AnnouncementCard(props) {
     <div className={classes.container}>
       <div className={classes.textContainer}>
         <p className={classes.text}>{name}</p>
-        <p className={classes.dateText}>CREATED ON: {moment(createdAt).format('MM/DD/YYYY')}</p>
+        <p className={classes.dateText}>CREATED ON: {moment(PROPS.document.createdAt).format('MM/DD/YYYY')}</p>
       </div>
       {user && user.type === "Admin" && (
         <div className={classes.iconContainer}>
