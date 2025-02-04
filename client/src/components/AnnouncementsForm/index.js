@@ -248,7 +248,7 @@ function AnnouncementsForm(props) {
                             </div>
                         </div>
                         <div style={{ alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'flex-end', gap: 32, display: 'flex' }}>
-                            <div style={{ alignSelf: 'stretch' }}><span style={{ color: '#4B4B4B', fontSize: 24, fontFamily: 'Nunito', fontWeight: '400', wordWrap: 'break-word' }}>{PROPS.document.content}</span></div>
+                            <div style={{ alignSelf: 'stretch' }}><span style={{ color: '#4B4B4B', fontSize: 24, fontFamily: 'Nunito', fontWeight: '400', wordWrap: 'break-word', whiteSpace:'pre-wrap' }}>{PROPS.document.content}</span></div>
                         </div>
                     </div>
                 ) : (

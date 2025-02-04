@@ -115,7 +115,8 @@ const useStyles = makeStyles(theme => ({
         fontSize: 24,
         fontFamily: 'Nunito',
         fontWeight: '400',
-        wordWrap: 'break-word'
+        wordWrap: 'break-word',
+        whiteSpace: 'pre-wrap'
     },
     filesContainer: {
         marginTop: '2em'
@@ -168,8 +169,7 @@ function AnnouncementViewer(props) {
                                     {document.content}
                                 </div>
                             </div>
-
-                            {document.files && document.files.length > 0 && (
+                            {/* {document.files && document.files.length > 0 && (
                                 <div className={classes.filesContainer}>
                                     <SimpleListView
                                         title={"Attached Files"}
@@ -181,7 +181,7 @@ function AnnouncementViewer(props) {
                                         {...props}
                                     />
                                 </div>
-                            )}
+                            )} */}
                         </div>
                     </div>
                 </div>
