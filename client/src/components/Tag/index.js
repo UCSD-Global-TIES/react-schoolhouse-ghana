@@ -4,7 +4,7 @@ import { makeStyles } from "@material-ui/core/styles";
 const useStyles = makeStyles({
     text: {
       fontFamily: 'Nunito',
-      fontSize: '1rem',
+      fontSize: "0.75rem",
       fontStyle: 'normal',
       fontWeight: 500,
       lineHeight: 'normal',
@@ -12,12 +12,11 @@ const useStyles = makeStyles({
     },
     tag: {
       display: 'flex',
-      padding: '0rem 0.6875rem',
+      padding: '0rem 0.5rem',
       justifyContent: 'center',
       alignItems: 'center',
       borderRadius: '0.25rem',
       width: 'fit-content',
-      margin: '0.5rem',
     }
   });
 

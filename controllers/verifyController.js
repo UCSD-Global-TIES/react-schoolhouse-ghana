@@ -3,6 +3,7 @@ const gradeDb = require("../models/Grade");
 const subjectDb = require("../models/Subject");
 const fileDb = require("../models/File");
 const announcementDb = require("../models/Announcement");
+const taskDb = require("../models/Task");
 const config = require("../nasConfig");
 const path = require("path");
 const fs = require("fs")
@@ -11,6 +12,7 @@ const loadtest = require('loadtest');
 const gradeSeeds = require('../seeds/grades')
 const subjectSeeds = require('../seeds/subjects');
 const fileSeeds = require('../seeds/files');
+const taskSeeds = require('../seeds/tasks');
 const { announcements: announcementSeeds } = require('../seeds/announcements');
 
 const {
@@ -172,7 +174,12 @@ module.exports = {
                                     .then((newS) => {
                                         let gradeDoc = gradeSeeds;
                                         gradeDoc.subjects = [newS._id];
-
+                                        // 4
+                                        taskDb
+                                            .create(taskDoc)
+                                            .then((newT) => {
+                                                subjectDoc.tasks = [newT._id];
+                                            })
                                         const promises = [];
                                         promises.push(gradeDb.create(gradeDoc));
 

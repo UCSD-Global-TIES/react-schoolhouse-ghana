@@ -1,6 +1,6 @@
 const router = require("express").Router();
 const subjectController = require("../../controllers/subjectController");
-
+const taskController = require('../../controllers/taskController');
 // Matches with "/api/subject"
 router.route("/")
   // Gets all subjects
@@ -38,5 +38,6 @@ router.route("/:sid/file/:fid")
   // Remove a file reference from the subject's 'files' array
   .delete(subjectController.removeFile)
 
+router.route("/:sid/tasks").get(subjectController.getTasksForSubject)
 module.exports = router;
 

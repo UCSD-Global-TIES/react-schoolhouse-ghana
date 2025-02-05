@@ -362,6 +362,48 @@ export default {
     return axios.get('/api/assessment', {
       headers: config
     });
-  }
+  },
 
+   // TASKS
+  // ---------------------------------------------------------------
+  // Get all 'Task' documents for a specific subject
+  getTasks: function (subject_id, key) {
+    console.log("GET TASKS", subject_id)
+    const config = {
+      'Authorization': key
+    };
+    return axios.get(`/api/subject/${subject_id}/tasks`, {
+      headers: config
+    }); // SECURE
+  },
+  // Create a 'Task'
+  addTask: function (newT, key) {
+    const config = {
+      'Authorization': key
+    };
+
+    return axios.post(`/api/tasks`, newT, {
+      headers: config
+    }); // SECURE
+  },
+  // Update a 'Task'
+  updateTask: function (newT, key) {
+    const config = {
+      'Authorization': key
+    };
+
+    return axios.put(`/api/tasks/${newT._id}`, newT, {
+      headers: config
+    }); // SECURE
+  },
+  // Delete a 'Task'
+  deleteTask: function (task_id, key) {
+    const config = {
+      'Authorization': key
+    };
+
+    return axios.delete(`/api/tasks/${task_id}`, {
+      headers: config
+    }); // SECURE
+  }
 };

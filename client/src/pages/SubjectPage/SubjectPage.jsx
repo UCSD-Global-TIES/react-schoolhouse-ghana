@@ -35,6 +35,8 @@ import HelpIcon from "../../assets/help.svg";
 import BookIcon from "../../assets/books.svg";
 import SubjectHome from "../../components/SubjectHome";
 import AnnouncementCard from "../../components/AnnouncementCard/AnnouncementCard";
+import SubjectTasksForm from "../../components/SubjectTasksForm";
+import TaskList from "../../components/TaskList";
 const drawerWidth = "9.375rem";
 
 const useStyles = makeStyles(theme => ({
@@ -298,15 +300,39 @@ function SubjectPage(props) {
                 {...p}
               />
               
-              <Typography variant="h2" className={classes.header}>Upcoming Tasks</Typography>
-              <div className={classes.sectionContainer}>
-                <AnnouncementCard></AnnouncementCard>
-                <AnnouncementCard></AnnouncementCard>
-                <AnnouncementCard></AnnouncementCard>
-              </div>
-              
+              <DocumentEditor
+                primary={doc => doc.title}
+                isSubComponent={"true"}
+                collection={"Upcoming Tasks"}
+                icon={faBullhorn}
+                FormComponent={(p) =>
+                  <SubjectTasksForm user={props.user} {...p} />}
+                get={(key) => API.getTasks(subject_id, key)}
+                post={(doc, key, user) => {
+                  let newA = doc;
+                  newA.subject = subject_id;
+                  newA.private = true;
+                  return API.addTask(newA, key, user)
+                }}
+                put={API.updateTask}
+                delete={API.deleteTask}
+                validation={{
+                  title: {
+                    validate: value => new Promise((resolve, reject) => {
+                      resolve(value)
+                    }),
+                    message: "You must enter a task title."
+                  },
+                  description: {
+                    validate: value => new Promise((resolve, reject) => {
+                      resolve(value)
+                    }),
+                    message: "You must enter some task content."
+                  },
+                }}
+                {...p}
+              />
 
-              
               <Typography variant="h2" className={classes.header}>Resources</Typography>
               
               

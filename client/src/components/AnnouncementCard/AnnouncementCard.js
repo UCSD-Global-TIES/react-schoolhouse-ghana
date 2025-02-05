@@ -1,6 +1,7 @@
 import { makeStyles } from "@material-ui/core/styles";
 import moment from "moment";
 import React from "react";
+import Tag from "../Tag";
 
 const useStyles = makeStyles({
   container: {
@@ -57,6 +58,12 @@ const useStyles = makeStyles({
       cursor: "pointer",
     },
   },
+  tagContainer: {
+    display: "flex",
+    gap: "0.5rem",
+    alignItems: "center",
+    verticalAlign: "middle",
+  }
   // Add more styles as needed for the design
 });
 
@@ -69,7 +76,8 @@ function AnnouncementCard(props) {
     handleDocument, 
     handleSelect, 
     document, 
-    user 
+    user,
+    subject
   } = props;
 
   const handleClick = () => {
@@ -86,7 +94,11 @@ function AnnouncementCard(props) {
     <div className={classes.container}>
       <div className={classes.textContainer}>
         <p className={classes.text}>{name}</p>
-        <p className={classes.dateText}>CREATED ON: {moment(createdAt).format('MM/DD/YYYY')}</p>
+        <div className={classes.tagContainer}>
+          <p className={classes.dateText}>CREATED ON: {moment(createdAt).format('MM/DD/YYYY')}</p>
+          {subject && (<Tag label={subject} color="blue"/>)}
+        </div>
+        
       </div>
       {user && user.type === "Admin" && (
         <div className={classes.iconContainer}>

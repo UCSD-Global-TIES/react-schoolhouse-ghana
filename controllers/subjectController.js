@@ -2,6 +2,7 @@ const gradeDb = require("../models/Grade");
 const subjectDb = require("../models/Subject");
 const announcementDb = require("../models/Announcement");
 const studentDb = require("../models/Student");
+const taskController = require('./taskController');
 
 const ip = require("ip")
 const API_PORT = process.env.PORT || 3001;
@@ -339,6 +340,16 @@ module.exports = {
                             })
                         })
 
+                } else {
+                    res.status(403).json(null);
+                }
+            })
+    },
+    getTasksForSubject: function (req, res) {
+        verifyKey(req.header('Authorization'), 'Teacher,Admin')
+            .then((isVerified) => {
+                if (isVerified) {
+                    taskController.getTasks(req, res);
                 } else {
                     res.status(403).json(null);
                 }
