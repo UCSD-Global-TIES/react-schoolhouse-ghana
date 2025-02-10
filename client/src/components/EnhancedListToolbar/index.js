@@ -114,9 +114,11 @@ const EnhancedListToolbar = (props) => {
       ) : (
         ""
       )}
-      <Button onClick={handleCreate} className={buttonClass + " " + classes.createBtn} classes={{ text: classes.padding }}>
-        + {title}
-      </Button>
+      {user.type == "Admin" && (
+        <Button onClick={handleCreate} className={buttonClass + " " + classes.createBtn} classes={{ text: classes.padding }}>
+          + {title}
+        </Button>
+      )}
     </Toolbar>
   </div>
   );
