@@ -9,7 +9,7 @@ const AdminRedirect = () => <Redirect to="/edit" />;
 const UserRedirect = () => <Redirect to="/user"/>
 
 const accountComponents = {
-    Student: UserPortal,
+    Student: UserRedirect,
     Teacher: UserRedirect,
     Admin: AdminRedirect
 }
