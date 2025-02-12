@@ -10,6 +10,10 @@ const routes = require("./routes");
 const config = require("./nasConfig");
 const cors = require('cors');
 
+// const gradebookRoutes = require("./routes/api/Gradebook");
+console.log("Current working directory:", __dirname); // Important!
+// const Gradebook = require('./models/Gradebook');
+const gradebookRoutes = require('./routes/api/gradebook'); 
 
 const app = express();
 var http = require('http').createServer(app);
@@ -70,6 +74,9 @@ if (process.env.NODE_ENV === "production") {
   app.use(config.publicPath, express.static(config.path));
 
 }
+
+// ✅ Register the gradebook API routes
+app.use("/api/gradebook", gradebookRoutes);
 
 // Add routes, both API and view
 app.use(routes);

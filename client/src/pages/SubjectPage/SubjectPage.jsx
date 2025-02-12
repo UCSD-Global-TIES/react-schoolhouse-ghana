@@ -37,6 +37,10 @@ import SubjectHome from "../../components/SubjectHome";
 import AnnouncementCard from "../../components/AnnouncementCard/AnnouncementCard";
 import SubjectTasksForm from "../../components/SubjectTasksForm";
 import TaskList from "../../components/TaskList";
+
+import { useNavigate } from "react-router-dom";
+const { subjects } = props; 
+
 const drawerWidth = "9.375rem";
 
 const useStyles = makeStyles(theme => ({
@@ -455,6 +459,24 @@ function SubjectPage(props) {
         <Typography variant="h1" className={classes.header}>{props.user.type}'s Class</Typography>
         <Typography className={clsx(classes.header,classes.subjectTitle)}>{subjectInfo.name}</Typography>
 
+        {/* ✅ View Gradebook Button */}
+          <button
+            onClick={() => props.history.push(`/gradebook/${subject_id}`)}
+            className={classes.buttonLink}
+            style={{
+              marginTop: "10px",
+              padding: "10px 15px",
+              fontSize: "1rem",
+              backgroundColor: "#1976d2",
+              color: "white",
+              border: "none",
+              borderRadius: "5px",
+              cursor: "pointer"
+            }}
+          >
+            View Gradebook
+          </button>
+
         {/* <TransitionGroup>
           <CSSTransition
             key={props.location.key}
@@ -478,5 +500,6 @@ function SubjectPage(props) {
     // </div>    
   );
 }
+
 
 export default SubjectPage;

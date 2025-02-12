@@ -16,6 +16,9 @@ import "typeface-roboto";
 import * as io from "socket.io-client";
 import SocketContext from "./socket-context";
 
+// // Import the Gradebook component
+import Gradebook from "./components/Gradebook"
+
 // Utils
 import API from "./utils/API";
 
@@ -182,6 +185,15 @@ function App() {
                 logout={handleLogout}
                 user={userInfo}
               />
+              
+
+              <ProtectedRoute
+                path="/Gradebook/:subjectId"
+                component={Gradebook}
+                logout={handleLogout}
+                user={userInfo}
+              />
+
               <Route component={NoMatch} />
             </Switch>
           )}
