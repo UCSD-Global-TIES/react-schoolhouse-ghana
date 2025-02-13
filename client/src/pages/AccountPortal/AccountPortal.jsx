@@ -2,14 +2,14 @@ import React from "react";
 import "../../utils/flowHeaders.min.css";
 import "./main.css";
 
-import UserPortal from "./versions/user/UserPortal.jsx";
+// import UserPortal from "./versions/user/UserPortal.jsx";
 import { Redirect } from "react-router-dom";
 
 const AdminRedirect = () => <Redirect to="/edit" />;
 const UserRedirect = () => <Redirect to="/user"/>
 
 const accountComponents = {
-    Student: UserPortal,
+    Student: UserRedirect,
     Teacher: UserRedirect,
     Admin: AdminRedirect
 }

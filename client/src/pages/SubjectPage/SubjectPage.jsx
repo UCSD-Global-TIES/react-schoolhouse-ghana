@@ -37,6 +37,7 @@ import SubjectHome from "../../components/SubjectHome";
 import AnnouncementCard from "../../components/AnnouncementCard/AnnouncementCard";
 import SubjectTasksForm from "../../components/SubjectTasksForm";
 import TaskList from "../../components/TaskList";
+import LogoutIcon from "../../assets/LogoutIcon.svg";
 const drawerWidth = "9.375rem";
 
 const useStyles = makeStyles(theme => ({
@@ -131,6 +132,8 @@ function SubjectPage(props) {
     setMobileOpen(!mobileOpen);
   };
 
+  const { logout } = props
+
   // menu items
   const documentMenuItems = [
     {
@@ -147,6 +150,11 @@ function SubjectPage(props) {
       label: "Help",
       iconPath: HelpIcon,
       path: `${props.match.url}/studentGrades`
+    },
+    {
+      label: "Log Out",
+      iconPath: LogoutIcon,
+      clickHandler: logout,
     }
   ];
 
@@ -165,33 +173,53 @@ function SubjectPage(props) {
           <h2 style={{ fontSize: "1.125rem" }}>American School</h2>
         </div>
         <div className={classes.sidebarLinks}>
-          {documentMenuItems.map((item, index) => (
-            <NavLink
-              to={item.path}
-              key={index}
-              className={`${classes.buttonLink} ${classes.navLink}`}
-            >
-              <ListItem
-                selected={props.location.pathname.includes(item.path)}
-                button
-                className={classes.linkBox}
-              >
-                <ListItemIcon className={classes.justifyIcon}>
-                  <img
-                    src={item.iconPath}
-                    alt={`${item.label} icon`}
-                    style={{ width: 24, height: 24 }}
-                  />
-                </ListItemIcon>
-
-                <ListItemText
-                  style={{ overflowWrap: "break-word" }}
-                  primary={item.label}
-                />
-              </ListItem>
-            </NavLink>
-          ))}
-        </div>
+                  {documentMenuItems.map((item, index) => (
+                    item.clickHandler ? (
+                      <ListItem
+                        key={index}
+                        button
+                        onClick={item.clickHandler}
+                        className={classes.linkBox}
+                      >
+                        <ListItemIcon className={classes.justifyIcon}>
+                          <img
+                            src={item.iconPath}
+                            alt={`${item.label} icon`}
+                            style={{ width: 24, height: 24 }}
+                          />
+                        </ListItemIcon>
+                        <ListItemText
+                          style={{ overflowWrap: "break-word" }}
+                          primary={item.label}
+                        />
+                      </ListItem>
+                    ) : (
+                      <NavLink
+                        to={item.path}
+                        key={index}
+                        className={`${classes.buttonLink} ${classes.navLink}`}
+                      >
+                        <ListItem
+                          selected={props.location.pathname.includes(item.path)}
+                          button
+                          className={classes.linkBox}
+                        >
+                          <ListItemIcon className={classes.justifyIcon}>
+                            <img
+                              src={item.iconPath}
+                              alt={`${item.label} icon`}
+                              style={{ width: 24, height: 24 }}
+                            />
+                          </ListItemIcon>
+                          <ListItemText
+                            style={{ overflowWrap: "break-word" }}
+                            primary={item.label}
+                          />
+                        </ListItem>
+                      </NavLink>
+                    )
+                  ))}
+                </div>
       </List>
     </div>
   );
