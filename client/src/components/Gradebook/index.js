@@ -1,3 +1,23 @@
+// import React from "react";
+
+// const Gradebook = () => {
+//   return (
+//     <div style={{
+//       display: "flex",
+//       justifyContent: "center",
+//       alignItems: "center",
+//       height: "100vh",
+//       fontSize: "24px",
+//       fontWeight: "bold"
+//     }}>
+//       Welcome to Gradebook
+//     </div>
+//   );
+// };
+
+// export default Gradebook;
+
+
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 // import "./Gradebook.css"; // Optional: add styling
@@ -11,6 +31,7 @@ const Gradebook = () => {
     fetch(`http://localhost:5000/api/gradebook/${subjectId}`)
       .then((res) => res.json())
       .then((data) => {
+        console.log("Fetched Gradebook Data:", data);
         setGradebook(data);
         setLoading(false);
       })

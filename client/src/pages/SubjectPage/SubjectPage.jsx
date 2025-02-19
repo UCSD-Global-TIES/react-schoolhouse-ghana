@@ -39,7 +39,6 @@ import SubjectTasksForm from "../../components/SubjectTasksForm";
 import TaskList from "../../components/TaskList";
 
 import { useNavigate } from "react-router-dom";
-const { subjects } = props; 
 
 const drawerWidth = "9.375rem";
 
@@ -121,6 +120,9 @@ function SubjectPage(props) {
   const socket = React.useContext(SocketContext)
   const classes = useStyles();
   const theme = useTheme();
+
+  const { subjects } = props; 
+
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const isSmallDevice = useMediaQuery({
     query: '(max-width: 600px)'

@@ -19,7 +19,17 @@ const app = express();
 var http = require('http').createServer(app);
 var io = require('socket.io')(http);
 const PORT = process.env.PORT || 3001;
-app.use(cors());
+
+const corsOptions = {
+  origin: "http://localhost:3000", // ✅ Allow frontend
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  credentials: true,
+  optionsSuccessStatus: 204
+};
+
+app.use(cors(corsOptions));
+
+// app.use(cors());
 
 // Define middleware here
 app.use(express.urlencoded({
