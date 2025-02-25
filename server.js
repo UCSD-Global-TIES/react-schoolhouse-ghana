@@ -10,9 +10,7 @@ const routes = require("./routes");
 const config = require("./nasConfig");
 const cors = require('cors');
 
-// const gradebookRoutes = require("./routes/api/Gradebook");
 console.log("Current working directory:", __dirname); // Important!
-// const Gradebook = require('./models/Gradebook');
 const gradebookRoutes = require('./routes/api/gradebook'); 
 
 const app = express();

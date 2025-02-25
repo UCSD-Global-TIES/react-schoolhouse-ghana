@@ -6,3 +6,6 @@ const apiRoutes = require("./api");
 router.use("/api", apiRoutes);
 
 module.exports = router;
+
+// const gradebookRoutes = require('./gradebook');
+// router.use('/gradebook', gradebookRoutes);

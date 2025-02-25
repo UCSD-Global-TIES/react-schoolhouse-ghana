@@ -17,7 +17,8 @@ import * as io from "socket.io-client";
 import SocketContext from "./socket-context";
 
 // // Import the Gradebook component
-import Gradebook from "./components/Gradebook"
+import GradebookPage from "./pages/Gradebook/GradebookPage";
+
 
 // Utils
 import API from "./utils/API";
@@ -188,8 +189,8 @@ function App() {
               
 
               <ProtectedRoute
-                path="/Gradebook/:subjectId"
-                component={Gradebook}
+                path="/gradebook/:subjectId"
+                component={GradebookPage}
                 logout={handleLogout}
                 user={userInfo}
               />

@@ -38,6 +38,7 @@
     "express": "^4.17.1",
     "express-session": "^1.17.0",
     "extract-zip": "^1.6.7",
+    "fast-csv": "^5.0.2",
     "file-system": "^2.2.2",
     "find": "^0.3.0",
     "generate-password": "^1.6.0",

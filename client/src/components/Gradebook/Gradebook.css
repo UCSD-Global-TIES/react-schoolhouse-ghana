@@ -1,0 +1,49 @@
+.gradebook-container {
+    padding: 20px;
+    font-family: Arial, sans-serif;
+}
+
+.gradebook-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+.gradebook-table th, .gradebook-table td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: center;
+}
+
+.gradebook-table th {
+    background-color: #1976d2;
+    color: white;
+}
+
+.gradebook-table input {
+    width: 100%;
+    border: none;
+    text-align: center;
+}
+
+.gradebook-table button {
+    background-color: red;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+}
+
+.gradebook-button {
+    background-color: #1976d2;
+    color: white;
+    padding: 8px 12px;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 1rem;
+}
+
+.gradebook-button:hover {
+    background-color: #1565c0;
+}

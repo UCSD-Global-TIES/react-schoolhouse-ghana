@@ -405,5 +405,26 @@ export default {
     return axios.delete(`/api/tasks/${task_id}`, {
       headers: config
     }); // SECURE
+  },
+
+// GRADEBOOK
+// ---------------------------------------------------------------
+// Get gradebook data for a specific subject
+  getGradebook: function (subject_id, key) {
+    const config = {
+      'Authorization': key
+    };
+    return axios.get(`/api/gradebook/${subject_id}`, {
+      headers: config
+    }); // SECURE
+  },
+  saveGradebook: function (subject_id, students, key) {
+    const config = {
+      'Authorization': key
+    };
+    return axios.post("/api/gradebook/save", { subject_id, students }, {
+      headers: config
+    });
   }
+
 };
