@@ -9,6 +9,7 @@ import { useMediaQuery } from 'react-responsive';
 import "../../utils/flowHeaders.min.css";
 import API from "../../utils/API";
 
+
 import "./main.css";
 import NavBarAdmin from "../../components/NavBarAdmin";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -18,6 +19,7 @@ import PageSpinner from "../../components/PageSpinner";
 import FileViewer from "../../components/FileViewer";
 import MarksViewer from "../../components/MarksViewer";
 import MarksForm from "../../components/MarksForm";
+
 
 import DocumentEditor from "../../components/DocumentEditor";
 import AnnouncementViewer from "../../components/AnnouncementViewer";
@@ -32,6 +34,7 @@ import sas from "../../logos/sas_logo.png"
 import BullhornIcon from "../../assets/bullhorn.svg";
 import HelpIcon from "../../assets/help.svg";
 
+
 import BookIcon from "../../assets/books.svg";
 import SubjectHome from "../../components/SubjectHome";
 import AnnouncementCard from "../../components/AnnouncementCard/AnnouncementCard";
@@ -39,6 +42,7 @@ import SubjectTasksForm from "../../components/SubjectTasksForm";
 import TaskList from "../../components/TaskList";
 import LogoutIcon from "../../assets/LogoutIcon.svg";
 const drawerWidth = "9.375rem";
+
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -112,7 +116,9 @@ const useStyles = makeStyles(theme => ({
     gap: "0.63rem",
   },
 
+
 }));
+
 
 function SubjectPage(props) {
   const socket = React.useContext(SocketContext)
@@ -124,15 +130,19 @@ function SubjectPage(props) {
   })
   const subject_id = props.match.params.id;
 
+
   const [subjectInfo, setSubjectInfo] = useState({});
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
   };
 
+
   const { logout } = props
+
 
   // menu items
   const documentMenuItems = [
@@ -145,7 +155,7 @@ function SubjectPage(props) {
       label: "Classes",
       iconPath: BookIcon,
       path: `${props.match.url}/resources`,
-    }, 
+    },
     {
       label: "Help",
       iconPath: HelpIcon,
@@ -157,6 +167,7 @@ function SubjectPage(props) {
       clickHandler: logout,
     }
   ];
+
 
   const drawer = (
     <div onClick={isSmallDevice ? handleDrawerToggle : () => {}}>
@@ -224,6 +235,7 @@ function SubjectPage(props) {
     </div>
   );
 
+
   const pagesInfo = [
     {
       component:
@@ -279,82 +291,102 @@ function SubjectPage(props) {
     },
     {
       component: (props) => (
-        <>
-          <DocumentEditor
-            primary={doc => doc.title}
-            isSubComponent={"true"}
-            collection={"Announcements"}
-            icon={faBullhorn}
-            FormComponent={(p) =>
-              <SubjectAnnouncementsForm user={props.user} {...p} />
-            }
-            get={(key) => API.getAnnouncements(key, subject_id)}
-            post={(doc, key, user) => {
-              let newA = doc;
-              newA.subject = subject_id;
-              newA.private = true;
-              return API.addAnnouncement(newA, key, user)
-            }}
-            put={API.updateAnnouncement}
-            delete={API.deleteAnnouncements}
-            validation={{
-              title: {
-                validate: value => new Promise((resolve, reject) => {
-                  resolve(value)
-                }),
-                message: "You must enter an announcement title."
-              },
-              content: {
-                validate: value => new Promise((resolve, reject) => {
-                  resolve(value)
-                }),
-                message: "You must enter some announcement content."
-              },
-            }}
-            {...props}
-          />
-          
-          <DocumentEditor
-            primary={doc => doc.title}
-            isSubComponent={"true"}
-            collection={"Upcoming Tasks"}
-            icon={faBullhorn}
-            FormComponent={(p) =>
-              <SubjectTasksForm user={props.user} {...p} />
-            }
-            get={(key) => API.getTasks(subject_id, key)}
-            post={(doc, key, user) => {
-              let newA = doc;
-              newA.subject = subject_id;
-              newA.private = true;
-              return API.addTask(newA, key, user)
-            }}
-            put={API.updateTask}
-            delete={API.deleteTask}
-            validation={{
-              title: {
-                validate: value => new Promise((resolve, reject) => {
-                  resolve(value)
-                }),
-                message: "You must enter a task title."
-              },
-              description: {
-                validate: value => new Promise((resolve, reject) => {
-                  resolve(value)
-                }),
-                message: "You must enter some task content."
-              },
-            }}
-            {...props}
-          />
-    
-          <Typography variant="h2" className={classes.header}>Resources</Typography>
-          
-          <SubjectFilesForm
-            document={subjectInfo}
-            {...props}
-          />
-        </>
+        props.user.type === "Student" ? (
+          <>
+            <SimpleListView
+              title={"Announcements"}
+              items={subjectInfo.announcements || []}
+              pageMax={5}
+              icon={faBullhorn}
+              labelField={"title"}
+              viewer={AnnouncementViewer}
+              searchbar
+              {...props}
+            />
+            <Typography variant="h2" className={classes.header}>Resources</Typography>
+            <SubjectFilesForm
+              document={subjectInfo}
+              {...props}
+            />
+          </>
+        ) : (
+          <>
+            <DocumentEditor
+              primary={doc => doc.title}
+              isSubComponent={"true"}
+              collection={"Announcements"}
+              icon={faBullhorn}
+              FormComponent={(p) =>
+                <SubjectAnnouncementsForm user={props.user} {...p} />
+              }
+              get={(key) => API.getAnnouncements(key, subject_id)}
+              post={(doc, key, user) => {
+                let newA = doc;
+                newA.subject = subject_id;
+                newA.private = true;
+                return API.addAnnouncement(newA, key, user)
+              }}
+              put={API.updateAnnouncement}
+              delete={API.deleteAnnouncements}
+              validation={{
+                title: {
+                  validate: value => new Promise((resolve, reject) => {
+                    resolve(value)
+                  }),
+                  message: "You must enter an announcement title."
+                },
+                content: {
+                  validate: value => new Promise((resolve, reject) => {
+                    resolve(value)
+                  }),
+                  message: "You must enter some announcement content."
+                },
+              }}
+              {...props}
+            />
+           
+            <DocumentEditor
+              primary={doc => doc.title}
+              isSubComponent={"true"}
+              collection={"Upcoming Tasks"}
+              icon={faBullhorn}
+              FormComponent={(p) =>
+                <SubjectTasksForm user={props.user} {...p} />
+              }
+              get={(key) => API.getTasks(subject_id, key)}
+              post={(doc, key, user) => {
+                let newA = doc;
+                newA.subject = subject_id;
+                newA.private = true;
+                return API.addTask(newA, key, user)
+              }}
+              put={API.updateTask}
+              delete={API.deleteTask}
+              validation={{
+                title: {
+                  validate: value => new Promise((resolve, reject) => {
+                    resolve(value)
+                  }),
+                  message: "You must enter a task title."
+                },
+                description: {
+                  validate: value => new Promise((resolve, reject) => {
+                    resolve(value)
+                  }),
+                  message: "You must enter some task content."
+                },
+              }}
+              {...props}
+            />
+     
+            <Typography variant="h2" className={classes.header}>Resources</Typography>
+           
+            <SubjectFilesForm
+              document={subjectInfo}
+              {...props}
+            />
+          </>
+        )
       ),
       path: `${props.match.path}/resources`
     },
@@ -368,14 +400,17 @@ function SubjectPage(props) {
           (props) => (
             <MarksForm subject_id={subject_id}/>
 
+
           )
       ,
       path: `${props.match.path}/studentGrades`
     }
   ]
 
+
   const handleRefresh = () => {
     setRefreshing(true);
+
 
     API
       .getSubject(subject_id, props.user.key)
@@ -386,8 +421,11 @@ function SubjectPage(props) {
   }
 
 
+
+
   // SET DEFAULT MENU
   const defaultRoute = `${props.match.path}/announcements`;
+
 
   useEffect(() => {
     // Retrieve 'Subject' document
@@ -398,6 +436,7 @@ function SubjectPage(props) {
         setLoading(false);
       })
 
+
     // LISTEN FOR MODIFIED SUBJECT (INCOMPLETE)
     const collections = ['subjects', 'announcements', 'subject announcements', `subject-files-${subject_id}`];
     for (const collection of collections) {
@@ -406,15 +445,19 @@ function SubjectPage(props) {
       })
     }
 
+
   }, []);
+
 
   // if (props.user.type === "Student" || props.user.type === "Teacher") {
   //   if (!props.user.profile.grade !== subjectInfo.grade) { return <AccessDenied /> }
   // }
 
+
   if (loading) {
     return <PageSpinner />
   }
+
 
   return (
     <div className={classes.root}>
@@ -427,6 +470,7 @@ function SubjectPage(props) {
           Refreshing...
         </Alert>
       </Snackbar>
+
 
       <CssBaseline />
       <nav className={classes.drawer}>
@@ -462,9 +506,11 @@ function SubjectPage(props) {
       <main className={classes.content} style={{ marginLeft: !isSmallDevice ? drawerWidth : 0, }}>
         {/* <div className={classes.toolbar} /> */}
 
+
         {/* <Typography style={{ padding: "1rem" }} align='center' className={clsx(classes.textGlow, "flow-text")} variant="h3"> {subjectInfo.name} </Typography> */}
         <Typography variant="h1" className={classes.header}>{props.user.type}'s Class</Typography>
         <Typography className={clsx(classes.header,classes.subjectTitle)}>{subjectInfo.name}</Typography>
+
 
         {/* <TransitionGroup>
           <CSSTransition
@@ -477,6 +523,7 @@ function SubjectPage(props) {
             pagesInfo.map((page, idx) => (
               <ProtectedRoute key={`page-${idx}`} exact path={page.path} component={page.component} user={props.user} />
 
+
             ))
           }
           <Redirect to={defaultRoute} />
@@ -485,6 +532,7 @@ function SubjectPage(props) {
         </TransitionGroup> */}
       </main>
     </div>
+
 
     // </div>    
   );

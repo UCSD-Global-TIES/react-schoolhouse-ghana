@@ -8,7 +8,6 @@ import moment from "moment";
 import "../../utils/flowHeaders.min.css";
 
 import { faChevronLeft, faChevronRight, faSpinner } from "@fortawesome/free-solid-svg-icons";
-import { set } from "mongoose";
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -24,7 +23,6 @@ const useStyles = makeStyles(theme => ({
 const Transition = React.forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
 });
-
 
 function SimpleListView(props) {
     const classes = useStyles();
@@ -45,7 +43,6 @@ function SimpleListView(props) {
             setCurrentDocument(doc);
             setDialogOpen(true);
         }
-
     }
 
     // HANDLE QUERY CHANGE
@@ -59,9 +56,10 @@ function SimpleListView(props) {
 
         // Filter documents
         if (value.length) {
-            const filteredDocuments = PROPS.items.filter(document => document[PROPS.labelField].toLowerCase().includes(value.toLowerCase()));
+            const filteredDocuments = PROPS.items.filter(document => 
+                document[PROPS.labelField].toLowerCase().includes(value.toLowerCase())
+            );
             setFilteredDocuments(filteredDocuments);
-
         } else {
             // Reset the filtered documents to ALL documents
             setFilteredDocuments(PROPS.items);
@@ -74,7 +72,6 @@ function SimpleListView(props) {
 
     const handlePageChange = (direction) => {
         setPageIdx(pageIdx + direction)
-
     }
 
     useEffect(() => {
@@ -82,7 +79,8 @@ function SimpleListView(props) {
         setPageIdx(0)
 
         // Filter documents
-        const filteredDocuments = props.items.filter(document => document[PROPS.labelField]?.toLowerCase().includes(searchQuery.toLowerCase())
+        const filteredDocuments = props.items.filter(document => 
+            document[PROPS.labelField]?.toLowerCase().includes(searchQuery.toLowerCase())
         );
 
         setProps(props);
@@ -94,7 +92,6 @@ function SimpleListView(props) {
         <div style={{ ...PROPS.style }}>
             {currentDocument[PROPS.labelField] && DocumentViewer &&
                 <Dialog
-
                     open={dialogOpen}
                     TransitionComponent={Transition}
                     keepMounted
@@ -105,33 +102,38 @@ function SimpleListView(props) {
                     <DialogTitle style={{ padding: "10px 24px" }}
                         align="center" id="alert-dialog-slide-title">{currentDocument[PROPS.labelField]}</DialogTitle>
 
-
                     <DialogContent style={{  padding: "0px 24px" }}>
-
-                        <DocumentViewer document={currentDocument} />
-
+                        <DocumentViewer 
+                            document={currentDocument} 
+                            onClose={handleCloseDocument}  // Add this line
+                            {...PROPS}  // Spread remaining props
+                        />
                     </DialogContent>
                     <DialogActions>
                         <Button onClick={handleCloseDocument} color="primary">
                             Close
                         </Button>
-
                     </DialogActions>
                 </Dialog>
-
             }
 
-            {
-                PROPS.searchbar &&
+            {/* Rest of the component remains the same */}
+            {PROPS.searchbar && (
                 <FormControl className={classes.searchbar}>
-                    <InputLabel htmlFor="standard-adornment-amount"> Search {PROPS.title.toLowerCase()}</InputLabel>
+                    <InputLabel htmlFor="standard-adornment-amount"> 
+                        Search {PROPS.title.toLowerCase()}
+                    </InputLabel>
                     <Input
                         value={searchQuery}
                         onChange={handleQueryChange}
-                        startAdornment={<InputAdornment position="start"><SearchIcon /></InputAdornment>}
+                        startAdornment={
+                            <InputAdornment position="start">
+                                <SearchIcon />
+                            </InputAdornment>
+                        }
                     />
                 </FormControl>
-            }
+            )}
             <List
                 className={classes.root}
                 subheader={
