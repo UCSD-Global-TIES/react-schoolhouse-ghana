@@ -151,12 +151,12 @@ function ClassCardWide({ name, handleDocument, document, status, year, handleSel
         {status === "archived" ? (
           <>
             <Tag label={year} color="grey" />
-            <Tag label="Archived" color="grey" />
+            <Tag label="ARCHIVED" color="grey" />
           </>
-        ) : status === "published" ? (
-          <Tag label={year} color="green" />
+        ) : status === "unpublished" ? (
+          <Tag label="UNPUBLISHED" color="blue" />
         ) : (
-          <Tag label="Unpublished" color="blue" />
+          <Tag label={year} color="green" />
         )}
       </div>
       
