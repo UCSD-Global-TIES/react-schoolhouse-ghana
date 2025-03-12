@@ -7,8 +7,9 @@ import Tag from "../Tag";
 const useStyles = makeStyles({
   
     container: (props) => ({
-      minWidth: '10.5rem',
-      maxWidth: '10.5rem',
+      margin: '30px',
+      minWidth: '20.5rem',
+      maxWidth: '20.5rem',
       flexShrink: 0,
       height: 'fit-content',
       borderRadius:' 0.75rem',
@@ -96,7 +97,7 @@ const useStyles = makeStyles({
   // Add more styles as needed for the design
 });
 
-function ClassCard({ name, handleDocument, document, tagLabel, tagColor, handleSelect, editable, secondLine }) {
+function ClassCardWide({ name, handleDocument, document, status, year, handleSelect, editable }) {
   
   //const { name, handleDocument, document, tagLabel, tagColor, handleSelect, editable } = props;
   const classes = useStyles({editable});
@@ -146,13 +147,21 @@ function ClassCard({ name, handleDocument, document, tagLabel, tagColor, handleS
       </div>
       </div>
       <p className={classes.text}>{name}</p>
-      <p className={classes.text}>{secondLine}</p>
       <div className={classes.tagContainer}>
-        <Tag label={tagLabel} color={tagColor}></Tag>
+        {status === "archived" ? (
+          <>
+            <Tag label={year} color="grey" />
+            <Tag label="Archived" color="grey" />
+          </>
+        ) : status === "published" ? (
+          <Tag label={year} color="green" />
+        ) : (
+          <Tag label="Unpublished" color="blue" />
+        )}
       </div>
       
     </div>
   );
 }
 
-export default ClassCard;
+export default ClassCardWide;
