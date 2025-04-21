@@ -204,7 +204,7 @@ module.exports = {
             })
     },
     getAnnouncements: function (req, res) {
-        verifyKey(req.header('Authorization'), 'Teacher,Admin')
+        verifyKey(req.header('Authorization'), 'Student,Teacher,Admin')
             .then((isVerified) => {
                 if (isVerified) {
                     announcementDb

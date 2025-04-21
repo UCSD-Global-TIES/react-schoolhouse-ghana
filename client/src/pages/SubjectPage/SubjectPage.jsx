@@ -238,171 +238,129 @@ function SubjectPage(props) {
 
   const pagesInfo = [
     {
-      component:
-        props.user.type === "Student" ?
-          (props) => (
-            <SimpleListView
-              title={"Announcements"}
-              items={subjectInfo.announcements || []}
-              pageMax={5}
-              icon={faBullhorn}
-              labelField={"title"}
-              viewer={AnnouncementViewer}
-              searchbar
-              {...props}
-            />
-          )
-          :
-          (p) => (
-            <DocumentEditor
-              primary={doc => doc.title}
-              collection={"Subject Announcements"}
-              icon={faBullhorn}
-              FormComponent={(p) =>
-                <SubjectAnnouncementsForm user={props.user} {...p} />}
-              get={(key) => API.getAnnouncements(key, subject_id)}
-              post={(doc, key, user) => {
-                let newA = doc;
-                newA.subject = subject_id;
-                newA.private = true;
-                return API.addAnnouncement(newA, key, user)
-              }}
-              put={API.updateAnnouncement}
-              delete={API.deleteAnnouncements}
-              validation={{
-                title: {
-                  validate: value => new Promise((resolve, reject) => {
-                    resolve(value)
-                  }),
-                  message: "You must enter an announcement title."
-                },
-                content: {
-                  validate: value => new Promise((resolve, reject) => {
-                    resolve(value)
-                  }),
-                  message: "You must enter some announcement content."
-                },
-              }}
-              {...p}
-            />
-          )
-      ,
+      component: (props) => (
+        <DocumentEditor
+          primary={doc => doc.title}
+          collection={"Subject Announcements"}
+          icon={faBullhorn}
+          FormComponent={(p) =>
+            <SubjectAnnouncementsForm user={props.user} {...p} />}
+          get={(key) => API.getAnnouncements(key, subject_id)}
+          post={(doc, key, user) => {
+            let newA = doc;
+            newA.subject = subject_id;
+            newA.private = true;
+            return API.addAnnouncement(newA, key, user)
+          }}
+          put={API.updateAnnouncement}
+          delete={API.deleteAnnouncements}
+          validation={{
+            title: {
+              validate: value => new Promise((resolve, reject) => {
+                resolve(value)
+              }),
+              message: "You must enter an announcement title."
+            },
+            content: {
+              validate: value => new Promise((resolve, reject) => {
+                resolve(value)
+              }),
+              message: "You must enter some announcement content."
+            },
+          }}
+          {...props}
+        />
+      ),
       path: `${props.match.path}/announcements`
     },
+    
     {
       component: (props) => (
-        props.user.type === "Student" ? (
-          <>
-            <SimpleListView
-              title={"Announcements"}
-              items={subjectInfo.announcements || []}
-              pageMax={5}
-              icon={faBullhorn}
-              labelField={"title"}
-              viewer={AnnouncementViewer}
-              searchbar
-              {...props}
-            />
-            <Typography variant="h2" className={classes.header}>Resources</Typography>
-            <SubjectFilesForm
-              document={subjectInfo}
-              {...props}
-            />
-          </>
-        ) : (
-          <>
-            <DocumentEditor
-              primary={doc => doc.title}
-              isSubComponent={"true"}
-              collection={"Announcements"}
-              icon={faBullhorn}
-              FormComponent={(p) =>
-                <SubjectAnnouncementsForm user={props.user} {...p} />
-              }
-              get={(key) => API.getAnnouncements(key, subject_id)}
-              post={(doc, key, user) => {
-                let newA = doc;
-                newA.subject = subject_id;
-                newA.private = true;
-                return API.addAnnouncement(newA, key, user)
-              }}
-              put={API.updateAnnouncement}
-              delete={API.deleteAnnouncements}
-              validation={{
-                title: {
-                  validate: value => new Promise((resolve, reject) => {
-                    resolve(value)
-                  }),
-                  message: "You must enter an announcement title."
-                },
-                content: {
-                  validate: value => new Promise((resolve, reject) => {
-                    resolve(value)
-                  }),
-                  message: "You must enter some announcement content."
-                },
-              }}
-              {...props}
-            />
-           
-            <DocumentEditor
-              primary={doc => doc.title}
-              isSubComponent={"true"}
-              collection={"Upcoming Tasks"}
-              icon={faBullhorn}
-              FormComponent={(p) =>
-                <SubjectTasksForm user={props.user} {...p} />
-              }
-              get={(key) => API.getTasks(subject_id, key)}
-              post={(doc, key, user) => {
-                let newA = doc;
-                newA.subject = subject_id;
-                newA.private = true;
-                return API.addTask(newA, key, user)
-              }}
-              put={API.updateTask}
-              delete={API.deleteTask}
-              validation={{
-                title: {
-                  validate: value => new Promise((resolve, reject) => {
-                    resolve(value)
-                  }),
-                  message: "You must enter a task title."
-                },
-                description: {
-                  validate: value => new Promise((resolve, reject) => {
-                    resolve(value)
-                  }),
-                  message: "You must enter some task content."
-                },
-              }}
-              {...props}
-            />
-     
-            <Typography variant="h2" className={classes.header}>Resources</Typography>
-           
-            <SubjectFilesForm
-              document={subjectInfo}
-              {...props}
-            />
-          </>
-        )
+        <>
+          <DocumentEditor
+            primary={doc => doc.title}
+            isSubComponent={"true"}
+            collection={"Announcements"}
+            icon={faBullhorn}
+            FormComponent={(p) =>
+              <SubjectAnnouncementsForm user={props.user} {...p} />
+            }
+            get={(key) => API.getAnnouncements(key, subject_id)}
+            post={(doc, key, user) => {
+              let newA = doc;
+              newA.subject = subject_id;
+              newA.private = true;
+              return API.addAnnouncement(newA, key, user)
+            }}
+            put={API.updateAnnouncement}
+            delete={API.deleteAnnouncements}
+            validation={{
+              title: {
+                validate: value => new Promise((resolve, reject) => {
+                  resolve(value)
+                }),
+                message: "You must enter an announcement title."
+              },
+              content: {
+                validate: value => new Promise((resolve, reject) => {
+                  resolve(value)
+                }),
+                message: "You must enter some announcement content."
+              },
+            }}
+            {...props}
+          />
+          
+          <DocumentEditor
+            primary={doc => doc.title}
+            isSubComponent={"true"}
+            collection={"Upcoming Tasks"}
+            icon={faBullhorn}
+            FormComponent={(p) =>
+              <SubjectTasksForm user={props.user} {...p} />
+            }
+            get={(key) => API.getTasks(subject_id, key)}
+            post={(doc, key, user) => {
+              let newA = doc;
+              newA.subject = subject_id;
+              newA.private = true;
+              return API.addTask(newA, key, user)
+            }}
+            put={API.updateTask}
+            delete={API.deleteTask}
+            validation={{
+              title: {
+                validate: value => new Promise((resolve, reject) => {
+                  resolve(value)
+                }),
+                message: "You must enter a task title."
+              },
+              description: {
+                validate: value => new Promise((resolve, reject) => {
+                  resolve(value)
+                }),
+                message: "You must enter some task content."
+              },
+            }}
+            {...props}
+          />
+    
+          <Typography variant="h2" className={classes.header}>Resources</Typography>
+          
+          <SubjectFilesForm
+            document={subjectInfo}
+            {...props}
+          />
+        </>
       ),
       path: `${props.match.path}/resources`
     },
     {
-      component:
+      component: (props) => (
         props.user.type === "Student" ?
-          (props) => (
-            <MarksViewer {...props}/>
-          )
-          :
-          (props) => (
-            <MarksForm subject_id={subject_id}/>
-
-
-          )
-      ,
+          <MarksViewer {...props}/> :
+          <MarksForm subject_id={subject_id}/>
+      ),
       path: `${props.match.path}/studentGrades`
     }
   ]
