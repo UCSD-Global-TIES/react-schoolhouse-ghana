@@ -132,7 +132,7 @@ function AnnouncementCard(props) {
             CREATED ON: {moment(PROPS.document.createdAt).format('MM/DD/YYYY')}
           </p>
         </div>
-        {user && user.type === "Admin" && (
+        {user && (user.type === "Admin" || user.type === "Teacher") && (
           <div className={classes.iconContainer}>
             <div className={classes.icon} onClick={handleClick}>
               <svg
