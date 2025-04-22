@@ -59,8 +59,9 @@ const EnhancedListToolbar = (props) => {
   const classes = useToolbarStyles();
   const { user, numSelected, handleCreate, handleDelete, handleUpdate, buttonClass, title, useSubHeader } =
     props;
-    console.log("User in EnhancedListToolbar:", user);
-
+    
+  console.log("User in EnhancedListToolbar:", user);
+  
   return (
     <div>
       {title === "Announcement" && (
@@ -94,8 +95,7 @@ const EnhancedListToolbar = (props) => {
         </Typography>
       )}
       
-
-
+      
       {numSelected === 1 ? (
         <Tooltip title="Edit">
           <IconButton onClick={handleUpdate} aria-label="edit">
@@ -114,9 +114,11 @@ const EnhancedListToolbar = (props) => {
       ) : (
         ""
       )}
-      <Button onClick={handleCreate} className={buttonClass + " " + classes.createBtn} classes={{ text: classes.padding }}>
-        + {title}
-      </Button>
+      {(user && (user.type === "Admin" || user.type === "Teacher")) && (
+        <Button onClick={handleCreate} className={buttonClass + " " + classes.createBtn} classes={{ text: classes.padding }}>
+          + {title}
+        </Button>
+      )}
     </Toolbar>
   </div>
   );
