@@ -7,6 +7,12 @@ import API from "../../utils/API";
 const GradebookPage = ({ match, user }) => {
   const subjectId = match.params.subjectId;
   const [gradebookData, setGradebookData] = useState([]);
+  const isStudent = user?.type === "Student";
+
+  const filteredData = isStudent
+    ? gradebookData.filter((student) => student.studentName === user.name)
+    : gradebookData;
+
 
   // ✅ Fetch saved grades on page load
   useEffect(() => {
@@ -41,9 +47,23 @@ const GradebookPage = ({ match, user }) => {
     <div>
       <GradebookNavbar />
       <h1>Gradebook</h1>
-      <GradebookTable data={gradebookData} updateData={setGradebookData} />
-      <GradebookForm onSubmit={(newStudent) => setGradebookData([...gradebookData, { ...newStudent, grades: [] }])} />
-      <button onClick={saveGradebook}>Save Gradebook</button>
+      <GradebookTable
+        data={filteredData}
+        updateData={setGradebookData}
+        readOnly={isStudent}
+      />
+
+      {!isStudent && (
+        <>
+          <GradebookForm
+            onSubmit={(newStudent) =>
+              setGradebookData([...gradebookData, { ...newStudent, grades: [] }])
+            }
+          />
+          <button onClick={saveGradebook}>Save Gradebook</button>
+        </>
+      )}
+
     </div>
   );
 };

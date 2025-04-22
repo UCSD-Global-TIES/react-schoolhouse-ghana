@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "./Gradebook.css"; // Ensure this file exists for styling
 
-const GradebookTable = ({ data, updateData }) => {
+const GradebookTable = ({ data, updateData, readOnly }) => {
   const [assignments, setAssignments] = useState(["Assignment 1", "Assignment 2"]);
 
   const addAssignment = () => {
@@ -59,31 +59,44 @@ const GradebookTable = ({ data, updateData }) => {
           {data.map((student, studentIndex) => (
             <tr key={studentIndex}>
               <td>
-                <input
-                  type="text"
-                  value={student.studentName}
-                  onChange={(e) => handleStudentChange(studentIndex, "studentName", e.target.value)}
-                />
+                {readOnly ? (
+                  <span>{student.studentName}</span>
+                ) : (
+                  <input
+                    type="text"
+                    value={student.studentName}
+                    onChange={(e) => handleStudentChange(studentIndex, "studentName", e.target.value)}
+                  />
+                )}
               </td>
               {assignments.map((_, assignmentIndex) => (
                 <td key={assignmentIndex}>
-                  <input
-                    type="number"
-                    value={student.grades?.[assignmentIndex] || ""}
-                    onChange={(e) => handleGradeChange(studentIndex, assignmentIndex, e.target.value)}
-                  />
+                  {readOnly ? (
+                    <span>{student.grades?.[assignmentIndex]}</span>
+                  ) : (
+                    <input
+                      type="number"
+                      value={student.grades?.[assignmentIndex] || ""}
+                      onChange={(e) => handleGradeChange(studentIndex, assignmentIndex, e.target.value)}
+                    />
+                  )}
                 </td>
               ))}
               <td>{calculateTotal(student.grades)}</td>
               <td>{getLetterGrade(calculateTotal(student.grades))}</td>
-              <td>
-                <button onClick={() => removeStudent(studentIndex)}>Remove</button> 
-              </td>
+              {!readOnly && (
+                <td>
+                  <button onClick={() => removeStudent(studentIndex)}>Remove</button>
+                </td>
+              )}
+
             </tr>
           ))}
         </tbody>
       </table>
-      <button onClick={addAssignment}>Add Assignment</button>
+      {!readOnly && (
+        <button onClick={addAssignment}>Add Assignment</button>
+      )}
     </div>
   );
 };
