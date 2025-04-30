@@ -115,8 +115,7 @@ const useStyles = makeStyles(theme => ({
         fontSize: 24,
         fontFamily: 'Nunito',
         fontWeight: '400',
-        wordWrap: 'break-word',
-        whiteSpace: 'pre-wrap'
+        wordWrap: 'break-word'
     },
     filesContainer: {
         marginTop: '2em'
@@ -126,13 +125,12 @@ const useStyles = makeStyles(theme => ({
 function AnnouncementViewer(props) {
     const classes = useStyles();
     const { document, onClose } = props;
-
-    // Close modal when clicking outside
     const handleBackdropClick = (e) => {
         if (e.target === e.currentTarget) {
             onClose();
         }
     };
+    const hasFiles = document.files && document.files.length > 0;
 
     return (
         <div className={classes.modal} onClick={handleBackdropClick}>
@@ -169,7 +167,7 @@ function AnnouncementViewer(props) {
                                     {document.content}
                                 </div>
                             </div>
-                            {/* {document.files && document.files.length > 0 && (
+                            {hasFiles && (
                                 <div className={classes.filesContainer}>
                                     <SimpleListView
                                         title={"Attached Files"}
@@ -181,7 +179,7 @@ function AnnouncementViewer(props) {
                                         {...props}
                                     />
                                 </div>
-                            )} */}
+                            )}
                         </div>
                     </div>
                 </div>

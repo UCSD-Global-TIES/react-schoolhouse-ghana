@@ -725,6 +725,7 @@ function DocumentEditor(props) {
                             document={document}
                             name={primary(document)}
                             user={props.user} 
+                            subject={document.subject}
                           />
                         </List>
                       );

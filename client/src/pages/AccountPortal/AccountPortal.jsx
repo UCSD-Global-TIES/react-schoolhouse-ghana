@@ -2,7 +2,7 @@ import React from "react";
 import "../../utils/flowHeaders.min.css";
 import "./main.css";
 
-import UserPortal from "./versions/user/UserPortal.jsx";
+// import UserPortal from "./versions/user/UserPortal.jsx";
 import { Redirect } from "react-router-dom";
 
 const AdminRedirect = () => <Redirect to="/edit" />;

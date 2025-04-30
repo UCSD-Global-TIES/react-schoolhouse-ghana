@@ -23,48 +23,40 @@ const useStyles = makeStyles(theme => ({
     },
 }));
 
-const disabledMsg = `This field will be populated after announcement creation.`
+const disabledMsg = `This field will be populated after task creation.`
 
 const textFields = [
     {
         name: "title",
         label: "Title",
         required: true,
-        helper: "This is an informative title of this announcement."
+        helper: "This is an informative title of this task."
     },
     {
-        name: "content",
-        label: "Content",
+        name: "description",
+        label: "Description",
         multiline: true,
         required: true,
-        helper: "This is the main content of this announcement."
+        helper: "This is the main content of this task."
     },
     {
-        name: "authorName",
-        label: "Author Name",
+        name: "dueDate",
+        label: "Due Date",
         disabled: true,
-        helper: "This is the name of the announcement's author."
+        helper: "This is when the task should be completed by."
     },
     {
         name: "createdAt",
         label: "Created On",
         isDate: true,
         disabled: true,
-        helper: "This is the date this announcement was created."
+        helper: "This is the date this task was created."
     },
-    {
-        name: "updatedAt",
-        label: "Last Updated",
-        isDate: true,
-        disabled: true,
-        helper: "This is the date this announcement was last updated."
-    },
-
 ]
 
 // Private field is special use case
 
-function SubjectAnnouncementsForm(props) {
+function SubjectTasksForm(props) {
     const classes = useStyles();
     const [fileOptions, setFileOptions] = useState([]);
     const [selectedFiles, setSelectedFiles] = useState(props.document.files || []);
@@ -135,7 +127,7 @@ function SubjectAnnouncementsForm(props) {
                         />
                     ))}
 
-                {/* <DocumentPicker
+                <DocumentPicker
                     title={"Attached Files"}
                     docs={fileOptions}
                     pageMax={5}
@@ -144,11 +136,11 @@ function SubjectAnnouncementsForm(props) {
                     collection={"Files"}
                     primary={doc => doc.nickname}
                     handleChange={(docs) => handlePickChange('files', docs)}
-                /> */}
+                />
 
             </div>
         </div>
     )
 };
 
-export default SubjectAnnouncementsForm;
+export default SubjectTasksForm;

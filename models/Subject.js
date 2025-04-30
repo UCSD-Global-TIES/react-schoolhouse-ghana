@@ -13,6 +13,10 @@ const subjectSchema = new Schema({
   files: [{
     type: Schema.Types.ObjectId,
     ref: 'File'
+  }],
+  tasks: [{
+    type: Schema.Types.ObjectId,
+    ref: 'Task'
   }]
 }, { timestamps: true });
 

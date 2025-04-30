@@ -78,6 +78,7 @@ const useStyles = makeStyles({
   tagContainer: {
     display: 'flex',
     justifyContent: 'flex-end',
+    margin: '0.5rem'
     // other styles...
   },
   iconContainer:(props) =>({
