@@ -11,14 +11,11 @@ const {
 } = require("./processAnnouncements");
 module.exports = {
     getGrades: function (req, res) {
-        // Allow both Admin and Teacher to access grades
         verifyKey(req.header('Authorization'), 'Admin,Teacher')
             .then((authData) => {
                 if (authData.isAuthorized) {
-                    // Set query based on user type
                     let query = {};
                     
-                    // If user is a Teacher, only return grades where they are assigned
                     if (authData.type === 'Teacher') {
                         query = { teachers: { $in: [authData.profile_id] } };
                     }
@@ -115,7 +112,7 @@ module.exports = {
                     // Set query based on user type
                     let query = { _id: req.params.gid };
                     
-                    // If user is a Teacher, ensure they can only access grades where they are assigned
+                    //get grades where they are assigned
                     if (authData.type === 'Teacher') {
                         query.teachers = { $in: [authData.profile_id] };
                     }

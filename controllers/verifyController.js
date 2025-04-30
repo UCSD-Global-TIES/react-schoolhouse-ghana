@@ -80,7 +80,6 @@ module.exports = {
         const types = access_type.split(",");
 
         return new Promise((resolve, reject) => {
-            // API KEY SHOULD NOT BE ACCOUNT _id (future feature)
             accountDb
                 .findOne({
                     _id: key
@@ -88,7 +87,6 @@ module.exports = {
                 .then((account) => {
                     if (account) {
                         if (types.includes(account.type)) {
-                            // Return user info along with authorization status
                             resolve({
                                 isAuthorized: true,
                                 type: account.type,
