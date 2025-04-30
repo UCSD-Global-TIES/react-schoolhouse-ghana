@@ -87,10 +87,24 @@ module.exports = {
                 })
                 .then((account) => {
                     if (account) {
-                        resolve(types.includes(account.type));
-                    } else resolve(undefined)
+                        if (types.includes(account.type)) {
+                            // Return user info along with authorization status
+                            resolve({
+                                isAuthorized: true,
+                                type: account.type,
+                                profile_id: account.profile
+                            });
+                        } else {
+                            resolve({ isAuthorized: false });
+                        }
+                    } else {
+                        resolve({ isAuthorized: false });
+                    }
                 })
-        })
+                .catch(err => {
+                    resolve({ isAuthorized: false });
+                });
+        });
     },
     verifyInitialization: function (req, res) {
         const rootAccount = {

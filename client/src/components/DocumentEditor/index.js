@@ -21,7 +21,6 @@ import Divider from '@material-ui/core/Divider';
 import API from "../../utils/API";
 
 import AccountFilter from "../AccountFilter/index";
-import transitions from "@material-ui/core/styles/transitions";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -98,7 +97,7 @@ const useStyles = makeStyles((theme) => ({
     marginTop:".5rem",
     maxWidth: "100%",
     flexWrap: "nowrap",
-},
+  },
   tabs: {
     border: "none",
     borderTop: "none",
@@ -109,6 +108,11 @@ const useStyles = makeStyles((theme) => ({
     transition: "none",
     borderRadius: "none",
   },
+  noGradesMessage: {
+    margin: "2rem 0",
+    color: "#4B4B4B",
+    textAlign: "center",
+  }
 }));
 
 // Can be non-specific for all document editors
@@ -122,7 +126,6 @@ function DocumentEditor(props) {
   const MAX_ITEMS = 5;
 
   const { user, FormComponent, icon, collection, primary, validation, type, grStatus, secondary, isSubComponent } = props;
-  console.log(user)
   const classes = useStyles();
 
   // DOCUMENTS EDITOR
@@ -169,27 +172,31 @@ function DocumentEditor(props) {
   const handleRefresh = () => {
     setRefreshing(true);
     setSelected(null);
-
+  
     props.get(props.user.key).then((docData) => {
       const docList = docData.data;
-
+      console.log("Refresh - Documents returned for user type:", props.user.type, docList);
+  
+      // No filtering needed here because gradesController will handle it on the server side
+      const filteredList = docList;
+  
       // Initialize documents
-      setDocuments(docList);
-
+      setDocuments(filteredList);
+  
       setPage(page);
-
+  
       if (searchQuery.length) {
-        const filteredDocuments = docList.filter((document) =>
+        const filteredDocuments = filteredList.filter((document) =>
           primary(document).toLowerCase().includes(searchQuery.toLowerCase())
         );
         setFilteredDocuments(filteredDocuments);
         setViewableDocuments(filteredDocuments.slice(0, MAX_ITEMS));
       } else {
         // Reset the filtered documents to ALL documents
-        setFilteredDocuments(docList);
-        setViewableDocuments(docList.slice(0, MAX_ITEMS));
+        setFilteredDocuments(filteredList);
+        setViewableDocuments(filteredList.slice(0, MAX_ITEMS));
       }
-
+  
       setRefreshing(false);
     });
   };
@@ -427,43 +434,44 @@ function DocumentEditor(props) {
     props.history.push(`${destination}?_id=${_id}&redirect=true`);
   };
 
-
   useEffect(() => {
     const promises = [];
     promises.push(API.getUsers(props.user.key));
 
     Promise.all(promises)
-        .then((results) => {
-            const teachers = [];
-            for (const account of results[0].data) {
-                const { first_name, last_name, profile_id: _id, profile_createdAt: createdAt, profile_updatedAt: updatedAt } = account;
-                const profileObj = {
-                    first_name,
-                    last_name,
-                    _id,
-                    createdAt,
-                    updatedAt
-                }
+      .then((results) => {
+        const teachers = [];
+        for (const account of results[0].data) {
+          const { first_name, last_name, profile_id: _id, profile_createdAt: createdAt, profile_updatedAt: updatedAt } = account;
+          const profileObj = {
+            first_name,
+            last_name,
+            _id,
+            createdAt,
+            updatedAt
+          }
 
-                if (account.type === "Teacher") teachers.push(profileObj)
-            }
+          if (account.type === "Teacher") teachers.push(profileObj)
+        }
 
-            setTeacherOptions([...teachers]);
-
-        })
-}, []);
-
+        setTeacherOptions([...teachers]);
+      })
+  }, []);
 
   useEffect(() => {
     if (!!props.get) {
       props.get(props.user.key).then((docData) => {
         const docList = docData.data;
-
+        console.log("Initial load - Documents returned for user type:", props.user.type, docList);
+  
+        // No client-side filtering needed - server will handle it
+        const filteredList = docList;
+  
         // Initialize documents
         setPage(page);
-        setDocuments(docList);
-        setFilteredDocuments(docList);
-        setViewableDocuments(docList.slice(0, MAX_ITEMS));
+        setDocuments(filteredList);
+        setFilteredDocuments(filteredList);
+        setViewableDocuments(filteredList.slice(0, MAX_ITEMS));
         setLoading(false);
 
         // If the user has requested a document in the route, set the document
@@ -477,7 +485,7 @@ function DocumentEditor(props) {
           // Check if the specified document exists
           if (_id) {
             let isDocument = false;
-            for (const document of docList) {
+            for (const document of filteredList) {
               if (document._id == _id) {
                 handleDocument(true, document);
                 isDocument = true;
@@ -505,6 +513,11 @@ function DocumentEditor(props) {
       });
     }
   }, []);
+
+  // Helper function to check if any grades exist for a given status
+  const hasGradesWithStatus = (status) => {
+    return filteredDocuments.some(document => grStatus(document) === `(${status})`);
+  };
 
   return (
     <>
@@ -621,7 +634,7 @@ function DocumentEditor(props) {
                 handleDelete={() => handleConfirm(true)}
                 buttonClass={classes.btn}
                 useSubHeader={isSubComponent}
-                user = {user}
+                user={user}
               />
 
               <SearchBar
@@ -643,7 +656,7 @@ function DocumentEditor(props) {
             ) : filteredDocuments.length ? (
               <>
                 {/* Logic for Handling Account Interface*/}
-                {collection == "Account" ? (
+                {collection === "Account" ? (
                   <AccountFilter
                     filteredDocuments={filteredDocuments}
                     type={type}
@@ -654,45 +667,40 @@ function DocumentEditor(props) {
                     setPage={setPage}
                     icon={icon}
                   />
-                ) : collection == "Grade" ? (
+                ) : collection === "Grade" ? (
                   <div>
-                  
-                    {["active", "unpublished", "archived"].map((item) => (
-                      
-                      <>
-                        
-                        {filteredDocuments.filter(
-                          (document) => grStatus(document) == `(${item})`
-                        ).length > 0 ? (
+                    {["active", "unpublished", "archived"].map((status) => (
+                      <React.Fragment key={`status-${status}`}>
+                        {hasGradesWithStatus(status) ? (
                           <>
-                          <Typography variant="h2">{item}</Typography>
-                          <div className={classes.classContainer}>
-                          
-                            {filteredDocuments.map((document) => {
-                                const date = new Date(document.createdAt);
-                                const year = date.getFullYear();
-                                
-                                const yearLabel = 'YR' + String(year).slice(-2) + '-' + (String(year+1).slice(-2));
+                            <Typography variant="h2">{status}</Typography>
+                            <div className={classes.classContainer}>
+                              {filteredDocuments.map((document, idx) => {
+                                if (grStatus(document) === `(${status})`) {
+                                  const date = new Date(document.createdAt);
+                                  const year = date.getFullYear();
+                                  
+                                  const yearLabel = 'YR' + String(year).slice(-2) + '-' + (String(year+1).slice(-2));
 
-                                let label = '';
-                                if(item === 'active'){
-                                    label = year + '-' + (year + 1);
-                                } else {
-                                    label = item;
-                                }
+                                  let label = '';
+                                  if(status === 'active'){
+                                      label = year + '-' + (year + 1);
+                                  } else {
+                                      label = status;
+                                  }
 
-                                const teacherId = document.teachers[0];
-                                const teacher = teacherOptions.find(teacher => teacher._id === teacherId);
-                                const teacherName = teacher ? `${teacher.last_name}` : '';
+                                  const teacherId = document.teachers && document.teachers[0];
+                                  const teacher = teacherOptions.find(teacher => teacher._id === teacherId);
+                                  const teacherName = teacher ? `${teacher.last_name}` : '';
 
-                                const gradeLabel = teacher ? secondary(document) : primary(document);
- 
-                                return (
-                                  grStatus(document) == `(${item})` && (
+                                  const gradeLabel = teacher ? secondary(document) : primary(document);
+                                  
+                                  return (
                                     <ClassCard
-                                      name = {`${teacherName} ${gradeLabel}`}
-                                      secondLine = {yearLabel}
-                                      tagColor={tagMap[item]}
+                                      key={`grade-card-${document._id}`}
+                                      name={`${teacherName} ${gradeLabel}`}
+                                      secondLine={yearLabel}
+                                      tagColor={tagMap[status]}
                                       tagLabel={label}
                                       image=''
                                       handleDocument={handleDocument}
@@ -700,25 +708,30 @@ function DocumentEditor(props) {
                                       document={document}
                                       editable={true}
                                     />
-                                  )
-                                );
-                            })}
-                          </div>
-                          {item !== "archived" && <Divider style={{marginBottom:'2rem', height: '0.1875rem'}}/>}
-                          
+                                  );
+                                }
+                                return null;
+                              })}
+                            </div>
+                            {status !== "archived" && <Divider style={{marginBottom:'2rem', height: '0.1875rem'}}/>}
                           </>
-                        ) : (
-                          <p>No {item.toLowerCase()} grades to display.</p>
-                        )}
-                      </>
+                        ) : null}
+                      </React.Fragment>
                     ))}
+                    
+                    {/* Show message if no grades available for a Teacher */}
+                    {props.user.type === "Teacher" && filteredDocuments.length === 0 && (
+                      <Typography variant="body1" className={classes.noGradesMessage}>
+                        You currently don't have any assigned grade classes. Please contact an administrator if you believe this is an error.
+                      </Typography>
+                    )}
                   </div>
                 ) : (
                   <>
                     {viewableDocuments.map((document, idx) => {
                       const labelId = `${collection.toLowerCase()}-${idx}`;
                       return (
-                        <List className={classes.list}>
+                        <List key={labelId} className={classes.list}>
                           <AnnouncementCard
                             handleDocument={handleDocument}
                             handleSelect={handleSelect}

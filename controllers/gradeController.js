@@ -11,11 +11,20 @@ const {
 } = require("./processAnnouncements");
 module.exports = {
     getGrades: function (req, res) {
-        verifyKey(req.header('Authorization'), 'Admin')
-            .then((isVerified) => {
-                if (isVerified) {
+        // Allow both Admin and Teacher to access grades
+        verifyKey(req.header('Authorization'), 'Admin,Teacher')
+            .then((authData) => {
+                if (authData.isAuthorized) {
+                    // Set query based on user type
+                    let query = {};
+                    
+                    // If user is a Teacher, only return grades where they are assigned
+                    if (authData.type === 'Teacher') {
+                        query = { teachers: { $in: [authData.profile_id] } };
+                    }
+                    
                     gradeDb
-                        .find({})
+                        .find(query)
                         .populate('subjects')
                         .then(gradeDocs => res.json(gradeDocs))
                         .catch(err => res.status(422).json(err));
@@ -27,8 +36,8 @@ module.exports = {
     },
     getUserGrade: function (req, res) {
         verifyKey(req.header('Authorization'), 'Student,Teacher,Admin')
-            .then((isVerified) => {
-                if (isVerified) {
+            .then((authData) => {
+                if (authData.isAuthorized) {
 
                     const uid = req.params.uid;
 
@@ -98,14 +107,21 @@ module.exports = {
             })
     },
     getGrade: function (req, res) {
-        verifyKey(req.header('Authorization'), 'Admin')
-            .then((isVerified) => {
-                if (isVerified) {
+        // Allow both Admin and Teacher to get individual grades
+        verifyKey(req.header('Authorization'), 'Admin,Teacher')
+            .then((authData) => {
+                if (authData.isAuthorized) {
+
+                    // Set query based on user type
+                    let query = { _id: req.params.gid };
+                    
+                    // If user is a Teacher, ensure they can only access grades where they are assigned
+                    if (authData.type === 'Teacher') {
+                        query.teachers = { $in: [authData.profile_id] };
+                    }
 
                     gradeDb
-                        .findOne({
-                            _id: req.params.gid
-                        })
+                        .findOne(query)
                         .populate('subjects')
                         .populate('teachers')
                         .populate('students')
@@ -119,8 +135,8 @@ module.exports = {
     },
     addGrade: function (req, res) {
         verifyKey(req.header('Authorization'), 'Admin')
-            .then((isVerified) => {
-                if (isVerified) {
+            .then((authData) => {
+                if (authData.isAuthorized) {
                     // Create folder
                     let gradeDoc = req.body;
 
@@ -175,8 +191,8 @@ module.exports = {
     },
     updateGrade: function (req, res) {
         verifyKey(req.header('Authorization'), 'Admin')
-            .then((isVerified) => {
-                if (isVerified) {
+            .then((authData) => {
+                if (authData.isAuthorized) {
                     // Create folder
                     let gradeDoc = req.body;
 
@@ -232,8 +248,8 @@ module.exports = {
     },
     deleteGrade: function (req, res) {
         verifyKey(req.header('Authorization'), 'Admin')
-            .then((isVerified) => {
-                if (isVerified) {
+            .then((authData) => {
+                if (authData.isAuthorized) {
                     const gid = req.params.gid;
 
                     gradeDb
@@ -252,151 +268,4 @@ module.exports = {
                 }
             })
     },
-    // updateGradeStatus: function (req, res) {
-    //     verifyKey(req.header('Authorization'), 'Admin')
-    //         .then((isVerified) => {
-    //             if (isVerified) {
-    //                 const { gid, status } = req.params;
-    
-    //                 gradeDb
-    //                     .findOneAndUpdate({ _id: gid }, { status: status })
-    //                     .then(updatedGrade => res.json(updatedGrade))
-    //                     .catch(err => res.status(422).json(err));
-    //             } else {
-    //                 res.status(403).json(null);
-    //             }
-    //         })
-    // }
-    // addStudent: function (req, res) {
-    //     verifyKey(req.header('Authorization'), 'Admin')
-    //         .then((isVerified) => {
-    //             if (isVerified) {
-    //                 const gid = req.params.gid;
-    //                 const sid = req.params.sid;
-
-    //                 gradeDb
-    //                     .findOneAndUpdate({
-    //                         _id: gid
-    //                     }, {
-    //                         $push: {
-    //                             students: sid
-    //                         }
-    //                     })
-    //                     .then(newG => res.json(newG))
-    //                     .catch(err => res.status(422).json(err));
-    //             } else {
-    //                 res.status(403).json(null);
-    //             }
-    //         })
-    // },
-    // removeStudent: function (req, res) {
-    //     verifyKey(req.header('Authorization'), 'Admin')
-    //         .then((isVerified) => {
-    //             if (isVerified) {
-    //                 const gid = req.params.gid;
-    //                 const sid = req.params.sid;
-
-    //                 gradeDb
-    //                     .findOneAndUpdate({
-    //                         _id: gid
-    //                     }, {
-    //                         $pull: {
-    //                             students: sid
-    //                         }
-    //                     })
-    //                     .then(newG => res.json(newG))
-    //                     .catch(err => res.status(422).json(err));
-    //             } else {
-    //                 res.status(403).json(null);
-    //             }
-    //         })
-    // },
-    // addTeacher: function (req, res) {
-    //     verifyKey(req.header('Authorization'), 'Admin')
-    //         .then((isVerified) => {
-    //             if (isVerified) {
-    //                 const gid = req.params.gid;
-    //                 const tid = req.params.tid;
-
-    //                 gradeDb
-    //                     .findOneAndUpdate({
-    //                         _id: gid
-    //                     }, {
-    //                         $push: {
-    //                             teachers: tid
-    //                         }
-    //                     })
-    //                     .then(newG => res.json(newG))
-    //                     .catch(err => res.status(422).json(err));
-    //             } else {
-    //                 res.status(403).json(null);
-    //             }
-    //         })
-    // },
-    // removeTeacher: function (req, res) {
-    //     verifyKey(req.header('Authorization'), 'Admin')
-    //         .then((isVerified) => {
-    //             if (isVerified) {
-    //                 const gid = req.params.gid;
-    //                 const tid = req.params.tid;
-
-    //                 gradeDb
-    //                     .findOneAndUpdate({
-    //                         _id: gid
-    //                     }, {
-    //                         $pull: {
-    //                             teachers: tid
-    //                         }
-    //                     })
-    //                     .then(newG => res.json(newG))
-    //                     .catch(err => res.status(422).json(err));
-    //             } else {
-    //                 res.status(403).json(null);
-    //             }
-    //         })
-    // },
-    // addSubject: function (req, res) {
-    //     verifyKey(req.header('Authorization'), 'Admin')
-    //         .then((isVerified) => {
-    //             if (isVerified) {
-    //                 const gid = req.params.gid;
-    //                 const sid = req.params.sid;
-
-    //                 gradeDb
-    //                     .findOneAndUpdate({
-    //                         _id: gid
-    //                     }, {
-    //                         $push: {
-    //                             subjects: sid
-    //                         }
-    //                     })
-    //                     .then(newG => res.json(newG))
-    //                     .catch(err => res.status(422).json(err));
-    //             } else {
-    //                 res.status(403).json(null);
-    //             }
-    //         })
-    // },
-    // removeSubject: function (req, res) {
-    //     verifyKey(req.header('Authorization'), 'Admin')
-    //         .then((isVerified) => {
-    //             if (isVerified) {
-    //                 const gid = req.params.gid;
-    //                 const sid = req.params.sid;
-
-    //                 gradeDb
-    //                     .findOneAndUpdate({
-    //                         _id: gid
-    //                     }, {
-    //                         $pull: {
-    //                             subjects: sid
-    //                         }
-    //                     })
-    //                     .then(newG => res.json(newG))
-    //                     .catch(err => res.status(422).json(err));
-    //             } else {
-    //                 res.status(403).json(null);
-    //             }
-    //         })
-    // },
 }
