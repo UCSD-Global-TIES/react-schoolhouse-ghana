@@ -125,14 +125,11 @@ const useStyles = makeStyles(theme => ({
 function AnnouncementViewer(props) {
     const classes = useStyles();
     const { document, onClose } = props;
-
     const handleBackdropClick = (e) => {
         if (e.target === e.currentTarget) {
             onClose();
         }
     };
-
-    // Check if there are any files to display
     const hasFiles = document.files && document.files.length > 0;
 
     return (
@@ -170,7 +167,6 @@ function AnnouncementViewer(props) {
                                     {document.content}
                                 </div>
                             </div>
-
                             {hasFiles && (
                                 <div className={classes.filesContainer}>
                                     <SimpleListView
