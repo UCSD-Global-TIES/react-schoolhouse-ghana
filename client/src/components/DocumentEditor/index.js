@@ -28,7 +28,6 @@ const useStyles = makeStyles((theme) => ({
   },
   list: {
     width: "100%",
-    // backgroundColor: "#94DD9B", //theme.palette.background.paper,
   },
   buttonLink: {
     color: "inherit",
