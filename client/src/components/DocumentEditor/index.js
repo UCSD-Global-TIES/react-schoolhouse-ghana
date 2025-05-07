@@ -14,7 +14,8 @@ import NameCard from "../NameCard/NameCard";
 import AnnouncementCard from "../AnnouncementCard/AnnouncementCard";
 
 import ClassCard from "../ClassCard";
-import EnrolledClasses from "../EnrolledClasses";
+import ClassCardWide from "../ClassCardWide"
+// import EnrolledClasses from "../EnrolledClasses";
 
 import Divider from '@material-ui/core/Divider';
 
@@ -120,6 +121,7 @@ const useStyles = makeStyles((theme) => ({
 // API - specifies create, get, update, delete actions
 // icon - used for no documents message and for list
 // Form - component used for document dialog
+
 function DocumentEditor(props) {
   const socket = useContext(SocketContext);
   const MAX_ITEMS = 5;
@@ -518,6 +520,58 @@ function DocumentEditor(props) {
     return filteredDocuments.some(document => grStatus(document) === `(${status})`);
   };
 
+  // Render card based on user type
+  const renderGradeCard = (document, status) => {
+    const date = new Date(document.createdAt);
+    const year = date.getFullYear();
+    const yearLabel = 'YR' + String(year).slice(-2) + '-' + (String(year+1).slice(-2));
+
+    // For teacher view, use ClassCardWide
+    if (props.user.type === "Teacher") {
+      return (
+        <ClassCardWide
+          key={`grade-card-${document._id}`}
+          name={primary(document)}
+          document={document}
+          status={status}
+          year={yearLabel}
+          handleDocument={handleDocument}
+          handleSelect={handleSelect}
+          editable={true}
+        />
+      );
+    } 
+    // For admin view, use ClassCard
+    else {
+      let label = '';
+      if (status === 'active') {
+        label = year + '-' + (year + 1);
+      } else {
+        label = status;
+      }
+
+      const teacherId = document.teachers && document.teachers[0];
+      const teacher = teacherOptions.find(teacher => teacher._id === teacherId);
+      const teacherName = teacher ? `${teacher.last_name}` : '';
+      const gradeLabel = teacher ? secondary(document) : primary(document);
+      
+      return (
+        <ClassCard
+          key={`grade-card-${document._id}`}
+          name={`${teacherName} ${gradeLabel}`}
+          secondLine={yearLabel}
+          tagColor={tagMap[status]}
+          tagLabel={label}
+          image=''
+          handleDocument={handleDocument}
+          handleSelect={handleSelect}
+          document={document}
+          editable={true}
+        />
+      );
+    }
+  };
+
   return (
     <>
       {/* ALERTS FOR API ACTIONS */}
@@ -676,38 +730,7 @@ function DocumentEditor(props) {
                             <div className={classes.classContainer}>
                               {filteredDocuments.map((document, idx) => {
                                 if (grStatus(document) === `(${status})`) {
-                                  const date = new Date(document.createdAt);
-                                  const year = date.getFullYear();
-                                  
-                                  const yearLabel = 'YR' + String(year).slice(-2) + '-' + (String(year+1).slice(-2));
-
-                                  let label = '';
-                                  if(status === 'active'){
-                                      label = year + '-' + (year + 1);
-                                  } else {
-                                      label = status;
-                                  }
-
-                                  const teacherId = document.teachers && document.teachers[0];
-                                  const teacher = teacherOptions.find(teacher => teacher._id === teacherId);
-                                  const teacherName = teacher ? `${teacher.last_name}` : '';
-
-                                  const gradeLabel = teacher ? secondary(document) : primary(document);
-                                  
-                                  return (
-                                    <ClassCard
-                                      key={`grade-card-${document._id}`}
-                                      name={`${teacherName} ${gradeLabel}`}
-                                      secondLine={yearLabel}
-                                      tagColor={tagMap[status]}
-                                      tagLabel={label}
-                                      image=''
-                                      handleDocument={handleDocument}
-                                      handleSelect={handleSelect}
-                                      document={document}
-                                      editable={true}
-                                    />
-                                  );
+                                  return renderGradeCard(document, status);
                                 }
                                 return null;
                               })}
