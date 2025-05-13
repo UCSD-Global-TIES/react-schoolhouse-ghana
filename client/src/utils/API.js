@@ -76,7 +76,7 @@ export default {
     const config = {
       'Authorization': key
     };
-    return axios.get(`/api/subject/${subject_id}`, {
+    return axios.get(`/api/subjects/${subject_id}`, {
       headers: config
     }); // SECURE
   },
@@ -85,7 +85,7 @@ export default {
     const config = {
       'Authorization': key
     };
-    return axios.get(`/api/subject/`, {
+    return axios.get(`/api/subjects/`, {
       headers: config
     }); // SECURE
   },
@@ -142,7 +142,7 @@ export default {
     };
 
     if (subject_id) {
-      return axios.get(`/api/subject/${subject_id}/ann`, {
+      return axios.get(`/api/subjects/${subject_id}/ann`, {
         headers: config
       }); // SECURE
     }
@@ -372,7 +372,7 @@ export default {
     const config = {
       'Authorization': key
     };
-    return axios.get(`/api/subject/${subject_id}/tasks`, {
+    return axios.get(`/api/subjects/${subject_id}/tasks`, {
       headers: config
     }); // SECURE
   },
@@ -410,21 +410,19 @@ export default {
 // GRADEBOOK
 // ---------------------------------------------------------------
 // Get gradebook data for a specific subject
-  getGradebook: function (subject_id, key) {
-    const config = {
-      'Authorization': key
-    };
-    return axios.get(`/api/gradebook/${subject_id}`, {
-      headers: config
-    }); // SECURE
-  },
-  saveGradebook: function (subject_id, students, key) {
-    const config = {
-      'Authorization': key
-    };
-    return axios.post("/api/gradebook/save", { subject_id, students }, {
-      headers: config
-    });
-  }
+  getGradebook: (subjectId, key) =>
+    axios.get(`/api/subjects/${subjectId}/gradebook`, {
+      headers: { Authorization: key },
+    }),
+
+  saveGradebook: (subjectId, gradebookEntries, key) =>
+    axios.post(`/api/subjects/${subjectId}/gradebook`, gradebookEntries, {
+      headers: { Authorization: key },
+    }),
+
+  getSubject: (subjectId, key) =>
+    axios.get(`/api/subjects/${subjectId}`, {
+      headers: { Authorization: key },
+    }),
 
 };

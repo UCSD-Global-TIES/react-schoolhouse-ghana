@@ -1,68 +1,80 @@
 const Gradebook = require("../models/Gradebook");
 const fs = require("fs");
 const fastcsv = require("fast-csv");
+const Subject = require("../models/Subject");
 
 // ✅ Fetch grades for a subject
+// GET /api/subjects/:subjectId/gradebook
 exports.getGradesBySubject = async (req, res) => {
-    try {
-      console.log("🔹 Fetching Grades for Subject:", req.params.subjectId);
-  
-      // ✅ Ensure the query matches how data is stored
-      const grades = await Gradebook.find({ subjectId: req.params.subjectId });
-  
-      if (!grades.length) {
-        console.log("❌ No grades found for this subject!");
-        return res.status(404).json({ error: "No grades found" });
-      }
-  
-      console.log("✅ Grades Fetched:", grades);
-      
-      res.json(grades);
-    } catch (error) {
-      console.error("❌ Error fetching grades:", error);
-      res.status(500).json({ error: "Error fetching grades" });
+  try {
+    const { subjectId } = req.params;
+    console.log(`🔹 Fetching Grades for Subject: ${subjectId}`);
+    const entries = await Gradebook
+      .find({ subjectId })
+      .populate({path: "gradeId", select: "level"});
+    console.log("📊 Gradebook entries with level:", entries);
+
+    if (!entries.length) {
+      console.log("❌ No grades found for this subject!");
+      return res.status(404).json({ error: "No grades found" });
     }
-  };
-  
-  
-  
-  // ✅ Save gradebook data (overwrite existing records)
-  exports.saveGradebook = async (req, res) => {
-    try {
-      console.log("🔹 Incoming Save Request:", req.body);
-  
-      if (!req.body.students || req.body.students.length === 0) {
-        return res.status(400).json({ error: "No students provided" });
-      }
-  
-      // ✅ Instead of deleting everything, update existing records or insert new ones
-      for (let student of req.body.students) {
-        await Gradebook.findOneAndUpdate(
-          { subjectId: req.body.subject_id, studentName: student.studentName },
-          { grades: student.grades,subjectId: req.body.subjectId },
-          { upsert: true, new: true }
-        );
-      }
-  
-      console.log("✅ Gradebook saved successfully!");
-      res.status(201).json({ message: "Gradebook saved successfully!" });
-    } catch (error) {
-      console.error("❌ Error Saving Gradebook:", error);
-      res.status(500).json({ error: "Error saving gradebook" });
+    // console.log("✅ Grades Fetched:", entries);
+    return res.json(entries);
+  } catch (error) {
+    console.error("❌ Error fetching grades:", error);
+    return res.status(500).json({ error: "Error fetching grades" });
+  }
+};
+exports.getSubjectById = async (req, res) => {
+  try {
+    const { subjectId } = req.params;
+    const subject = await Subject.findById(subjectId);
+    if (!subject) {
+      return res.status(404).json({ error: "Subject not found" });
     }
-  };
-  
-  
-// // Save gradebook data
-// exports.saveGradebook = async (req, res) => {
-//   try {
-//     await Gradebook.deleteMany({ subjectId: req.body.subjectId });
-//     await Gradebook.insertMany(req.body.students);
-//     res.json({ message: "Gradebook saved successfully!" });
-//   } catch (error) {
-//     res.status(500).json({ error: "Error saving gradebook" });
-//   }
-// };
+    // only send back the fields you need
+    return res.json({
+      name: subject.name,
+      gradeLevel: subject.gradeLevel,
+      // …any other metadata you store on Subject
+    });
+  } catch (err) {
+    console.error("❌ Error fetching subject:", err);
+    return res.status(500).json({ error: "Error fetching subject" });
+  }
+};
+
+// POST /api/subjects/:subjectId/gradebook
+// expects req.body to be an array of gradebook objects
+exports.saveGradebook = async (req, res) => {
+  try {
+    const { subjectId } = req.params;
+    const entries = req.body;
+    if (!Array.isArray(entries) || entries.length === 0) {
+      return res.status(400).json({ error: "No gradebook data provided" });
+    }
+
+    // console.log(`🔹 Saving Gradebook for Subject: ${subjectId}`, entries);
+    for (const entry of entries) {
+      const { studentId, studentName, grades, gradeId } = entry;
+      if (!studentId) {
+        console.warn("⚠️  Skipping entry with no studentId:", entry);
+        continue;
+      }
+      await Gradebook.findOneAndUpdate(
+        { subjectId, studentId, gradeId },
+        { subjectId, studentId, studentName, grades, gradeId },
+        { upsert: true, new: true, setDefaultsOnInsert: true }
+      );
+    }
+
+    // console.log("✅ Gradebook saved successfully!");
+    return res.status(200).json({ message: "Gradebook saved successfully" });
+  } catch (error) {
+    console.error("❌ Error saving gradebook:", error);
+    return res.status(500).json({ error: "Error saving gradebook" });
+  }
+};
 
 // Export to CSV
 exports.exportToCSV = async (req, res) => {

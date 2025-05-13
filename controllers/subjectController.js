@@ -43,7 +43,7 @@ module.exports = {
         verifyKey(req.header('Authorization'), 'Teacher,Admin')
             .then((isVerified) => {
                 if (isVerified) {
-                    const sid = req.params.sid;
+                    const sid = req.params.subjectId;
                     announcementDb
                         .create(req.body)
                         .then(newA => {
@@ -73,7 +73,7 @@ module.exports = {
         verifyKey(req.header('Authorization'), 'Teacher,Admin').then((isVerified) => {
             if (isVerified) {
                 const aid = req.params.aid;
-                const sid = req.params.sid
+                const sid = req.params.subjectId
                 subjectDb
                     .update({
                         _id: sid
@@ -107,7 +107,7 @@ module.exports = {
         verifyKey(req.header('Authorization'), 'Teacher,Admin')
             .then((isVerified) => {
                 if (isVerified) {
-                    const sid = req.params.sid;
+                    const sid = req.params.subjectId;
                     const fid = req.params.fid;
 
                     subjectDb
@@ -129,7 +129,7 @@ module.exports = {
         verifyKey(req.header('Authorization'), 'Teacher,Admin')
             .then((isVerified) => {
                 if (isVerified) {
-                    const sid = req.params.sid;
+                    const sid = req.params.subjectId;
                     const fid = req.params.fid;
 
                     subjectDb
@@ -163,12 +163,13 @@ module.exports = {
             })
     },
     getSubject: function (req, res) {
+        // console.log("getSubject params:", req.params);
         verifyKey(req.header('Authorization'), 'Student,Teacher,Admin')
             .then((isVerified) => {
                 if (isVerified) {
                     subjectDb
                         .findOne({
-                            _id: req.params.sid
+                            _id: req.params.subjectId
                         })
                         .populate({
                             path: 'announcements',
@@ -203,12 +204,13 @@ module.exports = {
                 }
             })
     },
+
     getAnnouncements: function (req, res) {
         verifyKey(req.header('Authorization'), 'Student,Teacher,Admin')
             .then((isVerified) => {
                 if (isVerified) {
                     announcementDb
-                        .find({ subject: req.params.sid })
+                        .find({ subject: req.params.subjectId })
                         .then(subjectAnns => res.json(subjectAnns))
                         .catch(err => res.status(422).json(err));
 
@@ -256,7 +258,7 @@ module.exports = {
         verifyKey(req.header('Authorization'), 'Teacher,Admin')
             .then((isVerified) => {
                 if (isVerified) {
-                    const sid = req.params.sid;
+                    const sid = req.params.subjectId;
                     let subjectDoc = req.body;
                     const gradeID = subjectDoc.grade;
                     subjectDoc.grade = null;
@@ -316,7 +318,7 @@ module.exports = {
         verifyKey(req.header('Authorization'), 'Admin')
             .then((isVerified) => {
                 if (isVerified) {
-                    const sid = req.params.sid;
+                    const sid = req.params.subjectId;
                     // Delete subject document
                     subjectDb
                         .findOneAndDelete({

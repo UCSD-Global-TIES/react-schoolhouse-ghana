@@ -1,6 +1,6 @@
 const router = require("express").Router();
 const generalRoutes = require("./general");
-const subjectRoutes = require("./subject");
+const subjectRoutes = require("./subjects");
 const gradeRoutes = require("./grade");
 const accountRoutes = require("./account");
 const fileRoutes = require("./file");

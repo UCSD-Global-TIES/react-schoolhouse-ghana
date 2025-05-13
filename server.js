@@ -12,6 +12,7 @@ const cors = require('cors');
 
 console.log("Current working directory:", __dirname); // Important!
 const gradebookRoutes = require('./routes/api/gradebook'); 
+const subjectsRouter   = require("./routes/api/subjects");
 
 const app = express();
 var http = require('http').createServer(app);
@@ -85,6 +86,9 @@ if (process.env.NODE_ENV === "production") {
 
 // ✅ Register the gradebook API routes
 app.use("/api/gradebook", gradebookRoutes);
+
+// subject API
+app.use("/api/subjects", subjectsRouter); 
 
 // Add routes, both API and view
 app.use(routes);
