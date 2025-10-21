@@ -54,6 +54,7 @@ import "./main.css";
 import AccountIcon from "../../../../assets/account-icon.svg";
 import BookIcon from "../../../../assets/books.svg";
 import BullhornIcon from "../../../../assets/bullhorn.svg";
+import HomeIcon from "../../../../assets/icons8-home.svg";
 
 const drawerWidth = "9.375rem";
 const drawerPadding = "3.5rem 0";
@@ -156,13 +157,13 @@ function TeacherPortal(props) {
   const documentMenuItems = [
     {
       label: "Home",
-      iconPath: BullhornIcon,
+      iconPath: HomeIcon,
       path: `${props.match.url}/announcements`,
     },
     {
       label: "Classes",
       iconPath: BookIcon,
-      path: `${props.match.url}/grades`,
+      path: `${props.match.url}/subjects`,
     },
     // {
     //   label: "Accounts",

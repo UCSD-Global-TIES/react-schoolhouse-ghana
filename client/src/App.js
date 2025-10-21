@@ -38,6 +38,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 // Pages
 import AccountPortal from "./pages/AccountPortal/index";
 import AdminPortal from "./pages/AccountPortal/versions/admin/AdminPortal";
+import TeacherPortal from "./pages/AccountPortal/versions/teacher/TeacherPortal.jsx";
 import AssessmentPage from "./pages/AssessmentPage/index";
 import LoginPortal from "./pages/LoginPortal/index";
 import NoMatch from "./pages/NoMatch/index";
@@ -146,7 +147,9 @@ function App() {
               </div>
             </div>
           ) : (
-            <Switch>
+            <>
+              {console.debug && console.debug("[App] userInfo:", userInfo)}
+              <Switch>
               {/* Portal component should check account type and render the correct component */}
               <ProtectedRoute
                 exact
@@ -157,6 +160,12 @@ function App() {
               <ProtectedRoute
                 path="/user"
                 component={UserPortal}
+                logout={handleLogout}
+                user={userInfo}
+              />
+              <ProtectedRoute
+                path="/teacher"
+                component={TeacherPortal}
                 logout={handleLogout}
                 user={userInfo}
               />
@@ -197,6 +206,7 @@ function App() {
 
               <Route component={NoMatch} />
             </Switch>
+            </>
           )}
         </div>
       </SocketContext.Provider>
