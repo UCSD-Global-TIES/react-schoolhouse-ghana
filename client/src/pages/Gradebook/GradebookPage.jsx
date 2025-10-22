@@ -1,22 +1,102 @@
 import React, { useEffect, useState } from "react";
-import GradebookNavbar from "../../components/Gradebook/GradebookNavbar";
-import GradebookTable  from "../../components/Gradebook/GradebookTable";
-import GradebookForm   from "../../components/Gradebook/GradebookForm";
-import API             from "../../utils/API";
+import { NavLink } from "react-router-dom";
+import {
+  CssBaseline,
+  Drawer,
+  Hidden,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+} from "@material-ui/core";
+import { makeStyles, useTheme } from "@material-ui/core/styles";
+import { useMediaQuery } from "react-responsive";
 
-const GradebookPage = ({ match, user }) => {
+import GradebookNavbar from "../../components/Gradebook/GradebookNavbar";
+import GradebookTable from "../../components/Gradebook/GradebookTable";
+import GradebookForm from "../../components/Gradebook/GradebookForm";
+import API from "../../utils/API";
+
+import BookIcon from "../../assets/books.svg";
+import BullhornIcon from "../../assets/bullhorn.svg";
+import HelpIcon from "../../assets/help.svg";
+import LogoutIcon from "../../assets/LogoutIcon.svg";
+import HomeIcon from "../../assets/icons8-home.svg";
+import GradebookIcon from "../../assets/gradebookIcon.svg";
+
+const drawerWidth = "9.375rem";
+
+const useStyles = makeStyles((theme) => ({
+  root: { alignItems: "flex-start" },
+  toolbar: theme.mixins.toolbar,
+  sidebar: {
+    display: "flex",
+    width: drawerWidth,
+    padding: "3.5rem 0",
+    flexDirection: "column",
+    alignItems: "flex-start",
+    flexShrink: 0,
+    alignSelf: "stretch",
+  },
+  drawerPaper: {
+    background: "var(--primary-color)",
+    color: "var(--background-color)",
+  },
+  content: { flexGrow: 1, padding: theme.spacing(1) },
+  buttonLink: { color: "inherit", textDecoration: "none" },
+  sidebarLinks: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "flexStart",
+    alignSelf: "stretch",
+    width: "100%",
+  },
+  navLink: {
+    textDecoration: "none",
+    color: "inherit",
+    display: "flex",
+    height: "5rem",
+    flexDirection: "column",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: "0.9375rem",
+    alignSelf: "stretch",
+  },
+  linkBox: { display: "flex", flexDirection: "column" },
+  justifyIcon: { display: "flex", justifyContent: "center" },
+}));
+
+const GradebookPage = ({ match, user, history, location, logout }) => {
+  const classes = useStyles();
+  const theme = useTheme();
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const isSmallDevice = useMediaQuery({ query: "(max-width: 600px)" });
+
   const subjectId = match.params.subjectId;
   const [gradebookData, setGradebookData] = useState([]);
-  const [subjectInfo, setSubjectInfo]   = useState({ name: "" });
+  const [subjectInfo, setSubjectInfo] = useState({ name: "" });
   const isStudent = user?.type === "Student";
 
   // build teacherName…
   const { profile } = user || {};
   const teacherName = profile
     ? `${profile.first_name} ${profile.last_name}`
-    : user.name;
+    : user?.name;
 
-  // fetch subject name…
+  // derive portal base
+  const portalBase = user && user.type === "Teacher" ? "/teacher" : (user && user.type === "Admin" ? "/edit" : "/user");
+
+  const documentMenuItems = [
+    { label: "Home", iconPath: HomeIcon, path: `${portalBase}` },
+    { label: "Announcements", iconPath: BullhornIcon, path: `/subject/${subjectId}/announcements` },
+    { label: "Classes", iconPath: BookIcon, path: `${portalBase}/classes` },
+    { label: "Gradebook", iconPath: GradebookIcon, path: `/gradebook/${subjectId}` },
+    { label: "Help", iconPath: HelpIcon, path: `/subject/${subjectId}/studentGrades` },
+    { label: "Log Out", iconPath: LogoutIcon, clickHandler: () => { if (logout) logout(); } },
+  ];
+
+  const handleDrawerToggle = () => setMobileOpen(!mobileOpen);
+
   useEffect(() => {
     if (!subjectId || !user?.key) return;
     API.getSubject(subjectId, user.key)
@@ -24,7 +104,6 @@ const GradebookPage = ({ match, user }) => {
       .catch(console.error);
   }, [subjectId, user?.key]);
 
-  // fetch gradebook…
   useEffect(() => {
     if (!subjectId || !user?.key) return;
     API.getGradebook(subjectId, user.key)
@@ -32,48 +111,74 @@ const GradebookPage = ({ match, user }) => {
       .catch(console.error);
   }, [subjectId, user?.key]);
 
-  // save handler
   const saveGradebook = () => {
     API.saveGradebook(subjectId, gradebookData, user.key)
       .then(() => alert("✅ Gradebook saved!"))
       .catch(console.error);
   };
 
-  // derive gradeLevel
   const gradeLevel = gradebookData[0]?.gradeId?.level ?? "–";
-
-  // filter for student…
   const displayedData = isStudent
     ? gradebookData.filter((r) => r.studentId === user.id)
     : gradebookData;
 
+  const drawer = (
+    <div onClick={isSmallDevice ? handleDrawerToggle : () => {}}>
+      <List className={classes.sidebar}>
+        <div style={{ textAlign: "center", margin: "0 auto", marginBottom: "10px", color: "var(--background-color)" }}>
+          <h1 style={{ fontSize: "1.75rem" }}>Semanhyia</h1>
+          <h2 style={{ fontSize: "1.125rem" }}>American School</h2>
+        </div>
+        <div className={classes.sidebarLinks}>
+          {documentMenuItems.map((item, index) => (
+            item.clickHandler ? (
+              <ListItem key={index} button onClick={item.clickHandler} className={classes.linkBox}>
+                <ListItemIcon className={classes.justifyIcon}>
+                  <img src={item.iconPath} alt={`${item.label} icon`} style={{ width: 24, height: 24 }} />
+                </ListItemIcon>
+                <ListItemText style={{ overflowWrap: "break-word" }} primary={item.label} />
+              </ListItem>
+            ) : (
+              <NavLink to={item.path} key={index} className={`${classes.buttonLink} ${classes.navLink}`}>
+                <ListItem selected={location.pathname.includes(item.path)} button className={classes.linkBox}>
+                  <ListItemIcon className={classes.justifyIcon}>
+                    <img src={item.iconPath} alt={`${item.label} icon`} style={{ width: 24, height: 24 }} />
+                  </ListItemIcon>
+                  <ListItemText style={{ overflowWrap: "break-word" }} primary={item.label} />
+                </ListItem>
+              </NavLink>
+            )
+          ))}
+        </div>
+      </List>
+    </div>
+  );
+
   return (
-    <div>
-      <GradebookNavbar
-        subjectName={subjectInfo.name}
-        teacherName={teacherName}
-        gradeLevel={gradeLevel}
-      />
-
-      <GradebookTable
-        data={displayedData}
-        updateData={setGradebookData}
-        readOnly={isStudent}
-      />
-
-      {!isStudent && (
-        <>
-          <GradebookForm
-            onSubmit={(newRow) =>
-              setGradebookData((prev) => [
-                ...prev,
-                { ...newRow, subjectId, gradeId: newRow.gradeId || null, grades: [] },
-              ])
-            }
-          />
-          <button onClick={saveGradebook}>Save Gradebook</button>
-        </>
-      )}
+    <div className={classes.root}>
+      <CssBaseline />
+      <nav className={classes.drawer}>
+        <Hidden smUp implementation="css">
+          <Drawer variant="temporary" anchor={theme.direction === "rtl" ? "right" : "left"} open={mobileOpen} onClose={handleDrawerToggle} classes={{ paper: classes.drawerPaper }} ModalProps={{ keepMounted: true }}>
+            {drawer}
+          </Drawer>
+        </Hidden>
+        <Hidden xsDown implementation="css">
+          <Drawer classes={{ paper: classes.drawerPaper }} variant="permanent" open>
+            {drawer}
+          </Drawer>
+        </Hidden>
+      </nav>
+      <main className={classes.content} style={{ marginLeft: !isSmallDevice ? drawerWidth : 0 }}>
+        <GradebookNavbar subjectName={subjectInfo.name} teacherName={teacherName} gradeLevel={gradeLevel} />
+        <GradebookTable data={displayedData} updateData={setGradebookData} readOnly={isStudent} />
+        {!isStudent && (
+          <>
+            <GradebookForm onSubmit={(newRow) => setGradebookData((prev) => [...prev, { ...newRow, subjectId, gradeId: newRow.gradeId || null, grades: [] }])} />
+            <button onClick={saveGradebook}>Save Gradebook</button>
+          </>
+        )}
+      </main>
     </div>
   );
 };

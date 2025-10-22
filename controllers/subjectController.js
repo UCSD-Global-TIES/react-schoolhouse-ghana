@@ -2,6 +2,7 @@ const gradeDb = require("../models/Grade");
 const subjectDb = require("../models/Subject");
 const announcementDb = require("../models/Announcement");
 const studentDb = require("../models/Student");
+const accountDb = require("../models/Account");
 const taskController = require('./taskController');
 
 const ip = require("ip")
@@ -148,18 +149,52 @@ module.exports = {
             })
     },
     getSubjects: function (req, res) {
-        verifyKey(req.header('Authorization'), 'Admin')
+        // Allow Admin, Teacher and Student to fetch subjects, but scope Teacher/Student to their grades
+        const key = req.header('Authorization');
+        verifyKey(key, 'Admin,Teacher,Student')
             .then((isVerified) => {
-                if (isVerified) {
-                    subjectDb
-                        .find({})
-                        .populate('announcements')
-                        .then(subjectDoc => res.json(subjectDoc))
+                if (!isVerified) return res.status(403).json(null);
+
+                // Load the account so we can inspect its type/profile
+                accountDb.findOne({ _id: key }).then(account => {
+                    if (!account) return res.status(403).json(null);
+
+                    // Admin: return all subjects
+                    if (account.type === 'Admin') {
+                        subjectDb.find({})
+                            .populate('announcements')
+                            .then(subjectDoc => res.json(subjectDoc))
+                            .catch(err => res.status(422).json(err));
+                        return;
+                    }
+
+                    // For Teacher or Student: find grades that include the teacher/student
+                    const profileId = account.profile;
+                    const query = account.type === 'Teacher' ? { teachers: profileId } : { students: profileId };
+
+                    gradeDb.find(query)
+                        .then(grades => {
+                            // Collect unique subject ids from grades
+                            const subjectIdSet = new Set();
+                            for (const g of grades) {
+                                if (g.subjects && g.subjects.length) {
+                                    for (const sid of g.subjects) subjectIdSet.add(String(sid));
+                                }
+                            }
+
+                            const subjectIds = Array.from(subjectIdSet);
+                            if (!subjectIds.length) return res.json([]);
+
+                            // Fetch subjects and populate announcements
+                            subjectDb.find({ _id: { $in: subjectIds } })
+                                .populate('announcements')
+                                .then(subjectDocs => res.json(subjectDocs))
+                                .catch(err => res.status(422).json(err));
+                        })
                         .catch(err => res.status(422).json(err));
 
-                } else {
-                    res.status(403).json(null);
-                }
+                }).catch(err => res.status(422).json(err));
+
             })
     },
     getSubject: function (req, res) {

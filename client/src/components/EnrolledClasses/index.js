@@ -1,5 +1,6 @@
 import React from 'react';
 import ClassCard from '../ClassCard';
+import { Link } from 'react-router-dom';
 import { makeStyles } from "@material-ui/core/styles";
 import { Typography } from '@material-ui/core';
 
@@ -47,7 +48,9 @@ function EnrolledClasses(props) {
                             label = status;
                         }
                         return (
-                            <ClassCard name = {`${subject.name} ${gradeLabel}`} secondLine = {yearLabel} tagColor={tagMap[status]} tagLabel={label} image='' editable={editable} />
+                            <Link to={`/subject/${subject._id}`} key={subject._id} style={{ textDecoration: 'none' }}>
+                                <ClassCard name = {`${subject.name} ${gradeLabel}`} secondLine = {yearLabel} tagColor={tagMap[status]} tagLabel={label} image='' editable={editable} />
+                            </Link>
                         );
                     })}
                     </div>

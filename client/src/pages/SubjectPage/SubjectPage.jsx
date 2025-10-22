@@ -32,6 +32,7 @@ import sas from "../../logos/sas_logo.png"
 // import AccountIcon from "../../../../assets/account-icon.svg";
 // import BookIcon from "../../../../assets/books.svg";
 import BullhornIcon from "../../assets/bullhorn.svg";
+import HomeIcon from "../../assets/icons8-home.svg";
 import HelpIcon from "../../assets/help.svg";
 
 
@@ -41,6 +42,7 @@ import AnnouncementCard from "../../components/AnnouncementCard/AnnouncementCard
 import SubjectTasksForm from "../../components/SubjectTasksForm";
 import TaskList from "../../components/TaskList";
 import LogoutIcon from "../../assets/LogoutIcon.svg";
+import GradebookIcon from "../../assets/gradebookIcon.svg";
 const drawerWidth = "9.375rem";
 
 
@@ -147,17 +149,37 @@ function SubjectPage(props) {
   const { logout } = props
 
 
+  // derive portal base path (so Home/Classes go back to the portal)
+  const portalBase = props.user && props.user.type === 'Teacher' ? '/teacher' : (props.user && props.user.type === 'Admin' ? '/edit' : '/user');
+
+  // Only include a Home link in the subject drawer if the current location
+  // is not already under the portal base (prevents duplicate Home entries
+  // when subject is rendered inside a portal nested route).
+  const includeHome = !props.location.pathname.startsWith(portalBase);
+
   // menu items
   const documentMenuItems = [
+    ...(includeHome ? [{
+      label: "Home",
+      iconPath: HomeIcon,
+      path: portalBase,
+    }] : []),
     {
-      label: "Announcements",
+      label: "Resources",
       iconPath: BullhornIcon,
-      path: `${props.match.url}/announcements`,
+      // point the main sidebar entry to the composite resources view
+      path: `${props.match.url}/resources`,
+    },
+    {
+      label: "Gradebook",
+      iconPath: GradebookIcon,
+      path: `/gradebook/${subject_id}`,
     },
     {
       label: "Classes",
       iconPath: BookIcon,
-      path: `${props.match.url}/resources`,
+      // link back to portal classes list so users exit subject context
+      path: `${portalBase}/classes`,
     },
     {
       label: "Help",
@@ -384,8 +406,8 @@ function SubjectPage(props) {
 
 
 
-  // SET DEFAULT MENU
-  const defaultRoute = `${props.match.path}/announcements`;
+  // SET DEFAULT MENU (open the composite Resources view by default)
+  const defaultRoute = `${props.match.path}/resources`;
 
 
   useEffect(() => {
@@ -473,23 +495,7 @@ function SubjectPage(props) {
         <Typography className={clsx(classes.header,classes.subjectTitle)}>{subjectInfo.name}</Typography>
 
 
-        {/* ✅ View Gradebook Button */}
-          <button
-            onClick={() => props.history.push(`/gradebook/${subject_id}`)}
-            className={classes.buttonLink}
-            style={{
-              marginTop: "10px",
-              padding: "10px 15px",
-              fontSize: "1rem",
-              backgroundColor: "#1976d2",
-              color: "white",
-              border: "none",
-              borderRadius: "5px",
-              cursor: "pointer"
-            }}
-          >
-            View Gradebook
-          </button>
+        {/* Gradebook is available in the sidebar menu (see documentMenuItems) */}
 
         {/* <TransitionGroup>
           <CSSTransition

@@ -44,6 +44,7 @@ import LoginPortal from "./pages/LoginPortal/index";
 import NoMatch from "./pages/NoMatch/index";
 import SubjectPage from "./pages/SubjectPage/index";
 import UserPortal from "./pages/AccountPortal/versions/user/UserPortal.jsx"; 
+import ClassesList from "./pages/ClassesList/ClassesList";
 
 const socket = io();
 
@@ -149,6 +150,13 @@ function App() {
           ) : (
             <>
               {console.debug && console.debug("[App] userInfo:", userInfo)}
+{/*REMEMBER TO REMOVE THIS AFTER TEST  */}
+              {/* Simple welcome banner to verify user role/ID */}
+              {userInfo && (
+                <div style={{ padding: "0.5rem", textAlign: "center", background: "#f5f5f5" }}>
+                  {`Welcome ${userInfo.type} ID: ${userInfo.key}`}
+                </div>
+              )}
               <Switch>
               {/* Portal component should check account type and render the correct component */}
               <ProtectedRoute
@@ -173,6 +181,12 @@ function App() {
               <ProtectedRoute
                 path="/subject/:id"
                 component={SubjectPage}
+                logout={handleLogout}
+                user={userInfo}
+              />
+              <ProtectedRoute
+                path="/classes"
+                component={ClassesList}
                 logout={handleLogout}
                 user={userInfo}
               />

@@ -38,6 +38,7 @@ import NameCard from "../../../../components/NameCard/NameCard";
 import ProtectedRoute from "../../../../components/ProtectedRoute";
 import SubjectsForm from "../../../../components/SubjectsForm";
 import UploadQueue from "../../../../components/UploadQueue";
+import ClassesList from '../../../../pages/ClassesList/ClassesList';
 import UserList from "./../../../../components/UserList/UserList";
 import SearchBar from "../../../../components/SearchBar/SearchBar.js";
 
@@ -163,7 +164,7 @@ function TeacherPortal(props) {
     {
       label: "Classes",
       iconPath: BookIcon,
-      path: `${props.match.url}/subjects`,
+      path: `${props.match.url}/classes`,
     },
     // {
     //   label: "Accounts",
@@ -545,6 +546,12 @@ function TeacherPortal(props) {
               user={props.user}
             />
           ))}
+          <ProtectedRoute
+            exact
+            path={`${props.match.path}/classes`}
+            component={(p) => <ClassesList {...p} user={props.user} />}
+            user={props.user}
+          />
           <Redirect to={defaultRoute} />
         </Switch>
       </main>

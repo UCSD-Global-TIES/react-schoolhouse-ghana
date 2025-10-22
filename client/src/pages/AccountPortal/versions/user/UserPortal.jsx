@@ -38,6 +38,7 @@ import NameCard from "../../../../components/NameCard/NameCard";
 import ProtectedRoute from "../../../../components/ProtectedRoute";
 import SubjectsForm from "../../../../components/SubjectsForm";
 import UploadQueue from "../../../../components/UploadQueue";
+import ClassesList from '../../../../pages/ClassesList/ClassesList';
 import UserList from "./../../../../components/UserList/UserList";
 import SearchBar from "../../../../components/SearchBar/SearchBar.js";
 
@@ -55,7 +56,6 @@ import AccountIcon from "../../../../assets/account-icon.svg";
 import BookIcon from "../../../../assets/books.svg";
 import BullhornIcon from "../../../../assets/bullhorn.svg";
 import HomeIcon from "../../../../assets/icons8-home.svg";
-import { Home } from "@mui/icons-material";
 
 const drawerWidth = "9.375rem";
 const drawerPadding = "3.5rem 0";
@@ -147,7 +147,7 @@ function UserPortal(props) {
     {
       label: "Classes",
       iconPath: BookIcon,
-      path: `${props.match.url}/subjects`,
+      path: `${props.match.url}/classes`,
     },
     // {
     //   label: "Accounts",
@@ -326,53 +326,53 @@ function UserPortal(props) {
       },
     },
     // ACCOUNT MANAGER
-    {
-      collection: "Account",
-      icon: faUsers,
-      FormComponent: (p) => <AccountsForm user={props.user} {...p} />,
-      primary: (doc) => `${doc.first_name} ${doc.last_name} `,
-      type: (doc) => `(${doc.type})`,
-      path: `${props.match.path}/accounts`,
-      api: {
-        get: API.getAccounts,
-        post: API.addAccount,
-        put: API.updateAccount,
-        delete: API.deleteAccounts,
-      },
-      validation: {
-        first_name: {
-          validate: (value) =>
-            new Promise((resolve, reject) => {
-              resolve(value);
-            }),
-          message: "You must enter the user's first name.",
-        },
-        last_name: {
-          validate: (value) =>
-            new Promise((resolve, reject) => {
-              resolve(value);
-            }),
-          message: "You must enter the user's last name.",
-        },
-        type: {
-          validate: (value) =>
-            new Promise((resolve, reject) => {
-              resolve(value);
-            }),
-          message: "You must select the user's account type.",
-        },
-        password: {
-          validate: (value) =>
-            new Promise((resolve, reject) => {
-              if (!value) resolve(false);
+    // {
+    //   collection: "Account",
+    //   icon: faUsers,
+    //   FormComponent: (p) => <AccountsForm user={props.user} {...p} />,
+    //   primary: (doc) => `${doc.first_name} ${doc.last_name} `,
+    //   type: (doc) => `(${doc.type})`,
+    //   path: `${props.match.path}/accounts`,
+    //   api: {
+    //     get: API.getAccounts,
+    //     post: API.addAccount,
+    //     put: API.updateAccount,
+    //     delete: API.deleteAccounts,
+    //   },
+    //   validation: {
+    //     first_name: {
+    //       validate: (value) =>
+    //         new Promise((resolve, reject) => {
+    //           resolve(value);
+    //         }),
+    //       message: "You must enter the user's first name.",
+    //     },
+    //     last_name: {
+    //       validate: (value) =>
+    //         new Promise((resolve, reject) => {
+    //           resolve(value);
+    //         }),
+    //       message: "You must enter the user's last name.",
+    //     },
+    //     type: {
+    //       validate: (value) =>
+    //         new Promise((resolve, reject) => {
+    //           resolve(value);
+    //         }),
+    //       message: "You must select the user's account type.",
+    //     },
+    //     password: {
+    //       validate: (value) =>
+    //         new Promise((resolve, reject) => {
+    //           if (!value) resolve(false);
 
-              if (value.length >= 5) resolve(true);
-              else resolve(false);
-            }),
-          message: "You must enter a password longer than five characters.",
-        },
-      },
-    },
+    //           if (value.length >= 5) resolve(true);
+    //           else resolve(false);
+    //         }),
+    //       message: "You must enter a password longer than five characters.",
+    //     },
+    //   },
+    // },
     // FILES
     {
       collection: "Files",
@@ -530,6 +530,12 @@ function UserPortal(props) {
               user={props.user}
             />
           ))}
+          <ProtectedRoute
+            exact
+            path={`${props.match.path}/classes`}
+            component={(p) => <ClassesList {...p} user={props.user} />}
+            user={props.user}
+          />
           <Redirect to={defaultRoute} />
         </Switch>
       </main>
