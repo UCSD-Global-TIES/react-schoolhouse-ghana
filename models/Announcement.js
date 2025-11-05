@@ -6,6 +6,16 @@ const announcementSchema = new Schema({
     type: String,
     required: true
   },
+  authorId: {
+    type: Schema.Types.ObjectId,
+    ref: 'Account',
+    required: true
+  },
+  authorRole: {
+    type: String,
+    enum: ['Admin', 'Teacher'],
+    required: true
+  },
   title: {
     type: String,
     required: true

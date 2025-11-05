@@ -41,27 +41,51 @@ module.exports = {
         })
     },
     addAnnouncement: function (req, res) {
-        verifyKey(req.header('Authorization'), 'Teacher,Admin')
+        const userKey = req.header('Authorization');
+        verifyKey(userKey, 'Teacher,Admin')
             .then((isVerified) => {
                 if (isVerified) {
                     const sid = req.params.subjectId;
-                    announcementDb
-                        .create(req.body)
-                        .then(newA => {
-                            // Add to subject' announcements
-                            const aid = newA._id;
+                    
+                    // Get user info to add as author
+                    accountDb.findOne({ _id: userKey })
+                        .populate('profile')
+                        .then((account) => {
+                            if (!account) {
+                                return res.status(403).json({ error: 'User not found' });
+                            }
 
-                            subjectDb
-                                .update({
-                                    _id: sid
-                                }, {
-                                    $push: {
-                                        announcements: aid
-                                    }
+                            // Add author information to the request body
+                            const announcementData = {
+                                ...req.body,
+                                authorId: account._id,
+                                authorRole: account.type,
+                                authorName: account.type === 'Admin' 
+                                    ? `${account.profile.first_name} ${account.profile.last_name}`
+                                    : `${account.profile.first_name} ${account.profile.last_name}`,
+                                subject: sid  // Ensure subject-specific announcements are linked to the subject
+                            };
+
+                            announcementDb
+                                .create(announcementData)
+                                .then(newA => {
+                                    // Add to subject' announcements
+                                    const aid = newA._id;
+
+                                    subjectDb
+                                        .update({
+                                            _id: sid
+                                        }, {
+                                            $push: {
+                                                announcements: aid
+                                            }
+                                        })
+                                        .then(() => {
+                                            res.json(newA);
+                                        })
+                                        .catch(err => res.status(422).json(err));
                                 })
-                                .then(() => {
-                                    res.json(newA);
-                                })
+                                .catch(err => res.status(422).json(err));
                         })
                         .catch(err => res.status(422).json(err));
                 } else {
@@ -71,30 +95,50 @@ module.exports = {
 
     },
     deleteAnnouncement: function (req, res) {
-        verifyKey(req.header('Authorization'), 'Teacher,Admin').then((isVerified) => {
+        const userKey = req.header('Authorization');
+        verifyKey(userKey, 'Teacher,Admin').then((isVerified) => {
             if (isVerified) {
                 const aid = req.params.aid;
-                const sid = req.params.subjectId
-                subjectDb
-                    .update({
-                        _id: sid
-                    }, {
-                        $pull: {
-                            announcements: aid
-                        }
-                    })
-                    .then(() => {
-                        announcementDb
-                            .findOne({
-                                _id: aid
-                            })
-                            .then(doc => {
+                const sid = req.params.subjectId;
 
-                                doc.remove();
-                                res.json({});
+                // First, get the current user's information
+                accountDb.findOne({ _id: userKey })
+                    .then((currentUser) => {
+                        if (!currentUser) {
+                            return res.status(403).json({ error: 'User not found' });
+                        }
+
+                        // Get the announcement to check ownership
+                        announcementDb.findOne({ _id: aid })
+                            .then((announcement) => {
+                                if (!announcement) {
+                                    return res.status(404).json({ error: 'Announcement not found' });
+                                }
+
+                                // Permission check: Admins can delete any announcement, Teachers can only delete their own
+                                const canDelete = currentUser.type === 'Admin' || 
+                                    (currentUser.type === 'Teacher' && announcement.authorId.toString() === currentUser._id.toString());
+
+                                if (!canDelete) {
+                                    return res.status(403).json({ error: 'You do not have permission to delete this announcement' });
+                                }
+
+                                // Proceed with deletion
+                                subjectDb
+                                    .update({
+                                        _id: sid
+                                    }, {
+                                        $pull: {
+                                            announcements: aid
+                                        }
+                                    })
+                                    .then(() => {
+                                        announcement.remove();
+                                        res.json({});
+                                    })
+                                    .catch(err => res.status(422).json(err));
                             })
                             .catch(err => res.status(422).json(err));
-
                     })
                     .catch(err => res.status(422).json(err));
 
@@ -241,14 +285,68 @@ module.exports = {
     },
 
     getAnnouncements: function (req, res) {
-        verifyKey(req.header('Authorization'), 'Student,Teacher,Admin')
+        const userKey = req.header('Authorization');
+        verifyKey(userKey, 'Student,Teacher,Admin')
             .then((isVerified) => {
                 if (isVerified) {
-                    announcementDb
-                        .find({ subject: req.params.subjectId })
-                        .then(subjectAnns => res.json(subjectAnns))
-                        .catch(err => res.status(422).json(err));
+                    const subjectId = req.params.subjectId;
+                    
+                    // Get current user info for enrollment checking
+                    accountDb.findOne({ _id: userKey })
+                        .populate('profile')
+                        .then((currentUser) => {
+                            if (!currentUser) {
+                                return res.status(403).json({ error: 'User not found' });
+                            }
 
+                            // Check if user has access to this subject
+                            if (currentUser.type === 'Student') {
+                                // For students, check if they're enrolled in a grade that includes this subject
+                                gradeDb.findOne({ 
+                                    students: currentUser.profile._id,
+                                    subjects: subjectId 
+                                })
+                                .then((enrollment) => {
+                                    if (!enrollment) {
+                                        // Student not enrolled in this subject
+                                        return res.status(403).json({ error: 'You are not enrolled in this subject' });
+                                    }
+
+                                    // Student is enrolled, get subject announcements
+                                    announcementDb
+                                        .find({ subject: subjectId })
+                                        .then(subjectAnns => res.json(subjectAnns))
+                                        .catch(err => res.status(422).json(err));
+                                })
+                                .catch(err => res.status(422).json(err));
+                            } else if (currentUser.type === 'Teacher') {
+                                // For teachers, check if they teach this subject (are in a grade with this subject)
+                                gradeDb.findOne({ 
+                                    teachers: currentUser.profile._id,
+                                    subjects: subjectId 
+                                })
+                                .then((teaching) => {
+                                    if (!teaching) {
+                                        // Teacher doesn't teach this subject
+                                        return res.status(403).json({ error: 'You do not teach this subject' });
+                                    }
+
+                                    // Teacher teaches this subject, get all announcements
+                                    announcementDb
+                                        .find({ subject: subjectId })
+                                        .then(subjectAnns => res.json(subjectAnns))
+                                        .catch(err => res.status(422).json(err));
+                                })
+                                .catch(err => res.status(422).json(err));
+                            } else {
+                                // Admin can see all subject announcements
+                                announcementDb
+                                    .find({ subject: subjectId })
+                                    .then(subjectAnns => res.json(subjectAnns))
+                                    .catch(err => res.status(422).json(err));
+                            }
+                        })
+                        .catch(err => res.status(422).json(err));
                 } else {
                     res.status(403).json(null);
                 }
