@@ -92,10 +92,11 @@ const useStyles = makeStyles((theme) => ({
     marginTop: theme.spacing(0.5),
   },
   tableContainer: {
-  backgroundColor: theme.palette.background.paper,
-  borderRadius: theme.shape.borderRadius * 2,
-  boxShadow: theme.shadows[1],
-  padding: theme.spacing(3),
+    backgroundColor: theme.palette.background.paper,
+    borderRadius: theme.shape.borderRadius * 2,
+    boxShadow: theme.shadows[1],
+    padding: theme.spacing(4),
+    border: '2px solid #4CAF50',
   },
   actionsRow: {
     display: "flex",
