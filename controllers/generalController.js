@@ -175,7 +175,14 @@ module.exports = {
                                             .catch(err => res.status(422).json(err));
                                         return; // Early return for student case since we have async grade lookup
                                     }
-                                    // Admin users see all announcements (existing behavior)
+                                    
+                                    // Admin users - filter out teacher announcements, only show admin announcements
+                                    if (currentUser.type === 'Admin') {
+                                        filteredAnnouncements = generalOnlyAnnouncements.filter(announcement => {
+                                            // Only show admin announcements
+                                            return announcement.authorRole === 'Admin';
+                                        });
+                                    }
                                     // Note: Teacher and Student cases return early above due to async grade lookup
 
                                     res.json(processAnnouncements(filteredAnnouncements));

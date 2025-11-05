@@ -364,7 +364,7 @@ module.exports = {
                                 })
                                 .catch(err => res.status(422).json(err));
                             } else {
-                                // Admin can see all subject announcements (no audience filtering)
+                                // Admin can see subject announcements but filter out teacher announcements
                                 announcementDb
                                     .find({ 
                                         $or: [
@@ -372,7 +372,13 @@ module.exports = {
                                             { subjects: subjectId }
                                         ]
                                     })
-                                    .then(subjectAnns => res.json(subjectAnns))
+                                    .then(announcements => {
+                                        // Filter to only show admin announcements
+                                        const adminOnlyAnnouncements = announcements.filter(announcement => 
+                                            announcement.authorRole === 'Admin'
+                                        );
+                                        res.json(adminOnlyAnnouncements);
+                                    })
                                     .catch(err => res.status(422).json(err));
                             }
                         })
