@@ -8,19 +8,13 @@ import {
   ListItem,
   ListItemIcon,
   ListItemText,
-  Typography,
   Button,
-  Select,
-  MenuItem,
-  Box,
 } from "@material-ui/core";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
 import { useMediaQuery } from "react-responsive";
-
-import GradebookNavbar from "../../components/Gradebook/GradebookNavbar";
-import GradebookTable from "../../components/Gradebook/GradebookTable";
-import GradebookForm from "../../components/Gradebook/GradebookForm";
 import API from "../../utils/API";
+import Gradebook from "../../components/Gradebook/Gradebook";
+import "../../components/Gradebook/Gradebook.css";
 
 import BookIcon from "../../assets/books.svg";
 import BullhornIcon from "../../assets/bullhorn.svg";
@@ -49,20 +43,13 @@ const useStyles = makeStyles((theme) => ({
   },
   content: {
     flexGrow: 1,
-    padding: theme.spacing(2),
     display: "flex",
     flexDirection: "column",
     height: "100vh",
     overflowY: "auto",
+    backgroundColor: theme.palette.background.default,
   },
   buttonLink: { color: "inherit", textDecoration: "none" },
-  sidebarLinks: {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "flexStart",
-    alignSelf: "stretch",
-    width: "100%",
-  },
   navLink: {
     textDecoration: "none",
     color: "inherit",
@@ -72,41 +59,9 @@ const useStyles = makeStyles((theme) => ({
     justifyContent: "center",
     alignItems: "center",
     gap: "0.9375rem",
-    alignSelf: "stretch",
   },
   linkBox: { display: "flex", flexDirection: "column" },
   justifyIcon: { display: "flex", justifyContent: "center" },
-  headerSection: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: theme.spacing(2),
-  },
-  breadcrumb: {
-    fontSize: "0.875rem",
-    color: theme.palette.text.secondary,
-  },
-  classTitle: {
-    fontWeight: 700,
-    fontSize: "1.75rem",
-    marginTop: theme.spacing(0.5),
-  },
-  tableContainer: {
-    backgroundColor: theme.palette.background.paper,
-    borderRadius: theme.shape.borderRadius * 2,
-    boxShadow: theme.shadows[1],
-    padding: theme.spacing(4),
-    border: '2px solid #4CAF50',
-  },
-  actionsRow: {
-    display: "flex",
-    justifyContent: "flex-end",
-    alignItems: "center",
-    gap: theme.spacing(2),
-    maxWidth: 1200,
-    marginLeft: "auto",
-    marginRight: "auto",
-  },
   schoolName: {
     fontSize: "2rem",
     fontWeight: 700,
@@ -118,9 +73,17 @@ const useStyles = makeStyles((theme) => ({
     color: "var(--background-color)",
     marginTop: 0,
   },
+  actionsRow: {
+    display: "flex",
+    justifyContent: "flex-end",
+    alignItems: "center",
+    gap: theme.spacing(2),
+    margin: "20px auto 0",
+    maxWidth: 1200,
+  },
 }));
 
-const GradebookPage = ({ match, user, history, location, logout }) => {
+const GradebookPage = ({ match, user, location, logout }) => {
   const classes = useStyles();
   const theme = useTheme();
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -129,28 +92,41 @@ const GradebookPage = ({ match, user, history, location, logout }) => {
   const subjectId = match.params.subjectId;
   const [gradebookData, setGradebookData] = useState([]);
   const [subjectInfo, setSubjectInfo] = useState({ name: "" });
+  const [assignments, setAssignments] = useState([]);
+  const [students, setStudents] = useState([]);
   const isStudent = user?.type === "Student";
 
-  // build teacherName…
-  const { profile } = user || {};
-  const teacherName = profile
-    ? `${profile.first_name} ${profile.last_name}`
-    : user?.name;
-
-  // derive portal base
-  const portalBase = user && user.type === "Teacher" ? "/teacher" : (user && user.type === "Admin" ? "/edit" : "/user");
+  const portalBase =
+    user?.type === "Teacher"
+      ? "/teacher"
+      : user?.type === "Admin"
+      ? "/edit"
+      : "/user";
 
   const documentMenuItems = [
     { label: "Home", iconPath: HomeIcon, path: `${portalBase}` },
-    { label: "Announcements", iconPath: BullhornIcon, path: `/subject/${subjectId}/announcements` },
+    {
+      label: "Announcements",
+      iconPath: BullhornIcon,
+      path: `/subject/${subjectId}/announcements`,
+    },
     { label: "Classes", iconPath: BookIcon, path: `${portalBase}/classes` },
-    { label: "Gradebook Testing", iconPath: GradebookIcon, path: `/gradebook/${subjectId}` },
-    { label: "Help", iconPath: HelpIcon, path: `/subject/${subjectId}/studentGrades` },
-    { label: "Log Out", iconPath: LogoutIcon, clickHandler: () => { if (logout) logout(); } },
+    { label: "Gradebook", iconPath: GradebookIcon, path: `/gradebook/${subjectId}` },
+    {
+      label: "Help",
+      iconPath: HelpIcon,
+      path: `/subject/${subjectId}/studentGrades`,
+    },
+    {
+      label: "Log Out",
+      iconPath: LogoutIcon,
+      clickHandler: () => logout && logout(),
+    },
   ];
 
   const handleDrawerToggle = () => setMobileOpen(!mobileOpen);
 
+  // Fetch subject info
   useEffect(() => {
     if (!subjectId || !user?.key) return;
     API.getSubject(subjectId, user.key)
@@ -158,10 +134,21 @@ const GradebookPage = ({ match, user, history, location, logout }) => {
       .catch(console.error);
   }, [subjectId, user?.key]);
 
+  // Fetch gradebook data (students + assignments)
   useEffect(() => {
     if (!subjectId || !user?.key) return;
     API.getGradebook(subjectId, user.key)
-      .then(({ data }) => setGradebookData(data))
+      .then(({ data }) => {
+        setGradebookData(data);
+        const uniqueStudents = [
+          ...new Map(data.map((g) => [g.studentId, g.studentName])).entries(),
+        ].map(([id, name]) => ({ id, name }));
+        const uniqueAssignments = [
+          ...new Map(data.map((g) => [g.assignmentId, g.assignmentTitle])).entries(),
+        ].map(([id, title]) => ({ id, title }));
+        setStudents(uniqueStudents);
+        setAssignments(uniqueAssignments);
+      })
       .catch(console.error);
   }, [subjectId, user?.key]);
 
@@ -171,39 +158,45 @@ const GradebookPage = ({ match, user, history, location, logout }) => {
       .catch(console.error);
   };
 
-  const gradeLevel = gradebookData[0]?.gradeId?.level ?? "–";
-  const displayedData = isStudent
-    ? gradebookData.filter((r) => r.studentId === user.id)
-    : gradebookData;
-
   const drawer = (
-    <div onClick={isSmallDevice ? handleDrawerToggle : () => {}}>
+    <div onClick={isSmallDevice ? handleDrawerToggle : undefined}>
       <List className={classes.sidebar}>
-        <div style={{ textAlign: "center", margin: "0 auto", marginBottom: "10px" }}>
+        <div style={{ textAlign: "center", marginBottom: "10px" }}>
           <h1 className={classes.schoolName}>Semanhyia</h1>
           <h2 className={classes.schoolSubtitle}>American School</h2>
         </div>
-        <div className={classes.sidebarLinks}>
-          {documentMenuItems.map((item, index) => (
-            item.clickHandler ? (
-              <ListItem key={index} button onClick={item.clickHandler} className={classes.linkBox}>
+        {documentMenuItems.map((item, index) =>
+          item.clickHandler ? (
+            <ListItem
+              key={index}
+              button
+              onClick={item.clickHandler}
+              className={classes.linkBox}
+            >
+              <ListItemIcon className={classes.justifyIcon}>
+                <img src={item.iconPath} alt={item.label} width={24} height={24} />
+              </ListItemIcon>
+              <ListItemText primary={item.label} />
+            </ListItem>
+          ) : (
+            <NavLink
+              to={item.path}
+              key={index}
+              className={`${classes.buttonLink} ${classes.navLink}`}
+            >
+              <ListItem
+                selected={location.pathname.includes(item.path)}
+                button
+                className={classes.linkBox}
+              >
                 <ListItemIcon className={classes.justifyIcon}>
-                  <img src={item.iconPath} alt={`${item.label} icon`} style={{ width: 24, height: 24 }} />
+                  <img src={item.iconPath} alt={item.label} width={24} height={24} />
                 </ListItemIcon>
-                <ListItemText style={{ overflowWrap: "break-word" }} primary={item.label} />
+                <ListItemText primary={item.label} />
               </ListItem>
-            ) : (
-              <NavLink to={item.path} key={index} className={`${classes.buttonLink} ${classes.navLink}`}>
-                <ListItem selected={location.pathname.includes(item.path)} button className={classes.linkBox}>
-                  <ListItemIcon className={classes.justifyIcon}>
-                    <img src={item.iconPath} alt={`${item.label} icon`} style={{ width: 24, height: 24 }} />
-                  </ListItemIcon>
-                  <ListItemText style={{ overflowWrap: "break-word" }} primary={item.label} />
-                </ListItem>
-              </NavLink>
-            )
-          ))}
-        </div>
+            </NavLink>
+          )
+        )}
       </List>
     </div>
   );
@@ -211,46 +204,55 @@ const GradebookPage = ({ match, user, history, location, logout }) => {
   return (
     <div className={classes.root}>
       <CssBaseline />
-      <nav className={classes.drawer}>
-        <Hidden smUp implementation="css">
-          <Drawer variant="temporary" anchor={theme.direction === "rtl" ? "right" : "left"} open={mobileOpen} onClose={handleDrawerToggle} classes={{ paper: classes.drawerPaper }} ModalProps={{ keepMounted: true }}>
+      <nav>
+        <Hidden smUp>
+          <Drawer
+            variant="temporary"
+            anchor={theme.direction === "rtl" ? "right" : "left"}
+            open={mobileOpen}
+            onClose={handleDrawerToggle}
+            classes={{ paper: classes.drawerPaper }}
+            ModalProps={{ keepMounted: true }}
+          >
             {drawer}
           </Drawer>
         </Hidden>
-        <Hidden xsDown implementation="css">
+        <Hidden xsDown>
           <Drawer classes={{ paper: classes.drawerPaper }} variant="permanent" open>
             {drawer}
           </Drawer>
         </Hidden>
       </nav>
+
       <main className={classes.content} style={{ marginLeft: !isSmallDevice ? drawerWidth : 0 }}>
-        <GradebookNavbar subjectName={subjectInfo.name} teacherName={teacherName} gradeLevel={gradeLevel} />
-        <div className={classes.headerSection}>
-          <div>
-            <Typography className={classes.breadcrumb}>Classes / Science 5A / Gradebook</Typography>
-            <Typography className={classes.classTitle}>Ms. Mensah’s Class</Typography>
+        <div className="gradebook-layout">
+          <div className="breadcrumbs">
+            <span>Classes</span> / <span>{subjectInfo.name || "Class"}</span> /{" "}
+            <strong>Gradebook</strong>
           </div>
-          <Select defaultValue="" displayEmpty variant="outlined" size="small" style={{ minWidth: 140 }}>
-            <MenuItem value="" disabled>
-              Select Class
-            </MenuItem>
-            {/* Add options here if needed */}
-          </Select>
+
+          <h2 className="gradebook-class-title">{subjectInfo.name || "Class"}</h2>
+
+          <div className="gradebook-header">
+            <h1>Gradebook</h1>
+            <div className="select-class">
+              <span>SELECT CLASS</span>
+              <div className="expand-icon">⌄</div>
+            </div>
+          </div>
+
+          <div className="gradebook-scroll">
+            <Gradebook students={students} assignments={assignments} data={gradebookData} />
+          </div>
+
+          {!isStudent && (
+            <div className={classes.actionsRow}>
+              <Button variant="contained" color="primary" onClick={saveGradebook}>
+                Save Gradebook
+              </Button>
+            </div>
+          )}
         </div>
-        <Typography variant="h6" gutterBottom>
-          Gradebook
-        </Typography>
-        <Box className={classes.tableContainer}>
-          <GradebookTable data={displayedData} updateData={setGradebookData} readOnly={isStudent} />
-        </Box>
-        {!isStudent && (
-          <div className={classes.actionsRow}>
-            <GradebookForm onSubmit={(newRow) => setGradebookData((prev) => [...prev, { ...newRow, subjectId, gradeId: newRow.gradeId || null, grades: [] }])} />
-            <Button variant="contained" color="primary" onClick={saveGradebook}>
-              Save Gradebook
-            </Button>
-          </div>
-        )}
       </main>
     </div>
   );
