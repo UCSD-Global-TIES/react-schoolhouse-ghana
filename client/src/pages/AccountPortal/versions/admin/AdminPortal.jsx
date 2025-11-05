@@ -253,7 +253,14 @@ function AdminPortal(props) {
       path: `${props.match.path}/announcements`,
       api: {
         get: API.getAnnouncements,
-        post: API.addAnnouncement,
+        post: (announcementData, key) => {
+          // Check if this is a multi-subject announcement
+          if (announcementData.subjects && announcementData.subjects.length > 0) {
+            return API.addMultiSubjectAnnouncement(announcementData, key);
+          } else {
+            return API.addAnnouncement(announcementData, key, props.user);
+          }
+        },
         put: API.updateAnnouncement,
         delete: API.deleteAnnouncements,
       },

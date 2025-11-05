@@ -61,38 +61,99 @@ module.exports = {
                                         // 1. Admin announcements
                                         // 2. Their own announcements
                                         // They should NOT see other teachers' announcements
-                                        filteredAnnouncements = generalOnlyAnnouncements.filter(announcement => {
-                                            // Show admin announcements
-                                            if (announcement.authorRole === 'Admin') return true;
-                                            
-                                            // Show their own announcements
-                                            if (announcement.authorId && announcement.authorId.toString() === currentUser._id.toString()) return true;
-                                            
-                                            // For legacy announcements without authorRole, check by authorName
-                                            if (!announcement.authorRole && announcement.authorName) {
-                                                const userFullName = `${currentUser.profile.first_name} ${currentUser.profile.last_name}`;
-                                                return announcement.authorName === userFullName;
-                                            }
-                                            
-                                            // Hide other teachers' announcements
-                                            return false;
-                                        });
+                                        // Get teacher's subjects for filtering admin announcements
+                                        gradeDb.findOne({ teachers: currentUser.profile._id })
+                                            .populate('subjects')
+                                            .then((teacherGrade) => {
+                                                filteredAnnouncements = generalOnlyAnnouncements.filter(announcement => {
+                                                    // Show general admin announcements (no subject targeting) if targeted to teachers
+                                                    if (announcement.authorRole === 'Admin' && !announcement.subject && (!announcement.subjects || announcement.subjects.length === 0)) {
+                                                        const targetAudience = announcement.targetAudience || 'both';
+                                                        return targetAudience === 'both' || targetAudience === 'teachers';
+                                                    }
+                                                    
+                                                    // Show targeted admin announcements only if teacher teaches those subjects and is in target audience
+                                                    if (announcement.authorRole === 'Admin' && teacherGrade) {
+                                                        const targetAudience = announcement.targetAudience || 'both';
+                                                        const isTargetAudience = targetAudience === 'both' || targetAudience === 'teachers';
+                                                        
+                                                        if (isTargetAudience) {
+                                                            const teacherSubjectIds = teacherGrade.subjects.map(s => s._id.toString());
+                                                            
+                                                            // Check single subject
+                                                            if (announcement.subject && teacherSubjectIds.includes(announcement.subject.toString())) {
+                                                                return true;
+                                                            }
+                                                            
+                                                            // Check multiple subjects
+                                                            if (announcement.subjects && announcement.subjects.length > 0) {
+                                                                return announcement.subjects.some(subjectId => 
+                                                                    teacherSubjectIds.includes(subjectId.toString())
+                                                                );
+                                                            }
+                                                        }
+                                                    }
+                                                    
+                                                    // Show their own announcements
+                                                    if (announcement.authorId && announcement.authorId.toString() === currentUser._id.toString()) return true;
+                                                    
+                                                    // For legacy announcements without authorRole, check by authorName
+                                                    if (!announcement.authorRole && announcement.authorName) {
+                                                        const userFullName = `${currentUser.profile.first_name} ${currentUser.profile.last_name}`;
+                                                        return announcement.authorName === userFullName;
+                                                    }
+                                                    
+                                                    // Hide other teachers' announcements
+                                                    return false;
+                                                });
+
+                                                res.json(processAnnouncements(filteredAnnouncements));
+                                            })
+                                            .catch(err => res.status(422).json(err));
+                                        return; // Early return for teacher case
                                     } else if (currentUser.type === 'Student') {
                                         // Students need additional filtering based on enrollment
                                         // First get student's enrolled subjects via grade
                                         gradeDb.findOne({ students: currentUser.profile._id })
-                                            .populate('teachers')
+                                            .populate(['teachers', 'subjects'])
                                             .then((studentGrade) => {
                                                 if (!studentGrade) {
-                                                    // Student not enrolled in any grade, show only admin announcements
+                                                    // Student not enrolled in any grade, show only general admin announcements
                                                     filteredAnnouncements = generalOnlyAnnouncements.filter(announcement => 
-                                                        announcement.authorRole === 'Admin'
+                                                        announcement.authorRole === 'Admin' && !announcement.subject && (!announcement.subjects || announcement.subjects.length === 0)
                                                     );
                                                 } else {
-                                                    // Student enrolled, show admin announcements + teacher announcements from their teachers
+                                                    // Student enrolled, filter announcements based on enrollment
+                                                    const studentSubjectIds = studentGrade.subjects.map(s => s._id.toString());
+                                                    
                                                     filteredAnnouncements = generalOnlyAnnouncements.filter(announcement => {
-                                                        // Show admin announcements
-                                                        if (announcement.authorRole === 'Admin') return true;
+                                                        // Show general admin announcements (no subject targeting) if targeted to students
+                                                        if (announcement.authorRole === 'Admin' && !announcement.subject && (!announcement.subjects || announcement.subjects.length === 0)) {
+                                                            const targetAudience = announcement.targetAudience || 'both';
+                                                            return targetAudience === 'both' || targetAudience === 'students';
+                                                        }
+                                                        
+                                                        // Show targeted admin announcements only if student is enrolled in those subjects and is in target audience
+                                                        if (announcement.authorRole === 'Admin') {
+                                                            const targetAudience = announcement.targetAudience || 'both';
+                                                            const isTargetAudience = targetAudience === 'both' || targetAudience === 'students';
+                                                            
+                                                            if (isTargetAudience) {
+                                                                // Check single subject
+                                                                if (announcement.subject && studentSubjectIds.includes(announcement.subject.toString())) {
+                                                                    return true;
+                                                                }
+                                                                
+                                                                // Check multiple subjects
+                                                                if (announcement.subjects && announcement.subjects.length > 0) {
+                                                                    return announcement.subjects.some(subjectId => 
+                                                                        studentSubjectIds.includes(subjectId.toString())
+                                                                    );
+                                                                }
+                                                            }
+                                                            
+                                                            return false; // Hide other targeted admin announcements
+                                                        }
                                                         
                                                         // Show teacher announcements only from teachers in their grade
                                                         if (announcement.authorRole === 'Teacher' && announcement.authorId) {
@@ -115,7 +176,7 @@ module.exports = {
                                         return; // Early return for student case since we have async grade lookup
                                     }
                                     // Admin users see all announcements (existing behavior)
-                                    // Note: Student case returns early above due to async grade lookup
+                                    // Note: Teacher and Student cases return early above due to async grade lookup
 
                                     res.json(processAnnouncements(filteredAnnouncements));
                                 })
@@ -147,7 +208,8 @@ module.exports = {
                                 authorRole: account.type,
                                 authorName: `${account.profile.first_name} ${account.profile.last_name}`,
                                 private: false,
-                                subject: null  // Ensure general announcements don't have a subject
+                                subject: null,  // Ensure general announcements don't have a subject
+                                targetAudience: req.body.targetAudience || 'both'  // Default to both if not specified
                             };
 
                             announcementDb
@@ -163,6 +225,62 @@ module.exports = {
                 }
             })
 
+    },
+    addMultiSubjectAnnouncement: function (req, res) {
+        const userKey = req.header('Authorization');
+        verifyKey(userKey, 'Admin')
+            .then((isVerified) => {
+                if (isVerified) {
+                    // Get user info to add as author
+                    accountDb.findOne({ _id: userKey })
+                        .populate('profile')
+                        .then((account) => {
+                            if (!account) {
+                                return res.status(403).json({ error: 'User not found' });
+                            }
+
+                            const { subjects, ...announcementData } = req.body;
+
+                            if (!subjects || !Array.isArray(subjects) || subjects.length === 0) {
+                                return res.status(400).json({ error: 'At least one subject must be selected' });
+                            }
+
+                            // Create the base announcement data
+                            const baseAnnouncementData = {
+                                ...announcementData,
+                                authorId: account._id,
+                                authorRole: account.type,
+                                authorName: `${account.profile.first_name} ${account.profile.last_name}`,
+                                subjects: subjects,
+                                private: false,  // Multi-subject admin announcements are public but targeted
+                                targetAudience: announcementData.targetAudience || 'both'  // Default to both if not specified
+                            };
+
+                            // Create one announcement with multiple subjects
+                            announcementDb
+                                .create(baseAnnouncementData)
+                                .then(newAnnouncement => {
+                                    // Add this announcement to each selected subject
+                                    const subjectUpdatePromises = subjects.map(subjectId => 
+                                        subjectDb.updateOne(
+                                            { _id: subjectId },
+                                            { $push: { announcements: newAnnouncement._id } }
+                                        )
+                                    );
+
+                                    Promise.all(subjectUpdatePromises)
+                                        .then(() => {
+                                            res.json(newAnnouncement);
+                                        })
+                                        .catch(err => res.status(422).json(err));
+                                })
+                                .catch(err => res.status(422).json(err));
+                        })
+                        .catch(err => res.status(422).json(err));
+                } else {
+                    res.status(403).json(null);
+                }
+            })
     },
     deleteAnnouncement: function (req, res) {
         verifyKey(req.header('Authorization'), 'Teacher,Admin').then((isVerified) => {

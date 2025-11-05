@@ -25,6 +25,16 @@ export default {
     }
 
   },
+  // Create announcement for multiple subjects (Admin only)
+  addMultiSubjectAnnouncement: function (announcementData, key) {
+    const config = {
+      'Authorization': key
+    };
+
+    return axios.post(`/api/general/ann/multi-subject`, announcementData, {
+      headers: config
+    }); // SECURE
+  },
   // // Get all 'File' documents
   getFiles: function (key) {
     const config = {
