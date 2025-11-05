@@ -178,6 +178,7 @@ function App() {
                 user={userInfo}
               />
               {/* Class component should check account type and render the correct component */}
+
               <ProtectedRoute
                 path="/subject/:id"
                 component={SubjectPage}
@@ -209,6 +210,8 @@ function App() {
                 logout={handleLogout}
                 user={userInfo}
               />
+
+              
               
 
               <ProtectedRoute

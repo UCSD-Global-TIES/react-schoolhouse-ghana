@@ -8,6 +8,11 @@ import {
   ListItem,
   ListItemIcon,
   ListItemText,
+  Typography,
+  Button,
+  Select,
+  MenuItem,
+  Box,
 } from "@material-ui/core";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
 import { useMediaQuery } from "react-responsive";
@@ -32,7 +37,7 @@ const useStyles = makeStyles((theme) => ({
   sidebar: {
     display: "flex",
     width: drawerWidth,
-    padding: "3.5rem 0",
+    padding: "4.5rem 0 2rem",
     flexDirection: "column",
     alignItems: "flex-start",
     flexShrink: 0,
@@ -42,7 +47,14 @@ const useStyles = makeStyles((theme) => ({
     background: "var(--primary-color)",
     color: "var(--background-color)",
   },
-  content: { flexGrow: 1, padding: theme.spacing(1) },
+  content: {
+    flexGrow: 1,
+    padding: theme.spacing(2),
+    display: "flex",
+    flexDirection: "column",
+    height: "100vh",
+    overflowY: "auto",
+  },
   buttonLink: { color: "inherit", textDecoration: "none" },
   sidebarLinks: {
     display: "flex",
@@ -64,6 +76,47 @@ const useStyles = makeStyles((theme) => ({
   },
   linkBox: { display: "flex", flexDirection: "column" },
   justifyIcon: { display: "flex", justifyContent: "center" },
+  headerSection: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: theme.spacing(2),
+  },
+  breadcrumb: {
+    fontSize: "0.875rem",
+    color: theme.palette.text.secondary,
+  },
+  classTitle: {
+    fontWeight: 700,
+    fontSize: "1.75rem",
+    marginTop: theme.spacing(0.5),
+  },
+  tableContainer: {
+  backgroundColor: theme.palette.background.paper,
+  borderRadius: theme.shape.borderRadius * 2,
+  boxShadow: theme.shadows[1],
+  padding: theme.spacing(3),
+  },
+  actionsRow: {
+    display: "flex",
+    justifyContent: "flex-end",
+    alignItems: "center",
+    gap: theme.spacing(2),
+    maxWidth: 1200,
+    marginLeft: "auto",
+    marginRight: "auto",
+  },
+  schoolName: {
+    fontSize: "2rem",
+    fontWeight: 700,
+    color: "var(--background-color)",
+    marginBottom: 4,
+  },
+  schoolSubtitle: {
+    fontSize: "1rem",
+    color: "var(--background-color)",
+    marginTop: 0,
+  },
 }));
 
 const GradebookPage = ({ match, user, history, location, logout }) => {
@@ -90,7 +143,7 @@ const GradebookPage = ({ match, user, history, location, logout }) => {
     { label: "Home", iconPath: HomeIcon, path: `${portalBase}` },
     { label: "Announcements", iconPath: BullhornIcon, path: `/subject/${subjectId}/announcements` },
     { label: "Classes", iconPath: BookIcon, path: `${portalBase}/classes` },
-    { label: "Gradebook", iconPath: GradebookIcon, path: `/gradebook/${subjectId}` },
+    { label: "Gradebook Testing", iconPath: GradebookIcon, path: `/gradebook/${subjectId}` },
     { label: "Help", iconPath: HelpIcon, path: `/subject/${subjectId}/studentGrades` },
     { label: "Log Out", iconPath: LogoutIcon, clickHandler: () => { if (logout) logout(); } },
   ];
@@ -125,9 +178,9 @@ const GradebookPage = ({ match, user, history, location, logout }) => {
   const drawer = (
     <div onClick={isSmallDevice ? handleDrawerToggle : () => {}}>
       <List className={classes.sidebar}>
-        <div style={{ textAlign: "center", margin: "0 auto", marginBottom: "10px", color: "var(--background-color)" }}>
-          <h1 style={{ fontSize: "1.75rem" }}>Semanhyia</h1>
-          <h2 style={{ fontSize: "1.125rem" }}>American School</h2>
+        <div style={{ textAlign: "center", margin: "0 auto", marginBottom: "10px" }}>
+          <h1 className={classes.schoolName}>Semanhyia</h1>
+          <h2 className={classes.schoolSubtitle}>American School</h2>
         </div>
         <div className={classes.sidebarLinks}>
           {documentMenuItems.map((item, index) => (
@@ -171,12 +224,31 @@ const GradebookPage = ({ match, user, history, location, logout }) => {
       </nav>
       <main className={classes.content} style={{ marginLeft: !isSmallDevice ? drawerWidth : 0 }}>
         <GradebookNavbar subjectName={subjectInfo.name} teacherName={teacherName} gradeLevel={gradeLevel} />
-        <GradebookTable data={displayedData} updateData={setGradebookData} readOnly={isStudent} />
+        <div className={classes.headerSection}>
+          <div>
+            <Typography className={classes.breadcrumb}>Classes / Science 5A / Gradebook</Typography>
+            <Typography className={classes.classTitle}>Ms. Mensah’s Class</Typography>
+          </div>
+          <Select defaultValue="" displayEmpty variant="outlined" size="small" style={{ minWidth: 140 }}>
+            <MenuItem value="" disabled>
+              Select Class
+            </MenuItem>
+            {/* Add options here if needed */}
+          </Select>
+        </div>
+        <Typography variant="h6" gutterBottom>
+          Gradebook
+        </Typography>
+        <Box className={classes.tableContainer}>
+          <GradebookTable data={displayedData} updateData={setGradebookData} readOnly={isStudent} />
+        </Box>
         {!isStudent && (
-          <>
+          <div className={classes.actionsRow}>
             <GradebookForm onSubmit={(newRow) => setGradebookData((prev) => [...prev, { ...newRow, subjectId, gradeId: newRow.gradeId || null, grades: [] }])} />
-            <button onClick={saveGradebook}>Save Gradebook</button>
-          </>
+            <Button variant="contained" color="primary" onClick={saveGradebook}>
+              Save Gradebook
+            </Button>
+          </div>
         )}
       </main>
     </div>
