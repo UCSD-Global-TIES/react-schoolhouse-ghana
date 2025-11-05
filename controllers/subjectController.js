@@ -285,14 +285,68 @@ module.exports = {
     },
 
     getAnnouncements: function (req, res) {
-        verifyKey(req.header('Authorization'), 'Student,Teacher,Admin')
+        const userKey = req.header('Authorization');
+        verifyKey(userKey, 'Student,Teacher,Admin')
             .then((isVerified) => {
                 if (isVerified) {
-                    announcementDb
-                        .find({ subject: req.params.subjectId })
-                        .then(subjectAnns => res.json(subjectAnns))
-                        .catch(err => res.status(422).json(err));
+                    const subjectId = req.params.subjectId;
+                    
+                    // Get current user info for enrollment checking
+                    accountDb.findOne({ _id: userKey })
+                        .populate('profile')
+                        .then((currentUser) => {
+                            if (!currentUser) {
+                                return res.status(403).json({ error: 'User not found' });
+                            }
 
+                            // Check if user has access to this subject
+                            if (currentUser.type === 'Student') {
+                                // For students, check if they're enrolled in a grade that includes this subject
+                                gradeDb.findOne({ 
+                                    students: currentUser.profile._id,
+                                    subjects: subjectId 
+                                })
+                                .then((enrollment) => {
+                                    if (!enrollment) {
+                                        // Student not enrolled in this subject
+                                        return res.status(403).json({ error: 'You are not enrolled in this subject' });
+                                    }
+
+                                    // Student is enrolled, get subject announcements
+                                    announcementDb
+                                        .find({ subject: subjectId })
+                                        .then(subjectAnns => res.json(subjectAnns))
+                                        .catch(err => res.status(422).json(err));
+                                })
+                                .catch(err => res.status(422).json(err));
+                            } else if (currentUser.type === 'Teacher') {
+                                // For teachers, check if they teach this subject (are in a grade with this subject)
+                                gradeDb.findOne({ 
+                                    teachers: currentUser.profile._id,
+                                    subjects: subjectId 
+                                })
+                                .then((teaching) => {
+                                    if (!teaching) {
+                                        // Teacher doesn't teach this subject
+                                        return res.status(403).json({ error: 'You do not teach this subject' });
+                                    }
+
+                                    // Teacher teaches this subject, get all announcements
+                                    announcementDb
+                                        .find({ subject: subjectId })
+                                        .then(subjectAnns => res.json(subjectAnns))
+                                        .catch(err => res.status(422).json(err));
+                                })
+                                .catch(err => res.status(422).json(err));
+                            } else {
+                                // Admin can see all subject announcements
+                                announcementDb
+                                    .find({ subject: subjectId })
+                                    .then(subjectAnns => res.json(subjectAnns))
+                                    .catch(err => res.status(422).json(err));
+                            }
+                        })
+                        .catch(err => res.status(422).json(err));
                 } else {
                     res.status(403).json(null);
                 }

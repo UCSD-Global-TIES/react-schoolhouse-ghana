@@ -1,6 +1,7 @@
 const announcementDb = require("../models/Announcement");
 const subjectDb = require("../models/Subject");
 const accountDb = require("../models/Account");
+const gradeDb = require("../models/Grade");
 const ip = require("ip")
 const API_PORT = process.env.PORT || 3001;
 
@@ -76,8 +77,45 @@ module.exports = {
                                             // Hide other teachers' announcements
                                             return false;
                                         });
+                                    } else if (currentUser.type === 'Student') {
+                                        // Students need additional filtering based on enrollment
+                                        // First get student's enrolled subjects via grade
+                                        gradeDb.findOne({ students: currentUser.profile._id })
+                                            .populate('teachers')
+                                            .then((studentGrade) => {
+                                                if (!studentGrade) {
+                                                    // Student not enrolled in any grade, show only admin announcements
+                                                    filteredAnnouncements = generalOnlyAnnouncements.filter(announcement => 
+                                                        announcement.authorRole === 'Admin'
+                                                    );
+                                                } else {
+                                                    // Student enrolled, show admin announcements + teacher announcements from their teachers
+                                                    filteredAnnouncements = generalOnlyAnnouncements.filter(announcement => {
+                                                        // Show admin announcements
+                                                        if (announcement.authorRole === 'Admin') return true;
+                                                        
+                                                        // Show teacher announcements only from teachers in their grade
+                                                        if (announcement.authorRole === 'Teacher' && announcement.authorId) {
+                                                            return studentGrade.teachers.some(teacher => 
+                                                                teacher._id.toString() === announcement.authorId.toString()
+                                                            );
+                                                        }
+                                                        
+                                                        // For legacy announcements, we'll be permissive and show them
+                                                        // You might want to restrict this further
+                                                        if (!announcement.authorRole) return true;
+                                                        
+                                                        return false;
+                                                    });
+                                                }
+                                                
+                                                res.json(processAnnouncements(filteredAnnouncements));
+                                            })
+                                            .catch(err => res.status(422).json(err));
+                                        return; // Early return for student case since we have async grade lookup
                                     }
-                                    // Admin and Student users see all announcements (existing behavior)
+                                    // Admin users see all announcements (existing behavior)
+                                    // Note: Student case returns early above due to async grade lookup
 
                                     res.json(processAnnouncements(filteredAnnouncements));
                                 })
