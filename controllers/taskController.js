@@ -7,13 +7,23 @@ const API_PORT = process.env.PORT || 3001;
 module.exports = {
   createTask: async (req, res) => {
     try {
-      const { title, description, dueDate, subjectId } = req.body;
-      const task = new Task({ title, description, dueDate, subject: subjectId });
+      console.log('[taskController.createTask] incoming', req.path, req.method, req.body);
+      // Accept either `subjectId` (older clients) or `subject` (client sends subject)
+      const { title, description, dueDate, subjectId, subject } = req.body;
+      const subjectRef = subjectId || subject;
+
+      if (!subjectRef) {
+        return res.status(400).json({ error: 'Missing subject id' });
+      }
+
+      const task = new Task({ title, description, dueDate, subject: subjectRef });
       await task.save();
 
-      const subject = await Subject.findById(subjectId);
-      subject.tasks.push(task._id);
-      await subject.save();
+      const subj = await Subject.findById(subjectRef);
+      if (subj) {
+        subj.tasks.push(task._id);
+        await subj.save();
+      }
 
       res.status(201).json(task);
     } catch (err) {
@@ -23,7 +33,10 @@ module.exports = {
 
   getTasks: async (req, res) => {
     try {
-      const tasks = await Task.find({ subject: req.params.sid });
+      console.log('[taskController.getTasks] params:', req.params);
+      // Support either `subjectId` (routes use this) or legacy `sid`
+      const subjectParam = req.params.subjectId || req.params.sid;
+      const tasks = await Task.find({ subject: subjectParam });
       res.status(200).json(tasks);
     } catch (err) {
       res.status(500).json({ error: err.message });
