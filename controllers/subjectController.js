@@ -312,10 +312,23 @@ module.exports = {
                                         return res.status(403).json({ error: 'You are not enrolled in this subject' });
                                     }
 
-                                    // Student is enrolled, get subject announcements
+                                    // Student is enrolled, get subject announcements filtered by audience
+                                    // Find announcements that are either specifically for this subject OR include this subject in subjects array
                                     announcementDb
-                                        .find({ subject: subjectId })
-                                        .then(subjectAnns => res.json(subjectAnns))
+                                        .find({ 
+                                            $or: [
+                                                { subject: subjectId },
+                                                { subjects: subjectId }
+                                            ]
+                                        })
+                                        .then(announcements => {
+                                            // Filter by target audience for students
+                                            const filteredAnnouncements = announcements.filter(announcement => {
+                                                const targetAudience = announcement.targetAudience || 'both';
+                                                return targetAudience === 'both' || targetAudience === 'students';
+                                            });
+                                            res.json(filteredAnnouncements);
+                                        })
                                         .catch(err => res.status(422).json(err));
                                 })
                                 .catch(err => res.status(422).json(err));
@@ -331,18 +344,41 @@ module.exports = {
                                         return res.status(403).json({ error: 'You do not teach this subject' });
                                     }
 
-                                    // Teacher teaches this subject, get all announcements
+                                    // Teacher teaches this subject, get announcements filtered by audience
                                     announcementDb
-                                        .find({ subject: subjectId })
-                                        .then(subjectAnns => res.json(subjectAnns))
+                                        .find({ 
+                                            $or: [
+                                                { subject: subjectId },
+                                                { subjects: subjectId }
+                                            ]
+                                        })
+                                        .then(announcements => {
+                                            // Filter by target audience for teachers
+                                            const filteredAnnouncements = announcements.filter(announcement => {
+                                                const targetAudience = announcement.targetAudience || 'both';
+                                                return targetAudience === 'both' || targetAudience === 'teachers';
+                                            });
+                                            res.json(filteredAnnouncements);
+                                        })
                                         .catch(err => res.status(422).json(err));
                                 })
                                 .catch(err => res.status(422).json(err));
                             } else {
-                                // Admin can see all subject announcements
+                                // Admin can see subject announcements but filter out teacher announcements
                                 announcementDb
-                                    .find({ subject: subjectId })
-                                    .then(subjectAnns => res.json(subjectAnns))
+                                    .find({ 
+                                        $or: [
+                                            { subject: subjectId },
+                                            { subjects: subjectId }
+                                        ]
+                                    })
+                                    .then(announcements => {
+                                        // Filter to only show admin announcements
+                                        const adminOnlyAnnouncements = announcements.filter(announcement => 
+                                            announcement.authorRole === 'Admin'
+                                        );
+                                        res.json(adminOnlyAnnouncements);
+                                    })
                                     .catch(err => res.status(422).json(err));
                             }
                         })

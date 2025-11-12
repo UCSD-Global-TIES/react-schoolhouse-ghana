@@ -92,8 +92,20 @@ function AnnouncementsForm(props) {
     const [selectedFiles, setSelectedFiles] = useState(props.document.files || []);
     const [options, setOptions] = useState([]);
     const [subjectValue, setSubjectValue] = useState(null);
+    const [selectedSubjects, setSelectedSubjects] = useState([]);
+    const [multiSubjectMode, setMultiSubjectMode] = useState(false);
     const [PROPS, setProps] = useState(props);
     const [viewMode, setViewMode] = useState(!props.isCreate);
+
+    // Check if user is admin to show multi-subject option
+    const isAdmin = PROPS.user && PROPS.user.type === 'Admin';
+
+    // Audience targeting options for admins
+    const audienceOptions = [
+        { _id: 'both', name: 'Teachers & Students', description: 'Visible to both teachers and students' },
+        { _id: 'teachers', name: 'Teachers Only', description: 'Visible only to teachers' },
+        { _id: 'students', name: 'Students Only', description: 'Visible only to students' }
+    ];
 
     const handleSwitchToggle = name => e => {
         const event = {
@@ -114,6 +126,43 @@ function AnnouncementsForm(props) {
                 }
             };
             PROPS.handleChange(event);
+        }
+    };
+
+    const handleMultiSubjectChange = (e, value) => {
+        setSelectedSubjects(value);
+        // Update the parent component with selected subject IDs
+        const event = {
+            target: {
+                name: 'subjects',
+                value: value.map(subject => subject._id)
+            }
+        };
+        PROPS.handleChange(event);
+    };
+
+    const handleMultiSubjectModeToggle = (e) => {
+        setMultiSubjectMode(e.target.checked);
+        if (e.target.checked) {
+            // If turning on multi-subject mode, clear single subject
+            setSubjectValue(null);
+            const singleSubjectEvent = {
+                target: {
+                    name: 'subject',
+                    value: null
+                }
+            };
+            PROPS.handleChange(singleSubjectEvent);
+        } else {
+            // If turning off multi-subject mode, clear selected subjects
+            setSelectedSubjects([]);
+            const multiSubjectEvent = {
+                target: {
+                    name: 'subjects',
+                    value: []
+                }
+            };
+            PROPS.handleChange(multiSubjectEvent);
         }
     };
 
@@ -206,7 +255,27 @@ function AnnouncementsForm(props) {
                             />
                         </Box>
                     </Box>
-                    <Autocomplete
+
+                    {/* Multi-subject mode toggle for admins */}
+                    {isAdmin && PROPS.document['private'] && (
+                        <Box className={classes.field} display="flex">
+                            <Box flexGrow={1}>
+                                Multiple Subjects <Typography display='inline' variant='caption' color='textSecondary'>Post to multiple subjects at once.</Typography>
+                            </Box>
+                            <Box>
+                                <Switch
+                                    disabled={!PROPS.isCreate}
+                                    checked={multiSubjectMode}
+                                    onChange={handleMultiSubjectModeToggle}
+                                    color="primary"
+                                    inputProps={{ 'aria-label': 'multi-subject toggle' }}
+                                />
+                            </Box>
+                        </Box>
+                    )}
+                    {/* Single subject selector - for teachers and non-multi-subject mode */}
+                    {!multiSubjectMode && (
+                        <Autocomplete
                             onChange={(e, value) => handleAutocompleteChange(e, value, 'subject')}
                             value={subjectValue}
                             disabled={!PROPS.document['private'] || !PROPS.isCreate}
@@ -234,6 +303,40 @@ function AnnouncementsForm(props) {
                                 />
                             )}
                         />
+                    )}
+
+                    {/* Multi-subject selector - for admins in multi-subject mode */}
+                    {isAdmin && multiSubjectMode && PROPS.document['private'] && (
+                        <Autocomplete
+                            multiple
+                            onChange={handleMultiSubjectChange}
+                            value={selectedSubjects}
+                            disabled={!PROPS.isCreate}
+                            className={classes.field}
+                            loading={loading}
+                            options={options.sort((a, b) => a.grade - b.grade)}
+                            groupBy={option => `Grade ${option.grade}`}
+                            getOptionLabel={option => option.name}
+                            renderInput={params => (
+                                <TextField
+                                    {...params}
+                                    label="Select Subjects"
+                                    helperText="This announcement will be posted to all selected subjects."
+                                    fullWidth
+                                    variant="outlined"
+                                    InputProps={{
+                                        ...params.InputProps,
+                                        endAdornment: (
+                                            <React.Fragment>
+                                                {loading ? <CircularProgress color="inherit" size={20} /> : null}
+                                                {params.InputProps.endAdornment}
+                                            </React.Fragment>
+                                        ),
+                                    }}
+                                />
+                            )}
+                        />
+                    )}
                     </div>
                 )}
                 {viewMode ? (
@@ -277,6 +380,28 @@ function AnnouncementsForm(props) {
                         />
                     ))
                 )}
+
+                {/* Audience targeting for admin announcements */}
+                {isAdmin && !viewMode && (
+                    <Autocomplete
+                        onChange={(e, value) => handleAutocompleteChange(e, value, 'targetAudience')}
+                        value={audienceOptions.find(option => option._id === (PROPS.document.targetAudience || 'both'))}
+                        disabled={!PROPS.isCreate}
+                        className={classes.field}
+                        options={audienceOptions}
+                        getOptionLabel={option => option.name}
+                        renderInput={params => (
+                            <TextField
+                                {...params}
+                                label="Target Audience"
+                                helperText="Specify who can see this announcement."
+                                fullWidth
+                                variant="outlined"
+                            />
+                        )}
+                    />
+                )}
+
                 {!viewMode && (
                     <DocumentPicker
                         title={"Attached Files"}

@@ -124,6 +124,41 @@ module.exports = {
                     // Create folder
                     let gradeDoc = req.body;
                     
+                    // Debug logging to see what data we're receiving
+                    console.log('🔹 Received grade data:', JSON.stringify(gradeDoc, null, 2));
+                    
+                    // Validate required fields - check for undefined, null, or empty string
+                    if (gradeDoc.level === undefined || gradeDoc.level === null || gradeDoc.level === '') {
+                        console.error('❌ Grade level is missing from request:', gradeDoc.level);
+                        return res.status(400).json({ 
+                            error: 'Grade level is required',
+                            received: gradeDoc
+                        });
+                    }
+                    
+                    // Ensure level is a number
+                    if (isNaN(gradeDoc.level)) {
+                        console.error('❌ Grade level is not a valid number:', gradeDoc.level);
+                        return res.status(400).json({ 
+                            error: 'Grade level must be a number',
+                            received: gradeDoc.level
+                        });
+                    }
+                    
+                    // Convert level to number if it's a string
+                    gradeDoc.level = parseInt(gradeDoc.level);
+                    
+                    // Validate that level is a positive integer
+                    if (gradeDoc.level < 1) {
+                        console.error('❌ Grade level must be 1 or greater:', gradeDoc.level);
+                        return res.status(400).json({ 
+                            error: 'Grade level must be 1 or greater',
+                            received: gradeDoc.level
+                        });
+                    }
+                    
+                    console.log('✅ Validated grade data:', JSON.stringify(gradeDoc, null, 2));
+                    
                     // Find all grades whose field 'students'/'teachers'/'subjects' has an identical _id in newG's corresponding fields and pull that _id the respective field 
                     gradeDb.updateMany({
                                 $or: [{

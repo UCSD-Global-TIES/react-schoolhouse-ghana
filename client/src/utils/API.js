@@ -25,6 +25,16 @@ export default {
     }
 
   },
+  // Create announcement for multiple subjects (Admin only)
+  addMultiSubjectAnnouncement: function (announcementData, key) {
+    const config = {
+      'Authorization': key
+    };
+
+    return axios.post(`/api/general/ann/multi-subject`, announcementData, {
+      headers: config
+    }); // SECURE
+  },
   // // Get all 'File' documents
   getFiles: function (key) {
     const config = {
@@ -417,11 +427,6 @@ export default {
 
   saveGradebook: (subjectId, gradebookEntries, key) =>
     axios.post(`/api/subjects/${subjectId}/gradebook`, gradebookEntries, {
-      headers: { Authorization: key },
-    }),
-
-  getSubject: (subjectId, key) =>
-    axios.get(`/api/subjects/${subjectId}`, {
       headers: { Authorization: key },
     }),
 

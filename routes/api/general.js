@@ -8,6 +8,11 @@ router.route("/ann")
   // Post a public announcement
   .post(generalController.addAnnouncement)
 
+// Matches with "/api/general/ann/multi-subject"
+router.route("/ann/multi-subject")
+  // Post announcement to multiple subjects (Admin only)
+  .post(generalController.addMultiSubjectAnnouncement)
+
 // Matches with "/api/general/ann/:aid"
 router.route("/ann/:aid")
   // Deletes a specific public announcement

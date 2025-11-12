@@ -8,10 +8,12 @@ import {
   ListItem,
   ListItemIcon,
   ListItemText,
-  Button,
 } from "@material-ui/core";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
 import { useMediaQuery } from "react-responsive";
+
+import GradebookNavbar from "../../components/Gradebook/GradebookNavbar";
+import GradebookTable from "../../components/Gradebook/GradebookTable";
 import API from "../../utils/API";
 import Gradebook from "../../components/Gradebook/Gradebook";
 import "../../components/Gradebook/Gradebook.css";
@@ -31,7 +33,7 @@ const useStyles = makeStyles((theme) => ({
   sidebar: {
     display: "flex",
     width: drawerWidth,
-    padding: "4.5rem 0 2rem",
+    padding: "3.5rem 0",
     flexDirection: "column",
     alignItems: "flex-start",
     flexShrink: 0,
@@ -41,14 +43,7 @@ const useStyles = makeStyles((theme) => ({
     background: "var(--primary-color)",
     color: "var(--background-color)",
   },
-  content: {
-    flexGrow: 1,
-    display: "flex",
-    flexDirection: "column",
-    height: "100vh",
-    overflowY: "auto",
-    backgroundColor: theme.palette.background.default,
-  },
+  content: { flexGrow: 1, padding: theme.spacing(1) },
   buttonLink: { color: "inherit", textDecoration: "none" },
   navLink: {
     textDecoration: "none",
@@ -62,25 +57,6 @@ const useStyles = makeStyles((theme) => ({
   },
   linkBox: { display: "flex", flexDirection: "column" },
   justifyIcon: { display: "flex", justifyContent: "center" },
-  schoolName: {
-    fontSize: "2rem",
-    fontWeight: 700,
-    color: "var(--background-color)",
-    marginBottom: 4,
-  },
-  schoolSubtitle: {
-    fontSize: "1rem",
-    color: "var(--background-color)",
-    marginTop: 0,
-  },
-  actionsRow: {
-    display: "flex",
-    justifyContent: "flex-end",
-    alignItems: "center",
-    gap: theme.spacing(2),
-    margin: "20px auto 0",
-    maxWidth: 1200,
-  },
 }));
 
 const GradebookPage = ({ match, user, location, logout }) => {
@@ -112,16 +88,8 @@ const GradebookPage = ({ match, user, location, logout }) => {
     },
     { label: "Classes", iconPath: BookIcon, path: `${portalBase}/classes` },
     { label: "Gradebook", iconPath: GradebookIcon, path: `/gradebook/${subjectId}` },
-    {
-      label: "Help",
-      iconPath: HelpIcon,
-      path: `/subject/${subjectId}/studentGrades`,
-    },
-    {
-      label: "Log Out",
-      iconPath: LogoutIcon,
-      clickHandler: () => logout && logout(),
-    },
+    { label: "Help", iconPath: HelpIcon, path: `/subject/${subjectId}/studentGrades` },
+    { label: "Log Out", iconPath: LogoutIcon, clickHandler: () => { if (logout) logout(); } },
   ];
 
   const handleDrawerToggle = () => setMobileOpen(!mobileOpen);
@@ -137,19 +105,18 @@ const GradebookPage = ({ match, user, location, logout }) => {
   // Fetch gradebook data (students + assignments)
   useEffect(() => {
     if (!subjectId || !user?.key) return;
+    
+    console.log(`🔹 Student gradebook access - User Type: ${user?.type}, Subject: ${subjectId}`);
+    
     API.getGradebook(subjectId, user.key)
       .then(({ data }) => {
+        console.log(`✅ Received ${data.length} gradebook entries for user:`, data);
         setGradebookData(data);
-        const uniqueStudents = [
-          ...new Map(data.map((g) => [g.studentId, g.studentName])).entries(),
-        ].map(([id, name]) => ({ id, name }));
-        const uniqueAssignments = [
-          ...new Map(data.map((g) => [g.assignmentId, g.assignmentTitle])).entries(),
-        ].map(([id, title]) => ({ id, title }));
-        setStudents(uniqueStudents);
-        setAssignments(uniqueAssignments);
       })
-      .catch(console.error);
+      .catch((error) => {
+        console.error('❌ Error fetching gradebook:', error);
+        console.error(error);
+      });
   }, [subjectId, user?.key]);
 
   const saveGradebook = () => {
@@ -158,12 +125,18 @@ const GradebookPage = ({ match, user, location, logout }) => {
       .catch(console.error);
   };
 
+  const gradeLevel = gradebookData[0]?.gradeId?.level ?? "–";
+  
+  // Since the backend now filters student data, we can use the data directly
+  // No need for frontend filtering anymore as students only get their own data from the server
+  const displayedData = gradebookData;
+
   const drawer = (
     <div onClick={isSmallDevice ? handleDrawerToggle : undefined}>
       <List className={classes.sidebar}>
-        <div style={{ textAlign: "center", marginBottom: "10px" }}>
-          <h1 className={classes.schoolName}>Semanhyia</h1>
-          <h2 className={classes.schoolSubtitle}>American School</h2>
+        <div style={{ textAlign: "center", margin: "0 auto", marginBottom: "10px", color: "var(--background-color)" }}>
+          <h1 style={{ fontSize: "1.75rem" }}>Semanhyia</h1>
+          <h2 style={{ fontSize: "1.125rem" }}>American School</h2>
         </div>
         {documentMenuItems.map((item, index) =>
           item.clickHandler ? (
@@ -225,34 +198,16 @@ const GradebookPage = ({ match, user, location, logout }) => {
       </nav>
 
       <main className={classes.content} style={{ marginLeft: !isSmallDevice ? drawerWidth : 0 }}>
-        <div className="gradebook-layout">
-          <div className="breadcrumbs">
-            <span>Classes</span> / <span>{subjectInfo.name || "Class"}</span> /{" "}
-            <strong>Gradebook</strong>
-          </div>
-
-          <h2 className="gradebook-class-title">{subjectInfo.name || "Class"}</h2>
-
-          <div className="gradebook-header">
-            <h1>Gradebook</h1>
-            <div className="select-class">
-              <span>SELECT CLASS</span>
-              <div className="expand-icon">⌄</div>
+        <GradebookNavbar subjectName={subjectInfo.name} teacherName={teacherName} gradeLevel={gradeLevel} />
+        <GradebookTable data={displayedData} updateData={setGradebookData} readOnly={isStudent} />
+        {!isStudent && (
+          <>
+            <div style={{ marginTop: "20px", textAlign: "center", color: "#666" }}>
+              <p><span role="img" aria-label="books">📚</span> Students are automatically enrolled based on subject enrollment</p>
             </div>
-          </div>
-
-          <div className="gradebook-scroll">
-            <Gradebook students={students} assignments={assignments} data={gradebookData} />
-          </div>
-
-          {!isStudent && (
-            <div className={classes.actionsRow}>
-              <Button variant="contained" color="primary" onClick={saveGradebook}>
-                Save Gradebook
-              </Button>
-            </div>
-          )}
-        </div>
+            <button onClick={saveGradebook}>Save Gradebook</button>
+          </>
+        )}
       </main>
     </div>
   );
