@@ -327,6 +327,11 @@ function DocumentEditor(props) {
 
   // Handle creation of document
   const handleCreate = (doc) => {
+    // Debug logging to see what data we're sending
+    console.log('🔹 Frontend: Creating document with data:', JSON.stringify(doc, null, 2));
+    console.log('🔹 Frontend: Document level field:', doc.level);
+    console.log('🔹 Frontend: Document keys:', Object.keys(doc));
+    
     validateForm(doc).then((isValid) => {
       if (isValid) {
         setActionPending(true);
@@ -347,6 +352,8 @@ function DocumentEditor(props) {
 
           setTimeout(() => setActionPending(false), 1000);
         });
+      } else {
+        console.log('❌ Frontend: Form validation failed for:', JSON.stringify(doc, null, 2));
       }
     });
   };

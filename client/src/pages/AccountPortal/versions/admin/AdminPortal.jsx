@@ -287,7 +287,7 @@ function AdminPortal(props) {
       icon: faShapes,
       FormComponent: (p) => <GradesForm user={props.user} {...p} />,
       primary: (doc) => `Grade ${doc.level}`,
-      secondary: (doc) => `G${doc.level}`,
+      secondary: (doc) => `Grade ${doc.level}`, // Changed from G${doc.level} to full format
       path: `${props.match.path}/grades`,
       grStatus: (doc) => `(${doc.status})`,
       api: {

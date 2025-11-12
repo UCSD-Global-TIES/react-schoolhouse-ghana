@@ -430,9 +430,4 @@ export default {
       headers: { Authorization: key },
     }),
 
-  getSubject: (subjectId, key) =>
-    axios.get(`/api/subjects/${subjectId}`, {
-      headers: { Authorization: key },
-    }),
-
 };

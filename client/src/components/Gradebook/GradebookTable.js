@@ -19,18 +19,6 @@ const GradebookTable = ({ data, updateData, readOnly }) => {
     updateData(updatedData); // ✅ Ensure this function is correctly passed
   };
 
-  const handleStudentChange = (index, field, value) => {
-    let updatedData = [...data];
-    updatedData[index][field] = value;
-    updateData(updatedData);
-  };
-
-  const removeStudent = (studentIndex) => {
-    let updatedData = [...data];
-    updatedData.splice(studentIndex, 1);
-    updateData(updatedData);
-  };
-
   return (
     <div className="gradebook-container">
       <table className="gradebook-table">
@@ -52,22 +40,14 @@ const GradebookTable = ({ data, updateData, readOnly }) => {
             ))}
             <th>Total</th>
             <th>Letter Grade</th>
-            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
           {data.map((student, studentIndex) => (
             <tr key={studentIndex}>
               <td>
-                {readOnly ? (
-                  <span>{student.studentName}</span>
-                ) : (
-                  <input
-                    type="text"
-                    value={student.studentName}
-                    onChange={(e) => handleStudentChange(studentIndex, "studentName", e.target.value)}
-                  />
-                )}
+                {/* Student names are read-only as they come from enrollment */}
+                <span>{student.studentName}</span>
               </td>
               {assignments.map((_, assignmentIndex) => (
                 <td key={assignmentIndex}>
@@ -84,12 +64,6 @@ const GradebookTable = ({ data, updateData, readOnly }) => {
               ))}
               <td>{calculateTotal(student.grades)}</td>
               <td>{getLetterGrade(calculateTotal(student.grades))}</td>
-              {!readOnly && (
-                <td>
-                  <button onClick={() => removeStudent(studentIndex)}>Remove</button>
-                </td>
-              )}
-
             </tr>
           ))}
         </tbody>
