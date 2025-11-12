@@ -36,42 +36,42 @@ module.exports = {
             })
     },
     createFile: function (req, res) {
-        verifyKey(req.header('Authorization'), 'Admin')
+        verifyKey(req.header('Authorization'), 'Admin,Teacher')
             .then((isVerified) => {
-                if (isVerified) {
+                if (!isVerified) return res.status(403).json(null);
 
-                    //Create file document
-                    const path = req.body.get('path');
-
-                    // Upload to NAS
-                    uploadFile(req, res, path)
-                        .then((fileInfo) => {
-                            if (fileInfo) res.json(null);
-
-                            const fileDoc = {
-                                nickname: req.body.get('name'),
-                                filename: fileInfo.name,
-                                type: req.body.get('type'),
-                                path: fileInfo.path,
-                                date_created: fileInfo.created
-                            };
-
-                            // Create file document
-                            fileDb
-                                .create(fileDoc)
-                                .then(newF => {
-                                    res.json(newF)
-                                })
-                                .catch(err => res.status(422).json(err));
-
-
-                        })
-                        .catch(err => res.status(500).json(err));
-
-                } else {
-                    res.status(403).json(null);
+                // 🔹 Check if a file was uploaded
+                if (!req.file && !req.files) {
+                    return res.status(400).json({ error: "No file uploaded" });
                 }
-            })
+
+                console.log("Starting file upload...");
+
+                Promise.resolve(uploadFile(req, res))
+                  .then((fileInfo) => {
+                    console.log("Upload result:", fileInfo);
+                    if (!fileInfo) {
+                      return res.status(500).json({ error: "NAS upload failed or returned undefined" });
+                    }
+
+                      const fileDoc = {
+                          nickname: req.body.name || fileInfo.name,
+                          type: req.body.type || fileInfo.name.split('.').pop() || "unknown",
+                          filename: fileInfo.name,
+                          path: fileInfo.path,
+                          absolutePath: fileInfo.path,
+                          size: req.file ? `${req.file.size}` : "unknown",
+                      };
+
+                    return fileDb.create(fileDoc)
+                      .then((newFile) => res.json(newFile))
+                      .catch((err) => res.status(422).json(err));
+                  })
+                  .catch((err) => {
+                    console.error("Upload failed:", err);
+                    res.status(500).json({ error: err.message });
+                  });
+            });
     },
     getFile: function (req, res) {
         verifyKey(req.header('Authorization'), 'Student,Teacher,Admin')

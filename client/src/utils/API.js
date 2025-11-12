@@ -430,4 +430,21 @@ export default {
       headers: { Authorization: key },
     }),
 
+  getSubject: (subjectId, key) =>
+    axios.get(`/api/subjects/${subjectId}`, {
+      headers: { Authorization: key },
+    }),
+
+     
+  uploadFile: function (formData, key) {
+    const config = {
+      headers: {
+        Authorization: key,
+        "Content-Type": "multipart/form-data",
+      },
+    };
+    return axios.post(`/api/file`, formData, config);
+  },
+
+
 };
