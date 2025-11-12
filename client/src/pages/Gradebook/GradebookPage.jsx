@@ -235,10 +235,6 @@ const GradebookPage = ({ match, user, location, logout }) => {
 
           <div className="gradebook-header">
             <h1>Gradebook</h1>
-            <div className="select-class">
-              <span>SELECT CLASS</span>
-              <div className="expand-icon">⌄</div>
-            </div>
           </div>
 
           <div className="gradebook-scroll">

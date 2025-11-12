@@ -82,6 +82,8 @@ if (process.env.NODE_ENV === "production") {
   // Set up location of NAS storage path
   app.use(config.publicPath, express.static(config.path));
 
+  // Serve uploaded/NAS files
+  app.use("/files", express.static(config.path));
 }
 
 // ✅ Register the gradebook API routes
@@ -133,4 +135,3 @@ io.on('connection', function (client) {
       //     console.log(err)
       //   }
       // }
-

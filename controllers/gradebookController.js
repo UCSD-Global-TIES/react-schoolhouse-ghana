@@ -9,17 +9,37 @@ exports.getGradesBySubject = async (req, res) => {
   try {
     const { subjectId } = req.params;
     console.log(`🔹 Fetching Grades for Subject: ${subjectId}`);
-    const entries = await Gradebook
-      .find({ subjectId })
-      .populate({path: "gradeId", select: "level"});
-    console.log("📊 Gradebook entries with level:", entries);
 
-    if (!entries.length) {
-      console.log("❌ No grades found for this subject!");
-      return res.status(404).json({ error: "No grades found" });
+    // 1️⃣ Load subject + enrolled students
+    const subject = await Subject.findById(subjectId).populate("students", "name _id");
+    if (!subject) {
+      return res.status(404).json({ error: "Subject not found" });
     }
-    // console.log("✅ Grades Fetched:", entries);
-    return res.json(entries);
+
+    // 2️⃣ Fetch existing gradebook entries
+    const existingEntries = await Gradebook
+      .find({ subjectId })
+      .populate({ path: "gradeId", select: "level" })
+      .lean();
+
+    // 3️⃣ Build merged gradebook view
+    const merged = subject.students.map(student => {
+      const match = existingEntries.find(
+        g => g.studentId.toString() === student._id.toString()
+      );
+      return (
+        match || {
+          subjectId,
+          studentId: student._id,
+          studentName: student.name,
+          grades: [], // placeholder
+          isNew: true,
+        }
+      );
+    });
+
+    console.log(`📊 Gradebook merged entries: ${merged.length}`);
+    return res.json(merged);
   } catch (error) {
     console.error("❌ Error fetching grades:", error);
     return res.status(500).json({ error: "Error fetching grades" });

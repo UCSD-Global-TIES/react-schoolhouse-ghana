@@ -108,38 +108,44 @@ module.exports = {
     // https://medium.com/@bmshamsnahid/nodejs-file-upload-using-multer-3a904516f6d2
     // https://stackoverflow.com/questions/51566797/accessing-upload-data-in-react-from-multer-node-server
     uploadFile: function (req, res) {
-        new Promise((resolve, reject) => {
-            const FOLDER_PATH = config.path;
-            const createdAt = Date.now()
-            storage = multer.diskStorage({
-                destination: function (req, file, callback) {
-                    callback(null, FOLDER_PATH);
-                },
-                filename: function (req, file, callback) {
-                    callback(null, `${createdAt}-${file.originalname}`);
-                }
-            });
-            // upload = multer({
-            //     storage: storage
-            // }).array("files");
+    const FOLDER_PATH = config.path;
+    const createdAt = Date.now();
 
-            upload = multer({
-                storage: storage
-            }).single("file");
+    return new Promise((resolve, reject) => {
+        const storage = multer.diskStorage({
+            destination: function (req, file, callback) {
+                callback(null, FOLDER_PATH);
+            },
+            filename: function (req, file, callback) {
+                callback(null, `${createdAt}-${file.originalname}`);
+            }
+        });
 
-            upload(req, res, function (err) {
-                if (err) {
-                    return resolve(null);
-                }
-                resolve({
-                    name: `${createdAt}-${req.file.originalname}`,
-                    // PATH TO FILE ON SERVER
-                    path: `${FOLDER_PATH}/${createdAt}-${req.file.originalname}`,
-                    created: createdAt
-                });
-            });
-        })
-    },
+        const upload = multer({ storage }).single("file");
+
+        upload(req, res, function (err) {
+            if (err) {
+                console.error("NAS upload error:", err);
+                return resolve(null);
+            }
+
+            if (!req.file) {
+                console.error("No file received in NAS upload.");
+                return resolve(null);
+            }
+
+            const fileInfo = {
+                name: `${createdAt}-${req.file.originalname}`,
+                path: `/files/${createdAt}-${req.file.originalname}`,           // web-accessible path
+                absolutePath: `${FOLDER_PATH}/${createdAt}-${req.file.originalname}`, // internal system path
+                created: createdAt
+            };
+
+            console.log("NAS upload success:", fileInfo);
+            resolve(fileInfo);
+        });
+    });
+},
     // TODO - NOT USED (SHOULD BE CALLED EVERYTIME UPLOADING TO NAS)
     // READ: Get disk space 
     getDiskSpace: function (cb) {

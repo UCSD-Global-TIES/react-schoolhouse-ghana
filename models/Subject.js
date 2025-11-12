@@ -10,6 +10,10 @@ const subjectSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: 'Announcement'
   }],
+  students: [{ 
+    type: Schema.Types.ObjectId, 
+    ref: "Student" 
+  }],
   files: [{
     type: Schema.Types.ObjectId,
     ref: 'File'
