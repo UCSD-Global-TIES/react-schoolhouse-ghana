@@ -43,7 +43,14 @@ const useStyles = makeStyles((theme) => ({
     background: "var(--primary-color)",
     color: "var(--background-color)",
   },
-  content: { flexGrow: 1, padding: theme.spacing(1) },
+  content: {
+    flexGrow: 1,
+    display: "flex",
+    flexDirection: "column",
+    height: "100vh",
+    overflowY: "auto",
+    backgroundColor: theme.palette.background.default,
+  },
   buttonLink: { color: "inherit", textDecoration: "none" },
   navLink: {
     textDecoration: "none",
@@ -57,6 +64,48 @@ const useStyles = makeStyles((theme) => ({
   },
   linkBox: { display: "flex", flexDirection: "column" },
   justifyIcon: { display: "flex", justifyContent: "center" },
+  headerSection: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: theme.spacing(2),
+  },
+  breadcrumb: {
+    fontSize: "0.875rem",
+    color: theme.palette.text.secondary,
+  },
+  classTitle: {
+    fontWeight: 700,
+    fontSize: "1.75rem",
+    marginTop: theme.spacing(0.5),
+  },
+  tableContainer: {
+    backgroundColor: theme.palette.background.paper,
+    borderRadius: theme.shape.borderRadius * 2,
+    boxShadow: theme.shadows[1],
+    padding: theme.spacing(4),
+    border: '2px solid #4CAF50',
+  },
+  actionsRow: {
+    display: "flex",
+    justifyContent: "flex-end",
+    alignItems: "center",
+    gap: theme.spacing(2),
+    maxWidth: 1200,
+    marginLeft: "auto",
+    marginRight: "auto",
+  },
+  schoolName: {
+    fontSize: "2rem",
+    fontWeight: 700,
+    color: "var(--background-color)",
+    marginBottom: 4,
+  },
+  schoolSubtitle: {
+    fontSize: "1rem",
+    color: "var(--background-color)",
+    marginTop: 0,
+  },
 }));
 
 const GradebookPage = ({ match, user, location, logout }) => {
