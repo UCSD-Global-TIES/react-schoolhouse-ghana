@@ -339,7 +339,7 @@ function SubjectPage(props) {
           <DocumentEditor
             primary={doc => doc.title}
             isSubComponent={"true"}
-            collection={"Upcoming Tasks"}
+            collection={"Upcoming Assignments"}
             icon={faBullhorn}
             FormComponent={(p) =>
               <SubjectTasksForm user={props.user} {...p} />

@@ -42,8 +42,10 @@ const textFields = [
     {
         name: "dueDate",
         label: "Due Date",
-        disabled: true,
-        helper: "This is when the task should be completed by."
+        type: "date",
+        isDatePicker: true,
+        disabled: false,
+        helper: "This is when the assignment should be completed by."
     },
     {
         name: "createdAt",
@@ -110,9 +112,10 @@ function SubjectTasksForm(props) {
                             className={classes.field}
                             label={item.label}
                             name={item.name}
+                            type={item.isDatePicker ? "date" : "text"}
                             placeholder={(item.disabled || (item.updateOnly && PROPS.isCreate)) ? disabledMsg : ""}
                             disabled={(item.disabled || (item.updateOnly && PROPS.isCreate))}
-                            value={(item.isDate ? parseTime(PROPS.document[item.name]) : null) || PROPS.document[item.name] || ""}
+                            value={(item.isDate ? parseTime(PROPS.document[item.name]) : null) || (item.isDatePicker && PROPS.document[item.name] ? PROPS.document[item.name].split('T')[0] : PROPS.document[item.name] || "")}
                             helperText={PROPS.error[item.name] ? (PROPS.error[item.name].exists ? PROPS.error[item.name].message : item.helper) : item.helper}
                             onChange={PROPS.handleChange}
                             fullWidth
