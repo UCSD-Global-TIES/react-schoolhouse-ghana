@@ -336,25 +336,34 @@ function DocumentEditor(props) {
     validateForm(doc).then((isValid) => {
       if (isValid) {
         setActionPending(true);
-        props.post(doc, props.user.key, props.user.profile).then(() => {
-          setDialogOpen(false);
-          setCurrentAlert({
-            isOpen: true,
-            severity: "success",
-            message: `The ${collection.toLowerCase()}(s) have been successfully created!`,
+        props
+          .post(doc, props.user.key, props.user.profile)
+          .then(() => {
+            setDialogOpen(false);
+            setCurrentAlert({
+              isOpen: true,
+              severity: "success",
+              message: `The ${collection.toLowerCase()}(s) have been successfully created!`,
+            });
+
+            notifyServer();
+
+            if (redirectOnExit) {
+              // Inform user of redirect to previous document (inform user -> wait 1 sec. -> redirect)
+              setTimeout(() => props.history.goBack(), 1000);
+            }
+
+            setTimeout(() => setActionPending(false), 1000);
+          })
+          .catch((err) => {
+            // Surface API error to user
+            setCurrentAlert({
+              isOpen: true,
+              severity: "error",
+              message: err && err.response && err.response.data && err.response.data.error ? err.response.data.error : (err.message || 'Failed to create'),
+            });
+            setTimeout(() => setActionPending(false), 500);
           });
-
-          notifyServer();
-
-          if (redirectOnExit) {
-            // Inform user of redirect to previous document (inform user -> wait 1 sec. -> redirect)
-            setTimeout(() => props.history.goBack(), 1000);
-          }
-
-          setTimeout(() => setActionPending(false), 1000);
-        });
-      } else {
-        console.log('❌ Frontend: Form validation failed for:', JSON.stringify(doc, null, 2));
       }
     });
   };
@@ -364,23 +373,33 @@ function DocumentEditor(props) {
     validateForm(doc).then((isValid) => {
       if (isValid) {
         setActionPending(true);
-        props.put(doc, props.user.key).then(() => {
-          setDialogOpen(false);
-          setCurrentAlert({
-            isOpen: true,
-            severity: "success",
-            message: `The ${collection.toLowerCase()} has been successfully updated!`,
+        props
+          .put(doc, props.user.key)
+          .then(() => {
+            setDialogOpen(false);
+            setCurrentAlert({
+              isOpen: true,
+              severity: "success",
+              message: `The ${collection.toLowerCase()} has been successfully updated!`,
+            });
+
+            notifyServer();
+
+            if (redirectOnExit) {
+              // Inform user of redirect to previous document (inform user -> wait 1 sec. -> redirect)
+              setTimeout(() => props.history.goBack(), 1000);
+            }
+
+            setTimeout(() => setActionPending(false), 1000);
+          })
+          .catch((err) => {
+            setCurrentAlert({
+              isOpen: true,
+              severity: "error",
+              message: err && err.response && err.response.data && err.response.data.error ? err.response.data.error : (err.message || 'Failed to save'),
+            });
+            setTimeout(() => setActionPending(false), 500);
           });
-
-          notifyServer();
-
-          if (redirectOnExit) {
-            // Inform user of redirect to previous document (inform user -> wait 1 sec. -> redirect)
-            setTimeout(() => props.history.goBack(), 1000);
-          }
-
-          setTimeout(() => setActionPending(false), 1000);
-        });
       }
     });
   };

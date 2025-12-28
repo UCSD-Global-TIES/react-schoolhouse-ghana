@@ -218,10 +218,15 @@ const GradebookPage = ({ match, user, history, location, logout }) => {
         <GradebookNavbar subjectName={gradebookTitle} teacherName={teacherName} gradeLevel="" />
         
         {!isStudent && (
-          <div style={{ display: "flex", justifyContent: "flex-end", gap: "10px", marginBottom: "10px", marginTop: "-5px" }}>
-            <button onClick={() => setGradebookData([...gradebookData])} style={{ padding: "8px 16px", cursor: "pointer", backgroundColor: "#007bff", color: "white", border: "none", borderRadius: "4px" }}>Add Assignment</button>
-            <button onClick={saveGradebook} style={{ padding: "8px 16px", cursor: "pointer", backgroundColor: "#28a745", color: "white", border: "none", borderRadius: "4px" }}>Save Gradebook</button>
-          </div>
+          <>
+            <div style={{ marginTop: "20px", textAlign: "center", color: "#666" }}>
+              <p><span role="img" aria-label="books">📚</span> Students are automatically enrolled based on subject enrollment</p>
+            </div>
+            <div style={{ display: "flex", justifyContent: "flex-end", gap: "10px", marginBottom: "10px", marginTop: "10px" }}>
+              <button onClick={() => setGradebookData([...gradebookData])} style={{ padding: "8px 16px", cursor: "pointer", backgroundColor: "#007bff", color: "white", border: "none", borderRadius: "4px" }}>Add Assignment</button>
+              <button onClick={saveGradebook} style={{ padding: "8px 16px", cursor: "pointer", backgroundColor: "#28a745", color: "white", border: "none", borderRadius: "4px" }}>Save Gradebook</button>
+            </div>
+          </>
         )}
         
         <GradebookTable 

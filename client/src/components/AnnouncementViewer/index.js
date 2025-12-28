@@ -153,18 +153,29 @@ function AnnouncementViewer(props) {
                                 </div>
                             </div>
                             
-                            <div className={classes.dateContainer}>
-                                <div className={classes.dateWrapper}>
-                                    <div className={classes.dateLabel}>CREATED ON:</div>
-                                    <div className={classes.dateValue}>
-                                        {parseTime(document.createdAt)}
+                            {document.dueDate && (
+                                <div className={classes.dateContainer}>
+                                    <div className={classes.dateWrapper}>
+                                        <div className={classes.dateLabel}>DUE DATE: </div>
+                                        <div className={classes.dateValue} style={{ color: '#4B4B4B', fontWeight: 'bold' }}>
+                                            {parseTime(document.dueDate)}
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
+                            )}
                             
                             <div className={classes.contentContainer}>
                                 <div className={classes.content}>
-                                    {document.content}
+                                    {document.content || document.description}
+                                </div>
+                            </div>
+                            
+                            <div className={classes.dateContainer} style={{ marginTop: 'auto', paddingTop: '2rem', borderTop: '1px solid #E5E5E5' }}>
+                                <div className={classes.dateWrapper}>
+                                    <div className={classes.dateLabel}>CREATED ON: </div>
+                                    <div className={classes.dateValue}>
+                                        {parseTime(document.createdAt)}
+                                    </div>
                                 </div>
                             </div>
                             {hasFiles && (
