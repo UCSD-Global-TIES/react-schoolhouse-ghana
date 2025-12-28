@@ -10,12 +10,25 @@ const routes = require("./routes");
 const config = require("./nasConfig");
 const cors = require('cors');
 
+console.log("Current working directory:", __dirname); // Important!
+const gradebookRoutes = require('./routes/api/gradebook'); 
+const subjectsRouter   = require("./routes/api/subjects");
 
 const app = express();
 var http = require('http').createServer(app);
 var io = require('socket.io')(http);
 const PORT = process.env.PORT || 3001;
-app.use(cors());
+
+const corsOptions = {
+  origin: "http://localhost:3000", // ✅ Allow frontend
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  credentials: true,
+  optionsSuccessStatus: 204
+};
+
+app.use(cors(corsOptions));
+
+// app.use(cors());
 
 // Define middleware here
 app.use(express.urlencoded({
@@ -70,6 +83,12 @@ if (process.env.NODE_ENV === "production") {
   app.use(config.publicPath, express.static(config.path));
 
 }
+
+// ✅ Register the gradebook API routes
+app.use("/api/gradebook", gradebookRoutes);
+
+// subject API
+app.use("/api/subjects", subjectsRouter); 
 
 // Add routes, both API and view
 app.use(routes);

@@ -32,6 +32,8 @@ import sas from "../../logos/sas_logo.png"
 // import AccountIcon from "../../../../assets/account-icon.svg";
 // import BookIcon from "../../../../assets/books.svg";
 import BullhornIcon from "../../assets/bullhorn.svg";
+import OpenBookIcon from "../../assets/open-book.svg";
+import HomeIcon from "../../assets/icons8-home.svg";
 import HelpIcon from "../../assets/help.svg";
 
 
@@ -41,6 +43,7 @@ import AnnouncementCard from "../../components/AnnouncementCard/AnnouncementCard
 import SubjectTasksForm from "../../components/SubjectTasksForm";
 import TaskList from "../../components/TaskList";
 import LogoutIcon from "../../assets/LogoutIcon.svg";
+import GradebookIcon from "../../assets/gradebookIcon.svg";
 const drawerWidth = "9.375rem";
 
 
@@ -124,11 +127,23 @@ function SubjectPage(props) {
   const socket = React.useContext(SocketContext)
   const classes = useStyles();
   const theme = useTheme();
+
+  const { subjects } = props; 
+
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const isSmallDevice = useMediaQuery({
     query: '(max-width: 600px)'
   })
-  const subject_id = props.match.params.id;
+  const subject_id_param = props.match.params.id;
+  
+  // Extract actual subject ID from composite ID (format: subjectId_gradeId)
+  const subject_id = subject_id_param.includes('_') ? subject_id_param.split('_')[0] : subject_id_param;
+  const gradeIdFromUrl = subject_id_param.includes('_') ? subject_id_param.split('_')[1] : null;
+  
+  // Extract grade level and section from URL query parameters
+  const urlParams = new URLSearchParams(props.location.search);
+  const gradeLevel = urlParams.get('gradeLevel');
+  const gradeSection = urlParams.get('gradeSection');
 
 
   const [subjectInfo, setSubjectInfo] = useState({});
@@ -144,22 +159,39 @@ function SubjectPage(props) {
   const { logout } = props
 
 
+  // derive portal base path (so Home/Classes go back to the portal)
+  const portalBase = props.user && props.user.type === 'Teacher' ? '/teacher' : (props.user && props.user.type === 'Admin' ? '/edit' : '/user');
+
+  // Only include a Home link in the subject drawer if the current location
+  // is not already under the portal base (prevents duplicate Home entries
+  // when subject is rendered inside a portal nested route).
+  const includeHome = !props.location.pathname.startsWith(portalBase);
+
   // menu items
   const documentMenuItems = [
-    {
-      label: "Announcements",
-      iconPath: BullhornIcon,
-      path: `${props.match.url}/announcements`,
-    },
+    ...(includeHome ? [{
+      label: "Home",
+      iconPath: HomeIcon,
+      path: portalBase,
+    }] : []),
     {
       label: "Classes",
       iconPath: BookIcon,
+      // link back to portal classes list so users exit subject context
+      path: `${portalBase}/classes`,
+    },
+    {
+      label: "Subject",
+      iconPath: OpenBookIcon,
+      // point the main sidebar entry to the composite resources view
       path: `${props.match.url}/resources`,
     },
     {
-      label: "Help",
-      iconPath: HelpIcon,
-      path: `${props.match.url}/studentGrades`
+      label: "Gradebook",
+      iconPath: GradebookIcon,
+      path: (gradeLevel && gradeSection) 
+        ? `/gradebook/${subject_id_param}?gradeLevel=${gradeLevel}&gradeSection=${gradeSection}`
+        : `/gradebook/${subject_id_param}`,
     },
     {
       label: "Log Out",
@@ -314,7 +346,7 @@ function SubjectPage(props) {
           <DocumentEditor
             primary={doc => doc.title}
             isSubComponent={"true"}
-            collection={"Upcoming Tasks"}
+            collection={"Upcoming Assignments"}
             icon={faBullhorn}
             FormComponent={(p) =>
               <SubjectTasksForm user={props.user} {...p} />
@@ -381,8 +413,8 @@ function SubjectPage(props) {
 
 
 
-  // SET DEFAULT MENU
-  const defaultRoute = `${props.match.path}/announcements`;
+  // SET DEFAULT MENU (open the composite Resources view by default)
+  const defaultRoute = `${props.match.path}/resources`;
 
 
   useEffect(() => {
@@ -470,6 +502,8 @@ function SubjectPage(props) {
         <Typography className={clsx(classes.header,classes.subjectTitle)}>{subjectInfo.name}</Typography>
 
 
+        {/* Gradebook is available in the sidebar menu (see documentMenuItems) */}
+
         {/* <TransitionGroup>
           <CSSTransition
             key={props.location.key}
@@ -495,5 +529,6 @@ function SubjectPage(props) {
     // </div>    
   );
 }
+
 
 export default SubjectPage;

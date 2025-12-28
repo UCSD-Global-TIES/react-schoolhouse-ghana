@@ -119,6 +119,35 @@ function AnnouncementCard(props) {
     setShowViewer(true);
     // Remove the handleDocument call here since we want to show viewer, not form
   };
+
+  // Check if current user can edit/delete this announcement
+  const canEditOrDelete = () => {
+    if (!user || !document) return false;
+    
+    // Admin can edit/delete any announcement
+    if (user.type === "Admin") return true;
+    
+    // Teacher can only edit/delete their own announcements
+    if (user.type === "Teacher") {
+      // If announcement has author metadata, use it for permission check
+      if (document.authorId) {
+        return document.authorId === user.key || document.authorId === user.profile._id;
+      }
+      
+      // For legacy announcements without authorId, check by authorName
+      // This is a fallback for existing announcements
+      if (document.authorName && user.profile) {
+        const userFullName = `${user.profile.first_name} ${user.profile.last_name}`;
+        return document.authorName === userFullName;
+      }
+      
+      // If no author info available, allow edit for teachers (legacy behavior)
+      // You may want to change this to false for more restrictive behavior
+      return true;
+    }
+    
+    return false;
+  };
  
   return (
     <>
@@ -129,10 +158,10 @@ function AnnouncementCard(props) {
         <div className={classes.textContainer}>
           <p className={classes.text}>{name}</p>
           <p className={classes.dateText}>
-            CREATED ON: {moment(PROPS.document.createdAt).format('MM/DD/YYYY')}
+            {document.year || moment(PROPS.document.createdAt).format('YYYY') + '-' + (parseInt(moment(PROPS.document.createdAt).format('YYYY')) + 1)}
           </p>
         </div>
-        {user && (user.type === "Admin" || user.type === "Teacher") && (
+        {user && canEditOrDelete() && (
           <div className={classes.iconContainer}>
             <div className={classes.icon} onClick={handleClick}>
               <svg

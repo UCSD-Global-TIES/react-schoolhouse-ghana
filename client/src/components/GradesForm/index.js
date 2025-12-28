@@ -1,13 +1,24 @@
 import React, { useEffect, useState } from "react";
-import { TextField, Box, Switch, Typography, CircularProgress, Divider, Button } from "@material-ui/core";
+import { 
+    TextField, 
+    Box, 
+    Typography, 
+    Button,
+    Select,
+    MenuItem,
+    FormControl,
+    InputLabel,
+    Chip,
+    Checkbox,
+    FormControlLabel,
+    Paper
+} from "@material-ui/core";
 import { makeStyles } from '@material-ui/core/styles';
+import { ExpandMore, ExpandLess } from '@material-ui/icons';
 import { parseTime } from '../../utils/misc';
 import DocumentPicker from "../DocumentPicker"
-import EnrolledClasses from "../EnrolledClasses";
 import ConfirmDialog from "../ConfirmDialog";
-
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Checkbox from '@material-ui/core/Checkbox';
+import SectionDetail from "../SectionDetail";
 
 import "../../utils/flowHeaders.min.css";
 import API from "../../utils/API";
@@ -62,6 +73,16 @@ const textFields = [
         required: true
     },
     {
+        name: "section",
+        label: "Section",
+        helper: "Section letter for this grade (A, B, C, etc.). Must be a single uppercase letter.",
+        createOnly: true,
+        required: true,
+        maxLength: 1,
+        pattern: /^[A-Z]$/,
+        patternMessage: "Section must be a single uppercase letter (A, B, C, etc.)"
+    },
+    {
         name: "createdAt",
         label: "Created On",
         isDate: true,
@@ -83,239 +104,282 @@ const MIN_GRADE = 1;
 function GradesForm(props) {
     const classes = useStyles();
     const [subjectOptions, setSubjectOptions] = useState([]);
-    const [selectedSubjects, setSelectedSubjects] = useState(props.document.subjects || []);
-    const [studentOptions, setStudentOptions] = useState([]);
-    const [selectedStudents, setSelectedStudents] = useState(props.document.students || []);
-    const [teacherOptions, setTeacherOptions] = useState([]);
-    const [selectedTeachers, setSelectedTeachers] = useState(props.document.teachers || []);
-    const [gradeStatus, setGradeStatus] = useState(props.document.status || 'unpublished');
-    const [PROPS, setProps] = useState(props)
-    const [checked, setChecked] = useState(gradeStatus === 'active' ? true : false)
-    const [confirmOpen, setConfirmOpen] = useState(false);
 
+    // Grade Section Creation Wizard State (simplified for new grade creation)
+    const [wizardLevel, setWizardLevel] = useState(1);
+    const [wizardSectionCount, setWizardSectionCount] = useState(1);
+    const [wizardSelectedSubjects, setWizardSelectedSubjects] = useState([]);
+    const [isCreating, setIsCreating] = useState(false);
 
-    const handleNumberChange = (e) => {
-        const { value, name } = e.target;
-        let tmp = {
-            target: {
-                name,
-                value
-            }
-        }
+    // Section Detail State
+    const [currentSection, setCurrentSection] = useState(props.document.section || 'A');
 
-        // Prevent manual input of negative numbers
-        if (parseInt(value) < MIN_GRADE) {
-            tmp.target.value = MIN_GRADE;
-        }
-
-        props.handleChange(tmp);
-    }
-
-    const changeStatus = (e) => {
-        setChecked(e.target.checked);
-        let status = e.target.checked ? 'active' : 'unpublished';
-        setGradeStatus(status);
-
-        let newEvent = { ...e, target: { ...e.target, name: 'status', value: status } };
-
-        PROPS.handleChange(newEvent);
-    }
-
-    const handlePickChange = (name, selectedDocs) => {
-        switch (name) {
-            case "subjects":
-                setSelectedSubjects(selectedDocs);
-                break;
-            case "students":
-                setSelectedStudents(selectedDocs);
-                break;
-            case "teachers":
-                setSelectedTeachers(selectedDocs);
-                break;
-        }
-
-        const event = {
-            target: {
-                name,
-                value: selectedDocs
-            }
-        }
-        PROPS.handleChange(event)
-    }
 
     const rerouteSubjects = () => {
         props.history.push({
             pathname: `/edit/subjects`,
         })
-    
     }
 
-    const archiveGrade = () => {
-        setConfirmOpen(true);
-    }
+    // Grade Section Wizard Functions
+    const handleSubjectToggle = (subjectId) => {
+        setWizardSelectedSubjects(prev => 
+            prev.includes(subjectId) 
+                ? prev.filter(id => id !== subjectId)
+                : [...prev, subjectId]
+        );
+    };
 
-    const handleConfirm = (isOpen) => {
-        setConfirmOpen(isOpen);
-      };
-      
-    const handleArchive = (e) => {
-        setChecked(false);
-        let status = 'archived';
-        setGradeStatus(status);
+    const generateSectionLetters = (count) => {
+        return Array.from({ length: count }, (_, i) => String.fromCharCode(65 + i)); // A, B, C, etc.
+    };
 
-        let newEvent = { ...e, target: { ...e.target, name: 'status', value: status } };
+    // Simplified grade creation for wizard
+    const handlePublishGrades = async () => {
+        if (wizardSelectedSubjects.length === 0) {
+            alert('Please select at least one subject.');
+            return;
+        }
 
-        PROPS.handleChange(newEvent);
-        setConfirmOpen(false);
-    }
+        setIsCreating(true);
+        
+        try {
+            const sectionLetters = generateSectionLetters(wizardSectionCount);
+            console.log(`🔹 Creating ${sectionLetters.length} sections for Grade ${wizardLevel}:`, sectionLetters);
+            let successCount = 0;
+            const errors = [];
+            
+            for (let i = 0; i < sectionLetters.length; i++) {
+                const sectionLetter = sectionLetters[i];
+                
+                try {
+                    // Create completely fresh grade data object for each iteration
+                    const levelNum = parseInt(wizardLevel);
+                    const subjectsArray = Array.isArray(wizardSelectedSubjects) ? [...wizardSelectedSubjects] : [];
+                    
+                    // Create subjectTeacherAssignments with subjects but no teachers initially
+                    const subjectTeacherAssignments = subjectsArray.map(subjectId => ({
+                        subject: subjectId,
+                        teacher: null
+                    }));
+                    
+                    const gradeData = {
+                        level: levelNum,
+                        section: sectionLetter,
+                        subjectTeacherAssignments: subjectTeacherAssignments,
+                        students: [],
+                        status: 'active'
+                    };
+
+                    console.log(`🔹 Creating Grade ${levelNum}${sectionLetter} with data:`, JSON.stringify(gradeData, null, 2));
+                    
+                    const response = await API.addGrade(gradeData, props.user.key);
+                    console.log(`✅ Created Grade ${levelNum}${sectionLetter}:`, response.data);
+                    successCount++;
+                    
+                    // Add small delay between requests to avoid race conditions
+                    if (i < sectionLetters.length - 1) {
+                        await new Promise(resolve => setTimeout(resolve, 200));
+                    }
+                    
+                } catch (sectionError) {
+                    console.error(`❌ Error creating Grade ${wizardLevel}${sectionLetter}:`, sectionError.response?.data || sectionError.message);
+                    const errorMsg = sectionError.response?.data?.error || sectionError.message || 'Unknown error';
+                    errors.push(`Section ${sectionLetter}: ${errorMsg}`);
+                }
+            }
+
+            if (successCount === sectionLetters.length) {
+                alert(`✅ Successfully created Grade ${wizardLevel} with ${successCount} section${successCount > 1 ? 's' : ''}!`);
+                
+                // Close the dialog/form
+                if (props.handleClose) {
+                    props.handleClose();
+                }
+            } else if (successCount > 0) {
+                alert(`⚠️ Partially successful: Created ${successCount}/${sectionLetters.length} sections.\nErrors:\n${errors.join('\n')}`);
+            } else {
+                alert(`❌ Failed to create any sections.\nErrors:\n${errors.join('\n')}`);
+            }
+            
+        } catch (error) {
+            console.error('❌ Error in grade creation process:', error);
+            alert('Error creating grade sections. Please try again.');
+        } finally {
+            setIsCreating(false);
+        }
+    };
+
+    // Section Detail Handler Functions
+    const handleSectionNavigation = (newSection) => {
+        setCurrentSection(newSection);
+        
+        // Find the grade document for the new section
+        // This would typically involve fetching the grade data for the new section
+        // For now, we'll just update the current section
+        console.log(`Switching to section ${newSection}`);
+        
+        // TODO: Implement section switching logic
+        // This should update props.document to the new section's data
+    };
+
+    const handleEditSection = (sectionData) => {
+        console.log('📝 Edit Section clicked:', sectionData);
+        
+        // For now, let's show what editing would do
+        // In a full implementation, you would:
+        // 1. Open DocumentEditor in edit mode with this section's data
+        // 2. Or navigate to a different route for editing
+        
+        alert(`Edit functionality for Grade ${sectionData.level} Section ${sectionData.section}:\n\n` +
+              `Current Status: ${sectionData.status}\n` +
+              `Subject-Teacher Assignments: ${sectionData.subjectTeacherAssignments?.length || 0}\n` +
+              `Students: ${sectionData.students?.length || 0}\n\n` +
+              `To edit this grade, you can:\n` +
+              `- Add/remove subjects and assign teachers using the subject-teacher management dialog\n` +
+              `- Add/remove students using the student management dialog\n` +
+              `- Toggle Active/Archive status by clicking the status chip`);
+    };
 
     useEffect(() => {
-        const promises = [];
-        promises.push(API.getSubjects(props.user.key));
-        promises.push(API.getUsers(props.user.key));
-
-        Promise.all(promises)
-            .then((results) => {
-                const subjectIDs = [];
-                if (props.document.subjects) {
-                    for (const subject of props.document.subjects) {
-                        subjectIDs.push(subject._id);
-                    }
-                }
-
-                setSelectedSubjects(subjectIDs)
-
-                setSelectedStudents(props.document.students || [])
-
-                setSelectedTeachers(props.document.teachers || [])
-
-                const students = [];
-                const teachers = [];
-                for (const account of results[1].data) {
-                    const { first_name, last_name, profile_id: _id, profile_createdAt: createdAt, profile_updatedAt: updatedAt } = account;
-                    const profileObj = {
-                        first_name,
-                        last_name,
-                        _id,
-                        createdAt,
-                        updatedAt
-                    }
-
-                    if (account.type === "Student") students.push(profileObj)
-                    if (account.type === "Teacher") teachers.push(profileObj)
-                }
-
-                // Set options and loading flag to false
-                setSubjectOptions([...results[0].data]);
-                setStudentOptions([...students]);
-                setTeacherOptions([...teachers]);
-
+        // Load subjects for the wizard
+        API.getSubjects(props.user.key)
+            .then((result) => {
+                setSubjectOptions([...result.data]);
             })
+            .catch(error => {
+                console.error('Error loading subjects:', error);
+            });
+    }, [props.user.key]);
 
 
-    }, []);
 
+    // Set default section to 'A' for new grades
     useEffect(() => {
-        setProps(props);
-    }, [props])
+        if (props.isCreate && !props.document.section) {
+            const event = {
+                target: {
+                    name: 'section',
+                    value: 'A'
+                }
+            };
+            props.handleChange(event);
+        }
+    }, [props.isCreate, props.document.section]);
 
     return (
         <div className={classes.root}>
-
-            <div className={classes.vc}>
-
-                {
-                    textFields.map((item, idx) => (
-                        <TextField
-                            // Just for Grade 'level' field
-                            error={PROPS.error[item.name] ? PROPS.error[item.name].exists : null}
-                            required={item.required}
-                            type={item.isNumber ? "number" : "text"}
-                            key={`${item.name}-form-${idx}`}
-                            className={classes.field}
-                            label={item.label}
-                            name={item.name}
-                            placeholder={(item.disabled || (item.updateOnly && PROPS.isCreate)) ? disabledMsg : ""}
-                            disabled={(item.disabled || (item.updateOnly && PROPS.isCreate) || (item.createOnly && !PROPS.isCreate))}
-                            value={(item.isDate ? parseTime(PROPS.document[item.name]) : null) || ((item.isNumber && !PROPS.document[item.name]) ? MIN_GRADE : null) || PROPS.document[item.name] || ""}
-                            helperText={PROPS.error[item.name] ? (PROPS.error[item.name].exists ? PROPS.error[item.name].message : item.helper) : item.helper}
-                            onChange={item.isNumber ? handleNumberChange : PROPS.handleChange}
-                            fullWidth
-                            autoComplete={'off'}
-                            margin="normal"
-                            InputLabelProps={{
-                                shrink: true,
-                            }}
-                            multiline={item.multiline}
-                            rows={3}
-                            variant="outlined"
-                        />
-                    ))}
-                
-                <FormControlLabel control={<Checkbox checked={checked} onChange={changeStatus}/>} label="Publish Grade" />
-
-                {/* TODO: This has issues when editing subjects for a grade, also with 'gradeLabel' prop */}
-                {/* <div className={classes.margin}>
-                    <EnrolledClasses subjects={props.document.subjects} status={gradeStatus} title={'CURRENT SUBJECTS'} editable={false}></EnrolledClasses>
-                </div> */}
-                
-                <DocumentPicker
-                    title={"Grade Subjects"}
-                    docs={subjectOptions}
-                    pageMax={5}
-                    selected={selectedSubjects}
-                    icon={faChalkboardTeacher}
-                    collection={"Subjects"}
-                    primary={(doc) => doc.name}
-                    handleChange={(docs) => handlePickChange('subjects', docs)}
-                />
-
-                <Button className={classes.btn} onClick={rerouteSubjects}>Edit Subjects</Button>
-
-                <DocumentPicker
-                    title={"Students"}
-                    docs={studentOptions}
-                    pageMax={5}
-                    selected={selectedStudents}
-                    icon={faUserGraduate}
-                    collection={"Students"}
-                    primary={(doc) => `${doc.first_name} ${doc.last_name}`}
-                    handleChange={(docs) => handlePickChange('students', docs)}
-                />
-
-                <DocumentPicker
-                    title={"Teachers"}
-                    docs={teacherOptions}
-                    pageMax={5}
-                    selected={selectedTeachers}
-                    icon={faAppleAlt}
-                    collection={"Teachers"}
-                    primary={(doc) => `${doc.first_name} ${doc.last_name}`}
-                    handleChange={(docs) => handlePickChange('teachers', docs)}
-                />
-            </div>
             
-            <ConfirmDialog
-                open={confirmOpen}
-                buttonText={'Archive this Grade'}
-                handleClose={() => {
-                handleConfirm(false);
-                
-                }}
-                handleAction={handleArchive}
-            >
-                This will mark this grade as{" "}
-                <Typography
-                variant="body1"
-                style={{ display: "inline", fontWeight: "bold" }}
-                >
-                archived.
-                </Typography>{" "}
-                You can undo this action within grade page settings.
-            </ConfirmDialog>
             
-            <Button className={classes.btn} onClick={archiveGrade} disabled={gradeStatus === 'archived'}>Archive Grade</Button>
+            {/* Simplified Grade Creation Wizard */}
+            {props.isCreate ? (
+                <Paper elevation={2} style={{ padding: '24px', marginBottom: '20px' }}>
+                    <Typography variant="h6" gutterBottom color="primary">
+                        <span role="img" aria-label="books">📚</span> Create Grade Sections
+                    </Typography>
+                    
+                    {/* Grade Level Selection */}
+                    <FormControl variant="outlined" fullWidth style={{ marginBottom: '16px' }}>
+                        <InputLabel>Grade Level</InputLabel>
+                        <Select
+                            value={wizardLevel}
+                            onChange={(e) => setWizardLevel(e.target.value)}
+                            label="Grade Level"
+                        >
+                            {[1,2,3,4,5,6,7,8,9,10,11,12].map(level => (
+                                <MenuItem key={level} value={level}>Grade {level}</MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
 
+                    {/* Section Count Selection */}
+                    <FormControl variant="outlined" fullWidth style={{ marginBottom: '16px' }}>
+                        <InputLabel>Number of Sections</InputLabel>
+                        <Select
+                            value={wizardSectionCount}
+                            onChange={(e) => setWizardSectionCount(e.target.value)}
+                            label="Number of Sections"
+                        >
+                            {[1,2,3,4,5,6].map(count => (
+                                <MenuItem key={count} value={count}>
+                                    {count} Section{count > 1 ? 's' : ''} ({generateSectionLetters(count).join(', ')})
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
+
+                    {/* Subjects Selection */}
+                    <Box display="flex" justifyContent="space-between" alignItems="center" style={{ marginBottom: '8px' }}>
+                        <Typography variant="subtitle1">
+                            Select Subjects:
+                        </Typography>
+                        <Button 
+                            variant="outlined" 
+                            color="primary" 
+                            onClick={rerouteSubjects}
+                            size="small"
+                            style={{ minWidth: '120px' }}
+                        >
+                            + Subject
+                        </Button>
+                    </Box>
+                    
+                    {subjectOptions.length > 0 ? (
+                        <Box display="flex" flexWrap="wrap" gap={1} style={{ marginBottom: '24px' }}>
+                            {subjectOptions.map(subject => (
+                                <Chip
+                                    key={subject._id}
+                                    label={subject.name}
+                                    onClick={() => handleSubjectToggle(subject._id)}
+                                    color={wizardSelectedSubjects.includes(subject._id) ? 'primary' : 'default'}
+                                    variant={wizardSelectedSubjects.includes(subject._id) ? 'default' : 'outlined'}
+                                    clickable
+                                />
+                            ))}
+                        </Box>
+                    ) : (
+                        <Box style={{ 
+                            marginBottom: '24px', 
+                            padding: '16px', 
+                            backgroundColor: '#f5f5f5', 
+                            borderRadius: '4px',
+                            textAlign: 'center'
+                        }}>
+                            <Typography variant="body2" color="textSecondary">
+                                <span role="img" aria-label="warning">⚠️</span> No subjects available. Create subjects first to continue.
+                            </Typography>
+                        </Box>
+                    )}
+
+                    {/* Action Buttons */}
+                    <Box display="flex" gap={2} justifyContent="flex-end">
+                        <Button 
+                            variant="outlined" 
+                            onClick={() => props.handleClose && props.handleClose()}
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            onClick={handlePublishGrades}
+                            disabled={wizardSelectedSubjects.length === 0 || isCreating}
+                        >
+                            {isCreating ? 'Publishing...' : `Publish Grade ${wizardLevel}`}
+                        </Button>
+                    </Box>
+                </Paper>
+            ) : (
+                /* Section Detail View */
+                <SectionDetail
+                    gradeId={props.document._id}
+                    gradeLevel={props.document.level}
+                    currentSection={currentSection}
+                    onSectionChange={handleSectionNavigation}
+                    // Edit button removed in SectionDetail per design request
+                    user={props.user}
+                />
+            )}
         </div>
     )
 };

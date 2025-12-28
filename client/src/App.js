@@ -16,6 +16,10 @@ import "typeface-roboto";
 import * as io from "socket.io-client";
 import SocketContext from "./socket-context";
 
+// // Import the Gradebook component
+import GradebookPage from "./pages/Gradebook/GradebookPage";
+
+
 // Utils
 import API from "./utils/API";
 
@@ -34,11 +38,13 @@ import ProtectedRoute from "./components/ProtectedRoute";
 // Pages
 import AccountPortal from "./pages/AccountPortal/index";
 import AdminPortal from "./pages/AccountPortal/versions/admin/AdminPortal";
+import TeacherPortal from "./pages/AccountPortal/versions/teacher/TeacherPortal.jsx";
 import AssessmentPage from "./pages/AssessmentPage/index";
 import LoginPortal from "./pages/LoginPortal/index";
 import NoMatch from "./pages/NoMatch/index";
 import SubjectPage from "./pages/SubjectPage/index";
 import UserPortal from "./pages/AccountPortal/versions/user/UserPortal.jsx"; 
+import ClassesList from "./pages/ClassesList/ClassesList";
 
 const socket = io();
 
@@ -142,7 +148,16 @@ function App() {
               </div>
             </div>
           ) : (
-            <Switch>
+            <>
+              {console.debug && console.debug("[App] userInfo:", userInfo)}
+{/*REMEMBER TO REMOVE THIS AFTER TEST  */}
+              {/* Simple welcome banner to verify user role/ID */}
+              {userInfo && (
+                <div style={{ padding: "0.5rem", textAlign: "center", background: "#f5f5f5" }}>
+                  {`Welcome ${userInfo.type} ID: ${userInfo.key}`}
+                </div>
+              )}
+              <Switch>
               {/* Portal component should check account type and render the correct component */}
               <ProtectedRoute
                 exact
@@ -156,10 +171,22 @@ function App() {
                 logout={handleLogout}
                 user={userInfo}
               />
+              <ProtectedRoute
+                path="/teacher"
+                component={TeacherPortal}
+                logout={handleLogout}
+                user={userInfo}
+              />
               {/* Class component should check account type and render the correct component */}
               <ProtectedRoute
                 path="/subject/:id"
                 component={SubjectPage}
+                logout={handleLogout}
+                user={userInfo}
+              />
+              <ProtectedRoute
+                path="/classes"
+                component={ClassesList}
                 logout={handleLogout}
                 user={userInfo}
               />
@@ -182,8 +209,18 @@ function App() {
                 logout={handleLogout}
                 user={userInfo}
               />
+              
+
+              <ProtectedRoute
+                path="/gradebook/:subjectId"
+                component={GradebookPage}
+                logout={handleLogout}
+                user={userInfo}
+              />
+
               <Route component={NoMatch} />
             </Switch>
+            </>
           )}
         </div>
       </SocketContext.Provider>

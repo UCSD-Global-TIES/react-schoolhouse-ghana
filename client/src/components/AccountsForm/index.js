@@ -90,7 +90,7 @@ function AccountsForm(props) {
     const grade = gradeOptions.find(option => option._id == PROPS.document['grade']) || gradeValue || {};
     const subjects = grade.subjects || [];
     const status = grade.status || 'unpublished';
-    const gradeLabel = grade.level ? `G${grade.level}` : '';
+    const gradeLabel = grade.level ? `Grade ${grade.level}${grade.section || 'A'}` : '';
 
     const handleAutocompleteChange = (e, value, name) => {
         if (e && value && name) {

@@ -253,7 +253,14 @@ function AdminPortal(props) {
       path: `${props.match.path}/announcements`,
       api: {
         get: API.getAnnouncements,
-        post: API.addAnnouncement,
+        post: (announcementData, key) => {
+          // Check if this is a multi-subject announcement
+          if (announcementData.subjects && announcementData.subjects.length > 0) {
+            return API.addMultiSubjectAnnouncement(announcementData, key);
+          } else {
+            return API.addAnnouncement(announcementData, key, props.user);
+          }
+        },
         put: API.updateAnnouncement,
         delete: API.deleteAnnouncements,
       },
@@ -279,8 +286,8 @@ function AdminPortal(props) {
       collection: "Grade",
       icon: faShapes,
       FormComponent: (p) => <GradesForm user={props.user} {...p} />,
-      primary: (doc) => `Grade ${doc.level}`,
-      secondary: (doc) => `G${doc.level}`,
+      primary: (doc) => `Grade ${doc.level}${doc.section || 'A'}`,
+      secondary: (doc) => `Grade ${doc.level}${doc.section || 'A'}`,
       path: `${props.match.path}/grades`,
       grStatus: (doc) => `(${doc.status})`,
       api: {
@@ -293,16 +300,30 @@ function AdminPortal(props) {
         level: {
           validate: (value) =>
             new Promise((resolve, reject) => {
-              API.getGrades(props.user.key).then((result) => {
-                const grades = result.data;
-
-                for (const grade of grades) {
-                  if (grade.level === parseInt(value)) resolve(false);
-                }
+              // Note: We now allow same level with different sections
+              // The database compound index prevents duplicate level + section combinations
+              // This validation now just checks for reasonable level values
+              const levelNum = parseInt(value);
+              if (levelNum < 1 || levelNum > 12) {
+                resolve(false);
+              } else {
                 resolve(true);
-              });
+              }
             }),
-          message: "You must enter a grade level that does not yet exist.",
+          message: "Grade level must be between 1 and 12. Multiple sections (A, B, C) are allowed for the same level.",
+        },
+        section: {
+          validate: (value) =>
+            new Promise((resolve, reject) => {
+              // Validate section is a single uppercase letter
+              const sectionPattern = /^[A-Z]$/;
+              if (!sectionPattern.test(value)) {
+                resolve(false);
+              } else {
+                resolve(true);
+              }
+            }),
+          message: "Section must be a single uppercase letter (A, B, C, etc.)",
         },
       },
     },

@@ -112,11 +112,11 @@ function ClassCard({ name, handleDocument, document, tagLabel, tagColor, handleS
     handleSelect(document._id);
   };
   return (
-    <div className={classes.container}>
+    <div className={classes.container} onClick={handleClick} style={{cursor: 'pointer'}}>
       <div className={classes.imageContainer}>
         <div className={classes.iconContainer}>
         {/* Add icons here */}
-        <div className={classes.icon} onClick={handleClick}>
+        <div className={classes.icon} onClick={(e) => { e.stopPropagation(); handleClick(); }}>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="24"
@@ -130,7 +130,7 @@ function ClassCard({ name, handleDocument, document, tagLabel, tagColor, handleS
             />
           </svg>
         </div>
-        <div className={classes.icon} onClick={deleteDocument}>
+        <div className={classes.icon} onClick={(e) => { e.stopPropagation(); deleteDocument(); }}>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="24"

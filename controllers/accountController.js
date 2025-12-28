@@ -227,18 +227,14 @@ module.exports = {
                                                     }
                                                 },
                                                 {
-                                                    teachers: {
-                                                        $elemMatch: {
-                                                            $eq: profile_id
-                                                        }
-                                                    }
+                                                    'subjectTeacherAssignments.teacher': profile_id
                                                 }
                                             ]
                                         },
                                         {
                                             $pull: {
                                                 students: profile_id,
-                                                teachers: profile_id
+                                                'subjectTeacherAssignments': { teacher: profile_id }
                                             }
                                         }
                                     )
@@ -312,18 +308,14 @@ module.exports = {
                                                 }
                                             },
                                             {
-                                                teachers: {
-                                                    $elemMatch: {
-                                                        $eq: profile_id
-                                                    }
-                                                }
+                                                'subjectTeacherAssignments.teacher': profile_id
                                             }
                                         ]
                                     },
                                     {
                                         $pull: {
                                             students: profile_id,
-                                            teachers: profile_id
+                                            'subjectTeacherAssignments': { teacher: profile_id }
                                         }
                                     }
                                 )

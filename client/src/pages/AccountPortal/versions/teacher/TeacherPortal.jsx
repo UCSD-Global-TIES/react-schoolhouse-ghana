@@ -38,6 +38,7 @@ import NameCard from "../../../../components/NameCard/NameCard";
 import ProtectedRoute from "../../../../components/ProtectedRoute";
 import SubjectsForm from "../../../../components/SubjectsForm";
 import UploadQueue from "../../../../components/UploadQueue";
+import ClassesList from '../../../../pages/ClassesList/ClassesList';
 import UserList from "./../../../../components/UserList/UserList";
 import SearchBar from "../../../../components/SearchBar/SearchBar.js";
 
@@ -54,6 +55,7 @@ import "./main.css";
 import AccountIcon from "../../../../assets/account-icon.svg";
 import BookIcon from "../../../../assets/books.svg";
 import BullhornIcon from "../../../../assets/bullhorn.svg";
+import HomeIcon from "../../../../assets/icons8-home.svg";
 
 const drawerWidth = "9.375rem";
 const drawerPadding = "3.5rem 0";
@@ -156,13 +158,13 @@ function TeacherPortal(props) {
   const documentMenuItems = [
     {
       label: "Home",
-      iconPath: BullhornIcon,
+      iconPath: HomeIcon,
       path: `${props.match.url}/announcements`,
     },
     {
       label: "Classes",
       iconPath: BookIcon,
-      path: `${props.match.url}/grades`,
+      path: `${props.match.url}/classes`,
     },
     // {
     //   label: "Accounts",
@@ -279,8 +281,8 @@ function TeacherPortal(props) {
       collection: "Grade",
       icon: faShapes,
       FormComponent: (p) => <GradesForm user={props.user} {...p} />,
-      primary: (doc) => `Grade ${doc.level}`,
-      secondary: (doc) => `G${doc.level}`,
+      primary: (doc) => `Grade ${doc.level}${doc.section || 'A'}`,
+      secondary: (doc) => `Grade ${doc.level}${doc.section || 'A'}`,
       path: `${props.match.path}/grades`,
       grStatus: (doc) => `(${doc.status})`,
       api: {
@@ -309,10 +311,30 @@ function TeacherPortal(props) {
     // SUBJECTS
     {
       collection: "Subject",
-      link: (doc) => `/subject/${doc._id}`,
+      link: (doc) => {
+        // Use composite ID from backend (_id already contains subjectId_gradeId)
+        // and add grade info as query params for display
+        if (doc.gradeLevel && doc.gradeSection) {
+          return `/subject/${doc._id}?gradeLevel=${doc.gradeLevel}&gradeSection=${doc.gradeSection}`;
+        }
+        return `/subject/${doc._id}`;
+      },
       icon: faChalkboardTeacher,
       FormComponent: (p) => <SubjectsForm user={props.user} {...p} />,
-      primary: (doc) => doc.name,
+      primary: (doc) => {
+        // Debug: log the document to see what we're receiving
+        console.log('Subject document:', doc);
+        // Use displayName if available (includes grade-section), otherwise just the name
+        if (doc.displayName) {
+          return doc.displayName;
+        }
+        // Fallback: construct display name if we have grade info
+        if (doc.gradeLevel) {
+          return `Grade ${doc.gradeLevel}${doc.gradeSection || 'A'} ${doc.name}`;
+        }
+        return doc.name;
+      },
+      secondary: (doc) => doc.year ? `${doc.year}` : '',
       path: `${props.match.path}/subjects`,
       api: {
         get: API.getSubjects,
@@ -544,6 +566,12 @@ function TeacherPortal(props) {
               user={props.user}
             />
           ))}
+          <ProtectedRoute
+            exact
+            path={`${props.match.path}/classes`}
+            component={(p) => <ClassesList {...p} user={props.user} />}
+            user={props.user}
+          />
           <Redirect to={defaultRoute} />
         </Switch>
       </main>
