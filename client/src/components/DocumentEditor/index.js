@@ -15,6 +15,7 @@ import AnnouncementCard from "../AnnouncementCard/AnnouncementCard";
 
 import ClassCard from "../ClassCard";
 import EnrolledClasses from "../EnrolledClasses";
+import GradeLevelListing from "../GradeLevelListing";
 
 import Divider from '@material-ui/core/Divider';
 
@@ -552,8 +553,15 @@ function DocumentEditor(props) {
             )
           }
           className={classes.sectionContainer}
+          style={
+            typeof collection === 'string' && collection.toLowerCase().includes('grade')
+              ? { padding: '1rem 1.5rem', gap: '1rem' }
+              : undefined
+          }
         >
-          <Typography variant="h1">{`${collection} Editor`}</Typography>
+          {!(typeof collection === 'string' && collection.toLowerCase().includes('grade')) && (
+            <Typography variant="h1">{`${collection} Editor`}</Typography>
+          )}
           <FormComponent
             error={errorDocument}
             history={props.history}
@@ -562,25 +570,29 @@ function DocumentEditor(props) {
             document={currentDocument}
             handleRouteChange={handleRouteChange}
             handleChange={handleFormChange}
+            handleClose={() => handleDocument(false)}
           />
-          <div className={classes.buttonContainer}>
-            <Button
-              className={`${classes.btn} ${classes.cancelbtn}`}
-              onClick={() => handleDocument(false)}
-            >
-              Cancel
-            </Button>
-            <Button
-              className={classes.btn}
-              onClick={
-                isCreate
-                  ? () => handleCreate(currentDocument)
-                  : () => handleSave(currentDocument)
-              }
-            >
-              Finish
-            </Button>
-          </div>
+          {/* Hide Cancel/Finish buttons for Grades (Grades manages its own save operations) */}
+          {collection !== 'Grade' && (
+            <div className={classes.buttonContainer}>
+              <Button
+                className={`${classes.btn} ${classes.cancelbtn}`}
+                onClick={() => handleDocument(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                className={classes.btn}
+                onClick={
+                  isCreate
+                    ? () => handleCreate(currentDocument)
+                    : () => handleSave(currentDocument)
+                }
+              >
+                Finish
+              </Button>
+            </div>
+          )}
         </div>
       )}
 
@@ -662,70 +674,23 @@ function DocumentEditor(props) {
                     icon={icon}
                   />
                 ) : collection == "Grade" ? (
-                  <div>
-                  
-                    {["active", "unpublished", "archived"].map((item) => (
-                      
-                      <>
-                        
-                        {filteredDocuments.filter(
-                          (document) => grStatus(document) == `(${item})`
-                        ).length > 0 ? (
-                          <>
-                          <Typography variant="h2">{item}</Typography>
-                          <div className={classes.classContainer}>
-                          
-                            {filteredDocuments.map((document) => {
-                                const date = new Date(document.createdAt);
-                                const year = date.getFullYear();
-                                
-                                const yearLabel = 'YR' + String(year).slice(-2) + '-' + (String(year+1).slice(-2));
-
-                                let label = '';
-                                if(item === 'active'){
-                                    label = year + '-' + (year + 1);
-                                } else {
-                                    label = item;
-                                }
-
-                                const teacherId = document.teachers[0];
-                                const teacher = teacherOptions.find(teacher => teacher._id === teacherId);
-                                const teacherName = teacher ? `${teacher.last_name}` : '';
-
-                                const gradeLabel = teacher ? secondary(document) : primary(document);
- 
-                                return (
-                                  grStatus(document) == `(${item})` && (
-                                    <ClassCard
-                                      name = {`${teacherName} ${gradeLabel}`}
-                                      secondLine = {yearLabel}
-                                      tagColor={tagMap[item]}
-                                      tagLabel={label}
-                                      image=''
-                                      handleDocument={handleDocument}
-                                      handleSelect={handleSelect}
-                                      document={document}
-                                      editable={true}
-                                    />
-                                  )
-                                );
-                            })}
-                          </div>
-                          {item !== "archived" && <Divider style={{marginBottom:'2rem', height: '0.1875rem'}}/>}
-                          
-                          </>
-                        ) : (
-                          <p>No {item.toLowerCase()} grades to display.</p>
-                        )}
-                      </>
-                    ))}
-                  </div>
+                  <GradeLevelListing
+                    documents={filteredDocuments}
+                    grStatus={grStatus}
+                    primary={primary}
+                    secondary={secondary}
+                    handleDocument={handleDocument}
+                    handleSelect={handleSelect}
+                    teacherOptions={teacherOptions}
+                  />
                 ) : (
                   <>
                     {viewableDocuments.map((document, idx) => {
                       const labelId = `${collection.toLowerCase()}-${idx}`;
+                      // Create unique key for subjects with same ID but different grades
+                      const uniqueKey = document.gradeId ? `${document._id}-${document.gradeId}` : document._id || idx;
                       return (
-                        <List className={classes.list}>
+                        <List key={uniqueKey} className={classes.list}>
                           <AnnouncementCard
                             handleDocument={handleDocument}
                             handleSelect={handleSelect}

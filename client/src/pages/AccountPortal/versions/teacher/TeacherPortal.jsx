@@ -281,8 +281,8 @@ function TeacherPortal(props) {
       collection: "Grade",
       icon: faShapes,
       FormComponent: (p) => <GradesForm user={props.user} {...p} />,
-      primary: (doc) => `Grade ${doc.level}`,
-      secondary: (doc) => `G${doc.level}`,
+      primary: (doc) => `Grade ${doc.level}${doc.section || 'A'}`,
+      secondary: (doc) => `Grade ${doc.level}${doc.section || 'A'}`,
       path: `${props.match.path}/grades`,
       grStatus: (doc) => `(${doc.status})`,
       api: {
@@ -311,10 +311,30 @@ function TeacherPortal(props) {
     // SUBJECTS
     {
       collection: "Subject",
-      link: (doc) => `/subject/${doc._id}`,
+      link: (doc) => {
+        // Use composite ID from backend (_id already contains subjectId_gradeId)
+        // and add grade info as query params for display
+        if (doc.gradeLevel && doc.gradeSection) {
+          return `/subject/${doc._id}?gradeLevel=${doc.gradeLevel}&gradeSection=${doc.gradeSection}`;
+        }
+        return `/subject/${doc._id}`;
+      },
       icon: faChalkboardTeacher,
       FormComponent: (p) => <SubjectsForm user={props.user} {...p} />,
-      primary: (doc) => doc.name,
+      primary: (doc) => {
+        // Debug: log the document to see what we're receiving
+        console.log('Subject document:', doc);
+        // Use displayName if available (includes grade-section), otherwise just the name
+        if (doc.displayName) {
+          return doc.displayName;
+        }
+        // Fallback: construct display name if we have grade info
+        if (doc.gradeLevel) {
+          return `Grade ${doc.gradeLevel}${doc.gradeSection || 'A'} ${doc.name}`;
+        }
+        return doc.name;
+      },
+      secondary: (doc) => doc.year ? `${doc.year}` : '',
       path: `${props.match.path}/subjects`,
       api: {
         get: API.getSubjects,

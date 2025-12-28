@@ -214,25 +214,78 @@ module.exports = {
 
                     // For Teacher or Student: find grades that include the teacher/student
                     const profileId = account.profile;
-                    const query = account.type === 'Teacher' ? { teachers: profileId } : { students: profileId };
+                    
+                    // Build query based on new schema structure
+                    const query = account.type === 'Teacher' 
+                        ? { 'subjectTeacherAssignments.teacher': profileId }
+                        : { students: profileId };
 
                     gradeDb.find(query)
                         .then(grades => {
-                            // Collect unique subject ids from grades
-                            const subjectIdSet = new Set();
+                            // Build a map of subject -> grades for display
+                            // Map structure: { subjectId: [{ level, section, gradeId }, ...] }
+                            const subjectGradesMap = {};
+                            
                             for (const g of grades) {
-                                if (g.subjects && g.subjects.length) {
-                                    for (const sid of g.subjects) subjectIdSet.add(String(sid));
+                                if (g.subjectTeacherAssignments && g.subjectTeacherAssignments.length) {
+                                    for (const assignment of g.subjectTeacherAssignments) {
+                                        if (assignment.subject) {
+                                            // For teachers: only include subjects they actually teach
+                                            // For students: include all subjects from their grades
+                                            if (account.type === 'Student' || 
+                                                (account.type === 'Teacher' && String(assignment.teacher) === String(profileId))) {
+                                                const subjectId = String(assignment.subject);
+                                                if (!subjectGradesMap[subjectId]) {
+                                                    subjectGradesMap[subjectId] = [];
+                                                }
+                                                subjectGradesMap[subjectId].push({
+                                                    level: g.level,
+                                                    section: g.section || 'A',
+                                                    gradeId: g._id
+                                                });
+                                            }
+                                        }
+                                    }
                                 }
                             }
 
-                            const subjectIds = Array.from(subjectIdSet);
+                            const subjectIds = Object.keys(subjectGradesMap);
                             if (!subjectIds.length) return res.json([]);
 
                             // Fetch subjects and populate announcements
                             subjectDb.find({ _id: { $in: subjectIds } })
                                 .populate('announcements')
-                                .then(subjectDocs => res.json(subjectDocs))
+                                .then(subjectDocs => {
+                                    // For teachers: create separate entries for each subject-grade combination
+                                    // For students: keep subjects as-is with all their grades
+                                    if (account.type === 'Teacher') {
+                                        const expandedSubjects = [];
+                                        for (const subject of subjectDocs) {
+                                            const grades = subjectGradesMap[String(subject._id)];
+                                            for (const gradeInfo of grades) {
+                                                expandedSubjects.push({
+                                                    ...subject.toObject(),
+                                                    // Create a unique composite ID for this subject-grade combination
+                                                    _id: `${subject._id}_${gradeInfo.gradeId}`,
+                                                    // Store the original subject ID for API calls that need it
+                                                    subjectId: subject._id,
+                                                    displayName: `Grade ${gradeInfo.level}${gradeInfo.section} ${subject.name}`,
+                                                    gradeLevel: gradeInfo.level,
+                                                    gradeSection: gradeInfo.section,
+                                                    gradeId: gradeInfo.gradeId
+                                                });
+                                            }
+                                        }
+                                        res.json(expandedSubjects);
+                                    } else {
+                                        // Students: just add grade info array
+                                        const subjectsWithGrades = subjectDocs.map(subject => ({
+                                            ...subject.toObject(),
+                                            grades: subjectGradesMap[String(subject._id)]
+                                        }));
+                                        res.json(subjectsWithGrades);
+                                    }
+                                })
                                 .catch(err => res.status(422).json(err));
                         })
                         .catch(err => res.status(422).json(err));
@@ -304,7 +357,7 @@ module.exports = {
                                 // For students, check if they're enrolled in a grade that includes this subject
                                 gradeDb.findOne({ 
                                     students: currentUser.profile._id,
-                                    subjects: subjectId 
+                                    'subjectTeacherAssignments.subject': subjectId 
                                 })
                                 .then((enrollment) => {
                                     if (!enrollment) {
@@ -321,13 +374,15 @@ module.exports = {
                                                 { subjects: subjectId }
                                             ]
                                         })
+                                        .populate('files')
                                         .then(announcements => {
                                             // Filter by target audience for students
                                             const filteredAnnouncements = announcements.filter(announcement => {
                                                 const targetAudience = announcement.targetAudience || 'both';
                                                 return targetAudience === 'both' || targetAudience === 'students';
                                             });
-                                            res.json(filteredAnnouncements);
+                                            const processedAnnouncements = processAnnouncements(filteredAnnouncements);
+                                            res.json(processedAnnouncements);
                                         })
                                         .catch(err => res.status(422).json(err));
                                 })
@@ -335,8 +390,8 @@ module.exports = {
                             } else if (currentUser.type === 'Teacher') {
                                 // For teachers, check if they teach this subject (are in a grade with this subject)
                                 gradeDb.findOne({ 
-                                    teachers: currentUser.profile._id,
-                                    subjects: subjectId 
+                                    'subjectTeacherAssignments.teacher': currentUser.profile._id,
+                                    'subjectTeacherAssignments.subject': subjectId 
                                 })
                                 .then((teaching) => {
                                     if (!teaching) {
@@ -352,19 +407,21 @@ module.exports = {
                                                 { subjects: subjectId }
                                             ]
                                         })
+                                        .populate('files')
                                         .then(announcements => {
                                             // Filter by target audience for teachers
                                             const filteredAnnouncements = announcements.filter(announcement => {
                                                 const targetAudience = announcement.targetAudience || 'both';
                                                 return targetAudience === 'both' || targetAudience === 'teachers';
                                             });
-                                            res.json(filteredAnnouncements);
+                                            const processedAnnouncements = processAnnouncements(filteredAnnouncements);
+                                            res.json(processedAnnouncements);
                                         })
                                         .catch(err => res.status(422).json(err));
                                 })
                                 .catch(err => res.status(422).json(err));
                             } else {
-                                // Admin can see subject announcements but filter out teacher announcements
+                                // Admin can see all subject announcements
                                 announcementDb
                                     .find({ 
                                         $or: [
@@ -372,12 +429,10 @@ module.exports = {
                                             { subjects: subjectId }
                                         ]
                                     })
+                                    .populate('files')
                                     .then(announcements => {
-                                        // Filter to only show admin announcements
-                                        const adminOnlyAnnouncements = announcements.filter(announcement => 
-                                            announcement.authorRole === 'Admin'
-                                        );
-                                        res.json(adminOnlyAnnouncements);
+                                        const processedAnnouncements = processAnnouncements(announcements);
+                                        res.json(processedAnnouncements);
                                     })
                                     .catch(err => res.status(422).json(err));
                             }
@@ -440,18 +495,14 @@ module.exports = {
                             // If the subject is assigned a grade, remove reference to subject from all other grades
                             if (gradeID) {
 
-                                // Find all grades whose field 'students'/'teachers'/'subjects' has an identical _id in newG's corresponding fields and pull that _id the respective field 
+                                // Find all grades that have this subject in subjectTeacherAssignments and remove it
                                 gradeDb.updateMany(
                                     {
-                                        subjects: {
-                                            $elemMatch: {
-                                                $eq: newS._id
-                                            }
-                                        }
+                                        'subjectTeacherAssignments.subject': newS._id
                                     },
                                     {
                                         $pull: {
-                                            subjects: newS._id
+                                            subjectTeacherAssignments: { subject: newS._id }
                                         }
                                     }
 

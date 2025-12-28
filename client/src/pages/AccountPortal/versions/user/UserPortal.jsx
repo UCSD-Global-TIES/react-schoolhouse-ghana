@@ -264,8 +264,8 @@ function UserPortal(props) {
       collection: "Grade",
       icon: faShapes,
       FormComponent: (p) => <GradesForm user={props.user} {...p} />,
-      primary: (doc) => `Grade ${doc.level}`,
-      secondary: (doc) => `G${doc.level}`,
+      primary: (doc) => `Grade ${doc.level}${doc.section || 'A'}`,
+      secondary: (doc) => `Grade ${doc.level}${doc.section || 'A'}`,
       path: `${props.match.path}/grades`,
       grStatus: (doc) => `(${doc.status})`,
       api: {

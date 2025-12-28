@@ -6,44 +6,96 @@
 .gradebook-table {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 15px;
+    margin-top: 1px;
+    box-shadow: 0 2px 8px rgba(255, 150, 0, 0.1);
+    border-radius: 4px;
+    overflow: hidden;
 }
 
 .gradebook-table th, .gradebook-table td {
-    border: 1px solid #ddd;
+    border: 1px solid #ffe0c0;
     padding: 10px;
     text-align: center;
 }
 
 .gradebook-table th {
-    background-color: #1976d2;
+    background-color: hsla(35, 68%, 49%, 0.993);
     color: white;
+    font-weight: 600;
+    border: none;
+}
+
+.gradebook-table tbody tr {
+    transition: background-color 0.2s ease;
+}
+
+.gradebook-table tbody tr:nth-child(even) {
+    background-color: #fff9f0;
+}
+
+.gradebook-table tbody tr:nth-child(odd) {
+    background-color: #fffbf7;
+}
+
+.gradebook-table tbody tr:hover {
+    background-color: #ffe8d0;
+}
+
+.gradebook-table td:first-child {
+    font-weight: 500;
+    color: #333;
 }
 
 .gradebook-table input {
     width: 100%;
-    border: none;
+    border: 1px solid #ffc99f;
     text-align: center;
+    padding: 6px;
+    border-radius: 3px;
+    font-size: 0.95rem;
+    background-color: white;
+}
+
+.gradebook-table input:focus {
+    outline: none;
+    border-color: #ff9600;
+    background-color: #fffbf7;
+    box-shadow: 0 0 4px rgba(255, 150, 0, 0.3);
 }
 
 .gradebook-table button {
-    background-color: red;
+    background-color: hsla(35, 68%, 49%, 0.993);
     color: white;
     border: none;
-    padding: 5px 10px;
+    padding: 6px 12px;
     cursor: pointer;
+    border-radius: 3px;
+    font-weight: 500;
+    transition: background-color 0.2s ease;
+}
+
+.gradebook-table button:hover {
+    background-color: #e68900;
 }
 
 .gradebook-button {
-    background-color: #1976d2;
+    background-color: #ff9600;
     color: white;
-    padding: 8px 12px;
+    padding: 10px 16px;
     border: none;
     cursor: pointer;
-    border-radius: 5px;
+    border-radius: 4px;
     font-size: 1rem;
+    font-weight: 500;
+    transition: background-color 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 2px 4px rgba(255, 150, 0, 0.2);
 }
 
 .gradebook-button:hover {
-    background-color: #1565c0;
+    background-color: #e68900;
+    box-shadow: 0 4px 8px rgba(255, 150, 0, 0.3);
+}
+
+.gradebook-button:active {
+    transform: translateY(1px);
 }

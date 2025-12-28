@@ -14,10 +14,21 @@ module.exports = {
         verifyKey(req.header('Authorization'), 'Admin')
             .then((isVerified) => {
                 if (isVerified) {
+                    console.log('🔍 getGrades called - fetching all grades');
                     gradeDb
                         .find({})
-                        .populate('subjects')
-                        .then(gradeDocs => res.json(gradeDocs))
+                        .populate('subjectTeacherAssignments.subject')
+                        .populate('subjectTeacherAssignments.teacher')
+                        .then(gradeDocs => {
+                            console.log('📊 Grades fetched:', gradeDocs.map(g => ({
+                                level: g.level,
+                                section: g.section,
+                                assignments: g.subjectTeacherAssignments?.length || 0,
+                                students: g.students?.length || 0
+                            })));
+                            
+                            res.json(gradeDocs);
+                        })
                         .catch(err => res.status(422).json(err));
 
                 } else {
@@ -118,259 +129,248 @@ module.exports = {
             })
     },
     addGrade: function (req, res) {
+        console.log('🚀 addGrade endpoint called');
+        console.log('🔐 Authorization header:', req.header('Authorization') ? 'Present' : 'Missing');
+
         verifyKey(req.header('Authorization'), 'Admin')
             .then((isVerified) => {
-                if (isVerified) {
-                    // Create folder
-                    let gradeDoc = req.body;
-                    
-                    // Debug logging to see what data we're receiving
-                    console.log('🔹 Received grade data:', JSON.stringify(gradeDoc, null, 2));
-                    
-                    // Validate required fields - check for undefined, null, or empty string
-                    if (gradeDoc.level === undefined || gradeDoc.level === null || gradeDoc.level === '') {
-                        console.error('❌ Grade level is missing from request:', gradeDoc.level);
-                        return res.status(400).json({ 
-                            error: 'Grade level is required',
-                            received: gradeDoc
-                        });
-                    }
-                    
-                    // Ensure level is a number
-                    if (isNaN(gradeDoc.level)) {
-                        console.error('❌ Grade level is not a valid number:', gradeDoc.level);
-                        return res.status(400).json({ 
-                            error: 'Grade level must be a number',
-                            received: gradeDoc.level
-                        });
-                    }
-                    
-                    // Convert level to number if it's a string
-                    gradeDoc.level = parseInt(gradeDoc.level);
-                    
-                    // Validate that level is a positive integer
-                    if (gradeDoc.level < 1) {
-                        console.error('❌ Grade level must be 1 or greater:', gradeDoc.level);
-                        return res.status(400).json({ 
-                            error: 'Grade level must be 1 or greater',
-                            received: gradeDoc.level
-                        });
-                    }
-                    
-                    console.log('✅ Validated grade data:', JSON.stringify(gradeDoc, null, 2));
-                    
-                    // Find all grades whose field 'students'/'teachers'/'subjects' has an identical _id in newG's corresponding fields and pull that _id the respective field 
-                    gradeDb.updateMany({
-                                $or: [{
-                                        students: {
-                                            $in: gradeDoc.students
-                                        }
-                                    },
-                                    {
-                                        teachers: {
-                                            $in: gradeDoc.teachers
-                                        }
-                                    },
-                                    {
-                                        subjects: {
-                                            $in: gradeDoc.subjects
-                                        }
-                                    },
-                                ]
-                            }, {
-                                $pull: {
-                                    students: {
-                                        $in: gradeDoc.students
-                                    },
-                                    teachers: {
-                                        $in: gradeDoc.teachers
-                                    },
-                                    subjects: {
-                                        $in: gradeDoc.subjects
+                console.log('🔑 Authorization verified:', isVerified);
+                if (!isVerified) {
+                    return res.status(403).json(null);
+                }
+
+                const gradeDoc = req.body;
+                console.log('🔹 Received grade data:', JSON.stringify(gradeDoc, null, 2));
+
+                if (gradeDoc.level === undefined || gradeDoc.level === null || gradeDoc.level === '') {
+                    console.error('❌ Grade level is missing from request:', gradeDoc.level);
+                    return res.status(400).json({
+                        error: 'Grade level is required',
+                        received: gradeDoc
+                    });
+                }
+
+                gradeDoc.level = parseInt(gradeDoc.level, 10);
+                if (Number.isNaN(gradeDoc.level) || gradeDoc.level < 1) {
+                    console.error('❌ Invalid grade level:', gradeDoc.level);
+                    return res.status(400).json({
+                        error: 'Grade level must be a positive number',
+                        received: gradeDoc.level
+                    });
+                }
+
+                console.log('✅ Validated grade data');
+
+                const studentsToUpdate = Array.isArray(gradeDoc.students) ? gradeDoc.students : [];
+                return gradeDb.updateMany(
+                        { students: { $in: studentsToUpdate } },
+                        { $pull: { students: { $in: studentsToUpdate } } }
+                    )
+                    .then(() => {
+                        console.log('💾 About to create grade in database');
+                        return gradeDb.create(gradeDoc);
+                    })
+                    .then(async (newG) => {
+                        console.log('✅ Grade successfully created:', newG._id);
+
+                        try {
+                            const subjects = Array.isArray(newG.subjectTeacherAssignments)
+                                ? newG.subjectTeacherAssignments
+                                    .map((assignment) => assignment.subject)
+                                    .filter(Boolean)
+                                : [];
+                            const gradebookEntries = [];
+
+                            if (subjects.length > 0 && Array.isArray(newG.students) && newG.students.length > 0) {
+                                for (const studentId of newG.students) {
+                                    const studentDoc = await studentDb.findById(studentId);
+                                    if (!studentDoc) {
+                                        continue;
+                                    }
+                                    const studentName = `${studentDoc.first_name} ${studentDoc.last_name}`.trim();
+
+                                    for (const subjectId of subjects) {
+                                        gradebookEntries.push({
+                                            subjectId,
+                                            gradeId: newG._id,
+                                            studentId,
+                                            studentName,
+                                            grades: []
+                                        });
                                     }
                                 }
                             }
-                        )
-                        .then(() => {
-                            // Create class document 
-                            gradeDb
-                                .create(gradeDoc)
-                                .then(async (newG) => {
-                                    // Create gradebook entries for each student and subject
-                                    try {
-                                        const gradebookEntries = [];
-                                        
-                                        // For each student in the grade
-                                        for (const studentId of newG.students) {
-                                            // First get student name from database
-                                            const studentDoc = await studentDb.findById(studentId);
-                                            const studentName = `${studentDoc.first_name} ${studentDoc.last_name}`;
-                                            
-                                            // For each subject in the grade
-                                            for (const subjectId of newG.subjects) {
-                                                // Create a gradebook entry
-                                                gradebookEntries.push({
-                                                    subjectId: subjectId,
-                                                    gradeId: newG._id,
-                                                    studentId: studentId,
-                                                    studentName: studentName,
-                                                    grades: [] // Initialize with empty grades array
-                                                });
-                                            }
-                                        }
-                                        
-                                        // Only create entries if there are both students and subjects
-                                        if (gradebookEntries.length > 0) {
-                                            // Use insertMany to efficiently create all entries at once
-                                            // Set ordered: false to continue insertion even if some entries fail (due to duplicates)
-                                            await gradebookDb.insertMany(gradebookEntries, { ordered: false });
-                                        }
-                                        
-                                        res.json(newG);
-                                    } catch (err) {
-                                        // If there's an issue with creating gradebook entries, still return the grade
-                                        // but log the error for debugging
-                                        console.error("Error creating gradebook entries:", err);
-                                        res.json(newG);
-                                    }
-                                })
-                        })
-                        .catch(err => res.status(422).json(err));
-                } else {
-                    res.status(403).json(null);
-                }
+
+                            if (gradebookEntries.length > 0) {
+                                await gradebookDb.insertMany(gradebookEntries, { ordered: false });
+                            }
+                        } catch (err) {
+                            console.error('Error creating gradebook entries:', err);
+                        }
+
+                        return res.json(newG);
+                    })
+                    .catch(err => {
+                        console.error('Grade creation error:', err);
+
+                        if (err.code === 11000 && err.keyPattern && err.keyPattern.level && err.keyPattern.section) {
+                            const duplicateLevel = err.keyValue.level;
+                            const duplicateSection = err.keyValue.section;
+                            return res.status(422).json({
+                                error: `Grade ${duplicateLevel} Section ${duplicateSection} already exists. Please use a different section letter.`,
+                                type: 'duplicate_grade_section',
+                                level: duplicateLevel,
+                                section: duplicateSection
+                            });
+                        }
+
+                        return res.status(422).json(err);
+                    });
             })
+            .catch(err => {
+                console.error('Unexpected error in addGrade:', err);
+                res.status(500).json({ error: 'Unexpected error while creating grade.' });
+            });
     },
 
     updateGrade: function (req, res) {
+        console.log('🔄 updateGrade endpoint called');
+        console.log('📝 Update data received:', JSON.stringify(req.body, null, 2));
+
         verifyKey(req.header('Authorization'), 'Admin')
             .then((isVerified) => {
-                if (isVerified) {
-                    let gradeDoc = req.body;
-                    // Store the original grade to compare changes
-                    let originalGrade;
-                    
-                    // First get the original grade to track changes
-                    gradeDb.findById(gradeDoc._id)
-                        .then(oldGradeDoc => {
-                            originalGrade = oldGradeDoc;
-                            
-                            // Then proceed with the update
-                            return gradeDb.updateMany({
-                                $or: [{
-                                        students: {
-                                            $in: gradeDoc.students
-                                        }
-                                    },
-                                    {
-                                        teachers: {
-                                            $in: gradeDoc.teachers
-                                        }
-                                    },
-                                    {
-                                        subjects: {
-                                            $in: gradeDoc.subjects
-                                        }
-                                    },
-                                ]
-                            }, {
-                                $pull: {
-                                    students: {
-                                        $in: gradeDoc.students
-                                    },
-                                    teachers: {
-                                        $in: gradeDoc.teachers
-                                    },
-                                    subjects: {
-                                        $in: gradeDoc.subjects
-                                    }
-                                }
-                            });
-                        })
-                        .then(() => {
-                            // Update class document 
-                            return gradeDb.findOneAndUpdate({
-                                _id: gradeDoc._id
-                            }, gradeDoc, { new: true });
-                        })
-                        .then(async (updatedGrade) => {
-                            try {
-                                // Find new students (students in the updated grade that weren't in the original)
-                                const newStudents = updatedGrade.students.filter(
-                                    studentId => !originalGrade.students.some(id => id.toString() === studentId.toString())
-                                );
-                                
-                                // For new students, create gradebook entries for all subjects
-                                if (newStudents.length > 0) {
-                                    const gradebookEntries = [];
-                                    
-                                    for (const studentId of newStudents) {
-                                        // Get student name
-                                        const studentDoc = await studentDb.findById(studentId);
-                                        const studentName = `${studentDoc.first_name} ${studentDoc.last_name}`;
-                                        
-                                        for (const subjectId of updatedGrade.subjects) {
-                                            gradebookEntries.push({
-                                                subjectId: subjectId,
-                                                gradeId: updatedGrade._id,
-                                                studentId: studentId,
-                                                studentName: studentName,
-                                                grades: []
-                                            });
-                                        }
-                                    }
-                                    
-                                    if (gradebookEntries.length > 0) {
-                                        await gradebookDb.insertMany(gradebookEntries, { ordered: false });
-                                    }
-                                }
-                                
-                                // For existing students, check if there are new subjects and create entries
-                                const existingStudents = updatedGrade.students.filter(
-                                    studentId => originalGrade.students.some(id => id.toString() === studentId.toString())
-                                );
-                                
-                                // Find new subjects (subjects in the updated grade that weren't in the original)
-                                const newSubjects = updatedGrade.subjects.filter(
-                                    subjectId => !originalGrade.subjects.some(id => id.toString() === subjectId.toString())
-                                );
-                                
-                                // Create gradebook entries for existing students with new subjects
-                                if (existingStudents.length > 0 && newSubjects.length > 0) {
-                                    const gradebookEntries = [];
-                                    
-                                    for (const studentId of existingStudents) {
-                                        // Get student name
-                                        const studentDoc = await studentDb.findById(studentId);
-                                        const studentName = `${studentDoc.first_name} ${studentDoc.last_name}`;
-                                        
-                                        for (const subjectId of newSubjects) {
-                                            gradebookEntries.push({
-                                                subjectId: subjectId,
-                                                gradeId: updatedGrade._id,
-                                                studentId: studentId,
-                                                studentName: studentName,
-                                                grades: []
-                                            });
-                                        }
-                                    }
-                                    
-                                    if (gradebookEntries.length > 0) {
-                                        await gradebookDb.insertMany(gradebookEntries, { ordered: false });
-                                    }
-                                }
-                                
-                                res.json(updatedGrade);
-                            } catch (err) {
-                                console.error("Error updating gradebook entries:", err);
-                                res.json(updatedGrade);
-                            }
-                        })
-                        .catch(err => res.status(422).json(err));
-                } else {
-                    res.status(403).json(null);
+                if (!isVerified) {
+                    return res.status(403).json(null);
                 }
+
+                const gradeDoc = req.body;
+                let originalGrade;
+
+                console.log('🔍 Finding original grade:', gradeDoc._id);
+
+                return gradeDb.findById(gradeDoc._id)
+                    .then(oldGradeDoc => {
+                        if (!oldGradeDoc) {
+                            throw new Error('Grade not found');
+                        }
+                        originalGrade = oldGradeDoc;
+                        console.log('📊 Original grade data:', {
+                            level: oldGradeDoc.level,
+                            section: oldGradeDoc.section,
+                            students: Array.isArray(oldGradeDoc.students) ? oldGradeDoc.students.length : 0,
+                            teachers: Array.isArray(oldGradeDoc.teachers) ? oldGradeDoc.teachers.length : 0,
+                            subjects: Array.isArray(oldGradeDoc.subjects) ? oldGradeDoc.subjects.length : 0
+                        });
+                        console.log('📊 New grade data:', {
+                            level: gradeDoc.level,
+                            section: gradeDoc.section,
+                            students: Array.isArray(gradeDoc.students) ? gradeDoc.students.length : 0,
+                            teachers: Array.isArray(gradeDoc.teachers) ? gradeDoc.teachers.length : 0,
+                            subjects: Array.isArray(gradeDoc.subjects) ? gradeDoc.subjects.length : 0
+                        });
+
+                        const studentsToUpdate = Array.isArray(gradeDoc.students) ? gradeDoc.students : [];
+                        return gradeDb.updateMany(
+                            {
+                                _id: { $ne: gradeDoc._id },
+                                students: { $in: studentsToUpdate }
+                            },
+                            {
+                                $pull: { students: { $in: studentsToUpdate } }
+                            }
+                        );
+                    })
+                    .then(() => {
+                        console.log('💾 Updating grade document');
+                        return gradeDb.findOneAndUpdate(
+                            { _id: gradeDoc._id },
+                            gradeDoc,
+                            { new: true }
+                        );
+                    })
+                    .then(async (updatedGrade) => {
+                        if (!updatedGrade) {
+                            throw new Error('Unable to update grade');
+                        }
+                        console.log('✅ Grade updated:', updatedGrade._id);
+
+                        try {
+                            const updatedSubjects = Array.isArray(updatedGrade.subjectTeacherAssignments)
+                                ? updatedGrade.subjectTeacherAssignments
+                                    .map((assignment) => assignment.subject)
+                                    .filter(Boolean)
+                                : [];
+                            const originalSubjects = Array.isArray(originalGrade.subjectTeacherAssignments)
+                                ? originalGrade.subjectTeacherAssignments
+                                    .map((assignment) => assignment.subject.toString())
+                                : [];
+
+                            const newStudents = (updatedGrade.students || []).filter(
+                                (studentId) => !originalGrade.students.some((id) => id.toString() === studentId.toString())
+                            );
+                            const existingStudents = (updatedGrade.students || []).filter(
+                                (studentId) => originalGrade.students.some((id) => id.toString() === studentId.toString())
+                            );
+                            const newlyAddedSubjects = updatedSubjects.filter(
+                                (subjectId) => !originalSubjects.includes(subjectId.toString())
+                            );
+
+                            const gradebookEntries = [];
+
+                            if (newStudents.length > 0 && updatedSubjects.length > 0) {
+                                for (const studentId of newStudents) {
+                                    const studentDoc = await studentDb.findById(studentId);
+                                    if (!studentDoc) {
+                                        continue;
+                                    }
+                                    const studentName = `${studentDoc.first_name} ${studentDoc.last_name}`.trim();
+
+                                    for (const subjectId of updatedSubjects) {
+                                        gradebookEntries.push({
+                                            subjectId,
+                                            gradeId: updatedGrade._id,
+                                            studentId,
+                                            studentName,
+                                            grades: []
+                                        });
+                                    }
+                                }
+                            }
+
+                            if (existingStudents.length > 0 && newlyAddedSubjects.length > 0) {
+                                for (const studentId of existingStudents) {
+                                    const studentDoc = await studentDb.findById(studentId);
+                                    if (!studentDoc) {
+                                        continue;
+                                    }
+                                    const studentName = `${studentDoc.first_name} ${studentDoc.last_name}`.trim();
+
+                                    for (const subjectId of newlyAddedSubjects) {
+                                        gradebookEntries.push({
+                                            subjectId,
+                                            gradeId: updatedGrade._id,
+                                            studentId,
+                                            studentName,
+                                            grades: []
+                                        });
+                                    }
+                                }
+                            }
+
+                            if (gradebookEntries.length > 0) {
+                                await gradebookDb.insertMany(gradebookEntries, { ordered: false });
+                            }
+                        } catch (err) {
+                            console.error('Error updating gradebook entries:', err);
+                        }
+
+                        return res.json(updatedGrade);
+                    });
             })
+            .catch(err => {
+                console.error('❌ Error in updateGrade:', err);
+                res.status(422).json(err.message ? { error: err.message } : err);
+            });
     },
 
     deleteGrade: function (req, res) {

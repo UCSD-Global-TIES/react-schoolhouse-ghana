@@ -32,6 +32,7 @@ import sas from "../../logos/sas_logo.png"
 // import AccountIcon from "../../../../assets/account-icon.svg";
 // import BookIcon from "../../../../assets/books.svg";
 import BullhornIcon from "../../assets/bullhorn.svg";
+import OpenBookIcon from "../../assets/open-book.svg";
 import HomeIcon from "../../assets/icons8-home.svg";
 import HelpIcon from "../../assets/help.svg";
 
@@ -133,7 +134,16 @@ function SubjectPage(props) {
   const isSmallDevice = useMediaQuery({
     query: '(max-width: 600px)'
   })
-  const subject_id = props.match.params.id;
+  const subject_id_param = props.match.params.id;
+  
+  // Extract actual subject ID from composite ID (format: subjectId_gradeId)
+  const subject_id = subject_id_param.includes('_') ? subject_id_param.split('_')[0] : subject_id_param;
+  const gradeIdFromUrl = subject_id_param.includes('_') ? subject_id_param.split('_')[1] : null;
+  
+  // Extract grade level and section from URL query parameters
+  const urlParams = new URLSearchParams(props.location.search);
+  const gradeLevel = urlParams.get('gradeLevel');
+  const gradeSection = urlParams.get('gradeSection');
 
 
   const [subjectInfo, setSubjectInfo] = useState({});
@@ -165,26 +175,23 @@ function SubjectPage(props) {
       path: portalBase,
     }] : []),
     {
-      label: "Resources",
-      iconPath: BullhornIcon,
-      // point the main sidebar entry to the composite resources view
-      path: `${props.match.url}/resources`,
-    },
-    {
-      label: "Gradebook",
-      iconPath: GradebookIcon,
-      path: `/gradebook/${subject_id}`,
-    },
-    {
       label: "Classes",
       iconPath: BookIcon,
       // link back to portal classes list so users exit subject context
       path: `${portalBase}/classes`,
     },
     {
-      label: "Help",
-      iconPath: HelpIcon,
-      path: `${props.match.url}/studentGrades`
+      label: "Subject",
+      iconPath: OpenBookIcon,
+      // point the main sidebar entry to the composite resources view
+      path: `${props.match.url}/resources`,
+    },
+    {
+      label: "Gradebook",
+      iconPath: GradebookIcon,
+      path: (gradeLevel && gradeSection) 
+        ? `/gradebook/${subject_id_param}?gradeLevel=${gradeLevel}&gradeSection=${gradeSection}`
+        : `/gradebook/${subject_id_param}`,
     },
     {
       label: "Log Out",

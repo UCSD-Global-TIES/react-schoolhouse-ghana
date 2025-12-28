@@ -62,8 +62,9 @@ module.exports = {
                                         // 2. Their own announcements
                                         // They should NOT see other teachers' announcements
                                         // Get teacher's subjects for filtering admin announcements
-                                        gradeDb.findOne({ teachers: currentUser.profile._id })
-                                            .populate('subjects')
+                                        gradeDb.findOne({ 'subjectTeacherAssignments.teacher': currentUser.profile._id })
+                                            .populate('subjectTeacherAssignments.subject')
+                                            .populate('subjectTeacherAssignments.teacher')
                                             .then((teacherGrade) => {
                                                 filteredAnnouncements = generalOnlyAnnouncements.filter(announcement => {
                                                     // Show general admin announcements (no subject targeting) if targeted to teachers
@@ -78,7 +79,7 @@ module.exports = {
                                                         const isTargetAudience = targetAudience === 'both' || targetAudience === 'teachers';
                                                         
                                                         if (isTargetAudience) {
-                                                            const teacherSubjectIds = teacherGrade.subjects.map(s => s._id.toString());
+                                                            const teacherSubjectIds = teacherGrade.subjectTeacherAssignments.map(a => a.subject._id.toString());
                                                             
                                                             // Check single subject
                                                             if (announcement.subject && teacherSubjectIds.includes(announcement.subject.toString())) {
@@ -115,7 +116,8 @@ module.exports = {
                                         // Students need additional filtering based on enrollment
                                         // First get student's enrolled subjects via grade
                                         gradeDb.findOne({ students: currentUser.profile._id })
-                                            .populate(['teachers', 'subjects'])
+                                            .populate('subjectTeacherAssignments.subject')
+                                            .populate('subjectTeacherAssignments.teacher')
                                             .then((studentGrade) => {
                                                 if (!studentGrade) {
                                                     // Student not enrolled in any grade, show only general admin announcements
@@ -124,7 +126,7 @@ module.exports = {
                                                     );
                                                 } else {
                                                     // Student enrolled, filter announcements based on enrollment
-                                                    const studentSubjectIds = studentGrade.subjects.map(s => s._id.toString());
+                                                    const studentSubjectIds = studentGrade.subjectTeacherAssignments.map(a => a.subject._id.toString());
                                                     
                                                     filteredAnnouncements = generalOnlyAnnouncements.filter(announcement => {
                                                         // Show general admin announcements (no subject targeting) if targeted to students
@@ -157,8 +159,8 @@ module.exports = {
                                                         
                                                         // Show teacher announcements only from teachers in their grade
                                                         if (announcement.authorRole === 'Teacher' && announcement.authorId) {
-                                                            return studentGrade.teachers.some(teacher => 
-                                                                teacher._id.toString() === announcement.authorId.toString()
+                                                            return studentGrade.subjectTeacherAssignments.some(assignment => 
+                                                                assignment.teacher && assignment.teacher._id.toString() === announcement.authorId.toString()
                                                             );
                                                         }
                                                         

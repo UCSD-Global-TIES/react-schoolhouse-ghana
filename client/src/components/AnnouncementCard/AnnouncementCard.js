@@ -158,7 +158,7 @@ function AnnouncementCard(props) {
         <div className={classes.textContainer}>
           <p className={classes.text}>{name}</p>
           <p className={classes.dateText}>
-            CREATED ON: {moment(PROPS.document.createdAt).format('MM/DD/YYYY')}
+            {document.year || moment(PROPS.document.createdAt).format('YYYY') + '-' + (parseInt(moment(PROPS.document.createdAt).format('YYYY')) + 1)}
           </p>
         </div>
         {user && canEditOrDelete() && (

@@ -364,6 +364,16 @@ export default {
     }); // SECURE
   },
 
+  // Get account by profileId (to retrieve username for welcome banner)
+  getAccountByProfileId: function (profileId, key) {
+    const config = {
+      'Authorization': key
+    };
+    return axios.get(`/api/account/profile/${profileId}`, {
+      headers: config
+    }); // SECURE
+  },
+
   /// Deals with Assessments
   getAssessments: function (key) {
     const config = {
@@ -420,13 +430,21 @@ export default {
 // GRADEBOOK
 // ---------------------------------------------------------------
 // Get gradebook data for a specific subject
-  getGradebook: (subjectId, key) =>
+  getGradebook: (subjectId, key, gradeId = null) =>
     axios.get(`/api/subjects/${subjectId}/gradebook`, {
       headers: { Authorization: key },
+      params: gradeId ? { gradeId } : {}
     }),
 
-  saveGradebook: (subjectId, gradebookEntries, key) =>
-    axios.post(`/api/subjects/${subjectId}/gradebook`, gradebookEntries, {
+  saveGradebook: (subjectId, gradebookEntries, key, assignmentNames = []) =>
+    axios.post(`/api/subjects/${subjectId}/gradebook`, 
+      { entries: gradebookEntries, assignmentNames },
+      { headers: { Authorization: key } }
+    ),
+
+// Get gradebook data for a specific subject filtered by grade section
+  getGradebookBySection: (subjectId, level, section, key) =>
+    axios.get(`/api/subjects/${subjectId}/gradebook/section/${level}/${section}`, {
       headers: { Authorization: key },
     }),
 

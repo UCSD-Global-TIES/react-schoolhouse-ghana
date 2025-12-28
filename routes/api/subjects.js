@@ -48,4 +48,10 @@ router
   .get(gradebookController.getGradesBySubject)
   .post(gradebookController.saveGradebook);
 
+// Section-specific gradebook route
+// Matches with "/api/subjects/:subjectId/gradebook/section/:level/:section"
+router
+  .route("/:subjectId/gradebook/section/:level/:section")
+  .get(gradebookController.getGradesBySection);
+
 module.exports = router;

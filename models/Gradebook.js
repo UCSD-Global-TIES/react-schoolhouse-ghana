@@ -6,6 +6,7 @@ const GradebookSchema = new mongoose.Schema({
   studentName: { type: String, required: true },
   studentId: { type: mongoose.Schema.Types.ObjectId, ref: "Student", required: true }, // Adding this for easier lookup
   grades: { type: [Number], required: true },
+  assignmentNames: { type: [String], default: [] }, // Store custom assignment names
 });
 
 // Add compound index for faster lookups and to prevent duplicates

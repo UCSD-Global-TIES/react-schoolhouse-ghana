@@ -35,7 +35,7 @@ function EnrolledClasses(props) {
                     
                     <div className={classes.classContainer}>
                     
-                    {subjects.map((subject) => {
+                    {subjects.map((subject, index) => {
                         const date = new Date(subject.createdAt);
                         const year = date.getFullYear();
 
@@ -47,9 +47,27 @@ function EnrolledClasses(props) {
                         } else {
                             label = status;
                         }
+                        
+                        // Use displayName if available (includes grade-section), otherwise construct it
+                        let displayName = subject.name;
+                        if (subject.displayName) {
+                            displayName = subject.displayName;
+                        } else if (subject.gradeLevel) {
+                            displayName = `Grade ${subject.gradeLevel}${subject.gradeSection || 'A'} ${subject.name}`;
+                        }
+                        
+                        // Create unique key to avoid duplicate key warnings when same subject appears in multiple grades
+                        const uniqueKey = subject.gradeId ? `${subject._id}-${subject.gradeId}` : `${subject._id}-${index}`;
+                        
+                        // Use the composite ID from backend (_id already contains subjectId_gradeId)
+                        // and add grade info as query params for display
+                        const subjectUrl = subject.gradeLevel && subject.gradeSection 
+                            ? `/subject/${subject._id}?gradeLevel=${subject.gradeLevel}&gradeSection=${subject.gradeSection}`
+                            : `/subject/${subject._id}`;
+                        
                         return (
-                            <Link to={`/subject/${subject._id}`} key={subject._id} style={{ textDecoration: 'none' }}>
-                                <ClassCard name = {`${subject.name} ${gradeLabel}`} secondLine = {yearLabel} tagColor={tagMap[status]} tagLabel={label} image='' editable={editable} />
+                            <Link to={subjectUrl} key={uniqueKey} style={{ textDecoration: 'none' }}>
+                                <ClassCard name = {`${displayName} ${gradeLabel}`} secondLine = {yearLabel} tagColor={tagMap[status]} tagLabel={label} image='' editable={editable} />
                             </Link>
                         );
                     })}

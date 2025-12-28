@@ -18,6 +18,7 @@ import API from "../../utils/API";
 
 import BookIcon from "../../assets/books.svg";
 import BullhornIcon from "../../assets/bullhorn.svg";
+import OpenBookIcon from "../../assets/open-book.svg";
 import HelpIcon from "../../assets/help.svg";
 import LogoutIcon from "../../assets/LogoutIcon.svg";
 import HomeIcon from "../../assets/icons8-home.svg";
@@ -71,10 +72,17 @@ const GradebookPage = ({ match, user, history, location, logout }) => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const isSmallDevice = useMediaQuery({ query: "(max-width: 600px)" });
 
-  const subjectId = match.params.subjectId;
+  const subjectIdParam = match.params.subjectId;
+  // Extract actual subject ID and gradeId from composite ID (format: subjectId_gradeId)
+  const subjectId = subjectIdParam.includes('_') ? subjectIdParam.split('_')[0] : subjectIdParam;
+  const gradeId = subjectIdParam.includes('_') ? subjectIdParam.split('_')[1] : null;
+  
   const [gradebookData, setGradebookData] = useState([]);
+  const [assignmentNames, setAssignmentNames] = useState([]);
   const [subjectInfo, setSubjectInfo] = useState({ name: "" });
   const isStudent = user?.type === "Student";
+  
+
 
   // build teacherName…
   const { profile } = user || {};
@@ -87,10 +95,9 @@ const GradebookPage = ({ match, user, history, location, logout }) => {
 
   const documentMenuItems = [
     { label: "Home", iconPath: HomeIcon, path: `${portalBase}` },
-    { label: "Announcements", iconPath: BullhornIcon, path: `/subject/${subjectId}/announcements` },
     { label: "Classes", iconPath: BookIcon, path: `${portalBase}/classes` },
+    { label: "Subject", iconPath: OpenBookIcon, path: `/subject/${subjectId}/resources` },
     { label: "Gradebook", iconPath: GradebookIcon, path: `/gradebook/${subjectId}` },
-    { label: "Help", iconPath: HelpIcon, path: `/subject/${subjectId}/studentGrades` },
     { label: "Log Out", iconPath: LogoutIcon, clickHandler: () => { if (logout) logout(); } },
   ];
 
@@ -106,26 +113,55 @@ const GradebookPage = ({ match, user, history, location, logout }) => {
   useEffect(() => {
     if (!subjectId || !user?.key) return;
     
-    console.log(`🔹 Student gradebook access - User Type: ${user?.type}, Subject: ${subjectId}`);
+    // Extract grade level and section from URL query parameters
+    const urlParams = new URLSearchParams(location.search);
+    const gradeLevel = urlParams.get('gradeLevel');
+    const gradeSection = urlParams.get('gradeSection');
     
-    API.getGradebook(subjectId, user.key)
+    console.log(`🔹 Gradebook access - User Type: ${user?.type}, Subject: ${subjectId}, GradeId: ${gradeId}`);
+    console.log(`🔹 URL params - gradeLevel: ${gradeLevel}, gradeSection: ${gradeSection}`);
+    console.log(`🔹 Full URL:`, window.location.href);
+    
+    // Use specific grade API if gradeId is available in composite ID, or use section-specific if available
+    const gradebookPromise = gradeId
+      ? API.getGradebook(subjectId, user.key, gradeId)
+      : (gradeLevel && gradeSection)
+        ? API.getGradebookBySection(subjectId, gradeLevel, gradeSection, user.key)
+        : API.getGradebook(subjectId, user.key);
+    
+    console.log(`🔹 Using ${gradeId ? 'grade-specific' : (gradeLevel && gradeSection ? 'section-specific' : 'general')} gradebook API`);
+    
+    gradebookPromise
       .then(({ data }) => {
-        console.log(`✅ Received ${data.length} gradebook entries for user:`, data);
+        console.log(`✅ Received ${data.length} gradebook entries:`, data.slice(0, 3));
         setGradebookData(data);
       })
       .catch((error) => {
         console.error('❌ Error fetching gradebook:', error);
         console.error(error);
       });
-  }, [subjectId, user?.key]);
+  }, [subjectId, user?.key, isStudent, location.search]);
 
   const saveGradebook = () => {
-    API.saveGradebook(subjectId, gradebookData, user.key)
+    API.saveGradebook(subjectId, gradebookData, user.key, assignmentNames)
       .then(() => alert("✅ Gradebook saved!"))
       .catch(console.error);
   };
 
-  const gradeLevel = gradebookData[0]?.gradeId?.level ?? "–";
+
+
+  // Create display title with subject name and grade section
+  const getGradebookTitle = () => {
+    const subjectName = subjectInfo.name || "Subject";
+    if (gradebookData.length > 0) {
+      const gradeLevel = gradebookData[0]?.gradeInfo?.level ?? "–";
+      const gradeSection = gradebookData[0]?.gradeInfo?.section ?? "A";
+      return `${subjectName} Grade ${gradeLevel} Section ${gradeSection} Gradebook`;
+    }
+    return `${subjectName} Gradebook`;
+  };
+  
+  const gradebookTitle = getGradebookTitle();
   
   // Since the backend now filters student data, we can use the data directly
   // No need for frontend filtering anymore as students only get their own data from the server
@@ -179,16 +215,21 @@ const GradebookPage = ({ match, user, history, location, logout }) => {
         </Hidden>
       </nav>
       <main className={classes.content} style={{ marginLeft: !isSmallDevice ? drawerWidth : 0 }}>
-        <GradebookNavbar subjectName={subjectInfo.name} teacherName={teacherName} gradeLevel={gradeLevel} />
-        <GradebookTable data={displayedData} updateData={setGradebookData} readOnly={isStudent} />
+        <GradebookNavbar subjectName={gradebookTitle} teacherName={teacherName} gradeLevel="" />
+        
         {!isStudent && (
-          <>
-            <div style={{ marginTop: "20px", textAlign: "center", color: "#666" }}>
-              <p><span role="img" aria-label="books">📚</span> Students are automatically enrolled based on subject enrollment</p>
-            </div>
-            <button onClick={saveGradebook}>Save Gradebook</button>
-          </>
+          <div style={{ display: "flex", justifyContent: "flex-end", gap: "10px", marginBottom: "10px", marginTop: "-5px" }}>
+            <button onClick={() => setGradebookData([...gradebookData])} style={{ padding: "8px 16px", cursor: "pointer", backgroundColor: "#007bff", color: "white", border: "none", borderRadius: "4px" }}>Add Assignment</button>
+            <button onClick={saveGradebook} style={{ padding: "8px 16px", cursor: "pointer", backgroundColor: "#28a745", color: "white", border: "none", borderRadius: "4px" }}>Save Gradebook</button>
+          </div>
         )}
+        
+        <GradebookTable 
+          data={displayedData} 
+          updateData={setGradebookData} 
+          readOnly={isStudent}
+          onAssignmentNamesChange={setAssignmentNames}
+        />
       </main>
     </div>
   );
