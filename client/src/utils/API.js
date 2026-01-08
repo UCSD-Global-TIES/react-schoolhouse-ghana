@@ -25,6 +25,16 @@ export default {
     }
 
   },
+  // Create announcement for multiple subjects (Admin only)
+  addMultiSubjectAnnouncement: function (announcementData, key) {
+    const config = {
+      'Authorization': key
+    };
+
+    return axios.post(`/api/general/ann/multi-subject`, announcementData, {
+      headers: config
+    }); // SECURE
+  },
   // // Get all 'File' documents
   getFiles: function (key) {
     const config = {
@@ -76,7 +86,7 @@ export default {
     const config = {
       'Authorization': key
     };
-    return axios.get(`/api/subject/${subject_id}`, {
+    return axios.get(`/api/subjects/${subject_id}`, {
       headers: config
     }); // SECURE
   },
@@ -85,7 +95,7 @@ export default {
     const config = {
       'Authorization': key
     };
-    return axios.get(`/api/subject/`, {
+    return axios.get(`/api/subjects/`, {
       headers: config
     }); // SECURE
   },
@@ -142,7 +152,7 @@ export default {
     };
 
     if (subject_id) {
-      return axios.get(`/api/subject/${subject_id}/ann`, {
+      return axios.get(`/api/subjects/${subject_id}/ann`, {
         headers: config
       }); // SECURE
     }
@@ -354,6 +364,16 @@ export default {
     }); // SECURE
   },
 
+  // Get account by profileId (to retrieve username for welcome banner)
+  getAccountByProfileId: function (profileId, key) {
+    const config = {
+      'Authorization': key
+    };
+    return axios.get(`/api/account/profile/${profileId}`, {
+      headers: config
+    }); // SECURE
+  },
+
   /// Deals with Assessments
   getAssessments: function (key) {
     const config = {
@@ -362,6 +382,87 @@ export default {
     return axios.get('/api/assessment', {
       headers: config
     });
-  }
+  },
+
+   // TASKS
+  // ---------------------------------------------------------------
+  // Get all 'Task' documents for a specific subject
+  getTasks: function (subject_id, key) {
+    console.log("GET TASKS", subject_id)
+    const config = {
+      'Authorization': key
+    };
+    return axios.get(`/api/subjects/${subject_id}/tasks`, {
+      headers: config
+    }); // SECURE
+  },
+  // Create a 'Task'
+  addTask: function (newT, key) {
+    const config = {
+      'Authorization': key
+    };
+
+    return axios.post(`/api/tasks`, newT, {
+      headers: config
+    }); // SECURE
+  },
+  // Update a 'Task'
+  updateTask: function (newT, key) {
+    const config = {
+      'Authorization': key
+    };
+
+    return axios.put(`/api/tasks/${newT._id}`, newT, {
+      headers: config
+    }); // SECURE
+  },
+  // Delete a 'Task'
+  deleteTask: function (task_id, key) {
+    const config = {
+      'Authorization': key
+    };
+
+    return axios.delete(`/api/tasks/${task_id}`, {
+      headers: config
+    }); // SECURE
+  },
+
+// GRADEBOOK
+// ---------------------------------------------------------------
+// Get gradebook data for a specific subject
+  getGradebook: (subjectId, key, gradeId = null) =>
+    axios.get(`/api/subjects/${subjectId}/gradebook`, {
+      headers: { Authorization: key },
+      params: gradeId ? { gradeId } : {}
+    }),
+
+  saveGradebook: (subjectId, gradebookEntries, key, assignmentNames = []) =>
+    axios.post(`/api/subjects/${subjectId}/gradebook`, 
+      { entries: gradebookEntries, assignmentNames },
+      { headers: { Authorization: key } }
+    ),
+
+// Get gradebook data for a specific subject filtered by grade section
+  getGradebookBySection: (subjectId, level, section, key) =>
+    axios.get(`/api/subjects/${subjectId}/gradebook/section/${level}/${section}`, {
+      headers: { Authorization: key },
+    }),
+
+  getSubject: (subjectId, key) =>
+    axios.get(`/api/subjects/${subjectId}`, {
+      headers: { Authorization: key },
+    }),
+
+     
+  uploadFile: function (formData, key) {
+    const config = {
+      headers: {
+        Authorization: key,
+        "Content-Type": "multipart/form-data",
+      },
+    };
+    return axios.post(`/api/file`, formData, config);
+  },
+
 
 };

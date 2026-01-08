@@ -2,6 +2,8 @@ const gradeDb = require("../models/Grade");
 const subjectDb = require("../models/Subject");
 const announcementDb = require("../models/Announcement");
 const studentDb = require("../models/Student");
+const accountDb = require("../models/Account");
+const taskController = require('./taskController');
 
 const ip = require("ip")
 const API_PORT = process.env.PORT || 3001;
@@ -39,27 +41,51 @@ module.exports = {
         })
     },
     addAnnouncement: function (req, res) {
-        verifyKey(req.header('Authorization'), 'Teacher,Admin')
+        const userKey = req.header('Authorization');
+        verifyKey(userKey, 'Teacher,Admin')
             .then((isVerified) => {
                 if (isVerified) {
-                    const sid = req.params.sid;
-                    announcementDb
-                        .create(req.body)
-                        .then(newA => {
-                            // Add to subject' announcements
-                            const aid = newA._id;
+                    const sid = req.params.subjectId;
+                    
+                    // Get user info to add as author
+                    accountDb.findOne({ _id: userKey })
+                        .populate('profile')
+                        .then((account) => {
+                            if (!account) {
+                                return res.status(403).json({ error: 'User not found' });
+                            }
 
-                            subjectDb
-                                .update({
-                                    _id: sid
-                                }, {
-                                    $push: {
-                                        announcements: aid
-                                    }
+                            // Add author information to the request body
+                            const announcementData = {
+                                ...req.body,
+                                authorId: account._id,
+                                authorRole: account.type,
+                                authorName: account.type === 'Admin' 
+                                    ? `${account.profile.first_name} ${account.profile.last_name}`
+                                    : `${account.profile.first_name} ${account.profile.last_name}`,
+                                subject: sid  // Ensure subject-specific announcements are linked to the subject
+                            };
+
+                            announcementDb
+                                .create(announcementData)
+                                .then(newA => {
+                                    // Add to subject' announcements
+                                    const aid = newA._id;
+
+                                    subjectDb
+                                        .update({
+                                            _id: sid
+                                        }, {
+                                            $push: {
+                                                announcements: aid
+                                            }
+                                        })
+                                        .then(() => {
+                                            res.json(newA);
+                                        })
+                                        .catch(err => res.status(422).json(err));
                                 })
-                                .then(() => {
-                                    res.json(newA);
-                                })
+                                .catch(err => res.status(422).json(err));
                         })
                         .catch(err => res.status(422).json(err));
                 } else {
@@ -69,30 +95,50 @@ module.exports = {
 
     },
     deleteAnnouncement: function (req, res) {
-        verifyKey(req.header('Authorization'), 'Teacher,Admin').then((isVerified) => {
+        const userKey = req.header('Authorization');
+        verifyKey(userKey, 'Teacher,Admin').then((isVerified) => {
             if (isVerified) {
                 const aid = req.params.aid;
-                const sid = req.params.sid
-                subjectDb
-                    .update({
-                        _id: sid
-                    }, {
-                        $pull: {
-                            announcements: aid
-                        }
-                    })
-                    .then(() => {
-                        announcementDb
-                            .findOne({
-                                _id: aid
-                            })
-                            .then(doc => {
+                const sid = req.params.subjectId;
 
-                                doc.remove();
-                                res.json({});
+                // First, get the current user's information
+                accountDb.findOne({ _id: userKey })
+                    .then((currentUser) => {
+                        if (!currentUser) {
+                            return res.status(403).json({ error: 'User not found' });
+                        }
+
+                        // Get the announcement to check ownership
+                        announcementDb.findOne({ _id: aid })
+                            .then((announcement) => {
+                                if (!announcement) {
+                                    return res.status(404).json({ error: 'Announcement not found' });
+                                }
+
+                                // Permission check: Admins can delete any announcement, Teachers can only delete their own
+                                const canDelete = currentUser.type === 'Admin' || 
+                                    (currentUser.type === 'Teacher' && announcement.authorId.toString() === currentUser._id.toString());
+
+                                if (!canDelete) {
+                                    return res.status(403).json({ error: 'You do not have permission to delete this announcement' });
+                                }
+
+                                // Proceed with deletion
+                                subjectDb
+                                    .update({
+                                        _id: sid
+                                    }, {
+                                        $pull: {
+                                            announcements: aid
+                                        }
+                                    })
+                                    .then(() => {
+                                        announcement.remove();
+                                        res.json({});
+                                    })
+                                    .catch(err => res.status(422).json(err));
                             })
                             .catch(err => res.status(422).json(err));
-
                     })
                     .catch(err => res.status(422).json(err));
 
@@ -106,7 +152,7 @@ module.exports = {
         verifyKey(req.header('Authorization'), 'Teacher,Admin')
             .then((isVerified) => {
                 if (isVerified) {
-                    const sid = req.params.sid;
+                    const sid = req.params.subjectId;
                     const fid = req.params.fid;
 
                     subjectDb
@@ -128,7 +174,7 @@ module.exports = {
         verifyKey(req.header('Authorization'), 'Teacher,Admin')
             .then((isVerified) => {
                 if (isVerified) {
-                    const sid = req.params.sid;
+                    const sid = req.params.subjectId;
                     const fid = req.params.fid;
 
                     subjectDb
@@ -147,27 +193,115 @@ module.exports = {
             })
     },
     getSubjects: function (req, res) {
-        verifyKey(req.header('Authorization'), 'Admin')
+        // Allow Admin, Teacher and Student to fetch subjects, but scope Teacher/Student to their grades
+        const key = req.header('Authorization');
+        verifyKey(key, 'Admin,Teacher,Student')
             .then((isVerified) => {
-                if (isVerified) {
-                    subjectDb
-                        .find({})
-                        .populate('announcements')
-                        .then(subjectDoc => res.json(subjectDoc))
+                if (!isVerified) return res.status(403).json(null);
+
+                // Load the account so we can inspect its type/profile
+                accountDb.findOne({ _id: key }).then(account => {
+                    if (!account) return res.status(403).json(null);
+
+                    // Admin: return all subjects
+                    if (account.type === 'Admin') {
+                        subjectDb.find({})
+                            .populate('announcements')
+                            .then(subjectDoc => res.json(subjectDoc))
+                            .catch(err => res.status(422).json(err));
+                        return;
+                    }
+
+                    // For Teacher or Student: find grades that include the teacher/student
+                    const profileId = account.profile;
+                    
+                    // Build query based on new schema structure
+                    const query = account.type === 'Teacher' 
+                        ? { 'subjectTeacherAssignments.teacher': profileId }
+                        : { students: profileId };
+
+                    gradeDb.find(query)
+                        .then(grades => {
+                            // Build a map of subject -> grades for display
+                            // Map structure: { subjectId: [{ level, section, gradeId }, ...] }
+                            const subjectGradesMap = {};
+                            
+                            for (const g of grades) {
+                                if (g.subjectTeacherAssignments && g.subjectTeacherAssignments.length) {
+                                    for (const assignment of g.subjectTeacherAssignments) {
+                                        if (assignment.subject) {
+                                            // For teachers: only include subjects they actually teach
+                                            // For students: include all subjects from their grades
+                                            if (account.type === 'Student' || 
+                                                (account.type === 'Teacher' && String(assignment.teacher) === String(profileId))) {
+                                                const subjectId = String(assignment.subject);
+                                                if (!subjectGradesMap[subjectId]) {
+                                                    subjectGradesMap[subjectId] = [];
+                                                }
+                                                subjectGradesMap[subjectId].push({
+                                                    level: g.level,
+                                                    section: g.section || 'A',
+                                                    gradeId: g._id
+                                                });
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            const subjectIds = Object.keys(subjectGradesMap);
+                            if (!subjectIds.length) return res.json([]);
+
+                            // Fetch subjects and populate announcements
+                            subjectDb.find({ _id: { $in: subjectIds } })
+                                .populate('announcements')
+                                .then(subjectDocs => {
+                                    // For teachers: create separate entries for each subject-grade combination
+                                    // For students: keep subjects as-is with all their grades
+                                    if (account.type === 'Teacher') {
+                                        const expandedSubjects = [];
+                                        for (const subject of subjectDocs) {
+                                            const grades = subjectGradesMap[String(subject._id)];
+                                            for (const gradeInfo of grades) {
+                                                expandedSubjects.push({
+                                                    ...subject.toObject(),
+                                                    // Create a unique composite ID for this subject-grade combination
+                                                    _id: `${subject._id}_${gradeInfo.gradeId}`,
+                                                    // Store the original subject ID for API calls that need it
+                                                    subjectId: subject._id,
+                                                    displayName: `Grade ${gradeInfo.level}${gradeInfo.section} ${subject.name}`,
+                                                    gradeLevel: gradeInfo.level,
+                                                    gradeSection: gradeInfo.section,
+                                                    gradeId: gradeInfo.gradeId
+                                                });
+                                            }
+                                        }
+                                        res.json(expandedSubjects);
+                                    } else {
+                                        // Students: just add grade info array
+                                        const subjectsWithGrades = subjectDocs.map(subject => ({
+                                            ...subject.toObject(),
+                                            grades: subjectGradesMap[String(subject._id)]
+                                        }));
+                                        res.json(subjectsWithGrades);
+                                    }
+                                })
+                                .catch(err => res.status(422).json(err));
+                        })
                         .catch(err => res.status(422).json(err));
 
-                } else {
-                    res.status(403).json(null);
-                }
+                }).catch(err => res.status(422).json(err));
+
             })
     },
     getSubject: function (req, res) {
+        // console.log("getSubject params:", req.params);
         verifyKey(req.header('Authorization'), 'Student,Teacher,Admin')
             .then((isVerified) => {
                 if (isVerified) {
                     subjectDb
                         .findOne({
-                            _id: req.params.sid
+                            _id: req.params.subjectId
                         })
                         .populate({
                             path: 'announcements',
@@ -202,15 +336,108 @@ module.exports = {
                 }
             })
     },
+
     getAnnouncements: function (req, res) {
-        verifyKey(req.header('Authorization'), 'Teacher,Admin')
+        const userKey = req.header('Authorization');
+        verifyKey(userKey, 'Student,Teacher,Admin')
             .then((isVerified) => {
                 if (isVerified) {
-                    announcementDb
-                        .find({ subject: req.params.sid })
-                        .then(subjectAnns => res.json(subjectAnns))
-                        .catch(err => res.status(422).json(err));
+                    const subjectId = req.params.subjectId;
+                    
+                    // Get current user info for enrollment checking
+                    accountDb.findOne({ _id: userKey })
+                        .populate('profile')
+                        .then((currentUser) => {
+                            if (!currentUser) {
+                                return res.status(403).json({ error: 'User not found' });
+                            }
 
+                            // Check if user has access to this subject
+                            if (currentUser.type === 'Student') {
+                                // For students, check if they're enrolled in a grade that includes this subject
+                                gradeDb.findOne({ 
+                                    students: currentUser.profile._id,
+                                    'subjectTeacherAssignments.subject': subjectId 
+                                })
+                                .then((enrollment) => {
+                                    if (!enrollment) {
+                                        // Student not enrolled in this subject
+                                        return res.status(403).json({ error: 'You are not enrolled in this subject' });
+                                    }
+
+                                    // Student is enrolled, get subject announcements filtered by audience
+                                    // Find announcements that are either specifically for this subject OR include this subject in subjects array
+                                    announcementDb
+                                        .find({ 
+                                            $or: [
+                                                { subject: subjectId },
+                                                { subjects: subjectId }
+                                            ]
+                                        })
+                                        .populate('files')
+                                        .then(announcements => {
+                                            // Filter by target audience for students
+                                            const filteredAnnouncements = announcements.filter(announcement => {
+                                                const targetAudience = announcement.targetAudience || 'both';
+                                                return targetAudience === 'both' || targetAudience === 'students';
+                                            });
+                                            const processedAnnouncements = processAnnouncements(filteredAnnouncements);
+                                            res.json(processedAnnouncements);
+                                        })
+                                        .catch(err => res.status(422).json(err));
+                                })
+                                .catch(err => res.status(422).json(err));
+                            } else if (currentUser.type === 'Teacher') {
+                                // For teachers, check if they teach this subject (are in a grade with this subject)
+                                gradeDb.findOne({ 
+                                    'subjectTeacherAssignments.teacher': currentUser.profile._id,
+                                    'subjectTeacherAssignments.subject': subjectId 
+                                })
+                                .then((teaching) => {
+                                    if (!teaching) {
+                                        // Teacher doesn't teach this subject
+                                        return res.status(403).json({ error: 'You do not teach this subject' });
+                                    }
+
+                                    // Teacher teaches this subject, get announcements filtered by audience
+                                    announcementDb
+                                        .find({ 
+                                            $or: [
+                                                { subject: subjectId },
+                                                { subjects: subjectId }
+                                            ]
+                                        })
+                                        .populate('files')
+                                        .then(announcements => {
+                                            // Filter by target audience for teachers
+                                            const filteredAnnouncements = announcements.filter(announcement => {
+                                                const targetAudience = announcement.targetAudience || 'both';
+                                                return targetAudience === 'both' || targetAudience === 'teachers';
+                                            });
+                                            const processedAnnouncements = processAnnouncements(filteredAnnouncements);
+                                            res.json(processedAnnouncements);
+                                        })
+                                        .catch(err => res.status(422).json(err));
+                                })
+                                .catch(err => res.status(422).json(err));
+                            } else {
+                                // Admin can see all subject announcements
+                                announcementDb
+                                    .find({ 
+                                        $or: [
+                                            { subject: subjectId },
+                                            { subjects: subjectId }
+                                        ]
+                                    })
+                                    .populate('files')
+                                    .then(announcements => {
+                                        const processedAnnouncements = processAnnouncements(announcements);
+                                        res.json(processedAnnouncements);
+                                    })
+                                    .catch(err => res.status(422).json(err));
+                            }
+                        })
+                        .catch(err => res.status(422).json(err));
                 } else {
                     res.status(403).json(null);
                 }
@@ -255,7 +482,7 @@ module.exports = {
         verifyKey(req.header('Authorization'), 'Teacher,Admin')
             .then((isVerified) => {
                 if (isVerified) {
-                    const sid = req.params.sid;
+                    const sid = req.params.subjectId;
                     let subjectDoc = req.body;
                     const gradeID = subjectDoc.grade;
                     subjectDoc.grade = null;
@@ -268,18 +495,14 @@ module.exports = {
                             // If the subject is assigned a grade, remove reference to subject from all other grades
                             if (gradeID) {
 
-                                // Find all grades whose field 'students'/'teachers'/'subjects' has an identical _id in newG's corresponding fields and pull that _id the respective field 
+                                // Find all grades that have this subject in subjectTeacherAssignments and remove it
                                 gradeDb.updateMany(
                                     {
-                                        subjects: {
-                                            $elemMatch: {
-                                                $eq: newS._id
-                                            }
-                                        }
+                                        'subjectTeacherAssignments.subject': newS._id
                                     },
                                     {
                                         $pull: {
-                                            subjects: newS._id
+                                            subjectTeacherAssignments: { subject: newS._id }
                                         }
                                     }
 
@@ -315,7 +538,7 @@ module.exports = {
         verifyKey(req.header('Authorization'), 'Admin')
             .then((isVerified) => {
                 if (isVerified) {
-                    const sid = req.params.sid;
+                    const sid = req.params.subjectId;
                     // Delete subject document
                     subjectDb
                         .findOneAndDelete({
@@ -339,6 +562,16 @@ module.exports = {
                             })
                         })
 
+                } else {
+                    res.status(403).json(null);
+                }
+            })
+    },
+    getTasksForSubject: function (req, res) {
+        verifyKey(req.header('Authorization'), 'Teacher,Admin')
+            .then((isVerified) => {
+                if (isVerified) {
+                    taskController.getTasks(req, res);
                 } else {
                     res.status(403).json(null);
                 }

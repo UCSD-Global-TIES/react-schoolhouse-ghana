@@ -27,7 +27,7 @@ const useStyles = makeStyles(theme => ({
     },
     content: {
         width: "90%",
-        maxWidth: "700px",
+        //maxWidth: "700px",
     },
     skeleton: {
         width: "100%",
@@ -224,7 +224,10 @@ function DocumentEditorLink(props) {
             {/* DELETE DOCUMENT(S) DIALOG */}
             <ConfirmDialog
                 open={confirmOpen}
-                handleClose={() => handleConfirm(false)}
+                handleClose={() => {
+                    handleConfirm(false)
+                    setSelected(null)   
+                }}
                 handleAction={handleDelete}>
                 Are you sure you would like to delete all selected {selected.length} {collection.toLowerCase()}(s)?
             </ConfirmDialog>

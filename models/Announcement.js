@@ -6,6 +6,21 @@ const announcementSchema = new Schema({
     type: String,
     required: true
   },
+  authorId: {
+    type: Schema.Types.ObjectId,
+    ref: 'Account',
+    required: true
+  },
+  authorRole: {
+    type: String,
+    enum: ['Admin', 'Teacher'],
+    required: true
+  },
+  targetAudience: {
+    type: String,
+    enum: ['both', 'teachers', 'students'],
+    default: 'both'
+  },
   title: {
     type: String,
     required: true
@@ -26,7 +41,11 @@ const announcementSchema = new Schema({
   subject: {
     type: Schema.Types.ObjectId,
     ref: 'Subject'
-  }
+  },
+  subjects: [{
+    type: Schema.Types.ObjectId,
+    ref: 'Subject'
+  }]
 }, { timestamps: true });
 
 const Announcement = mongoose.model("Announcement", announcementSchema);

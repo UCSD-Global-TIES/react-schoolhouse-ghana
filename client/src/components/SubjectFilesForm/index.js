@@ -21,11 +21,12 @@ const useStyles = makeStyles(theme => ({
         margin: "1rem 0px"
     },
     vc: {
-        maxWidth: "600px",
+        //maxWidth: "600px",
         width: "90%",
         margin: "auto"
     },
 }));
+
 
 // Private field is special use case
 
@@ -100,6 +101,7 @@ function SubjectFilesForm(props) {
     return (
         <div className={classes.root}>
             {/* ALERTS FOR API ACTIONS */}
+            
             <Snackbar
                 anchorOrigin={{ vertical: "top", horizontal: "right" }}
                 open={currentAlert.isOpen}
@@ -113,6 +115,35 @@ function SubjectFilesForm(props) {
             <div className={classes.vc}>
                 <div style={{ marginBottom: "2rem", display: "flex", justifyContent: "flex-end" }}>
                     <Button
+                        variant="outlined"
+                        color="secondary"
+                        component="label"
+                    >
+                        Upload New File
+                        <input
+                            type="file"
+                            hidden
+                            onChange={async (e) => {
+                                const file = e.target.files[0];
+                                if (!file) return;
+                                const formData = new FormData();
+                                formData.append("file", file);
+                                formData.append("uploader", props.user._id);
+
+                                await API.uploadFile(formData, props.user.key);
+                                const result = await API.getFiles(props.user.key);
+                                setFileOptions(result.data);
+
+                                setCurrentAlert({
+                                    isOpen: true,
+                                    severity: "success",
+                                    message: `Uploaded ${file.name}`,
+                                });
+                            }}
+                        />
+                    </Button>
+                    
+                    <Button
                         variant="contained"
                         color="primary"
                         size="large"
@@ -124,6 +155,7 @@ function SubjectFilesForm(props) {
                         </Button>
 
                 </div>
+                
                 <DocumentPicker
                     link={(doc) => doc.path}
                     title={"Attached Files"}

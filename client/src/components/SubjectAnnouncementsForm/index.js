@@ -17,7 +17,7 @@ const useStyles = makeStyles(theme => ({
         margin: "1rem 0px"
     },
     vc: {
-        maxWidth: "500px",
+        //maxWidth: "500px",
         width: "90%",
         margin: "auto"
     },
@@ -135,7 +135,7 @@ function SubjectAnnouncementsForm(props) {
                         />
                     ))}
 
-                <DocumentPicker
+                {/* <DocumentPicker
                     title={"Attached Files"}
                     docs={fileOptions}
                     pageMax={5}
@@ -144,7 +144,7 @@ function SubjectAnnouncementsForm(props) {
                     collection={"Files"}
                     primary={doc => doc.nickname}
                     handleChange={(docs) => handlePickChange('files', docs)}
-                />
+                /> */}
 
             </div>
         </div>

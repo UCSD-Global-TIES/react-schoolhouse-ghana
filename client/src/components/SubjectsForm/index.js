@@ -19,7 +19,7 @@ const useStyles = makeStyles(theme => ({
         margin: "1rem 0px"
     },
     vc: {
-        maxWidth: "500px",
+        //maxWidth: "500px",
         width: "90%",
         margin: "auto"
     },
@@ -157,7 +157,7 @@ function SubjectsForm(props) {
                         // Sort by category tag (sort by increasing grade)
                         options={options.sort((a, b) => a.level - b.level)}
                         // Option text
-                        getOptionLabel={option => option.level ? `Grade ${option.level}` : ""}
+                        getOptionLabel={option => option.level ? `Grade ${option.level}${option.section || 'A'}` : ""}
                         renderInput={params => (
                             <TextField
                                 {...params}
